@@ -24,19 +24,19 @@ matrix:
     #    - rust: nightly
     #  fast_finish: true
     include:
-        - name: "bluepill"
+        - name: "bluepill blink"
           rust: stable
           EG: blink
           env: MCU="stm32f103"  TARGET="thumbv7m-none-eabi" 
 
     include:
-        - name: "bluepill"
+        - name: "bluepill serial_loopback_char"
           rust: stable
           EG: serial_loopback_char
           env: MCU="stm32f103"  TARGET="thumbv7m-none-eabi" 
 
     include:
-        - name: "discovery-stm32l100"
+        - name: "discovery-stm32l100 blink"
           rust: stable
           EG: blink
           env: MCU="stm32l100"  TARGET="thumbv7m-none-eabi" 
