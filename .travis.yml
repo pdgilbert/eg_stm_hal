@@ -15,8 +15,7 @@ branches:
 
 env:
 - MCU=stm32f103
-- MCU=stm32f101
-- MCU=stm32f100
+#- MCU=stm32l100
 
 #specify multiple parallel jobs. matrix could be MCU x EG
 matrix:
@@ -35,16 +34,16 @@ matrix:
           EG: serial_loopback_char
           env: MCU="stm32f103"  TARGET="thumbv7m-none-eabi" 
 
-    include:
-        - name: "discovery-stm32l100 blink"
-          rust: stable
-          EG: blink
-          env: MCU="stm32l100"  TARGET="thumbv7m-none-eabi" 
+#    include:
+#        - name: "discovery-stm32l100 blink"
+#          rust: stable
+#          EG: blink
+#          env: MCU="stm32l100"  TARGET="thumbv7m-none-eabi" 
 
 
 install:
   - rustup target add ${TARGET}
-  - cargo build  --target ${TARGET}  --features=${MCU}
+  - cargo build  --target ${TARGET}
 
 script:
   - echo  target is ${TARGET}  features is ${MCU}  example is ${EG}
