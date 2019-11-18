@@ -2,7 +2,7 @@ sudo: false
 
 language: rust
 
-cache: cargo
+cache: boards/*/target
 
 # trigger on pushes to master branch
 branches:
@@ -15,18 +15,21 @@ rust:
 #  - nightly
 
 env:
-- MCU=stm32f103
-- MCU=stm32l100
+  global:
+    - MCU=stm32f103
+    - MCU=stm32l100
 
-env:
-- EG=blink
-- EG=serial_loopback_char
+xenv:
+  global:
+    - EG=blink
+    - EG=serial_loopback_char
 
 ##matrix:
 #jobs:
-#    #  allow_failures:
-#    #    - rust: nightly
-#    #  fast_finish: true
+#    #allow_failures:
+#    #   - rust: nightly
+#
+#    fast_finish: true
 #    include:
 #        - name: "bluepill blink"
 #          rust: stable
@@ -48,19 +51,21 @@ env:
 before_install:
 
   - if [[ "$MCU" = "stm32f103" ]]; then
-       export TARGET="thumbv7m-none-eabi" ;
+       export TARGET="thumbv7m-none-eabi"  BOARD="bluepill";
    fi
 
   - if [[ "$MCU" = "stm32l100" ]]; then
-       export TARGET="thumbv7m-none-eabi" ;
+       export TARGET="thumbv7m-none-eabi" BOARD="discovery-stm32l100";
    fi
 
   - echo  target is ${TARGET}  features is ${MCU}  example is ${EG}
 
 install:
   - rustup target add ${TARGET}
+  - cd boards/${BOARD} 
   - cargo build  --target ${TARGET}
 
 script:
   - echo  target is ${TARGET}  features is ${MCU}  example is ${EG}
+  - cd boards/${BOARD} 
   - cargo build  --target ${TARGET}  --features ${MCU}  --example ${EG}
