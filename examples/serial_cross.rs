@@ -22,7 +22,7 @@ use cortex_m::{asm, singleton};
 use cortex_m_rt::entry;
 //use core::fmt::Write;
 use cortex_m_semihosting::hprintln;
-use core::str;
+//use core::str;
 //use core::ascii;
 //use nb::block;
 
@@ -98,24 +98,24 @@ fn main() -> ! {
 
     let tx1 = serial1.split().0.with_dma(channels.4);  
 
-    let (tx2, mut rx2) = serial.split();
-    let rx2 = rx2.with_dma(channels.6);
+    let (tx2, mut _rx2) = serial2.split();
     let tx2 = tx2.with_dma(channels.7);    
+    //let rx2 = rx2.with_dma(channels.6);
 
-    let (tx3, rx3) = serial3.split();   
-    let tx3 = tx3.with_dma(channels.2);    
+    let (_tx3, rx3) = serial3.split();   
+    //let tx3 = tx3.with_dma(channels.2);    
     let rx3 = rx3.with_dma(channels.3);
 
     hprintln!("Now try write ...").unwrap(); 
 
     // write with usart2 
-    let (_, tx2) = tx2.write(b" hello from usart2 to usart3").wait();
+    let (_, _tx2) = tx2.write(b" hello from usart2 to usart3").wait();
 
     hprintln!("and read.").unwrap(); 
     // read on usart3
     let buf = singleton!(: [u8; 8] = [0; 8]).unwrap();
     // SEEMS TO STALL HERE. MISSED MESSAGE AND WAITING?
-    let (buf, rx3) = rx3.read(buf).wait();  //buf mutable borrow occurs here
+    let (buf, _rx3) = rx3.read(buf).wait();  //buf mutable borrow occurs here
     let bufs = to_str(buf);                // borrow of `*buf` occurs here
 
     // echo on semihost.

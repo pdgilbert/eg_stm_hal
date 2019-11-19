@@ -8,7 +8,7 @@
 
 use panic_halt as _;
 //use cortex_m::asm;
-use cortex_m::{asm, singleton};
+use cortex_m::singleton;
 use cortex_m_rt::entry;
 //use core::fmt::Write;
 
@@ -60,13 +60,11 @@ fn main() -> ! {
     );
 
     // Split the serial struct into a receiving and a transmitting part
-    let (tx2, mut rx2) = serial.split();
+    let (tx2, rx2) = serial.split();
     let rx2 = rx2.with_dma(channels.6);
     let tx2 = tx2.with_dma(channels.7);    
 
-    //let send = b"The quick brown fox";
     let send = b"The quick ";
-    //writeln!(tx2, "{:?}", send).unwrap();   no method 
     tx2.write(send).wait();
     //let (_, tx2) = tx2.write(b" jumps").wait();
 
@@ -74,17 +72,13 @@ fn main() -> ! {
 
     // Read what was just sent. Blocks until the read is complete
     let buf = singleton!(: [u8; 10] = [0; 10]).unwrap();
-    // let (rcvd, rx2) = rx2.read(buf).wait(); //  runtime problem. stalls waiting
-    // let rcvd = rx2.read().wait();           //  compile problem. Can't print  rcvd
-        //  structure  `stm32f1xx_hal::dma::RxDma<stm32f1xx_hal::serial::Rx<stm32f1::stm32f103::USART2>, stm32f1xx_hal::dma::dma1::C6>`
-    let rcvd = rx2.read(buf);
-    //let rcvd = block!(rx2.read()).unwrap();
+    let (buf, _rx2) = rx2.read(buf).wait();    //  runtime problem. stalls waiting
 
     hprintln!("finished receive. ").unwrap();
-    asm::bkpt();
-    hprintln!("received {:?} ", rcvd).unwrap();
+    //asm::bkpt();
+    hprintln!("received {:?} ", buf).unwrap();
 
-    hprintln!("received {:?}", to_str(rcvd)).unwrap();
+    hprintln!("received {:?}", to_str(buf)).unwrap();
 
     // With tx and rx connected sent should equal received
     //assert_eq!(rcvd, send, "testing rcvd = send,  {} = {}", rcvd, send);
@@ -92,7 +86,8 @@ fn main() -> ! {
     // PUT A TEST HERE THAT WILL SHOW FAILURE. ASSERT SEEMS TO PANIC HALT SO ...
 
     // breakpoint to inspect
-    asm::bkpt();
+    //asm::bkpt();
 
+    hprintln!("entering empty loop.").unwrap();
     loop {}
 }

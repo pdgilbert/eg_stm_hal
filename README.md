@@ -8,6 +8,13 @@ environments. Just the setup may change.)
 ##  Status
 work in progress ...
 
+     HAL       |      Board          | Build Status 
+-------------- |:-------------------:|:----------------
+stm32f1xx-hal  |     bluepill        | [![Build Status](https://travis-ci.org/pdgilbert/eg_stm_hal.svg?branch=master)]
+
+
+
+
 ##  This Package Setup
 I am trying to have a common code base of examples that run on different boards.
 (This may be wishful thinking.) I have still not decided the best way to 

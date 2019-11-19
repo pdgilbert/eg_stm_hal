@@ -1,4 +1,5 @@
-//! Serial interface char-by-char read GPS on usart3 and write on usart1 to USB-TTL to console (minicom) and to semihost 
+//! Serial interface char-by-char read GPS on usart3 and write on usart1 
+//! to USB-TTL connected to console (minicom) and write to semihost 
 //!
 //! THESE ARE BLUE PILL PIN NUMBERS. CONFIRM PIN NUMBERS OF OTHER BOARDS
 //! usart1 connect the Tx pin pa9  to the Rx pin of a serial-usb converter
@@ -77,12 +78,12 @@ fn main() -> ! {
     );
 
     // Split the serial struct into a receiving and a transmitting part
-    let (mut tx1, mut rx1) = serial1.split();
-    let (mut tx3, mut rx3) = serial3.split();
+    let (mut tx1, mut _rx1) = serial1.split();  // console
+    let (mut _tx3, mut rx3) = serial3.split();  // GPS
 
     loop { // Read a byte and write
-      let received = block!(rx1.read()).unwrap();
-      //block!(tx1.write(received)).ok();
+      let received = block!(rx3.read()).unwrap();
+      block!(tx1.write(received)).ok();
       hprintln!("{}", from_utf8(&[received]).unwrap()).unwrap();
     }
 

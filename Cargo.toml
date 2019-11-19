@@ -3,6 +3,9 @@ name = "eg_stm_hal"
 version = "0.1.0"
 authors = ["Paul Gilbert <pdgilbert@users.noreply.github.com>"]
 edition = "2018"
+repository = "https://github.com/pdgilbert/eg_stm_hal"
+#documentation = "https://"
+readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -43,8 +46,8 @@ name = "echo_by_char"
 path = "examples/echo_by_char.rs"
 
 [[example]]
-name = "serial_gps_rw_test"
-path = "examples/serial_gps_rw_test.rs"
+name = "serial_gps_rw"
+path = "examples/serial_gps_rw.rs"
 
 [[example]]
 name = "serial_gps_rw_by_char"

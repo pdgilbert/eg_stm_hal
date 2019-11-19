@@ -32,10 +32,10 @@ matrix:
         #  env: MCU="stm32l100"  TARGET="thumbv7m-none-eabi"  BOARD="discovery-stm32l100"
 
         - name: "discovery-stm32f303"
-          env: MCU="stm32f303"  TARGET="thumbv7em-none-eabihf"  BOARD="discovery-stm332f303"
+          env: MCU="stm32f303"  TARGET="thumbv7em-none-eabihf"  BOARD="discovery-stm32f303"
 
         - name: "nucleo-64"
-          env: MCU="stm332f411"  TARGET="thumbv7em-none-eabihf"  BOARD="nucleo-64"
+          env: MCU="stm32f411"  TARGET="thumbv7em-none-eabihf"  BOARD="nucleo-64"
 
 
         #- name: "heltec-lora-node151"
@@ -52,8 +52,8 @@ script:
   # verify this is already in boards/${BOARD} from install
   - echo  PWD= ${PWD}
   - echo BOARD= ${BOARD} TARGET= ${TARGET}  MCU= ${MCU}
-  - cargo build  --target ${TARGET}  --features ${MCU}  --example  blink
-  - cargo build  --target ${TARGET}  --features ${MCU}  --example  echo_by_char
+  - ./foldAndColour "cargo build  --target ${TARGET}  --features ${MCU} --example blink" "example blink"
+  - ./foldAndColour "cargo build  --target ${TARGET}  --features ${MCU} --example echo_by_char" "echo_by_char"
   - cargo build  --target ${TARGET}  --features ${MCU}  --example  serial_cross
   - cargo build  --target ${TARGET}  --features ${MCU}  --example  serial-dma-tx
   - cargo build  --target ${TARGET}  --features ${MCU}  --example  serial_fmt

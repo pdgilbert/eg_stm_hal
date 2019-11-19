@@ -21,7 +21,7 @@ use cortex_m::{asm, singleton};
 use cortex_m_rt::entry;
 //use core::fmt::Write;
 use cortex_m_semihosting::hprintln;
-use core::str;
+//use core::str;
 //use core::ascii;
 //use nb::block;
 

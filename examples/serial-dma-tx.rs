@@ -7,8 +7,11 @@
 #![no_std]
 
 use panic_halt as _;
-use cortex_m::asm;
+//use cortex_m::asm;
 use cortex_m_rt::entry;
+
+use cortex_m_semihosting::hprintln;
+use heapless::Vec;
 
 //  eg blue pill stm32f103
 #[cfg(feature = "stm32f103")]
@@ -55,19 +58,25 @@ fn main() -> ! {
 
     let tx = serial.split().0.with_dma(channels.4);
     
-    let (_, tx) = tx.write(b"The quick brown fox").wait();
+    let (_, tx) = tx.write(b"The quick brown fox").wait(); // static byte works but not very flexible
 
-    let text = ["The ", "quick ", "brown ", "fox" ];
+    //let text = ["The ", "quick ", "brown ", "fox" ];  t in iter doesn't have a size known at compile-time
     //let text = ("The ", "quick ", "brown ", "fox" );
+    //let txt = ["The ", "quick ", "brown ", "fox" ];
+    let text :Vec<str> = ["The ", "quick ", "brown ", "fox" ];
+    //let text :Vec<&str> = txt.iter().map(AsRef::as_ref).collect();
+
     for t in text.iter() {
+       let (_, tx) = tx.write(t).wait();
        let (_, tx) = tx.write(t.as_bytes()).wait();
-    //                  ^^^^^ doesn't have a size known at compile-time
+       hprintln!("sent {:?}. ", t).unwrap();
     }
 
     let (_, tx) = tx.write(b" jumps").wait();
     tx.write(b" over the lazy dog.").wait();
 
-    asm::bkpt();
+    //asm::bkpt();
 
+    hprintln!("entering empty loop.").unwrap();
     loop {}
 }
