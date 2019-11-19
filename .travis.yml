@@ -17,11 +17,6 @@ rust:
   - stable
 #  - nightly
 
-env:
-  global:
-    - EG=blink
-    - EG=serial_loopback_char
-
 ##jobs:
 matrix:
     #allow_failures:
@@ -30,13 +25,20 @@ matrix:
     fast_finish: true
 
     include:
-        - name: "bluepill maybe blink"
+        - name: "bluepill blink"
           rust: stable
           env: MCU="stm32f103"  TARGET="thumbv7m-none-eabi"  BOARD="bluepill"
+          env: EG=blink
 
-        - name: "discovery-stm32l100 maybe blink"
+        - name: "bluepill serial_loopback_char"
+          rust: stable
+          env: MCU="stm32f103"  TARGET="thumbv7m-none-eabi"  BOARD="bluepill"
+          env: EG=serial_loopback_char
+
+        - name: "discovery-stm32l100 blink"
           rust: stable
           env: MCU="stm32l100"  TARGET="thumbv7m-none-eabi"  BOARD="discovery-stm32l100"
+          env: EG=blink
 
 before_install:
 
@@ -55,7 +57,6 @@ install:
 
 script:
   - echo BOARD= ${BOARD} TARGET= ${TARGET}  MCU= ${MCU}  EG= ${EG}
+  # verify this is already in boards/${BOARD} from install
   - echo  PWD= ${PWD}
-  - ls boards
-  - cd boards/${BOARD} 
   - cargo build  --target ${TARGET}  --features ${MCU}  --example ${EG}
