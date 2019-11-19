@@ -52,8 +52,8 @@ script:
   # verify this is already in boards/${BOARD} from install
   - echo  PWD= ${PWD}
   - echo BOARD= ${BOARD} TARGET= ${TARGET}  MCU= ${MCU}
-  - ./foldAndColour "cargo build  --target ${TARGET}  --features ${MCU} --example blink" "example blink"
-  - ./foldAndColour "cargo build  --target ${TARGET}  --features ${MCU} --example echo_by_char" "echo_by_char"
+  - ../../foldAndColour "cargo build  --target ${TARGET}  --features ${MCU} --example blink"        "example blink"
+  - ../../foldAndColour "cargo build  --target ${TARGET}  --features ${MCU} --example echo_by_char" "echo_by_char"
   - cargo build  --target ${TARGET}  --features ${MCU}  --example  serial_cross
   - cargo build  --target ${TARGET}  --features ${MCU}  --example  serial-dma-tx
   - cargo build  --target ${TARGET}  --features ${MCU}  --example  serial_fmt

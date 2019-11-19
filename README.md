@@ -8,11 +8,13 @@ environments. Just the setup may change.)
 ##  Status
 work in progress ...
 
-     HAL       |      Board          | Build Status 
--------------- |:-------------------:|:----------------
-stm32f1xx-hal  |     bluepill        | [![Build Status](https://travis-ci.org/pdgilbert/eg_stm_hal.svg?branch=master)]
+The Tracis CI is at (https://travis-ci.org/pdgilbert/eg_stm_hal)
 
+|      HAL       |      Board          | Build Status     |
+| -------------- |:-------------------:|:---------------- |
+| stm32f1xx-hal  |     bluepill        | [![Build Status](https://travis-ci.org/pdgilbert/eg_stm_hal.svg?branch=master)](https://travis-ci.org/pdgilbert/eg_stm_hal) |
 
+| stm32f3xx-hal  | STM32F303 Discovery | [![Build Status](https://travis-ci.org/pdgilbert/eg_stm_hal.svg?branch=master)](https://travis-ci.org/pdgilbert/eg_stm_hal) |
 
 
 ##  This Package Setup

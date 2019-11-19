@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# $1 is command and $2 is name are strings ;
+#command is the cammand to execute
+# name is the name of the fold
+
+usage='Usage:\n  foldAndColour  cmd  name\n eg   ./foldAndColour "echo this should be green | grep green"  "fold test 1" '
+
+case $# in
+    0)echo "${usage}"; exit 1 ;;
+    1)echo "${usage}"; exit 1 ;;
+    2) ;;
+    *) echo "${usage}"; exit 1 ;;
+  esac
+
+##- RED='\033[0;31m'
+#- RED='\033[1;91m'
+#- GRN='\033[0;32m'
+#- NC='\033[0m' # No Color
+
+echo $1 ; travis_fold:start:$2 
+eval $1 ; RC=$? 
+
+COL="\033[0;32m" && test  $RC != 0  && COL="\033[1;91m" 
+travis_fold:end:$2 
+echo -e ${COL}The command  \"$1\" exited with $RC.\\033[0m 
+exit ${RC} 
