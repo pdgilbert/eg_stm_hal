@@ -29,12 +29,12 @@ jobs:
     include:
         - name: "bluepill maybe blink"
           rust: stable
-          env: MCU="stm32f103"  TARGET="thumbv7m-none-eabi" BOARD="bluepill"
+          env: MCU="stm32f103"  TARGET="thumbv7m-none-eabi"  BOARD="bluepill"
 
     include:
         - name: "discovery-stm32l100 maybe blink"
           rust: stable
-          env: MCU="stm32l100"  TARGET="thumbv7m-none-eabi" BOARD="discovery-stm32l100"
+          env: MCU="stm32l100"  TARGET="thumbv7m-none-eabi"  BOARD="discovery-stm32l100"
 
 before_install:
 
@@ -47,6 +47,7 @@ before_install:
 
 install:
   - rustup target add ${TARGET}
+  - echo  PWD= ${PWD}
   - cd boards/${BOARD} 
   - cargo build  --target ${TARGET}
 
