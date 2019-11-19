@@ -85,10 +85,10 @@ git = "https://github.com/stm32-rs/stm32f4xx-hal"
 version = "0.6.0"
 features = ["stm32f411", "rt"]
 
-#[dependencies.stm32l1xx-hal]
-#git = "https://github.com/stm32-rs/stm32l1xx-hal"
-#version = "0.0.1"
-#features = ["stm32l100", "stm32l151", "rt"]
+[dependencies.stm32l1xx-hal]
+git = "https://github.com/stm32-rs/stm32l1xx-hal"
+version = "0.0.1"
+features = ["stm32l100", "stm32l151", "rt"]
 
 [dependencies.void]
 default-features = false
