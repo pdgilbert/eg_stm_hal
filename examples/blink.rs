@@ -5,7 +5,7 @@
 #![no_std]
 #![no_main]
 
-# FIX HERE TO CONFIGURE panic DIFFERENTLY FOR RELEASE
+// FIX HERE TO CONFIGURE panic DIFFERENTLY FOR RELEASE
 extern crate panic_halt; // you can put a breakpoint on `rust_begin_unwind` to catch panics
 // extern crate panic_abort; // requires nightly
 // extern crate panic_itm; // logs messages over ITM; requires ITM support

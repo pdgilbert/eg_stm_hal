@@ -2,7 +2,7 @@ sudo: false
 
 language: rust
 
-cache: boards/*/target
+cache: cargo
 
 # trigger on pushes to master branch
 branches:
@@ -25,20 +25,20 @@ matrix:
     fast_finish: true
 
     include:
-        - name: "bluepill blink"
-          rust: stable
-          env: BOARD="bluepill"            EG=blink
+        - name: "bluepill                      blink"
+          env: BOARD="bluepill"             EG=blink
 
-        - name: "bluepill serial_loopback_char"
-          rust: stable
-          env: BOARD="bluepill"            EG=serial_loopback_char
+        - name: "bluepill                      serial_loopback_char"
+         env: BOARD="bluepill"              EG=serial_loopback_char
 
-        - name: "discovery-stm32l100 blink"
-          rust: stable
+        - name: "discovery-stm32l100           blink"
           env: BOARD="discovery-stm32l100"  EG=blink
 
-before_install:
+        - name: "discovery-stm32l100           serial_loopback_char"
+          env: BOARD="discovery-stm32l100"  EG=serial_loopback_char
 
+before_install:
+  - export TRAVIS_BUILD_DIR=boards/${BOARD}
   - if [[ "$BOARD" = "bluepill" ]]; then
        export MCU="stm32f103" TARGET="thumbv7m-none-eabi" ;
     fi
@@ -47,13 +47,15 @@ before_install:
        export MCU="stm32l100" TARGET="thumbv7m-none-eabi" ;
     fi
 
-  - echo  BOARD= ${BOARD} target= ${TARGET}  features= ${MCU}
-  - echo  example= ${EG}
+  - echo  BOARD= ${BOARD} TARGET= ${TARGET}  MCU= ${MCU}
+  - echo  EG= ${EG}
+  - echo  TRAVIS_BUILD_DIR= ${TRAVIS_BUILD_DIR}
 
 install:
   - rustup target add ${TARGET}
   - echo  PWD= ${PWD}
-  - cd boards/${BOARD} 
+  - echo  TRAVIS_BUILD_DIR= ${TRAVIS_BUILD_DIR}
+  - cd  ${TRAVIS_BUILD_DIR}
   - cargo build  --target ${TARGET}
 
 script:
