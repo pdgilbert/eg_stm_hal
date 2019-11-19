@@ -27,24 +27,25 @@ matrix:
     include:
         - name: "bluepill blink"
           rust: stable
-          env: MCU="stm32f103"  TARGET="thumbv7m-none-eabi"  BOARD="bluepill"
-          env: EG=blink
+          env: BOARD="bluepill"            EG=blink
 
         - name: "bluepill serial_loopback_char"
           rust: stable
-          env: MCU="stm32f103"  TARGET="thumbv7m-none-eabi"  BOARD="bluepill"
-          env: EG=serial_loopback_char
+          env: BOARD="bluepill"            EG=serial_loopback_char
 
         - name: "discovery-stm32l100 blink"
           rust: stable
-          env: MCU="stm32l100"  TARGET="thumbv7m-none-eabi"  BOARD="discovery-stm32l100"
-          env: EG=blink
+          env: BOARD="discovery-stm32l100"  EG=blink
 
 before_install:
 
-  #- if [[ "$MCU" = "stm32f103" ]]; then
-  #     export TARGET="thumbv7m-none-eabi"  BOARD="bluepill";
-  # fi
+  - if [[ "$BOARD" = "bluepill" ]]; then
+       export MCU="stm32f103" TARGET="thumbv7m-none-eabi" ;
+    fi
+
+  - if [[ "$BOARD" = "discovery-stm32l100" ]]; then
+       export MCU="stm32l100" TARGET="thumbv7m-none-eabi" ;
+    fi
 
   - echo  BOARD= ${BOARD} target= ${TARGET}  features= ${MCU}
   - echo  example= ${EG}
