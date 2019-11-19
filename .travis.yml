@@ -9,7 +9,10 @@ branches:
   only:
    - master
 
-#specify multiple parallel jobs. matrix expands rust x BOARD x EG
+#Specify multiple parallel jobs. 
+#This could be done by a matrix expands rust x BOARD x EG, but
+#I cannot figure out how to do a matrix expand with two env variables.
+
 rust:
   - stable
 #  - nightly
@@ -19,8 +22,8 @@ env:
     - EG=blink
     - EG=serial_loopback_char
 
-##matrix:
-jobs:
+##jobs:
+matrix:
     #allow_failures:
     #   - rust: nightly
 
@@ -31,7 +34,6 @@ jobs:
           rust: stable
           env: MCU="stm32f103"  TARGET="thumbv7m-none-eabi"  BOARD="bluepill"
 
-    include:
         - name: "discovery-stm32l100 maybe blink"
           rust: stable
           env: MCU="stm32l100"  TARGET="thumbv7m-none-eabi"  BOARD="discovery-stm32l100"
@@ -53,5 +55,7 @@ install:
 
 script:
   - echo BOARD= ${BOARD} TARGET= ${TARGET}  MCU= ${MCU}  EG= ${EG}
+  - echo  PWD= ${PWD}
+  - ls boards
   - cd boards/${BOARD} 
   - cargo build  --target ${TARGET}  --features ${MCU}  --example ${EG}
