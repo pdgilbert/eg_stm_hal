@@ -28,8 +28,18 @@ matrix:
         - name: "bluepill"
           env: MCU="stm32f103"  TARGET="thumbv7m-none-eabi"  BOARD="bluepill"
 
-        - name: "discovery-stm32l100"
-          env: MCU="stm32l100"  TARGET="thumbv7m-none-eabi"  BOARD="discovery-stm32l100"
+        #- name: "discovery-stm32l100"
+        #  env: MCU="stm32l100"  TARGET="thumbv7m-none-eabi"  BOARD="discovery-stm32l100"
+
+        - name: "discovery-stm32f303"
+          env: MCU="stm32f303"  TARGET="thumbv7em-none-eabihf"  BOARD="discovery-stm332f303"
+
+        - name: "nucleo-64"
+          env: MCU="stm332f411"  TARGET="thumbv7em-none-eabihf"  BOARD="nucleo-64"
+
+
+        #- name: "heltec-lora-node151"
+        #  env: MCU="stm32l151"  TARGET="thumbv7m-none-eabi"  BOARD="heltec-lora-node151"
 
 before_install:
   - rustup target add ${TARGET}
