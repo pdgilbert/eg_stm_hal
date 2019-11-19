@@ -9,56 +9,41 @@ branches:
   only:
    - master
 
-#specify multiple parallel jobs. matrix expands rust x MCU x EG
+#specify multiple parallel jobs. matrix expands rust x BOARD x EG
 rust:
   - stable
 #  - nightly
 
 env:
   global:
-    - MCU=stm32f103
-    - MCU=stm32l100
-
-xenv:
-  global:
     - EG=blink
     - EG=serial_loopback_char
 
 ##matrix:
-#jobs:
-#    #allow_failures:
-#    #   - rust: nightly
-#
-#    fast_finish: true
-#    include:
-#        - name: "bluepill blink"
-#          rust: stable
-#          EG: blink
-#          env: MCU="stm32f103"  TARGET="thumbv7m-none-eabi" 
-#
-#    include:
-#        - name: "bluepill serial_loopback_char"
-#          rust: stable
-#          EG: serial_loopback_char
-#          env: MCU="stm32f103"  TARGET="thumbv7m-none-eabi" 
-#
-#    include:
-#        - name: "discovery-stm32l100 blink"
-#          rust: stable
-#          EG: blink
-#          env: MCU="stm32l100"  TARGET="thumbv7m-none-eabi" 
+jobs:
+    #allow_failures:
+    #   - rust: nightly
+
+    fast_finish: true
+
+    include:
+        - name: "bluepill maybe blink"
+          rust: stable
+          env: MCU="stm32f103"  TARGET="thumbv7m-none-eabi" BOARD="bluepill"
+
+    include:
+        - name: "discovery-stm32l100 maybe blink"
+          rust: stable
+          env: MCU="stm32l100"  TARGET="thumbv7m-none-eabi" BOARD="discovery-stm32l100"
 
 before_install:
 
-  - if [[ "$MCU" = "stm32f103" ]]; then
-       export TARGET="thumbv7m-none-eabi"  BOARD="bluepill";
-   fi
+  #- if [[ "$MCU" = "stm32f103" ]]; then
+  #     export TARGET="thumbv7m-none-eabi"  BOARD="bluepill";
+  # fi
 
-  - if [[ "$MCU" = "stm32l100" ]]; then
-       export TARGET="thumbv7m-none-eabi" BOARD="discovery-stm32l100";
-   fi
-
-  - echo  target is ${TARGET}  features is ${MCU}  example is ${EG}
+  - echo  BOARD= ${BOARD} target= ${TARGET}  features= ${MCU}
+  - echo  example= ${EG}
 
 install:
   - rustup target add ${TARGET}
@@ -66,6 +51,6 @@ install:
   - cargo build  --target ${TARGET}
 
 script:
-  - echo  target is ${TARGET}  features is ${MCU}  example is ${EG}
+  - echo BOARD= ${BOARD} TARGET= ${TARGET}  MCU= ${MCU}  EG= ${EG}
   - cd boards/${BOARD} 
   - cargo build  --target ${TARGET}  --features ${MCU}  --example ${EG}
