@@ -46,6 +46,7 @@ before_install:
 
 install:
   - cd  boards/${BOARD}
+  - cargo update
   - cargo build  --target ${TARGET}  --features ${MCU}
 
 script:
