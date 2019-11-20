@@ -29,7 +29,7 @@ matrix:
           env: MCU="stm32f103"  TARGET="thumbv7m-none-eabi"  BOARD="bluepill"
 
         - name: "none-stm32f100"
-          env: MCU="stm32f100"  TARGET="thumbv7m-none-eabi"  BOARD="none"
+          env: MCU="stm32f100"  TARGET="thumbv7m-none-eabi"  BOARD="none-stm32f100"
 
         #- name: "discovery-stm32l100"
         #  env: MCU="stm32l100"  TARGET="thumbv7m-none-eabi"  BOARD="discovery-stm32l100"

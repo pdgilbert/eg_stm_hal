@@ -1,15 +1,15 @@
 # Examples Using embedded Rust HAL [![Build Status](https://travis-ci.org/pdgilbert/eg_stm_hal.svg?branch=master)](https://travis-ci.org/pdgilbert/eg_stm_hal)
 
 This project's overall Travis CI build status is above.
-[Status for individual boards](https://travis-ci.org/pdgilbert/eg_stm_hal)
-described below can be seen at Travis CI.
+[Status for individual boards described below can be 
+seen at Travis CI.](https://travis-ci.org/pdgilbert/eg_stm_hal)
 
 ## Preamble
 These are newbie notes. I really am a newbie to embedded programming and to Rust. 
-This is an attempt to organize some of my notes taken while trying to figure things out.
+This is an attempt to organize some notes made while trying to figure things out.
 I have put them here in the hope they will be useful to others. More importantly for me,
 I am also trying to keep track of what works and what does not, in a way that can be
-kept up to date relatively easily. I have found a lot of confusing out-of-ate information
+kept up to date relatively easily. I have found a lot of confusing out-of-date information
 on the web, so my hope is that the CI links here will warn readers when this project 
 becomes old and broken.
 
@@ -25,7 +25,7 @@ So, this is not yet easy territory for faint of heart newbies, or anyone on a st
 For me, having spent many years dealing with cross platform desktop problems, 
 HAL just makes a lot of sense.
 
-After awhile things that were a real time consuming stumbling block become so obvious that
+After awhile things that were a time consuming stumbling block become so obvious that
 it no longer seems necessary to mention them. That is why it is so hard to write beginner
 documention, not to mention programmers' general reluctance to document anything.
 Please enter an issue if you think there is something that really needs to be clarified or added.
@@ -36,12 +36,14 @@ environments. Just the setup may change.)
 
 ##  Contents
 - [Status Summary](#status-summary)
-- [Links](#Links)
 - [This Package Setup](#this-package-setup)
 - [Notes on the Examples](#notes-on-the-examples)
+- [Hardware Notes](#hardware-notes)
+- [Misc Notes on STlink and OpenOCD](#misc-notes-on-stlink-and-openocd)
+- [Misc Install Notes](#misc-install-notes)
+- [Links](#Links)
 - [License](#License)
 - [Contribution](#Contribution)
-- [](## )
 - [](## )
 - [](## )
 
@@ -66,19 +68,17 @@ using [issues](https://github.com/pdgilbert/eg_stm_hal/issues) on the git projec
 | stm32l1xx-hal  | stm32l100 | discovery-stm32l100 |    no      |   no   | Hal does not build.                       |
 | stm32l1xx-hal  | stm32l151 | heltec-lora-node151 |    no      |   no   | Hal does not build.                       |
 
-This projects examples depend on these HALs
+
+This projects examples depend on these HALs. 
+See [HALs on Github](https://github.com/stm32-rs) and on [Travis CI.](https://travis-ci.org/stm32-rs)
 
 |   HAL git                         |       HAL Travis CI  Status           | 
 |:---------------------------------:|:-------------------------------------:|
-| [stm32f1xx-hal](https://github.com/stm32-rs/stm32f1xx-hal) | [![Build Status](https://travis-ci.org/stm32-rs/stm32f1xx-hal.svg?branch=master)](https://travis-ci.org/stm32-rs/stm32f1xx-hal) |
-| [stm32f3xx-hal](https://github.com/stm32-rs/stm32f3xx-hal) | [![Build Status](https://travis-ci.org/stm32-rs/stm32f3xx-hal.svg?branch=master)](https://travis-ci.org/stm32-rs/stm32f3xx-hal) |
-| [stm32f4xx-hal](https://github.com/stm32-rs/stm32f4xx-hal) | [![Build Status](https://travis-ci.org/stm32-rs/stm32f4xx-hal.svg?branch=master)](https://travis-ci.org/stm32-rs/stm32f4xx-hal) |
-| [stm32l1xx-hal](https://github.com/stm32-rs/stm32l1xx-hal) | [![Build Status](https://travis-ci.org/stm32-rs/stm32l1xx-hal.svg?branch=master)](https://travis-ci.org/stm32-rs/stm32l1xx-hal) |
+| [stm32f1xx-hal](https://github.com/stm32-rs/stm32f1xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32f1xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32f1xx-hal) |
+| [stm32f3xx-hal](https://github.com/stm32-rs/stm32f3xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32f3xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32f3xx-hal) |
+| [stm32f4xx-hal](https://github.com/stm32-rs/stm32f4xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32f4xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32f4xx-hal) |
+| [stm32l1xx-hal](https://github.com/stm32-rs/stm32l1xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32l1xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32l1xx-hal) |
 
-##  Links
-
-- [HALs on Github](https://github.com/stm32-rs) and on [Travis CI.](https://travis-ci.org/stm32-rs)
-- The CI for several rust embedded projects is [here.](https://travis-ci.org/rust-embedded)
 
 ##  This Package Setup
 
@@ -93,9 +93,10 @@ You can get this package from Github with
 git clone https://github.com/pdgilbert/eg_stm_hal.git
 ```
 This package is mostly examples in directory examples/, but the
-build fails unless there are targets so there needs to be something in src/. That can be
-defaults main.rs or lib.rs, or can be something else but then needs to be specified in 
-Cargo.toml. 
+build fails unless there are targets so there needs to be something in src/. 
+That could be main.rs or lib.rs, which are defaults, or could be something else but then then
+that needs to be specified in Cargo.toml. 
+This package has a src/lib.rs file with a small utility function used in several examples.
 
 It is unlikely that you would ever want to call functions in this package from another package,
 so I do not expect to ever set it up as a crate for importing.
@@ -103,11 +104,14 @@ so I do not expect to ever set it up as a crate for importing.
 
 ##  Notes on the Examples
 
+This examples are derived after working through many other examples, in particular the exaples
+in [stm32f1xx-hal.](https://github.com/stm32-rs/stm32f1xx-hal)
+
 There is more detail about these examples in comments in the source files, 
 but here is a brief summary
 
 | xxx                     | notes |   Description CHECK THESE AGAIN                                |
-| ----------------------- |:-----:|:---------------------------------------------------------------|
+| ----------------------- |:-----:|:-------------------------------------------------------------- |
 | blink                   |   1   | Blinks off-board LEDs                                          |
 | serial_loopback_char    |       | Single character loopback + semihost output                    |
 | serial_fmt              |       | Formatted string write to console on usart1                             |
@@ -131,19 +135,19 @@ but here is a brief summary
 
 This is the status of examples as of November 2019:
 
-|  xxx                   |   blue|pill   |    
-|                        | build |  run  | 
-| ---------------------- |:-----:|:-----:|
-|blink                   | yes   | works | 
-|serial_loopback_char    | yes   | works | 
-|serial_fmt              | yes   | works | 
-|serial_dma_tx           | no    |       |
-|serial_pass_thru_string | yes   | works | 
-|serial_loopback_string  | yes   |       |
-|echo_by_char            | yes   | works | 
-|serial_gps_rw           | yes   |       |
-|serial_gps_rw_by_char   | yes   |       |
-|serial_cross            | yes   |       |           
+|  xxx                    |  blue | pill  |    
+|                         | build |  run  | 
+| ----------------------- |:-----:|:-----:|
+| blink                   | yes   | works | 
+| serial_loopback_char    | yes   | works | 
+| serial_fmt              | yes   | works | 
+| serial_dma_tx           | no    |       |
+| serial_pass_thru_string | yes   | works | 
+| serial_loopback_string  | yes   |       |
+| echo_by_char            | yes   | works | 
+| serial_gps_rw           | yes   |       |
+| serial_gps_rw_by_char   | yes   |       |
+| serial_cross            | yes   |       |           
 
 
 To build the examples use
@@ -181,6 +185,20 @@ and in the other window do
 cargo  run --target $TARGET --features $MCU --example xxx
 ```
 
+## Hardware Notes
+
+I you have not yet bought a development board and are just looking to start then consider 
+a 'blue pill' with a cheap STlink dongle. It is not only the cheapest by far (I think I got
+5 for $10 with a dongle) but it also seems to be the best supported by HAL at the moment (Nov 2019). 
+No doubt the support is because all the developers have a few lying around.
+You could well want a more expensive development board when you get further along.
+
+With the 'blue pill' beware that it
+should have 1.5K pull up resistor on D+ (R10 on board). Ones I purchased do,
+but some versions are shipped with 10K or 4.7K. Some PCs will tolerate this.
+Also, the 3.3v regulator is very small (300mA) and feeds the input voltage through when it fails! Don't exceed 100mA.
+
+FILL IN LAYOUT
 
 ## Misc Notes on STlink and OpenOCD
 
@@ -248,8 +266,8 @@ These are described in detail in other places see, for example
 - https://github.com/rust-lang/rustup.rs  
 
 
-It is recommended to use the rust/cargo install directly from rust-lang.org rather than 
-using apt-get, which  requires root, does not have rustup, and is not the most recent.
+It is recommended to use the rust/cargo install directly from https://rust-lang.org rather than 
+using apt-get, since apt-get requires root, does not have rustup, and is not the most recent.
 I did something like
 ```
  sudo apt install gdb-multiarch  qemu-system-arm    # QEMU is emulator
@@ -260,17 +278,44 @@ I did something like
  cargo install itm                     #updates in ~/.cargo/bin
  [rustup component add llvm-tools-preview # not sure ]
 
- rustc --version
+ rustc  --version
  rustup --version 
  rustup update
 
- rustup target list #To see a list of available targets
- rustup show  #show toolchain info. (Directories can have override of default.)
- rustup target add thumbv6m-none-eabi  #Cortex-M0, M0+, and M1 (ARMv6-M architecture)
- rustup target add thumbv7m-none-eabi  #Cortex-M3 (ARMv7-M architecture)
- rustup target add thumbv7em-none-eabi #Cortex-M4 and M7 without hardware floating point
- rustup target add thumbv7em-none-eabihf #Cortex-M4F and M7F with hardware floating point
+ rustup target list    # To see a list of available targets
+ rustup show           # Show toolchain info. (Directories can have override of default.)
+ rustup target add thumbv6m-none-eabi    # Cortex-M0, M0+, and M1 (ARMv6-M architecture)
+ rustup target add thumbv7m-none-eabi    # Cortex-M3 (ARMv7-M architecture)
+ rustup target add thumbv7em-none-eabi   # Cortex-M4 and M7 without hardware floating point
+ rustup target add thumbv7em-none-eabihf # Cortex-M4F and M7F with hardware floating point
 ```
+
+To use cargo run to also build and start gdb, in .cargo/config uncomment
+```
+  runner = "gdb-multiarch -q -x openocd.gdb"
+```
+
+##  Links
+
+TO BE ORGANIZED SOMETIME
+- The Rust Programming Language  https://docs.rust-lang.org/book/title-page
+- The Embedded Rust Book   https://docs.rust-embedded.org/book/intro/index.html
+- Survey of rust embedded documentation https://docs.rust-embedded.org/
+
+- [HALs on Github](https://github.com/stm32-rs) and on [Travis CI.](https://travis-ci.org/stm32-rs)
+- The CI for several rust embedded projects is [here.](https://travis-ci.org/rust-embedded)
+
+- rust-embedded quickstart example  https://rust-embedded.github.io/book/start/qemu.html
+
+- https://www.rust-lang.org/learn/get-started
+- https://rust-embedded.github.io/book/
+- https://crates.io/
+- https://doc.rust-lang.org/cargo/index.html
+- https://doc.rust-lang.org/cargo/guide/
+- https://doc.rust-lang.org/book/ch11-00-testing.html
+- https://github.com/japaric/rust-cross
+- http://blog.japaric.io/brave-new-io/
+
 
 ## License
 
