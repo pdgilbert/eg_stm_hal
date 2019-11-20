@@ -28,6 +28,9 @@ matrix:
         - name: "bluepill"
           env: MCU="stm32f103"  TARGET="thumbv7m-none-eabi"  BOARD="bluepill"
 
+        - name: "none-stm32f100"
+          env: MCU="stm32f100"  TARGET="thumbv7m-none-eabi"  BOARD="none"
+
         #- name: "discovery-stm32l100"
         #  env: MCU="stm32l100"  TARGET="thumbv7m-none-eabi"  BOARD="discovery-stm32l100"
 
@@ -56,7 +59,7 @@ script:
   - cargo build  --target ${TARGET}  --features ${MCU}  --example blink
   - cargo build  --target ${TARGET}  --features ${MCU}  --example echo_by_char
   - cargo build  --target ${TARGET}  --features ${MCU}  --example  serial_cross
-  # - cargo build  --target ${TARGET}  --features ${MCU}  --example  serial-dma-tx
+  # - cargo build  --target ${TARGET}  --features ${MCU}  --example  serial_dma_tx
   - cargo build  --target ${TARGET}  --features ${MCU}  --example  serial_fmt
   - cargo build  --target ${TARGET}  --features ${MCU}  --example  serial_gps_rw_by_char
   - cargo build  --target ${TARGET}  --features ${MCU}  --example  serial_gps_rw

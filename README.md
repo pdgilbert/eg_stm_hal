@@ -1,5 +1,34 @@
-# eg_stm_hal
-Newbie notes - examples using embedded Rust HAL
+# Examples Using embedded Rust HAL [![Build Status](https://travis-ci.org/pdgilbert/eg_stm_hal.svg?branch=master)](https://travis-ci.org/pdgilbert/eg_stm_hal)
+
+This project's overall Travis CI build status is above.
+[Status for individual boards](https://travis-ci.org/pdgilbert/eg_stm_hal)
+described below can be seen at Travis CI.
+
+## Preamble
+These are newbie notes. I really am a newbie to embedded programming and to Rust. 
+This is an attempt to organize some of my notes taken while trying to figure things out.
+I have put them here in the hope they will be useful to others. More importantly for me,
+I am also trying to keep track of what works and what does not, in a way that can be
+kept up to date relatively easily. I have found a lot of confusing out-of-ate information
+on the web, so my hope is that the CI links here will warn readers when this project 
+becomes old and broken.
+
+Rust seems to have many attractive features compared to more mature languages.
+It has a modern packaging system which encourages documentation and testing.
+The language elements are designed so the compiler can catch many errors,
+which is frustrating while learning the language but will be a substantial time saving
+compared to run time debugging. The downside is that Rust is newer than many alternatives,
+embedded Rust is even newer, and the hardware abstraction library (HAL) project is in 
+active development.
+
+So, this is not yet easy territory for faint of heart newbies, or anyone on a strict timeline.
+For me, having spent many years dealing with cross platform desktop problems, 
+HAL just makes a lot of sense.
+
+After awhile things that were a real time consuming stumbling block become so obvious that
+it no longer seems necessary to mention them. That is why it is so hard to write beginner
+documention, not to mention programmers' general reluctance to document anything.
+Please enter an issue if you think there is something that really needs to be clarified or added.
 
 (My development environment is Linux, so these notes are specific to that 
 in many places. However, the examples should work in other development 
@@ -20,19 +49,24 @@ environments. Just the setup may change.)
 ##  Status Summary
  (November 19, 2019) work in progress ...
 
-The overall Travis CI build status is [![Build Status](https://travis-ci.org/pdgilbert/eg_stm_hal.svg?branch=master)](https://travis-ci.org/pdgilbert/eg_stm_hal)
-Status for [individual boards can be seen at Travis CI.](https://travis-ci.org/pdgilbert/eg_stm_hal)
-Testing if the code runs and does something resembling what it is supposed to do requires hardware and
-is not as automatic as CI. This is my summary as of November 2019.
+The overall Travis CI build status and the link for individual boards is given above.
+Testing if the code runs and does something resembling what it is supposed to do 
+requires hardware and is not as automatic as CI. 
+This is my summary as of November 2019. Boards indicates as in 'none-' mean that I do not
+have hardware to check this MCU. If you check the examples using one of these MCUs 
+then please provide details 
+using [issues](https://github.com/pdgilbert/eg_stm_hal/issues) on the git project page.
 
 |      HAL       |    MCU    |      Board          |   Builds   |  Runs  |          Notes                            |
 | -------------- |:---------:|:-------------------:|:----------:|:------:| :---------------------------------------- |
 | stm32f1xx-hal  | stm32f103 |      bluepill       |   mostly   |  some  | Problems using serial.                    |
+| stm32f1xx-hal  | stm32f100 |   none-stm32f100    |   mostly   |   NA   |                                           |
 | stm32f3xx-hal  | stm32f303 | discovery-stm32f303 |    no      |   no   | Hal differences. no `pac` in the root, ...|
 | stm32f4xx-hal  | stm32f411 |      nucleo-64      |    no      |   no   | Hal differences. no `pac` in the root, ...|
 | stm32l1xx-hal  | stm32l100 | discovery-stm32l100 |    no      |   no   | Hal does not build.                       |
 | stm32l1xx-hal  | stm32l151 | heltec-lora-node151 |    no      |   no   | Hal does not build.                       |
 
+This projects examples depend on these HALs
 
 |   HAL git                         |       HAL Travis CI  Status           | 
 |:---------------------------------:|:-------------------------------------:|
@@ -42,10 +76,12 @@ is not as automatic as CI. This is my summary as of November 2019.
 | [stm32l1xx-hal](https://github.com/stm32-rs/stm32l1xx-hal) | [![Build Status](https://travis-ci.org/stm32-rs/stm32l1xx-hal.svg?branch=master)](https://travis-ci.org/stm32-rs/stm32l1xx-hal) |
 
 ##  Links
+
 - [HALs on Github](https://github.com/stm32-rs) and on [Travis CI.](https://travis-ci.org/stm32-rs)
 - The CI for several rust embedded projects is [here.](https://travis-ci.org/rust-embedded)
 
 ##  This Package Setup
+
 I am trying to have a common code base of examples that run on different boards.
 (This may be wishful thinking.) I have still not decided the best way to 
 organize this for Cargo. Workspaces do not seem to be intended for this.
@@ -56,60 +92,44 @@ You can get this package from Github with
 ```
 git clone https://github.com/pdgilbert/eg_stm_hal.git
 ```
-
 This package is mostly examples in directory examples/, but the
 build fails unless there are targets so there needs to be something in src/. That can be
 defaults main.rs or lib.rs, or can be something else but then needs to be specified in 
 Cargo.toml. 
 
+It is unlikely that you would ever want to call functions in this package from another package,
+so I do not expect to ever set it up as a crate for importing.
+
+
 ##  Notes on the Examples
-There is more detail about these examples in comments in the source files.
-To build the examples use
-```rust
-cargo build  --target $TARGET  --features $MCU --example xxx
-```
-where `xxx` is one of the examples from the table below, and `TARGET` and `MCU` are environment
-variables for your processor. Boards indicated above use one of 
-```
-  export MCU=stm32f103 TARGET=thumbv7m-none-eabi     #  bluepill Cortex-M3
-  export MCU=stm32f303 TARGET=thumbv7em-none-eabihf  # STM32F303 Cortex-M3
-  export MCU=stm32f411 TARGET=thumbv7em-none-eabihf  # nucleo-64
-  export MCU=stm32l151 TARGET=thumbv7m-none-eabi     # heltec-lora-node151 Cortex-M3
-```
-Building the 
 
-Running the examples will require three shell windows on your desktop. One to run the To run the examples, in a separate windows do
-```
-minicom -D /dev/ttyUSB0 -b9600  #
-openocd -f interface/$INTERFACE.cfg -f target/$PROC.cfg  #
-```
+There is more detail about these examples in comments in the source files, 
+but here is a brief summary
 
-```
-cargo  run --target $TARGET --features $MCU --example xxx
-```
-
-| xxx                     | notes |   Description
+| xxx                     | notes |   Description CHECK THESE AGAIN                                |
 | ----------------------- |:-----:|:---------------------------------------------------------------|
 | blink                   |   1   | Blinks off-board LEDs                                          |
-| serial_loopback_char    |   2   | Single character loopback + semihost output                    |
-| serial_fmt              |       | Formatted string  write to console                             |
-| serial-dma-tx           |       | String writes to terminal serial interface                     |
+| serial_loopback_char    |       | Single character loopback + semihost output                    |
+| serial_fmt              |       | Formatted string write to console on usart1                             |
+| serial_dma_tx           |       | String writes to console interface                             |
 | serial_pass_thru_string |       | Read 15 chars input from console, output to semihost, repeat   |
 | serial_loopback_string  |       | String serial interface loopback  + semihost output            |
-| echo_by_char            |       | Echo back console input, char by char,  + semihost output      |
+| echo_by_char            |   2   | Echo back console input, char by char,  + semihost output      |
 | serial_gps_rw           |   3   | Read by str from GPS with echo to console + semihost output    |
 | serial_gps_rw_by_char   |       | Read by char from GPS with echo to console + semihost output   |
 | serial_cross            |       | Str write from one usart and read on another + semihost output |
 
 
-1.  Using the git versions of HALs (in Nov 2019 much is changing and release in crates.io is old). 
-2.  Blink_test does not blink in gdb steps, use continue.
-3.  With local echo on in terminal the characters are double <cr> gets a single <lf>.
-     Without local echo there is no <lf>. trouble if you type too fast
-4.  Ublox GPS by default uses 9600bps, odd Parity, 1 stop bit (minicom 8-N1). Can be checked
-      by direcstly connecting computer through usb-serial to GPS, skipping bluepill. (5v on 
-      usb-serial seemed to be preferred for power.)
+0.  Using the git versions of HALs (in Nov 2019 much is changing and release in crates.io is old). 
+1.  Blink_test does not blink in gdb steps, use continue.
+2.  With local echo on in console the characters are doubled, <cr> adds a single <lf>.
+     Without local echo there is no <lf>. There is trouble if you type too fast.
+4.  Ublox GPS by default uses 9600bps, odd Parity, 1 stop bit (minicom 8-N1). 
+      This can be checked by directly connecting a computer through usb-ttl dongle to the GPS, 
+      completely eliminating the development board. 
+      (If the dongle power is used. 5v if preferred on mine.)
 
+This is the status of examples as of November 2019:
 
 |  xxx                   |   blue|pill   |    
 |                        | build |  run  | 
@@ -117,7 +137,7 @@ cargo  run --target $TARGET --features $MCU --example xxx
 |blink                   | yes   | works | 
 |serial_loopback_char    | yes   | works | 
 |serial_fmt              | yes   | works | 
-|serial-dma-tx           | no    |       |
+|serial_dma_tx           | no    |       |
 |serial_pass_thru_string | yes   | works | 
 |serial_loopback_string  | yes   |       |
 |echo_by_char            | yes   | works | 
@@ -126,20 +146,100 @@ cargo  run --target $TARGET --features $MCU --example xxx
 |serial_cross            | yes   |       |           
 
 
+To build the examples use
+```rust
+cargo build  --target $TARGET  --features $MCU --example xxx
+```
+where `xxx` is one of the examples from the table above, and `TARGET` and `MCU` are environment
+variables for your processor. Boards indicated above use one of 
+```
+  export MCU=stm32f103 TARGET=thumbv7m-none-eabi     #  bluepill Cortex-M3
+  export MCU=stm32f303 TARGET=thumbv7em-none-eabihf  # STM32F303 Cortex-M3
+  export MCU=stm32f411 TARGET=thumbv7em-none-eabihf  # nucleo-64
+  export MCU=stm32l151 TARGET=thumbv7m-none-eabi     # heltec-lora-node151 Cortex-M3
+```
+
+Running the examples will require three shell windows on your desktop. 
+One to run cargo and compile the examples and run gdb to load and debug them.
+Another to run openocd to interface through the STlink to the development board.
+And the third to run a console connected to a usb-ttl dongle for IO in some of the examples.
+(I use minicom for this last, but there are many other possibilities.) 
+
+To run the examples first connect the development board to the desktop.
+Then in a separate windows do
+```
+minicom -D /dev/ttyUSBxx -b9600
+```
+where `xx` is replaced by the number of the USB port (see more notes below),
+9600 is the bit rate in the code but can be change,
+and
+```
+openocd -f interface/$INTERFACE.cfg -f target/$PROC.cfg 
+```
+and in the other window do
+```
+cargo  run --target $TARGET --features $MCU --example xxx
+```
+
+
 ## Misc Notes on STlink and OpenOCD
 
+The openocd  command above uses `INTERFACE` and `PROC` environment variables that indicate the
+STlink version and the development board MCU family respectively. 
+(The PROC will be similar to the MCU setting, unfortunately they are not exactly the same.)
+A typical specification for for bluepill development board and cheapo STlink dongle would be
+
+```
+  export INTERFACE=stlink-v2   PROC=stm32f1x 
+```
+Many development boads have an STlink built onto the board, in which case you need to determine
+the version, and that is not always clear. My Discovery kit STM32F303 says STlink V2-B but that 
+seems to mean v2-1. One symptom of an incorrect setting is that the openocd command start up 
+stalls at
+```
+  in procedure 'ocd_bouncer'
+```
+The openocd command should alway get to something like
+```
+...
+Info : stm32f1x.cpu: hardware has 6 breakpoints, 4 watchpoints
+```
+
+Some of the other causes for the `in procedure 'ocd_bouncer'` can be that the board is not 
+properly powered up, or has some other boot loader pre-burned into it.
+
+By removing 2 connectors on the 'ST-LINK' header it is possible to use the built in STlink on 
+some development boards to program another board.
+For example,  I can use the STlink on my Discovery STM32L100 to connect to a blue pill. 
+One reason to do this is that  SWD header on the Discovery has the SWO pin, which can be
+connected to PB3 pin on the blue pill to use itm. (Caveate, I have not got itm to work yet.)
+Another reason is that some boards have STlink v2-1. Cheapo dongles typically have STlink v2
+and only SWD header pins SWCLK, GND, SWDIO, and power are supported.
+
+A cheapo dongle can provide power to a bluepill using the 3.3v on the dongle connection to 
+3.3v on the blue pill SWD header. Beware that using STlink on another development board the power
+through this SWD header connection is a voltage sensor and is not sufficient to power the blue pill.
+Either power the blue pill with its own supply (eg. battery) or with separate 3.3v and gnd 
+lines from the development board (typically pins 1 and 2) and do not exceed about 100mw for 
+the blue pill and other things attached.
+
+Here are settings I have used
 ```
   export  PROC=stm32f1x  # bluepill
   export  PROC=stm32l1x  # discovery-stm32l100
 ```
-
+and
 ```
   export INTERFACE=stlink-v2   #  WaveGat dongle
   export INTERFACE=stlink-v2   #  STlink on Discovery STM32L100
   export INTERFACE=stlink-v2-1 #  STlink on Discovery STM32F303
 ```
+The complete list of possible  openocd cfg file options are in
+`/usr/share/openocd/scripts/interface/`, `/usr/share/openocd/scripts/target`
+and `/usr/share/openocd/scripts/board`
 
 ## Misc Install Notes
+
 Above assumes a development environment that has cargo, rust with cross compiler, rustup, 
 gdb with remote processor support (gdb-multiarch ,  openocd, etc. 
 These are described in detail in other places see, for example
