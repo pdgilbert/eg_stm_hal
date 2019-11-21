@@ -10,8 +10,7 @@ branches:
    - master
 
 #Specify multiple parallel jobs. 
-#This could be done by a matrix expands rust x BOARD x EG, but
-#I cannot figure out how to do a matrix expand with two env variables.
+#This could be done by a matrix expands rust x BOARD 
 
 rust:
   - stable
@@ -30,6 +29,9 @@ matrix:
 
         - name: "none-stm32f100"
           env: MCU="stm32f100"  TARGET="thumbv7m-none-eabi"  BOARD="none-stm32f100"
+
+        - name: "none-stm32f101"
+          env: MCU="stm32f101"  TARGET="thumbv7m-none-eabi"  BOARD="none-stm32f101"
 
         #- name: "discovery-stm32l100"
         #  env: MCU="stm32l100"  TARGET="thumbv7m-none-eabi"  BOARD="discovery-stm32l100"

@@ -11,7 +11,10 @@ readme = "README.md"
 
 [lib]
 # name = "whatever"  #lib name defaults to package name
-path = "src/lib.rs"
+# for most package the path to the lib would be
+#path = "src/lib.rs"
+# for the setup here that work if there is a link src/  --> ../../src/  but this works without the link
+path = "../../src/lib.rs"
 # A flag for enabling unit tests for this target. This is used by `cargo test`.
 test = true
 

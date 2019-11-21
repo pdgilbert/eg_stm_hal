@@ -37,7 +37,9 @@ environments. Just the setup may change.)
 ##  Contents
 - [Status Summary](#status-summary)
 - [This Package Setup](#this-package-setup)
-- [Notes on the Examples](#notes-on-the-examples)
+- [Summary of Examples](#summary-of-examples)
+- [Building Examples](#building-examples)
+- [Running Examples](#running-examples)
 - [Hardware Notes](#hardware-notes)
 - [Misc Notes on STlink and OpenOCD](#misc-notes-on-stlink-and-openocd)
 - [Misc Install Notes](#misc-install-notes)
@@ -54,30 +56,39 @@ environments. Just the setup may change.)
 The overall Travis CI build status and the link for individual boards is given above.
 Testing if the code runs and does something resembling what it is supposed to do 
 requires hardware and is not as automatic as CI. 
-This is my summary as of November 2019. Boards indicates as in 'none-' mean that I do not
+This is my summary as of November 2019. Boards indicated as in 'none-' mean that I do not
 have hardware to check this MCU. If you check the examples using one of these MCUs 
 then please provide details 
 using [issues](https://github.com/pdgilbert/eg_stm_hal/issues) on the git project page.
 
-|      HAL       |    MCU    |      Board          |   Builds   |  Runs  |          Notes                            |
-| -------------- |:---------:|:-------------------:|:----------:|:------:| :---------------------------------------- |
-| stm32f1xx-hal  | stm32f103 |      bluepill       |   mostly   |  some  | Problems using serial.                    |
-| stm32f1xx-hal  | stm32f100 |   none-stm32f100    |   mostly   |   NA   |                                           |
-| stm32f3xx-hal  | stm32f303 | discovery-stm32f303 |    no      |   no   | Hal differences. no `pac` in the root, ...|
-| stm32f4xx-hal  | stm32f411 |      nucleo-64      |    no      |   no   | Hal differences. no `pac` in the root, ...|
-| stm32l1xx-hal  | stm32l100 | discovery-stm32l100 |    no      |   no   | Hal does not build.                       |
-| stm32l1xx-hal  | stm32l151 | heltec-lora-node151 |    no      |   no   | Hal does not build.                       |
+|      HAL       |    MCU    |      Board          |   Builds   |  Runs  |          Notes                             |
+| -------------- |:---------:|:-------------------:|:----------:|:------:| :----------------------------------------- |
+| stm32f1xx-hal  | stm32f103 |      bluepill       |   mostly   |  some  | Problems using serial.                     |
+| stm32f1xx-hal  | stm32f100 |   none-stm32f100    |    no      |   NA   | ...rust-lld: error: undefined symbol: TIM6 |
+| stm32f1xx-hal  | stm32f101 |   none-stm32f101    |    no      |   NA   |     |
+| stm32f3xx-hal  | stm32f303 | discovery-stm32f303 |    no      |   no   | Hal differences. no `pac` in the root, ... |
+| stm32f4xx-hal  | stm32f411 |      nucleo-64      |    no      |   no   | Hal differences. no `pac` in the root, ... |
+| stm32l1xx-hal  | stm32l100 | discovery-stm32l100 |    no      |   no   | Hal does not build.                        |
+| stm32l1xx-hal  | stm32l151 | heltec-lora-node151 |    no      |   no   | Hal does not build.                        |
 
 
-This projects examples depend on these HALs. 
-See [HALs on Github](https://github.com/stm32-rs) and on [Travis CI.](https://travis-ci.org/stm32-rs)
+This project's examples depend on HALs. 
+See [HALs on Github](https://github.com/stm32-rs) and on [Travis CI.](https://travis-ci.com/stm32-rs)
 
 |   HAL git                         |       HAL Travis CI  Status           | 
 |:---------------------------------:|:-------------------------------------:|
+| [stm32f0xx-hal](https://github.org/stm32-rs/stm32f0xx-hal) | [![Build Status](https://travis-ci.org/stm32-rs/stm32f0xx-hal.svg?branch=master)](https://travis-ci.org/stm32-rs/stm32f0xx-hal) |
+| [stm32f0xx-hal](https://github.com/stm32-rs/stm32f0xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32f0xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32f0xx-hal) |
 | [stm32f1xx-hal](https://github.com/stm32-rs/stm32f1xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32f1xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32f1xx-hal) |
 | [stm32f3xx-hal](https://github.com/stm32-rs/stm32f3xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32f3xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32f3xx-hal) |
 | [stm32f4xx-hal](https://github.com/stm32-rs/stm32f4xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32f4xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32f4xx-hal) |
+| [stm32f7xx-hal](https://github.com/stm32-rs/stm32f7xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32f7xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32f7xx-hal) |
+| [stm32g0xx-hal](https://github.com/stm32-rs/stm32g0xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32g0xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32g0xx-hal) |
+| [stm32g4xx-hal](https://github.com/stm32-rs/stm32g4xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32g4xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32g4xx-hal) |
+| [stm32h7xx-hal](https://github.com/stm32-rs/stm32h7xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32h7xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32h7xx-hal) |
+| [stm32l0xx-hal](https://github.com/stm32-rs/stm32l0xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32l0xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32l0xx-hal) |
 | [stm32l1xx-hal](https://github.com/stm32-rs/stm32l1xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32l1xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32l1xx-hal) |
+| [stm32l4xx-hal](https://github.com/stm32-rs/stm32l4xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32l4xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32l4xx-hal) |
 
 
 ##  This Package Setup
@@ -86,15 +97,17 @@ I am trying to have a common code base of examples that run on different boards.
 (This may be wishful thinking.) I have still not decided the best way to 
 organize this for Cargo. Workspaces do not seem to be intended for this.
 My current setup is to have common files src/, examples/, ..., at the top level.
-Then, under boards/,  use soft links to the common files.
+Then, under boards/*/,  use soft links to the common files. 
+That leaves only memory.x and and build files target/ and Cargo.lock in
+the boards/*/ directories.
 
 You can get this package from Github with 
 ```
 git clone https://github.com/pdgilbert/eg_stm_hal.git
 ```
-This package is mostly examples in directory examples/, but the
+The package is mostly examples in directory examples/, but the
 build fails unless there are targets so there needs to be something in src/. 
-That could be main.rs or lib.rs, which are defaults, or could be something else but then then
+That could be main.rs or lib.rs, which are defaults, or could be something else but then
 that needs to be specified in Cargo.toml. 
 This package has a src/lib.rs file with a small utility function used in several examples.
 
@@ -102,12 +115,12 @@ It is unlikely that you would ever want to call functions in this package from a
 so I do not expect to ever set it up as a crate for importing.
 
 
-##  Notes on the Examples
+## Summaey of Examples
 
-This examples are derived after working through many other examples, in particular the exaples
+These examples are derived after working through many other examples, in particular the examples
 in [stm32f1xx-hal.](https://github.com/stm32-rs/stm32f1xx-hal)
 
-There is more detail about these examples in comments in the source files, 
+There is more detail about examples in comments in the source files, 
 but here is a brief summary
 
 | xxx                     | notes |   Description CHECK THESE AGAIN                                |
@@ -133,10 +146,9 @@ but here is a brief summary
       completely eliminating the development board. 
       (If the dongle power is used. 5v if preferred on mine.)
 
-This is the status of examples as of November 2019:
+This is the status of examples as of November 2019 running on a bluepill:
 
-|  xxx                    |  blue | pill  |    
-|                         | build |  run  | 
+|  xxx                    | build |  run  | 
 | ----------------------- |:-----:|:-----:|
 | blink                   | yes   | works | 
 | serial_loopback_char    | yes   | works | 
@@ -150,6 +162,8 @@ This is the status of examples as of November 2019:
 | serial_cross            | yes   |       |           
 
 
+## Building Examples
+
 To build the examples use
 ```rust
 cargo build  --target $TARGET  --features $MCU --example xxx
@@ -157,11 +171,16 @@ cargo build  --target $TARGET  --features $MCU --example xxx
 where `xxx` is one of the examples from the table above, and `TARGET` and `MCU` are environment
 variables for your processor. Boards indicated above use one of 
 ```
-  export MCU=stm32f103 TARGET=thumbv7m-none-eabi     #  bluepill Cortex-M3
-  export MCU=stm32f303 TARGET=thumbv7em-none-eabihf  # STM32F303 Cortex-M3
-  export MCU=stm32f411 TARGET=thumbv7em-none-eabihf  # nucleo-64
+  export MCU=stm32f103 TARGET=thumbv7m-none-eabi     # bluepill            Cortex-M3
+  export MCU=stm32f100 TARGET=thumbv7m-none-eabi     # none-stm32f100      Cortex-M3
+  export MCU=stm32f100 TARGET=thumbv7m-none-eabi     # none-stm32f101      Cortex-M3
+  export MCU=stm32f303 TARGET=thumbv7em-none-eabihf  # STM32F303           Cortex-M3
+  export MCU=stm32f411 TARGET=thumbv7em-none-eabihf  # nucleo-64           Cortex-M4
+  export MCU=stm32l100 TARGET=thumbv7m-none-eabi     # discovery-stm32l100 Cortex-M3
   export MCU=stm32l151 TARGET=thumbv7m-none-eabi     # heltec-lora-node151 Cortex-M3
 ```
+
+## Running Examples
 
 Running the examples will require three shell windows on your desktop. 
 One to run cargo and compile the examples and run gdb to load and debug them.
@@ -169,14 +188,18 @@ Another to run openocd to interface through the STlink to the development board.
 And the third to run a console connected to a usb-ttl dongle for IO in some of the examples.
 (I use minicom for this last, but there are many other possibilities.) 
 
-To run the examples first connect the development board to the desktop.
+To run the examples first connect the development board to the computer and determine 
+the USB device by
+```
+dmesg | grep -i tty  
+```
 Then in a separate windows do
 ```
-minicom -D /dev/ttyUSBxx -b9600
+minicom -D /dev/ttyUSBx -b9600
 ```
-where `xx` is replaced by the number of the USB port (see more notes below),
+where `x` is replaced by the number of the USB device.
 9600 is the bit rate in the code but can be change,
-and
+and then
 ```
 openocd -f interface/$INTERFACE.cfg -f target/$PROC.cfg 
 ```
@@ -205,10 +228,11 @@ FILL IN LAYOUT
 The openocd  command above uses `INTERFACE` and `PROC` environment variables that indicate the
 STlink version and the development board MCU family respectively. 
 (The PROC will be similar to the MCU setting, unfortunately they are not exactly the same.)
-A typical specification for for bluepill development board and cheapo STlink dongle would be
+Typical specification for a bluepill development board and STlink dongle would be
 
 ```
-  export INTERFACE=stlink-v2   PROC=stm32f1x 
+  export INTERFACE=stlink-v2    PROC=stm32f1x  #cheap  dongle and blue pill
+  export INTERFACE=stlink-v2-1  PROC=stm32f1x  #better dongle and blue pill
 ```
 Many development boads have an STlink built onto the board, in which case you need to determine
 the version, and that is not always clear. My Discovery kit STM32F303 says STlink V2-B but that 
