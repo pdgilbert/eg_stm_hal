@@ -188,6 +188,7 @@ Another to run openocd to interface through the STlink to the development board.
 And the third to run a console connected to a usb-ttl dongle for IO in some of the examples.
 (I use minicom for this last, but there are many other possibilities.) 
 
+
 To run the examples first connect the development board to the computer and determine 
 the USB device by
 ```
@@ -198,7 +199,9 @@ Then in a separate windows do
 minicom -D /dev/ttyUSBx -b9600
 ```
 where `x` is replaced by the number of the USB device.
-9600 is the bit rate in the code but can be change,
+9600 is the bit rate in the code but can be change.
+Next determine the settings for `INTERFACE` and `PROC` as described below in
+[Misc Notes on STlink and OpenOCD](#misc-notes-on-stlink-and-openocd)
 and then
 ```
 openocd -f interface/$INTERFACE.cfg -f target/$PROC.cfg 
@@ -207,10 +210,17 @@ and in the other window do
 ```
 cargo  run --target $TARGET --features $MCU --example xxx
 ```
+Assumes you have set up a runner in `.cargo/config` as mentioned below in
+[Misc Install Notes](#misc-install-notes). If all works then gdb will load the example and
+stop at the first breakpoint. Use
+```
+   (gdb) continue 
+```
+to start running the example code.
 
 ## Hardware Notes
 
-I you have not yet bought a development board and are just looking to start then consider 
+If you have not yet bought a development board and are just looking to start then consider 
 a 'blue pill' with a cheap STlink dongle. It is not only the cheapest by far (I think I got
 5 for $10 with a dongle) but it also seems to be the best supported by HAL at the moment (Nov 2019). 
 No doubt the support is because all the developers have a few lying around.
@@ -314,7 +324,7 @@ I did something like
  rustup target add thumbv7em-none-eabihf # Cortex-M4F and M7F with hardware floating point
 ```
 
-To use cargo run to also build and start gdb, in .cargo/config uncomment
+To use cargo to build and also start gdb and run the compiled code, in .cargo/config uncomment
 ```
   runner = "gdb-multiarch -q -x openocd.gdb"
 ```

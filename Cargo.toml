@@ -24,11 +24,6 @@ path = "examples/test.rs"
 #required-features = ["rt"]
 
 [[example]]
-name = "str_byte_str"
-path = "examples/str_byte_str.rs"
-#required-features = ["rt"]
-
-[[example]]
 name = "blink"
 path = "examples/blink.rs"
 

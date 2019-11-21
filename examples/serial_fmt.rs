@@ -13,21 +13,21 @@ use cortex_m_rt::entry;
 use core::fmt::Write;
 
 //  eg blue pill stm32f103
-#[cfg(feature = "stm32f103")]
-use stm32f1xx_hal::{ prelude::*,  pac,  serial::{Config, Serial}, };
+#[cfg(any(feature = "stm32f100",  feature = "stm32f101", feature = "stm32f103" ))]
+use stm32f1xx_hal::{ prelude::*, pac, serial::{Config, Serial, StopBits}, };
 
 //  eg Discovery-stm32f303
 //use alt_stm32f30x_hal::{  ??
-#[cfg(feature = "stm32f303")]
-use stm32f3xx_hal::{ prelude::*, pac, serial::{Config, Serial}, };
+#[cfg(any(feature = "stm32f301",  feature = "stm32f302", feature = "stm32f303"))]
+use stm32f3xx_hal::{ prelude::*, pac, serial::{Config, Serial, StopBits}, };
 
 // eg Nucleo-64  stm32f411
 #[cfg(feature = "stm32f411")]
-use stm32f4xx_hal::{ prelude::*, pac, serial::{Config, Serial}, };
+use stm32f4xx_hal::{ prelude::*, pac, serial::{Config, Serial, StopBits}, };
 
 // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 #[cfg(any(feature = "stm32l100",   feature = "stnm32l151" )) ]
-use stm32l1xx_hal::{ prelude::*, pac, serial::{Config, Serial}, };
+use stm32l1xx_hal::{ prelude::*, pac, serial::{Config, Serial, StopBits}, };
 
 
 #[entry]
@@ -55,8 +55,8 @@ fn main() -> ! {
         p.USART1,
         (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),  gpioa.pa10),
         &mut afio.mapr,
-        Config::default().baudrate(9600.bps()),
-        clocks,
+        Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1),
+         clocks,
         &mut rcc.apb2,
     );
 

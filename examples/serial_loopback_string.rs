@@ -17,12 +17,12 @@ use cortex_m_semihosting::hprintln;
 use eg_stm_hal::to_str;
 
 //  eg blue pill stm32f103
-#[cfg(feature = "stm32f103")]
-use stm32f1xx_hal::{ prelude::*,  pac,  serial::{Config, Serial}, };
+#[cfg(any(feature = "stm32f100",  feature = "stm32f101", feature = "stm32f103" ))]
+use stm32f1xx_hal::{ prelude::*, pac, serial::{Config, Serial, StopBits}, };
 
 //  eg Discovery-stm32f303
 //use alt_stm32f30x_hal::{  ??
-#[cfg(feature = "stm32f303")]
+#[cfg(any(feature = "stm32f301",  feature = "stm32f302", feature = "stm32f303"))]
 use stm32f3xx_hal::{ prelude::*, pac, serial::{Config, Serial, StopBits}, };
 
 // eg Nucleo-64  stm32f411
@@ -54,7 +54,7 @@ fn main() -> ! {
         p.USART2,
         (gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),   gpioa.pa3),
         &mut afio.mapr,
-        Config::default().baudrate(9600.bps()),
+        Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1),
         clocks,
         &mut rcc.apb1,
     );
