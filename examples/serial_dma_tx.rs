@@ -6,7 +6,12 @@
 #![no_main]
 #![no_std]
 
-use panic_halt as _;
+#[cfg(debug_assertions)]
+extern crate panic_semihosting;
+
+#[cfg(not(debug_assertions))]
+extern crate panic_halt;
+
 //use cortex_m::asm;
 use cortex_m_rt::entry;
 
@@ -63,14 +68,14 @@ fn main() -> ! {
     //let text = ["The ", "quick ", "brown ", "fox" ];  t in iter doesn't have a size known at compile-time
     //let text = ("The ", "quick ", "brown ", "fox" );
     //let txt = ["The ", "quick ", "brown ", "fox" ];
-    let text :Vec<str> = ["The ", "quick ", "brown ", "fox" ];
+    //let text :Vec<str> = ["The ", "quick ", "brown ", "fox" ];
     //let text :Vec<&str> = txt.iter().map(AsRef::as_ref).collect();
 
-    for t in text.iter() {
-       let (_, tx) = tx.write(t).wait();
-       let (_, tx) = tx.write(t.as_bytes()).wait();
-       hprintln!("sent {:?}. ", t).unwrap();
-    }
+    //for t in text.iter() {
+    //   let (_, tx) = tx.write(t).wait();
+    //   let (_, tx) = tx.write(t.as_bytes()).wait();
+    //   hprintln!("sent {:?}. ", t).unwrap();
+    //}
 
     let (_, tx) = tx.write(b" jumps").wait();
     tx.write(b" over the lazy dog.").wait();

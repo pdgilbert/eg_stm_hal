@@ -64,7 +64,7 @@ stm32f1 = "0.8.0"
 stm32f3 = "0.8.0"
 stm32f4 = "0.8.0"
 #stm32l1 = "0.8.0"
-as-slice = "0.2"
+as-slice = "0.1.2"
 panic-halt = "0.2.0"
 
 [dependencies.stm32f1xx-hal]

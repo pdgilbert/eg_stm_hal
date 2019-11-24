@@ -8,7 +8,12 @@
 #![no_main]
 #![no_std]
 
-use panic_halt as _;
+#[cfg(debug_assertions)]
+extern crate panic_semihosting;
+
+#[cfg(not(debug_assertions))]
+extern crate panic_halt;
+
 use cortex_m_rt::entry;
 use core::fmt::Write;
 
