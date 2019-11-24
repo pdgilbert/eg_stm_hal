@@ -1,22 +1,23 @@
 # Examples Using embedded Rust HAL [![Build Status](https://travis-ci.org/pdgilbert/eg_stm_hal.svg?branch=master)](https://travis-ci.org/pdgilbert/eg_stm_hal)
 
-This project's overall Travis CI build status is above.
-[Status for individual boards described below can be 
+This project's overall Travis CI build status is 
+[![Build Status](https://travis-ci.org/pdgilbert/eg_stm_hal.svg?branch=master)](https://travis-ci.org/pdgilbert/eg_stm_hal).
+The [status for individual boards described below can be 
 seen at Travis CI.](https://travis-ci.org/pdgilbert/eg_stm_hal)
 
 ## Preamble
-These are newbie notes. I really am a newbie to embedded programming and to Rust. 
-This is an attempt to organize some notes made while trying to figure things out.
-I have put them here in the hope they will be useful to others. More importantly for me,
+These are newbie notes. I really am new to embedded programming and to Rust. 
+This is an attempt to organize notes made while trying to figure things out.
+I have put them here in the hope they will be useful to others. 
 I am also trying to keep track of what works and what does not, in a way that can be
-kept up to date relatively easily. I have found a lot of confusing out-of-date information
+kept up to date relatively easily. There is a lot of confusing out-of-date information
 on the web, so my hope is that the CI links here will warn readers when this project 
 becomes old and broken.
 
 Rust seems to have many attractive features compared to more mature languages.
 It has a modern packaging system which encourages documentation and testing.
-The language elements are designed so the compiler can catch many errors,
-which is frustrating while learning the language but will be a substantial time saving
+The language elements are designed so the compiler can catch many errors.
+This is frustrating while learning the language but will be a substantial time saving
 compared to run time debugging. The downside is that Rust is newer than many alternatives,
 embedded Rust is even newer, and the hardware abstraction library (HAL) project is in 
 active development.
@@ -59,7 +60,7 @@ requires hardware and is not as automatic as CI.
 This is my summary as of November 2019. Boards indicated as in 'none-' mean that I do not
 have hardware to check this MCU. If you check the examples using one of these MCUs 
 then please provide details 
-using [issues](https://github.com/pdgilbert/eg_stm_hal/issues) on the git project page.
+using [issues](https://github.com/pdgilbert/eg_stm_hal/issues) on this git project page.
 
 |      HAL       |    MCU    |      Board          |   Builds   |  Runs  |          Notes                             |
 | -------------- |:---------:|:-------------------:|:----------:|:------:| :----------------------------------------- |
@@ -96,26 +97,26 @@ See [HALs on Github](https://github.com/stm32-rs) and on [Travis CI.](https://tr
 I am trying to have a common code base of examples that run on different boards.
 (This may be wishful thinking.) I have still not decided the best way to 
 organize this for Cargo. Workspaces do not seem to be intended for this.
-My current setup is to have common files src/, examples/, ..., at the top level.
-Then, under boards/*/,  use soft links to the common files. 
-That leaves only memory.x and and build files target/ and Cargo.lock in
-the boards/*/ directories.
+My current setup is to have common files `src/`, `examples/`, ..., at the top level.
+Then in the `boards/` directories use soft links to the common files. 
+That leaves only `memory.x` and and build files `target/` and `Cargo.lock` in
+the `boards/` directories.
 
 You can get this package from Github with 
 ```
 git clone https://github.com/pdgilbert/eg_stm_hal.git
 ```
-The package is mostly examples in directory examples/, but the
-build fails unless there are targets so there needs to be something in src/. 
-That could be main.rs or lib.rs, which are defaults, or could be something else but then
+The package is mostly examples in directory `examples/`, but the
+build fails unless there are targets so there needs to be something in `src/`. 
+That could be `main.rs` or `lib.rs`, which are defaults, or could be something else but then
 that needs to be specified in Cargo.toml. 
-This package has a src/lib.rs file with a small utility function used in several examples.
+This package has a `src/lib.rs` file with a small utility function used in several examples.
 
 It is unlikely that you would ever want to call functions in this package from another package,
 so I do not expect to ever set it up as a crate for importing.
 
 
-## Summaey of Examples
+## Summary of Examples
 
 These examples are derived after working through many other examples, in particular the examples
 in [stm32f1xx-hal.](https://github.com/stm32-rs/stm32f1xx-hal)
@@ -139,9 +140,9 @@ but here is a brief summary
 
 0.  Using the git versions of HALs (in Nov 2019 much is changing and release in crates.io is old). 
 1.  Blink_test does not blink in gdb steps, use continue.
-2.  With local echo on in console the characters are doubled, <cr> adds a single <lf>.
-     Without local echo there is no <lf>. There is trouble if you type too fast.
-4.  Ublox GPS by default uses 9600bps, odd Parity, 1 stop bit (minicom 8-N1). 
+2.  With local echo on in console the characters are doubled, `<cr>` adds a single `<lf>`.
+     Without local echo there is no `<lf>`. There is trouble if you type too fast.
+4.  Ublox GPS by default uses 9600bps, odd Parity, 1 stop bit (minicom 8-N-1). 
       This can be checked by directly connecting a computer through usb-ttl dongle to the GPS, 
       completely eliminating the development board. 
       (If the dongle power is used. 5v if preferred on mine.)
@@ -150,7 +151,7 @@ This is the status of examples as of November 2019 running on a bluepill:
 
 |  xxx                    | build |  run  | 
 | ----------------------- |:-----:|:-----:|
-| blink                   | yes   | works | 
+| [blink](examples/blinks.rs) | yes   | works | 
 | serial_loopback_char    | yes   | works | 
 | serial_fmt              | yes   | works | 
 | serial_dma_tx           | no    |       |
@@ -190,7 +191,7 @@ And the third to run a console connected to a usb-ttl dongle for IO in some of t
 
 
 To run the examples first connect the development board to the computer and determine 
-the USB device by
+the USB device number by
 ```
 dmesg | grep -i tty  
 ```
@@ -210,7 +211,7 @@ and in the other window do
 ```
 cargo  run --target $TARGET --features $MCU --example xxx
 ```
-Assumes you have set up a runner in `.cargo/config` as mentioned below in
+This assumes you have set up a runner in `.cargo/config` as mentioned below in
 [Misc Install Notes](#misc-install-notes). If all works then gdb will load the example and
 stop at the first breakpoint. Use
 ```
@@ -228,8 +229,9 @@ You could well want a more expensive development board when you get further alon
 
 With the 'blue pill' beware that it
 should have 1.5K pull up resistor on D+ (R10 on board). Ones I purchased do,
-but some versions are shipped with 10K or 4.7K. Some PCs will tolerate this.
-Also, the 3.3v regulator is very small (300mA) and feeds the input voltage through when it fails! Don't exceed 100mA.
+but some versions are shipped with 10K or 4.7K. Googling suggests some PCs will tolerate this.
+Also, the 3.3v regulator is small (300mA) and apparently feeds the input voltage through 
+when it fails! Don't exceed 100mA.
 
 FILL IN LAYOUT
 
@@ -260,8 +262,9 @@ Info : stm32f1x.cpu: hardware has 6 breakpoints, 4 watchpoints
 Some of the other causes for the `in procedure 'ocd_bouncer'` can be that the board is not 
 properly powered up, or has some other boot loader pre-burned into it.
 
-By removing 2 connectors on the 'ST-LINK' header it is possible to use the built in STlink on 
-some development boards to program another board.
+It is possible to use the built in STlink on some development boards to program another board. 
+To do this it is necessary to  removing 2 connectors on the 'ST-LINK' header and connect the 
+SWD header to the other board.
 For example,  I can use the STlink on my Discovery STM32L100 to connect to a blue pill. 
 One reason to do this is that  SWD header on the Discovery has the SWO pin, which can be
 connected to PB3 pin on the blue pill to use itm. (Caveate, I have not got itm to work yet.)
@@ -278,7 +281,8 @@ the blue pill and other things attached.
 Here are settings I have used
 ```
   export  PROC=stm32f1x  # bluepill
-  export  PROC=stm32l1x  # discovery-stm32l100
+  export  PROC=stm32l1x  # MCU on Discovery STM32L100
+  export  PROC=stm32f3x  # MCU on Discovery STM32F303
 ```
 and
 ```
@@ -324,10 +328,11 @@ I did something like
  rustup target add thumbv7em-none-eabihf # Cortex-M4F and M7F with hardware floating point
 ```
 
-To use cargo to build and also start gdb and run the compiled code, in .cargo/config uncomment
+To use cargo to build and also start gdb and run the compiled code, in `.cargo/confi`g uncomment
 ```
   runner = "gdb-multiarch -q -x openocd.gdb"
 ```
+This is already done in the `.cargo/config` in this package.
 
 ##  Links
 
