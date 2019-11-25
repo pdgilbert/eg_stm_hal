@@ -1,7 +1,8 @@
-# Examples Using embedded Rust HAL [![Build Status](https://travis-ci.org/pdgilbert/eg_stm_hal.svg?branch=master)](https://travis-ci.org/pdgilbert/eg_stm_hal)
+# Examples Using embedded Rust
 
 This project's overall Travis CI build status is 
 [![Build Status](https://travis-ci.org/pdgilbert/eg_stm_hal.svg?branch=master)](https://travis-ci.org/pdgilbert/eg_stm_hal).
+
 The [status for individual boards described below can be 
 seen at Travis CI.](https://travis-ci.org/pdgilbert/eg_stm_hal)
 
@@ -124,16 +125,16 @@ in [stm32f1xx-hal.](https://github.com/stm32-rs/stm32f1xx-hal)
 There is more detail about examples in comments in the source files, 
 but here is a brief summary
 
-| xxx                     | notes |   Description CHECK THESE AGAIN                                |
+| xxx                     | notes |   Description                                                  |
 | ----------------------- |:-----:|:-------------------------------------------------------------- |
-| blink                   |   1   | Blinks off-board LEDs                                          |
-| serial_loopback_char    |       | Single character loopback + semihost output                    |
-| serial_fmt              |       | Formatted string write to console on usart1                             |
+| blink                   |   1   | Blinks off-board LEDs attached to  pb 13,14,15                 |
+| serial_loopback_char    |       | Single character loopback on usart2  + semihost output         |
+| serial_fmt              |       | Formatted string write to console on usart1                    |
 | serial_dma_tx           |       | String writes to console interface                             |
 | serial_pass_thru_string |       | Read 15 chars input from console, output to semihost, repeat   |
-| serial_loopback_string  |       | String serial interface loopback  + semihost output            |
-| echo_by_char            |   2   | Echo back console input, char by char,  + semihost output      |
-| serial_gps_rw           |   3   | Read by str from GPS with echo to console + semihost output    |
+| serial_loopback_string  |       | String interface loopback on usart2 + semihost output          |
+| echo_by_char            |   2   | Echo console input, char by char,  + semihost output           |
+| serial_gps_rw           |   3   | Read by str  from GPS with echo to console + semihost output   |
 | serial_gps_rw_by_char   |       | Read by char from GPS with echo to console + semihost output   |
 | serial_cross            |       | Str write from one usart and read on another + semihost output |
 
@@ -151,7 +152,7 @@ This is the status of examples as of November 2019 running on a bluepill:
 
 |  xxx                    | build |  run  | 
 | ----------------------- |:-----:|:-----:|
-| [blink](examples/blinks.rs) | yes   | works | 
+| [blink](/examples/blinks.rs) | yes   | works | 
 | serial_loopback_char    | yes   | works | 
 | serial_fmt              | yes   | works | 
 | serial_dma_tx           | no    |       |

@@ -1,4 +1,4 @@
-//! Test write to console (eg. minicom) on serial USART1 (pins pa9, pa10) with DMA.
+//! Write to console (eg. minicom) on USART1 (pins pa9, pa10) with DMA.
 //! Compare with stm32f3xx_hal  serial-dma  examples.
 //! Verify minicom settings correspond to code here (8-N-1)
 

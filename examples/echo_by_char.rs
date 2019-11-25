@@ -1,4 +1,4 @@
-//! Continuous character echo minicom input back with usart1 to serial-usb converter on pin (pa9, pa10).
+//! Echo console input (on usart1 pins pa9, pa10 to serial-usb converter), char by char,  + semihost output
 //!
 //! Connect the Tx pin pa9  to the Rx pin of a serial-usb converter
 //! Connect the Rx pin pa10 to the Tx pin of a serial-usb converter
