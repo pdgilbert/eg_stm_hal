@@ -48,8 +48,6 @@ environments. Just the setup may change.)
 - [Links](#Links)
 - [License](#License)
 - [Contribution](#Contribution)
-- [](## )
-- [](## )
 
 
 ##  Status Summary
@@ -66,8 +64,8 @@ using [issues](https://github.com/pdgilbert/eg_stm_hal/issues) on this git proje
 |      HAL       |    MCU    |      Board          |   Builds   |  Runs  |          Notes                             |
 | -------------- |:---------:|:-------------------:|:----------:|:------:| :----------------------------------------- |
 | stm32f1xx-hal  | stm32f103 |      bluepill       |   mostly   |  some  | Problems using serial.                     |
-| stm32f1xx-hal  | stm32f100 |   none-stm32f100    |    no      |   NA   | ...rust-lld: error: undefined symbol: TIM6 |
-| stm32f1xx-hal  | stm32f101 |   none-stm32f101    |    no      |   NA   |     |
+| stm32f1xx-hal  | stm32f100 |   none-stm32f100    |   mostly   |   NA   | ...rust-lld: error: undefined symbol: TIM6 |
+| stm32f1xx-hal  | stm32f101 |   none-stm32f101    |   mostly   |   NA   |     |
 | stm32f3xx-hal  | stm32f303 | discovery-stm32f303 |    no      |   no   | Hal differences. no `pac` in the root, ... |
 | stm32f4xx-hal  | stm32f411 |      nucleo-64      |    no      |   no   | Hal differences. no `pac` in the root, ... |
 | stm32l1xx-hal  | stm32l100 | discovery-stm32l100 |    no      |   no   | Hal does not build.                        |
@@ -175,7 +173,7 @@ variables for your processor. Boards indicated above use one of
 ```
   export MCU=stm32f103 TARGET=thumbv7m-none-eabi     # bluepill            Cortex-M3
   export MCU=stm32f100 TARGET=thumbv7m-none-eabi     # none-stm32f100      Cortex-M3
-  export MCU=stm32f100 TARGET=thumbv7m-none-eabi     # none-stm32f101      Cortex-M3
+  export MCU=stm32f101 TARGET=thumbv7m-none-eabi     # none-stm32f101      Cortex-M3
   export MCU=stm32f303 TARGET=thumbv7em-none-eabihf  # STM32F303           Cortex-M3
   export MCU=stm32f411 TARGET=thumbv7em-none-eabihf  # nucleo-64           Cortex-M4
   export MCU=stm32l100 TARGET=thumbv7m-none-eabi     # discovery-stm32l100 Cortex-M3
@@ -190,9 +188,20 @@ Another to run openocd to interface through the STlink to the development board.
 And the third to run a console connected to a usb-ttl dongle for IO in some of the examples.
 (I use minicom for this last, but there are many other possibilities.) 
 
+(If the next connections to USB fail with `Permission denied` then the simplest 
+fix is to change the permissions on /dev/ttyUSBx so it is world rw.
+This has security implications so you might consider something safer.
+For the console you can add  your user name to the dialout group
+with `sudo adduser username dialout`. 
+Beware group changes may not take effect until you re-login. 
+For the STlink the udev rules can be set, as described in
+[Rust-embedded book](https://rust-embedded.github.io/book/intro/install/linux.html).
+I have had to do this for one computer and not for another.
+I don't understand it well enough to explain.)
 
-To run the examples first connect the development board to the computer and determine 
-the USB device number by
+To run the examples first connect the development board (STlink and console 
+USB-TTL) to two usb ports on the computer and determine 
+the USB device number for the console by
 ```
 dmesg | grep -i tty  
 ```
@@ -200,7 +209,7 @@ Then in a separate windows do
 ```
 minicom -D /dev/ttyUSBx -b9600
 ```
-where `x` is replaced by the number of the USB device.
+where `x` is replaced by the number of the USB console device.
 9600 is the bit rate in the code but can be change.
 Next determine the settings for `INTERFACE` and `PROC` as described below in
 [Misc Notes on STlink and OpenOCD](#misc-notes-on-stlink-and-openocd)
@@ -208,7 +217,7 @@ and then
 ```
 openocd -f interface/$INTERFACE.cfg -f target/$PROC.cfg 
 ```
-and in the other window do
+`openocd` seems to figure out the USB device to use. In the other window do
 ```
 cargo  run --target $TARGET --features $MCU --example xxx
 ```
@@ -311,6 +320,8 @@ I did something like
 ```
  sudo apt install gdb-multiarch  qemu-system-arm    # QEMU is emulator
  sudo apt install openocd       # for on chip debuging with ST-Link
+ sudo apt install gcc-multilib  # for 32 bit support I think
+ sudo apt install minicom
 
  curl https://sh.rustup.rs -sSf | sh   # installs rustc, cargo, and rustup in  ~/.cargo/bin
  cargo install cargo-binutils          #updates in ~/.cargo/bin

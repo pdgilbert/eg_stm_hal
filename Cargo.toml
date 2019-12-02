@@ -13,7 +13,8 @@ readme = "README.md"
 # name = "whatever"  #lib name defaults to package name
 # for most package the path to the lib would be
 #path = "src/lib.rs"
-# for the setup here that work if there is a link src/  --> ../../src/  but this works without the link
+# for the setup here "src/lib.rs" works if there is a link src/  --> ../../src/  
+# but  "../../src/lib.rs" works without the link.
 path = "../../src/lib.rs"
 # A flag for enabling unit tests for this target. This is used by `cargo test`.
 test = true
@@ -51,45 +52,50 @@ path = "examples/serial_gps_rw.rs"
 name = "serial_gps_rw_by_char"
 path = "examples/serial_gps_rw_by_char.rs"
 
-[package.metadata.docs.rs]
-#features = ["stm32f103", "rt"]
-features = ["stm32f103", "stm32f303", "stm32f411" ]
-# NEED MORE HERE
-
 [dependencies]
 cortex-m = "0.6.0"
 nb = "0.1.2"
 cortex-m-rt = "0.6.8"
-stm32f1 = "0.8.0"
-stm32f3 = "0.8.0"
-stm32f4 = "0.8.0"
-#stm32l1 = "0.8.0"
-as-slice = "0.1.2"
+#stm32f1 = "0.9.0"
+#as-slice = "0.1.2"
+#as-slice = "0.1"
 panic-halt = "0.2.0"
 
 [dependencies.stm32f1xx-hal]
 git = "https://github.com/stm32-rs/stm32f1xx-hal"
-#fversion = "0.4.0"
-features = ["stm32f103", "rt"]
+version = "0.4.0"
+optional = true
 
 [dependencies.stm32f3xx-hal]
 git = "https://github.com/stm32-rs/stm32f3xx-hal"
-version = "0.3.0"
-features = ["stm32f303", "rt"]
+#version = "0.3.0"
+optional = true
 
-#[dependencies.alt-stm32f30x-hal]
-#version = "0.6.1"
-#features = ["stm32f303", "rt"]
+##[dependencies.alt-stm32f30x-hal]
+##version = "0.6.1"
 
 [dependencies.stm32f4xx-hal]
 git = "https://github.com/stm32-rs/stm32f4xx-hal"
-version = "0.6.0"
-features = ["stm32f411", "rt"]
+#version = "0.6.0"
+optional = true
 
-#[dependencies.stm32l1xx-hal]
-#git = "https://github.com/stm32-rs/stm32l1xx-hal"
+[dependencies.stm32l1xx-hal]
+git = "https://github.com/stm32-rs/stm32l1xx-hal"
 #version = "0.1.0"
-#features = ["stm32l100", "stm32l151", "rt"]
+optional = true
+
+[features]
+#device-selected = []
+#doc = []
+#rt = ["stm32f1xx-hal/rt"]
+stm32f100 = ["stm32f1xx-hal/stm32f100", "stm32f1xx-hal/rt"]
+stm32f101 = ["stm32f1xx-hal/stm32f101", "stm32f1xx-hal/rt"]
+stm32f103 = ["stm32f1xx-hal/stm32f103", "stm32f1xx-hal/rt"]
+stm32f303 = ["stm32f3xx-hal/stm32f303", "stm32f3xx-hal/rt"] 
+stm32f401 = ["stm32f4xx-hal/stm32f401", "stm32f4xx-hal/rt"] 
+stm32f411 = ["stm32f4xx-hal/stm32f411", "stm32f4xx-hal/rt"] 
+stm32l100 = ["stm32l1xx-hal/stm32l100", "stm32l1xx-hal/rt"]
+stm32l151 = ["stm32l1xx-hal/stm32l151", "stm32l1xx-hal/rt"]
 
 [dependencies.void]
 default-features = false
@@ -151,17 +157,6 @@ version = "1.0.90"
 #git = "https://github.com/japaric/serde-json-core"
 #rev = "6f12b77c1ffeae167989fe06e0d8b15978bd6d18"
 
-[features]
-device-selected = []
-doc = []
-stm32f100 = ["stm32f1/stm32f100", "stm32f1/rt", "device-selected"]
-stm32f101 = ["stm32f1/stm32f101", "stm32f1/rt", "device-selected"]
-stm32f103 = ["stm32f1/stm32f103", "stm32f1/rt", "device-selected"]
-stm32f303 = ["stm32f3/stm32f303", "stm32f3/rt", "device-selected"]
-stm32f411 = ["stm32f4/stm32f411", "stm32f4/rt", "device-selected"]
-#stm32l100 = ["stm32l1/stm32l100", "stm32l1/rt", "device-selected"]
-#stm32l151 = ["stm32l1/stm32l151", "stm32l1/rt", "device-selected"]
-
 # Devices with 64 or 128 Kb ROM
 medium = []
 # Devices with 256 or 512 Kb ROM
@@ -177,3 +172,4 @@ codegen-units = 1
 codegen-units = 1
 debug = true
 lto = true
+
