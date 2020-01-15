@@ -20,20 +20,20 @@ use nb::block;
 
 //  eg blue pill stm32f103
 #[cfg(any(feature = "stm32f100",  feature = "stm32f101", feature = "stm32f103" ))]
-use stm32f1xx_hal::{ prelude::*, pac, timer::Timer, };
+use stm32f1xx_hal::{ prelude::*, pac::Peripherals, timer::Timer, };
 
 //  eg Discovery-stm32f303
 //use alt_stm32f30x_hal::{  ??
 #[cfg(any(feature = "stm32f301",  feature = "stm32f302", feature = "stm32f303"))]
-use stm32f3xx_hal::{ prelude::*, pac, timer::Timer, };
+use stm32f3xx_hal::{ prelude::*, pac::Peripherals, timer::Timer, };
 
 // eg Nucleo-64  stm32f411
 #[cfg(feature = "stm32f411")]
-use stm32f4xx_hal::{ prelude::*, pac, timer::Timer, };
+use stm32f4xx_hal::{ prelude::*, stm32::Peripherals, timer::Timer, };
 
 // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 #[cfg(any(feature = "stm32l100",   feature = "stnm32l151" )) ]
-use stm32l1xx_hal::{ prelude::*, pac, timer::Timer, };
+use stm32l1xx_hal::{ prelude::*, pac::Peripherals, timer::Timer, };
 
 use cortex_m_rt::entry;
 use embedded_hal::digital::v2::OutputPin;
@@ -43,7 +43,7 @@ fn main() -> ! {
     // Get access to the core peripherals from the cortex-m crate
     let cp = cortex_m::Peripherals::take().unwrap();
     // Get access to the device specific peripherals from the peripheral access crate
-    let dp = pac::Peripherals::take().unwrap();
+    let dp = Peripherals::take().unwrap();
 
     // Take ownership over the raw flash and rcc devices and convert them into the corresponding
     // HAL structs

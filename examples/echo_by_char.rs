@@ -24,25 +24,25 @@ use nb::block;
 
 //  eg blue pill stm32f103
 #[cfg(any(feature = "stm32f100",  feature = "stm32f101", feature = "stm32f103" ))]
-use stm32f1xx_hal::{ prelude::*, pac, serial::{Config, Serial, StopBits}, };
+use stm32f1xx_hal::{prelude::*, pac::Peripherals, serial::{Config, Serial, StopBits}};
 
 //  eg Discovery-stm32f303
 //use alt_stm32f30x_hal::{  ??
 #[cfg(any(feature = "stm32f301",  feature = "stm32f302", feature = "stm32f303"))]
-use stm32f3xx_hal::{ prelude::*, pac, serial::{Config, Serial, StopBits}, };
+use stm32f3xx_hal::{prelude::*, pac::Peripherals, serial::{Config, Serial, StopBits}};
 
 // eg Nucleo-64  stm32f411
 #[cfg(feature = "stm32f411")]
-use stm32f4xx_hal::{ prelude::*, pac, serial::{Config, Serial, StopBits}, };
+use stm32f4xx_hal::{prelude::*, stm32::Peripherals, serial::{Config, Serial, StopBits}};
 
 // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 #[cfg(any(feature = "stm32l100",   feature = "stnm32l151" )) ]
-use stm32l1xx_hal::{ prelude::*, pac, serial::{Config, Serial, StopBits}, };
+use stm32l1xx_hal::{prelude::*, pac::Peripherals, serial::{Config, Serial, StopBits}};
 
 
 #[entry]
 fn main() -> ! {
-    let p = pac::Peripherals::take().unwrap();
+    let p = Peripherals::take().unwrap();
     let mut flash = p.FLASH.constrain();
     let mut rcc = p.RCC.constrain();
     let clocks = rcc.cfgr.freeze(&mut flash.acr);

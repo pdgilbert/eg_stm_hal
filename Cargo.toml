@@ -63,7 +63,7 @@ panic-halt = "0.2.0"
 
 [dependencies.stm32f1xx-hal]
 git = "https://github.com/stm32-rs/stm32f1xx-hal"
-version = "0.4.0"
+#version = "0.5.1"
 optional = true
 
 [dependencies.stm32f3xx-hal]
@@ -157,12 +157,12 @@ version = "1.0.90"
 #git = "https://github.com/japaric/serde-json-core"
 #rev = "6f12b77c1ffeae167989fe06e0d8b15978bd6d18"
 
-# Devices with 64 or 128 Kb ROM
-medium = []
-# Devices with 256 or 512 Kb ROM
-high = ["medium"]
-# Devices with 768 Kb ROM or more
-xl = ["high"]
+## Devices with 64 or 128 Kb ROM
+#medium = []
+## Devices with 256 or 512 Kb ROM
+#high = ["medium"]
+## Devices with 768 Kb ROM or more
+#xl = ["high"]
 
 [profile.dev]
 incremental = false

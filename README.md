@@ -64,8 +64,8 @@ using [issues](https://github.com/pdgilbert/eg_stm_hal/issues) on this git proje
 |      HAL       |    MCU    |      Board          |   Builds   |  Runs  |          Notes                             |
 | -------------- |:---------:|:-------------------:|:----------:|:------:| :----------------------------------------- |
 | stm32f1xx-hal  | stm32f103 |      bluepill       |   mostly   |  some  | Problems using serial.                     |
-| stm32f1xx-hal  | stm32f100 |   none-stm32f100    |   mostly   |   NA   | ...rust-lld: error: undefined symbol: TIM6 |
-| stm32f1xx-hal  | stm32f101 |   none-stm32f101    |   mostly   |   NA   |     |
+| stm32f1xx-hal  | stm32f100 |   none-stm32f100    |   mostly   |   NA   |         |
+| stm32f1xx-hal  | stm32f101 |   none-stm32f101    |   mostly   |   NA   |         |
 | stm32f3xx-hal  | stm32f303 | discovery-stm32f303 |    no      |   no   | Hal differences. no `pac` in the root, ... |
 | stm32f4xx-hal  | stm32f411 |      nucleo-64      |    no      |   no   | Hal differences. no `pac` in the root, ... |
 | stm32l1xx-hal  | stm32l100 | discovery-stm32l100 |    no      |   no   | Hal does not build.                        |
@@ -77,7 +77,6 @@ See [HALs on Github](https://github.com/stm32-rs) and on [Travis CI.](https://tr
 
 |   HAL git                         |       HAL Travis CI  Status           | 
 |:---------------------------------:|:-------------------------------------:|
-| [stm32f0xx-hal](https://github.org/stm32-rs/stm32f0xx-hal) | [![Build Status](https://travis-ci.org/stm32-rs/stm32f0xx-hal.svg?branch=master)](https://travis-ci.org/stm32-rs/stm32f0xx-hal) |
 | [stm32f0xx-hal](https://github.com/stm32-rs/stm32f0xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32f0xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32f0xx-hal) |
 | [stm32f1xx-hal](https://github.com/stm32-rs/stm32f1xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32f1xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32f1xx-hal) |
 | [stm32f3xx-hal](https://github.com/stm32-rs/stm32f3xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32f3xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32f3xx-hal) |
@@ -164,12 +163,14 @@ This is the status of examples as of November 2019 running on a bluepill:
 
 ## Building Examples
 
-To build the examples use
+To build the examples cd into one of the board directories, eg cd boards/bluepill 
+and use
 ```rust
 cargo build  --target $TARGET  --features $MCU --example xxx
 ```
-where `xxx` is one of the examples from the table above, and `TARGET` and `MCU` are environment
-variables for your processor. Boards indicated above use one of 
+where `xxx` is one of the examples from the table above, and `TARGET` and `MCU` are
+environment variables for your processor (and corresponding to the board directory). 
+Boards indicated above use one of 
 ```
   export MCU=stm32f103 TARGET=thumbv7m-none-eabi     # bluepill            Cortex-M3
   export MCU=stm32f100 TARGET=thumbv7m-none-eabi     # none-stm32f100      Cortex-M3
@@ -340,7 +341,7 @@ I did something like
  rustup target add thumbv7em-none-eabihf # Cortex-M4F and M7F with hardware floating point
 ```
 
-To use cargo to build and also start gdb and run the compiled code, in `.cargo/confi`g uncomment
+To use cargo to build and also start gdb and run the compiled code, in `.cargo/config` uncomment
 ```
   runner = "gdb-multiarch -q -x openocd.gdb"
 ```
