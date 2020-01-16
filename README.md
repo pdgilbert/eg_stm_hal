@@ -1,10 +1,12 @@
 # Examples Using embedded Rust
 
-This project's overall Travis CI build status is 
-[![Build Status](https://travis-ci.org/pdgilbert/eg_stm_hal.svg?branch=master)](https://travis-ci.org/pdgilbert/eg_stm_hal).
-
 The [status for individual boards described below can be 
 seen at Travis CI.](https://travis-ci.org/pdgilbert/eg_stm_hal)
+
+This project's overall Travis CI build status is 
+[![Build Status](https://travis-ci.org/pdgilbert/eg_stm_hal.svg?branch=master)](https://travis-ci.org/pdgilbert/eg_stm_hal).
+This will indicate an error if any examples fail on any boards, 
+so often will indicate `error` even when most examples work on most boards.
 
 ## Preamble
 These are newbie notes. I really am new to embedded programming and to Rust. 
