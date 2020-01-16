@@ -36,7 +36,7 @@ use stm32f4xx_hal::{ prelude::*, stm32::Peripherals, timer::Timer, };
 use stm32l1xx_hal::{ prelude::*, pac::Peripherals, timer::Timer, };
 
 use cortex_m_rt::entry;
-//use embedded_hal::digital::v2::OutputPin;
+use embedded_hal::digital::v2::OutputPin;
 
 #[entry]
 fn main() -> ! {
