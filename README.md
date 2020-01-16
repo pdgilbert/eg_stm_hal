@@ -68,8 +68,8 @@ using [issues](https://github.com/pdgilbert/eg_stm_hal/issues) on this git proje
 | stm32f1xx-hal  | stm32f103 |      bluepill       |   mostly   |  some  | Problems using serial.                     |
 | stm32f1xx-hal  | stm32f100 |   none-stm32f100    |   mostly   |   NA   |         |
 | stm32f1xx-hal  | stm32f101 |   none-stm32f101    |   mostly   |   NA   |         |
-| stm32f3xx-hal  | stm32f303 | discovery-stm32f303 |    no      |   no   | Hal differences. no `pac` in the root, ... |
-| stm32f4xx-hal  | stm32f411 |      nucleo-64      |    no      |   no   | Hal differences. no `pac` in the root, ... |
+| stm32f3xx-hal  | stm32f303 | discovery-stm32f303 |    no      |   no   | Hal differences.  Code adjustments needed  |
+| stm32f4xx-hal  | stm32f411 |      nucleo-64      |    no      |   no   | Hal differences.  Code adjustments needed  |
 | stm32l1xx-hal  | stm32l100 | discovery-stm32l100 |    no      |   no   | Hal does not build.                        |
 | stm32l1xx-hal  | stm32l151 | heltec-lora-node151 |    no      |   no   | Hal does not build.                        |
 

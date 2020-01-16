@@ -25,7 +25,8 @@ use stm32f1xx_hal::{ prelude::*, pac::Peripherals, timer::Timer, };
 //  eg Discovery-stm32f303
 //use alt_stm32f30x_hal::{  ??
 #[cfg(any(feature = "stm32f301",  feature = "stm32f302", feature = "stm32f303"))]
-use stm32f3xx_hal::{ prelude::*, pac::Peripherals, timer::Timer, };
+use stm32f3xx_hal::{ prelude::*, stm32::Peripherals, timer::Timer, };
+// may need different timer, like Struct stm32f3xx_hal::stm32::SYST
 
 // eg Nucleo-64  stm32f411
 #[cfg(feature = "stm32f411")]
