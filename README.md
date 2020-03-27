@@ -45,7 +45,7 @@ environments. Just the setup may change.)
 - [Building Examples](#building-examples)
 - [Running Examples](#running-examples)
 - [Hardware Notes](#hardware-notes)
-- [Misc Notes on STlink and OpenOCD](#misc-notes-on-stlink-and-openocd)
+- [Misc Notes on ST-Link and OpenOCD](#misc-notes-on-st-link-and-openocd)
 - [Misc Install Notes](#misc-install-notes)
 - [Links](#Links)
 - [License](#License)
@@ -122,7 +122,10 @@ These examples are derived after working through many other examples, in particu
 in [stm32f1xx-hal.](https://github.com/stm32-rs/stm32f1xx-hal)
 
 There is more detail about examples in comments in the source files, 
-but here is a brief summary
+but here is a brief summary. 'Console' means a terminal session 
+(eg. minicom) on a computer connected via usb-to-ttl to the MPU USART1 (pins pa9, pa10 on bluepill).
+See [Running Examples](#running-examples) for more details.
+
 
 | xxx                     | notes |   Description                                                  |
 | ----------------------- |:-----:|:-------------------------------------------------------------- |
@@ -149,6 +152,7 @@ but here is a brief summary
 
 This is the status of examples as of November 2019 running on a bluepill:
 
+|                         | bluepill |    | 
 |  xxx                    | build |  run  | 
 | ----------------------- |:-----:|:-----:|
 | [blink](/examples/blinks.rs) | yes   | works | 
@@ -215,7 +219,7 @@ minicom -D /dev/ttyUSBx -b9600
 where `x` is replaced by the number of the USB console device.
 9600 is the bit rate in the code but can be change.
 Next determine the settings for `INTERFACE` and `PROC` as described below in
-[Misc Notes on STlink and OpenOCD](#misc-notes-on-stlink-and-openocd)
+[Misc Notes on ST-Link and OpenOCD](#misc-notes-on-st-link-and-openocd)
 and then
 ```
 openocd -f interface/$INTERFACE.cfg -f target/$PROC.cfg 
@@ -235,7 +239,7 @@ to start running the example code.
 ## Hardware Notes
 
 If you have not yet bought a development board and are just looking to start then consider 
-a 'blue pill' with a cheap STlink dongle. It is not only the cheapest by far (I think I got
+a 'blue pill' with a cheap ST-Link dongle. It is not only the cheapest by far (I think I got
 5 for $10 with a dongle) but it also seems to be the best supported by HAL at the moment (Nov 2019). 
 No doubt the support is because all the developers have a few lying around.
 You could well want a more expensive development board when you get further along.
@@ -248,18 +252,18 @@ when it fails! Don't exceed 100mA.
 
 FILL IN LAYOUT
 
-## Misc Notes on STlink and OpenOCD
+## Misc Notes on ST-Link and OpenOCD
 
 The openocd  command above uses `INTERFACE` and `PROC` environment variables that indicate the
-STlink version and the development board MCU family respectively. 
+ST-Link version and the development board MCU family respectively. 
 (The PROC will be similar to the MCU setting, unfortunately they are not exactly the same.)
-Typical specification for a bluepill development board and STlink dongle would be
+Typical specification for a bluepill development board and ST-Link dongle would be
 
 ```
   export INTERFACE=stlink-v2    PROC=stm32f1x  #cheap  dongle and blue pill
   export INTERFACE=stlink-v2-1  PROC=stm32f1x  #better dongle and blue pill
 ```
-Many development boads have an STlink built onto the board, in which case you need to determine
+Many development boads have an ST-Link built onto the board, in which case you need to determine
 the version, and that is not always clear. My Discovery kit STM32F303 says STlink V2-B but that 
 seems to mean v2-1. One symptom of an incorrect setting is that the openocd command start up 
 stalls at
