@@ -120,8 +120,9 @@ so I do not expect to ever set it up as a crate for importing.
 These examples are derived after working through many other examples, in particular the examples
 in [stm32f1xx-hal.](https://github.com/stm32-rs/stm32f1xx-hal)
 
-There is more detail about examples in comments in the source files, 
-but here is a brief summary. 'Console' means a terminal session 
+There is more detail about examples in comments in the source files, see the 
+[example directory](https://github.com/pdgilbert/eg_stm_hal/tree/master/examples).
+Here is a brief summary. 'Console' means a terminal session 
 (eg. minicom) on a computer connected via usb-to-ttl to the MPU USART1 (pins pa9, pa10 on bluepill).
 See [Running Examples](#running-examples) for more details.
 
@@ -156,9 +157,9 @@ This is the status of examples as of November 2019 running on a bluepill:
 
 |  xxx                    | build |  run  | 
 | ----------------------- |:-----:|:-----:|
-| [blink](../../examples/blinks.rs) | yes   | works | 
+| blink                   | yes   | works | 
 | serial_loopback_char    | yes   | works | 
-| [serial_fmt](../../examples/serial_fmt.rs) | yes   | works | 
+| serial_fmt              | yes   | works | 
 | serial_dma_tx           | no    |       |
 | serial_pass_thru_string | yes   | works | 
 | serial_loopback_string  | yes   |       |
