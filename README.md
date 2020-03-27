@@ -74,18 +74,18 @@ using [issues](https://github.com/pdgilbert/eg_stm_hal/issues) on this git proje
 | stm32l1xx-hal  | stm32l151 | heltec-lora-node151 |    no      |   no   | Hal does not build.                        |
 
 
-{% capture GITstm32 %}https://github.com/stm32-rs{% endcapture %}
+{% capture GIT %}https://github.com/stm32-rs{% endcapture %}
 
-{% capture CIstm32 %}https://travis-ci.com/stm32-rs{% endcapture %}
+{% capture CI %}https://travis-ci.com/stm32-rs{% endcapture %}
 
 This project's examples depend on HALs. 
-See [HALs on Github]({{ GITstm32 }}) and on [Travis CI.]({{ CIstm32 }}) and on [Travis CI.]({{CIstm32}})
+See [HALs on Github]({{GIT}}) and on [Travis CI.]({{CI}})
 See [HALs on Github](https://github.com/stm32-rs) and on [Travis CI.](https://travis-ci.com/stm32-rs)
 
 |   HAL git                         |       HAL Travis CI  Status           | 
 |:---------------------------------:|:-------------------------------------:|
-| [stm32f0xx-hal](https://github.com/stm32-rs/stm32f0xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32f0xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32f0xx-hal) |
-| [stm32f1xx-hal](https://github.com/stm32-rs/stm32f1xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32f1xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32f1xx-hal) |
+| [stm32f0xx-hal]({{GIT}}/stm32f0xx-hal) | [![Build Status]({{CI}}/stm32f0xx-hal.svg?branch=master)]({{CI}}/stm32f0xx-hal) |
+| [stm32f1xx-hal]({{GIT}}/stm32f1xx-hal) | [![Build Status]({{CI}}/stm32f1xx-hal.svg?branch=master)]({{CI}}/stm32f1xx-hal) |
 | [stm32f3xx-hal](https://github.com/stm32-rs/stm32f3xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32f3xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32f3xx-hal) |
 | [stm32f4xx-hal](https://github.com/stm32-rs/stm32f4xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32f4xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32f4xx-hal) |
 | [stm32f7xx-hal](https://github.com/stm32-rs/stm32f7xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32f7xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32f7xx-hal) |
@@ -162,9 +162,9 @@ This is the status of examples as of November 2019 running on a bluepill:
 
 |  xxx                    | build |  run  | 
 | ----------------------- |:-----:|:-----:|
-| [blink](/examples/blinks.rs) | yes   | works | 
+| [blink](examples/blinks.rs) | yes   | works | 
 | serial_loopback_char    | yes   | works | 
-| [serial_fmt](../blob/master/examples/serial_fmt.rs) | yes   | works | 
+| [serial_fmt](../examples/serial_fmt.rs) | yes   | works | 
 | serial_dma_tx           | no    |       |
 | serial_pass_thru_string | yes   | works | 
 | serial_loopback_string  | yes   |       |
