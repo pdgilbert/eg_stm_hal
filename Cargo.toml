@@ -109,6 +109,9 @@ version = "0.2.2"
 version = "0.2.3"
 features = ["unproven"]
 
+[dependencies.asm-delay]
+version = "0.7.0"
+
 [dev-dependencies]
 panic-halt = "0.2.0"
 panic-semihosting = "0.5.2"

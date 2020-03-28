@@ -152,11 +152,11 @@ See [Running Examples](#running-examples) for more details.
 
 This is the status of examples as of November 2019 running on a bluepill:
 
-|                         |   bluepill    | 
-| ----------------------- |:----------:|
+|                         |  bluepill  | 
+|:-----------------------:|:----------:|
 
 |  xxx                    | build |  run  | 
-| ----------------------- |:-----:|:-----:|
+|:-----------------------:|:-----:|:-----:|
 | blink                   | yes   | works | 
 | serial_loopback_char    | yes   | works | 
 | serial_fmt              | yes   | works | 
@@ -171,7 +171,7 @@ This is the status of examples as of November 2019 running on a bluepill:
 
 ## Building Examples
 
-To build the examples cd into one of the board directories, eg cd boards/bluepill 
+To build the examples cd into one of the board directories, eg `cd boards/bluepill` 
 and use
 ```rust
 cargo build  --target $TARGET  --features $MCU --example xxx
