@@ -174,19 +174,22 @@ This is the status of examples as of November 2019 running on a bluepill:
 To build the examples cd into one of the board directories, eg `cd boards/bluepill` 
 and use
 ```rust
-cargo build  --target $TARGET  --features $MCU --example xxx
+cargo build  --target $TARGET  --features $HAL,$MCU --example xxx
 ```
-where `xxx` is one of the examples from the table above, and `TARGET` and `MCU` are
+where `xxx` is one of the examples from the table above, and `TARGET`, `HAL`  and `MCU` are
 environment variables for your processor (and corresponding to the board directory). 
+Variables `HAL`  and `MCU` overlap, it should be possible to determine  `HAL`  based on `MCU`.
+The variable `HAL` is used in the example code whereas some of the underlying HAL packages
+actually need the specific `MCU`.
 Boards indicated above use one of 
 ```
-  export MCU=stm32f103 TARGET=thumbv7m-none-eabi     # bluepill            Cortex-M3
-  export MCU=stm32f100 TARGET=thumbv7m-none-eabi     # none-stm32f100      Cortex-M3
-  export MCU=stm32f101 TARGET=thumbv7m-none-eabi     # none-stm32f101      Cortex-M3
-  export MCU=stm32f303 TARGET=thumbv7em-none-eabihf  # STM32F303           Cortex-M3
-  export MCU=stm32f411 TARGET=thumbv7em-none-eabihf  # nucleo-64           Cortex-M4
-  export MCU=stm32l100 TARGET=thumbv7m-none-eabi     # discovery-stm32l100 Cortex-M3
-  export MCU=stm32l151 TARGET=thumbv7m-none-eabi     # heltec-lora-node151 Cortex-M3
+  export HAL=stm32f1xx MCU=stm32f103 TARGET=thumbv7m-none-eabi     # bluepill            Cortex-M3
+  export HAL=stm32f1xx MCU=stm32f100 TARGET=thumbv7m-none-eabi     # none-stm32f100      Cortex-M3
+  export HAL=stm32f1xx MCU=stm32f101 TARGET=thumbv7m-none-eabi     # none-stm32f101      Cortex-M3
+  export HAL=stm32f3xx MCU=stm32f303 TARGET=thumbv7em-none-eabihf  # STM32F303           Cortex-M3
+  export HAL=stm32f4xx MCU=stm32f411 TARGET=thumbv7em-none-eabihf  # nucleo-64           Cortex-M4
+  export HAL=stm32l1xx MCU=stm32l100 TARGET=thumbv7m-none-eabi     # discovery-stm32l100 Cortex-M3
+  export HAL=stm32l1xx MCU=stm32l151 TARGET=thumbv7m-none-eabi     # heltec-lora-node151 Cortex-M3
 ```
 
 ## Running Examples

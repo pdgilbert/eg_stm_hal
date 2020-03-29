@@ -25,25 +25,25 @@ matrix:
 
     include:
         - name: "bluepill"
-          env: MCU="stm32f103"  TARGET="thumbv7m-none-eabi"     BOARD="bluepill"
+          env: HAL= "stm32f1xx"  MCU="stm32f103"  TARGET="thumbv7m-none-eabi"     BOARD="bluepill"
 
         - name: "none-stm32f100"
-          env: MCU="stm32f100"  TARGET="thumbv7m-none-eabi"     BOARD="none-stm32f100"
+          env: HAL= "stm32f1xx"  MCU="stm32f100"  TARGET="thumbv7m-none-eabi"     BOARD="none-stm32f100"
 
         - name: "none-stm32f101"
-          env: MCU="stm32f101"  TARGET="thumbv7m-none-eabi"     BOARD="none-stm32f101"
-
-        - name: "discovery-stm32l100"
-          env: MCU="stm32l100"  TARGET="thumbv7m-none-eabi"     BOARD="discovery-stm32l100"
+          env: HAL= "stm32f1xx"  MCU="stm32f101"  TARGET="thumbv7m-none-eabi"     BOARD="none-stm32f101"
 
         - name: "discovery-stm32f303"
-          env: MCU="stm32f303"  TARGET="thumbv7em-none-eabihf"  BOARD="discovery-stm32f303"
+          env: HAL= "stm32f3xx"  MCU="stm32f303"  TARGET="thumbv7em-none-eabihf"  BOARD="discovery-stm32f303"
 
         - name: "nucleo-64"
-          env: MCU="stm32f411"  TARGET="thumbv7em-none-eabihf"  BOARD="nucleo-64"
+          env: HAL= "stm32f4xx"  MCU="stm32f411"  TARGET="thumbv7em-none-eabihf"  BOARD="nucleo-64"
+
+        - name: "discovery-stm32l100"
+          env: HAL= "stm32l1xx"  MCU="stm32l100"  TARGET="thumbv7m-none-eabi"     BOARD="discovery-stm32l100"
 
         - name: "heltec-lora-node151"
-          env: MCU="stm32l151"  TARGET="thumbv7m-none-eabi"     BOARD="heltec-lora-node151"
+          env: HAL= "stm32l1xx"  MCU="stm32l151"  TARGET="thumbv7m-none-eabi"     BOARD="heltec-lora-node151"
 
 before_install:
   - rustup target add ${TARGET}
@@ -51,19 +51,19 @@ before_install:
 install:
   - cd  boards/${BOARD}
   - cargo update
-  - cargo build  --target ${TARGET}  --features ${MCU}
+  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}
 
 script:
   # verify this is already in boards/${BOARD} from install
   - echo  PWD= ${PWD}
-  - echo BOARD= ${BOARD} TARGET= ${TARGET}  MCU= ${MCU}
-  - cargo build  --target ${TARGET}  --features ${MCU}  --example blink
-  - cargo build  --target ${TARGET}  --features ${MCU}  --example echo_by_char
-  - cargo build  --target ${TARGET}  --features ${MCU}  --example  serial_cross
-  # - cargo build  --target ${TARGET}  --features ${MCU}  --example  serial_dma_tx
-  - cargo build  --target ${TARGET}  --features ${MCU}  --example  serial_fmt
-  - cargo build  --target ${TARGET}  --features ${MCU}  --example  serial_gps_rw_by_char
-  - cargo build  --target ${TARGET}  --features ${MCU}  --example  serial_gps_rw
-  - cargo build  --target ${TARGET}  --features ${MCU}  --example  serial_loopback_char
-  - cargo build  --target ${TARGET}  --features ${MCU}  --example  serial_loopback_string
-  - cargo build  --target ${TARGET}  --features ${MCU}  --example  serial_pass_thru_string
+  - echo BOARD= ${BOARD} TARGET= ${TARGET}  HAL= ${HAL} MCU= ${MCU}
+  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example blink
+  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example echo_by_char
+  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  serial_cross
+  # - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  serial_dma_tx
+  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  serial_fmt
+  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  serial_gps_rw_by_char
+  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  serial_gps_rw
+  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  serial_loopback_char
+  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  serial_loopback_string
+  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  serial_pass_thru_string

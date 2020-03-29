@@ -19,20 +19,19 @@ extern crate panic_halt;
 // use nb::block;
 
 //  eg blue pill stm32f103
-#[cfg(any(feature = "stm32f100",  feature = "stm32f101", feature = "stm32f103" ))]
+#[cfg(feature = "stm32f1xx")]
 use stm32f1xx_hal::{ prelude::*, pac::Peripherals, };
 
 //  eg Discovery-stm32f303
-//use alt_stm32f30x_hal::{  ??
-#[cfg(any(feature = "stm32f301",  feature = "stm32f302", feature = "stm32f303"))]
+#[cfg(feature = "stm32f3xx")]
 use stm32f3xx_hal::{ prelude::*, stm32::Peripherals, };
 
 // eg Nucleo-64  stm32f411
-#[cfg(feature = "stm32f411")]
+#[cfg(feature = "stm32f4xx")]
 use stm32f4xx_hal::{ prelude::*, stm32::Peripherals, };
 
 // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
-#[cfg(any(feature = "stm32l100",   feature = "stnm32l151" )) ]
+#[cfg(feature = "stm32l1xx") ]
 use stm32l1xx_hal::{ prelude::*, pac::Peripherals, };
 
 use cortex_m_rt::entry;
@@ -50,9 +49,9 @@ fn main() -> ! {
     // Take ownership over the raw rcc device and convert to  HAL structs
     let mut rcc = dp.RCC.constrain();
 
-    #[cfg(any(feature = "stm32f100",  feature = "stm32f101", feature = "stm32f103" ))]
+    #[cfg(feature = "stm32f1xx")]
     let mut gpiob = dp.GPIOB.split(&mut rcc.apb2);
-    #[cfg(any(feature = "stm32f301",  feature = "stm32f302", feature = "stm32f303"))]
+    #[cfg(feature = "stm32f3xx")]
     let mut gpiob = dp.GPIOB.split(&mut rcc.ahb);
 
     // Configure gpio B pin 14 as a push-pull output. The `crh` register is passed to the function
