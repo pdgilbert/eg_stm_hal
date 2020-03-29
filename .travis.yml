@@ -25,25 +25,25 @@ matrix:
 
     include:
         - name: "bluepill"
-          env: HAL= "stm32f1xx"  MCU="stm32f103"  TARGET="thumbv7m-none-eabi"     BOARD="bluepill"
+          env: HAL="stm32f1xx"  MCU="stm32f103"  TARGET="thumbv7m-none-eabi"     BOARD="bluepill"
 
         - name: "none-stm32f100"
-          env: HAL= "stm32f1xx"  MCU="stm32f100"  TARGET="thumbv7m-none-eabi"     BOARD="none-stm32f100"
+          env: HAL="stm32f1xx"  MCU="stm32f100"  TARGET="thumbv7m-none-eabi"     BOARD="none-stm32f100"
 
         - name: "none-stm32f101"
-          env: HAL= "stm32f1xx"  MCU="stm32f101"  TARGET="thumbv7m-none-eabi"     BOARD="none-stm32f101"
+          env: HAL="stm32f1xx"  MCU="stm32f101"  TARGET="thumbv7m-none-eabi"     BOARD="none-stm32f101"
 
         - name: "discovery-stm32f303"
-          env: HAL= "stm32f3xx"  MCU="stm32f303"  TARGET="thumbv7em-none-eabihf"  BOARD="discovery-stm32f303"
+          env: HAL="stm32f3xx"  MCU="stm32f303"  TARGET="thumbv7em-none-eabihf"  BOARD="discovery-stm32f303"
 
         - name: "nucleo-64"
-          env: HAL= "stm32f4xx"  MCU="stm32f411"  TARGET="thumbv7em-none-eabihf"  BOARD="nucleo-64"
+          env: HAL="stm32f4xx"  MCU="stm32f411"  TARGET="thumbv7em-none-eabihf"  BOARD="nucleo-64"
 
         - name: "discovery-stm32l100"
-          env: HAL= "stm32l1xx"  MCU="stm32l100"  TARGET="thumbv7m-none-eabi"     BOARD="discovery-stm32l100"
+          env: HAL="stm32l1xx"  MCU="stm32l100"  TARGET="thumbv7m-none-eabi"     BOARD="discovery-stm32l100"
 
         - name: "heltec-lora-node151"
-          env: HAL= "stm32l1xx"  MCU="stm32l151"  TARGET="thumbv7m-none-eabi"     BOARD="heltec-lora-node151"
+          env: HAL="stm32l1xx"  MCU="stm32l151"  TARGET="thumbv7m-none-eabi"     BOARD="heltec-lora-node151"
 
 before_install:
   - rustup target add ${TARGET}

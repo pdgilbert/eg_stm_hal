@@ -231,7 +231,7 @@ openocd -f interface/$INTERFACE.cfg -f target/$PROC.cfg
 ```
 `openocd` seems to figure out the USB device to use. In the other window do
 ```
-cargo  run --target $TARGET --features $MCU --example xxx
+cargo  run --target $TARGET --features $HAL,$MCU --example xxx
 ```
 This assumes you have set up a runner in `.cargo/config` as mentioned below in
 [Misc Install Notes](#misc-install-notes). If all works then gdb will load the example and
