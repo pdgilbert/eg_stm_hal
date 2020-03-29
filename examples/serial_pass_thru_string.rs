@@ -1,7 +1,7 @@
 //! Serial DMA RX transfer. Read 15 chars input from console on USART1, output to semihost. Repeat.
 //! There is no echo on the console and it does not handle fast typing.
 //! 
-//! See examples/serial_loopback_char_test.rs for notes about connecting usart1 to 
+//! See examples/serial_loopback_char.rs for notes about connecting usart1 to 
 //!   serial ttl-usb converter on computer for console output.
 //! That file also has for more notes regarding setup.
 
@@ -20,6 +20,19 @@ use cortex_m_rt::entry;
 use cortex_m_semihosting::hprintln;
 
 use eg_stm_hal::to_str;
+
+#[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
+use stm32f1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, StopBits}, };
+
+#[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
+use stm32f3xx_hal::{prelude::*, stm32::Peripherals, };
+
+#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
+use stm32f4xx_hal::{prelude::*, stm32::Peripherals, };
+
+#[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
+use stm32l1xx_hal::{prelude::*,   pac::Peripherals, };
+
 
 //  eg blue pill stm32f103
 #[cfg(any(feature = "stm32f100",  feature = "stm32f101", feature = "stm32f103" ))]
@@ -50,7 +63,7 @@ fn main() -> ! {
     let channels  = p.DMA1.split(&mut rcc.ahb);
     let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
 
-    //see examples/serial_loopback_char_test.rs for more USART config notes.
+    //see examples/serial_loopback_char.rs for more USART config notes.
 
     let serial = Serial::usart1(
         p.USART1,

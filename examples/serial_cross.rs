@@ -8,7 +8,7 @@
 //! usart1 connect the Tx pin pa9  to the Rx pin of a serial-usb converter
 //! usart1 connect the Rx pin pa10 to the Tx pin of a serial-usb converter
 //! 
-//! See examples/serial_loopback_char_test.rs for notes about connecting usart1 to 
+//! See examples/serial_loopback_char.rs for notes about connecting usart1 to 
 //!   serial-usb converter on computer for console output.
 //! That file also has for more notes regarding setup below.
 
@@ -55,7 +55,7 @@ use stm32l1xx_hal::{prelude::*, pac::Peripherals, serial::{Config, Serial, StopB
 
 fn main() -> ! {
     
-    //see examples/serial_loopback_char_test.rs for more notes regarding this setup.
+    //see examples/serial_loopback_char.rs for more notes regarding this setup.
     let p = Peripherals::take().unwrap();
     let mut flash = p.FLASH.constrain();
     let mut rcc = p.RCC.constrain();
@@ -64,7 +64,7 @@ fn main() -> ! {
     let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
     let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
 
-    //see examples/serial_loopback_char_test.rs for more USART config notes.
+    //see examples/serial_loopback_char.rs for more USART config notes.
     //    USART    (tx, rx)
 
     //   usart1 console

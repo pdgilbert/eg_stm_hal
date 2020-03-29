@@ -10,10 +10,12 @@ so often will indicate `error` even when most examples work on most boards.
 
 ## Preamble
 These are newbie notes. I really am new to embedded programming and to Rust. 
-This is an attempt to organize notes made while trying to figure things out.
+However, I do have experience identifying bugs in other languages, and setting
+up examples and tests to help eliminate them.
+This is my attempt to organize notes made while trying to figure out Rust/embedded,
+and to monitor what is working or not using Travis CI.
 I have put them here in the hope they will be useful to others. 
-I am also trying to keep track of what works and what does not, in a way that can be
-kept up to date relatively easily. There is a lot of confusing out-of-date information
+There is a lot of confusing out-of-date information
 on the web, so my hope is that the CI links here will warn readers when this project 
 becomes old and broken.
 
@@ -32,7 +34,9 @@ HAL just makes a lot of sense.
 After awhile things that were a time consuming stumbling block become so obvious that
 it no longer seems necessary to mention them. That is why it is so hard to write beginner
 documention, not to mention programmers' general reluctance to document anything.
-Please enter an issue if you think there is something that really needs to be clarified or added.
+As a newbie I am probably more sensitive to what is missing or un-said, so please be patient
+if you think I am just stating the obvious sometimes.
+Also please enter an issue if you think there is something that really needs to be clarified or added.
 
 (My development environment is Linux, so these notes are specific to that 
 in many places. However, the examples should work in other development 
@@ -53,12 +57,12 @@ environments. Just the setup may change.)
 
 
 ##  Status Summary
- (November 19, 2019) work in progress ...
+ (March 2020) work in progress ...
 
 The overall Travis CI build status and the link for individual boards is given above.
 Testing if the code runs and does something resembling what it is supposed to do 
 requires hardware and is not as automatic as CI. 
-This is my summary as of November 2019. Boards indicated as in 'none-' mean that I do not
+This is my summary as of March 2020. Boards indicated as in 'none-' mean that I do not
 have hardware to check this MCU. If you check the examples using one of these MCUs 
 then please provide details 
 using [issues](https://github.com/pdgilbert/eg_stm_hal/issues) on this git project page.
@@ -150,23 +154,23 @@ See [Running Examples](#running-examples) for more details.
       completely eliminating the development board. 
       (If the dongle power is used. 5v if preferred on mine.)
 
-This is the status of examples as of November 2019 running on a bluepill:
+This is the status of examples as of March 2020:
 
-|                         |  bluepill  | 
-|:-----------------------:|:----------:|
+|                         |  bluepill  | disc. f303 | nucleo-64  |
+|:-----------------------:|:----------:|:----------:|:----------:|
 
-|  xxx                    | build |  run  | 
-|:-----------------------:|:-----:|:-----:|
-| blink                   | yes   | works | 
-| serial_loopback_char    | yes   | works | 
-| serial_fmt              | yes   | works | 
-| serial_dma_tx           | no    |       |
-| serial_pass_thru_string | yes   | works | 
-| serial_loopback_string  | yes   |       |
-| echo_by_char            | yes   | works | 
-| serial_gps_rw           | yes   |       |
-| serial_gps_rw_by_char   | yes   |       |
-| serial_cross            | yes   |       |           
+|  xxx                    | build |  run  | build |  run  | build |  run  | 
+|:-----------------------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
+| blink                   |  yes  | works |  yes  | works |  yes  | works | 
+| serial_loopback_char    |  yes  | works |	  |	  |	  |	  | 
+| serial_fmt              |  yes  | works |	  |	  |	  |	  | 
+| serial_dma_tx           |  no   |	  |	  |	  |	  |	  |
+| serial_pass_thru_string |  yes  | works |	  |	  |	  |	  | 
+| serial_loopback_string  |  yes  |	  |	  |	  |	  |	  |
+| echo_by_char            |  yes  | works |	  |	  |	  |	  | 
+| serial_gps_rw           |  yes  |	  |	  |	  |	  |	  |
+| serial_gps_rw_by_char   |  yes  |	  |	  |	  |	  |	  |
+| serial_cross            |  yes  |	  |	  |	  |	  |	  |	      
 
 
 ## Building Examples
@@ -186,7 +190,7 @@ Boards indicated above use one of
   export HAL=stm32f1xx MCU=stm32f103 TARGET=thumbv7m-none-eabi     # bluepill            Cortex-M3
   export HAL=stm32f1xx MCU=stm32f100 TARGET=thumbv7m-none-eabi     # none-stm32f100      Cortex-M3
   export HAL=stm32f1xx MCU=stm32f101 TARGET=thumbv7m-none-eabi     # none-stm32f101      Cortex-M3
-  export HAL=stm32f3xx MCU=stm32f303 TARGET=thumbv7em-none-eabihf  # STM32F303           Cortex-M3
+  export HAL=stm32f3xx MCU=stm32f303 TARGET=thumbv7em-none-eabihf  # discovery-stm32f303 Cortex-M3
   export HAL=stm32f4xx MCU=stm32f411 TARGET=thumbv7em-none-eabihf  # nucleo-64           Cortex-M4
   export HAL=stm32l1xx MCU=stm32l100 TARGET=thumbv7m-none-eabi     # discovery-stm32l100 Cortex-M3
   export HAL=stm32l1xx MCU=stm32l151 TARGET=thumbv7m-none-eabi     # heltec-lora-node151 Cortex-M3
@@ -261,7 +265,7 @@ FILL IN LAYOUT
 
 The openocd  command above uses `INTERFACE` and `PROC` environment variables that indicate the
 ST-Link version and the development board MCU family respectively. 
-(The PROC will be similar to the MCU setting, unfortunately they are not exactly the same.)
+(The PROC will be similar to the HAL and MCU setting, unfortunately they are not exactly the same.)
 Typical specification for a bluepill development board and ST-Link dongle would be
 
 ```
@@ -269,7 +273,8 @@ Typical specification for a bluepill development board and ST-Link dongle would 
   export INTERFACE=stlink-v2-1  PROC=stm32f1x  #better dongle and blue pill
 ```
 Many development boads have an ST-Link built onto the board, in which case you need to determine
-the version, and that is not always clear. My Discovery kit STM32F303 says STlink V2-B but that 
+the version, and that is not always clear. My discovery-stm32f303 (Discovery kit STM32F303)
+says STlink V2-B but that 
 seems to mean v2-1. One symptom of an incorrect setting is that the openocd command start up 
 stalls at
 ```
@@ -283,6 +288,13 @@ Info : stm32f1x.cpu: hardware has 6 breakpoints, 4 watchpoints
 
 Some of the other causes for the `in procedure 'ocd_bouncer'` can be that the board is not 
 properly powered up, or has some other boot loader pre-burned into it.
+
+Development boards I have tried:
+```
+  export INTERFACE=stlink-v2-1  PROC=stm32f3x  #discovery-stm32f303
+  export INTERFACE=stlink-v2-1  PROC=stm32f4x  #nucleo-64
+```
+The discovery-stm32f303 and nucleo-64 pop up a a window with Mbed.htm which I dismiss and then run `openocd`.
 
 It is possible to use the built in STlink on some development boards to program another board. 
 To do this it is necessary to  removing 2 connectors on the 'ST-LINK' header and connect the 

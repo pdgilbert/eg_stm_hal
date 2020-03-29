@@ -42,7 +42,7 @@ use stm32l1xx_hal::{prelude::*, pac::Peripherals, serial::{Config, Serial, StopB
 #[entry]
 fn main() -> ! {
 
-    //see examples/serial_loopback_char_test.rs for more notes regarding this setup.
+    //see examples/serial_loopback_char.rs for more notes regarding this setup.
     let p = Peripherals::take().unwrap();
     let mut flash = p.FLASH.constrain();
     let mut rcc = p.RCC.constrain();

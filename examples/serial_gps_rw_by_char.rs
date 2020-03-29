@@ -12,7 +12,7 @@
 //! usart3 connect the Rx pin pb11 to the Tx pin of GPS 
 //! usart3 connect the Tx pin pb10 to the Rx pin of GPS
 //! 
-//! See examples/serial_loopback_char_test.rs for notes about connecting usart1 to 
+//! See examples/serial_loopback_char.rs for notes about connecting usart1 to 
 //!   serial-usb converter on computer for console output.
 //! That file also has for more notes regarding setup below.
 
@@ -61,7 +61,7 @@ fn main() -> ! {
     let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
     let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
 
-    //see examples/serial_loopback_char_test.rs for more USART config notes.
+    //see examples/serial_loopback_char.rs for more USART config notes.
 
     let serial1 = Serial::usart1(
         p.USART1,

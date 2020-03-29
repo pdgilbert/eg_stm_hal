@@ -7,7 +7,7 @@
 //!  directly to the  USB-TTL and terminal with these settings (minicom 8-N-1) 
 //! I use 8 bit, odd parity, 1 stopbit (minicom 8-N-1), but only 9600bps seems important. 
 //! 
-//! See examples/serial_loopback_char_test.rs for notes about connecting usart1 to 
+//! See examples/serial_loopback_char.rs for notes about connecting usart1 to 
 //!   serial-usb converter on computer for console output.
 //! That file also has more notes regarding setup below.
 
@@ -57,7 +57,7 @@ fn main() -> ! {
     hprintln!("{}", to_str("just checking to_str".as_bytes())).expect("hprintln error."); 
     hprintln!("{:?}",      "just checking to_str".as_bytes()).expect("hprintln error."); 
 
-    //see examples/serial_loopback_char_test.rs for more notes regarding this setup.
+    //see examples/serial_loopback_char.rs for more notes regarding this setup.
     let p = Peripherals::take().unwrap();
     let mut flash = p.FLASH.constrain();
     let mut rcc = p.RCC.constrain();
@@ -68,7 +68,7 @@ fn main() -> ! {
 
     let channels = p.DMA1.split(&mut rcc.ahb);
 
-    //see examples/serial_loopback_char_test.rs for more USART config notes.
+    //see examples/serial_loopback_char.rs for more USART config notes.
     //    USART    (tx, rx)
 
     //  usart1 sending to console 

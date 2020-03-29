@@ -54,7 +54,7 @@ fn main() -> ! {
     let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
     // let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
 
-    //see examples/serial_loopback_char_test.rs for more USART config notes.
+    //see examples/serial_loopback_char.rs for more USART config notes.
 
     let serial = Serial::usart1(
         p.USART1,
