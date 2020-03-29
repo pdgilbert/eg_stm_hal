@@ -146,7 +146,7 @@ See [Running Examples](#running-examples) for more details.
 
 
 0.  Using the git versions of HALs (in Nov 2019 much is changing and release in crates.io is old). 
-1.  Blink_test does not blink in gdb steps, use continue.
+1.  Blink does not blink when stepping in gdb, use continue.
 2.  With local echo on in console the characters are doubled, `<cr>` adds a single `<lf>`.
      Without local echo there is no `<lf>`. There is trouble if you type too fast.
 4.  Ublox GPS by default uses 9600bps, odd Parity, 1 stop bit (minicom 8-N-1). 
@@ -156,7 +156,7 @@ See [Running Examples](#running-examples) for more details.
 
 This is the status of examples as of March 2020:
 
-|                         |  bluepill  | disc. f303 | nucleo-64  |
+| ----------------------- |  bluepill  | disc. f303 | nucleo-64  |
 |:-----------------------:|:----------:|:----------:|:----------:|
 
 |  xxx                    | build |  run  | build |  run  | build |  run  | 
