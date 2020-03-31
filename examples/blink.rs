@@ -19,7 +19,7 @@ extern crate panic_halt;
 // use nb::block;
 
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
-use stm32f1xx_hal::{prelude::*,   pac::Peripherals, };
+use {stm32f1xx_hal::{prelude::*,   pac::Peripherals, }, embedded_hal::digital::v2::OutputPin };
 
 #[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
 use stm32f3xx_hal::{prelude::*, stm32::Peripherals, };
@@ -31,7 +31,6 @@ use stm32f4xx_hal::{prelude::*, stm32::Peripherals, };
 use stm32l1xx_hal::{prelude::*,   pac::Peripherals, };
 
 use cortex_m_rt::entry;
-use embedded_hal::digital::v2::OutputPin;
 
 // use embedded_hal::prelude::*;
 use asm_delay::{ AsmDelay, bitrate, };
@@ -39,43 +38,57 @@ use asm_delay::{ AsmDelay, bitrate, };
 #[entry]
 fn main() -> ! {
 
-    // Get access to the device specific peripherals from the peripheral access crate
+    // 1. Get access to the device specific peripherals from the peripheral access crate
+    // 2. Take ownership over the raw rcc device and convert to  HAL structs
+    // 3. Configure gpio B pins 13,14,15 as a push-pull output. 
+    //    On bluepill the `crh` register is passed to the function
+    //    in order to configure the port. For pins 0-7, crl should be passed instead.
+
     let dp = Peripherals::take().unwrap();
 
-    // Take ownership over the raw rcc device and convert to  HAL structs
+    //#[cfg(feature = "stm32f1xx")]
+    //pub mod leds_on_13_14_15_stm32f1xx;
+    #[cfg(feature = "stm32f1xx")]
     let mut rcc = dp.RCC.constrain();
-
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f1xx")]
     let mut gpiob = dp.GPIOB.split(&mut rcc.apb2);
+    #[cfg(feature = "stm32f1xx")]
+    let mut led1 = gpiob.pb13.into_push_pull_output(&mut gpiob.crh);
+    #[cfg(feature = "stm32f1xx")]
+    let mut led2 = gpiob.pb14.into_push_pull_output(&mut gpiob.crh);
+    #[cfg(feature = "stm32f1xx")]
+    let mut led3 = gpiob.pb15.into_push_pull_output(&mut gpiob.crh);
+
+    #[cfg(feature = "stm32f3xx")]
+    let mut rcc = dp.RCC.constrain();
     #[cfg(feature = "stm32f3xx")]
     let mut gpiob = dp.GPIOB.split(&mut rcc.ahb);
-    #[cfg(feature = "stm32f4xx")]
-    let mut gpiob = dp.GPIOB.split();
-
-    // Configure gpio B pin 14 as a push-pull output. 
-    // On bluepill the `crh` register is passed to the function
-    // in order to configure the port. For pins 0-7, crl should be passed instead.
-
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
-    let mut led1 = gpiob.pb13.into_push_pull_output(&mut gpiob.crh);
     #[cfg(feature = "stm32f3xx")]
     let mut led1 = gpiob.pb13.into_push_pull_output(&mut gpiob.moder, &mut gpiob.otyper);
-    #[cfg(feature = "stm32f4xx")]
-    let mut led1 = gpiob.pb13.into_push_pull_output();
-
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
-    let mut led2 = gpiob.pb14.into_push_pull_output(&mut gpiob.crh);
     #[cfg(feature = "stm32f3xx")]
     let mut led2 = gpiob.pb14.into_push_pull_output(&mut gpiob.moder, &mut gpiob.otyper);
-    #[cfg(feature = "stm32f4xx")]
-    let mut led2 = gpiob.pb14.into_push_pull_output();
-
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
-    let mut led3 = gpiob.pb15.into_push_pull_output(&mut gpiob.crh);
     #[cfg(feature = "stm32f3xx")]
     let mut led3 = gpiob.pb15.into_push_pull_output(&mut gpiob.moder, &mut gpiob.otyper);
+
+    #[cfg(feature = "stm32f4xx")]
+    let gpiob = dp.GPIOB.split();
+    #[cfg(feature = "stm32f4xx")]
+    let mut led1 = gpiob.pb13.into_push_pull_output();
+    #[cfg(feature = "stm32f4xx")]
+    let mut led2 = gpiob.pb14.into_push_pull_output();
     #[cfg(feature = "stm32f4xx")]
     let mut led3 = gpiob.pb15.into_push_pull_output();
+
+    #[cfg(feature = "stm32l1xx")]
+    let mut rcc = dp.RCC.constrain();
+    #[cfg(feature = "stm32l1xx")]
+    let mut gpiob = dp.GPIOB.split(&mut rcc.apb2);
+    #[cfg(feature = "stm32l1xx")]
+    let mut led1 = gpiob.pb13.into_push_pull_output(&mut gpiob.crh);
+    #[cfg(feature = "stm32l1xx")]
+    let mut led2 = gpiob.pb14.into_push_pull_output(&mut gpiob.crh);
+    #[cfg(feature = "stm32l1xx")]
+    let mut led3 = gpiob.pb15.into_push_pull_output(&mut gpiob.crh);
 
     //this works on bluepill but need to be more specific about timer using other chips/HALs
     // may need different timer, like Struct stm32f3xx_hal::stm32::SYST

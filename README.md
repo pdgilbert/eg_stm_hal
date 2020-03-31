@@ -13,8 +13,8 @@ These are newbie notes. I really am new to embedded programming and to Rust.
 However, I do have experience identifying bugs in other languages, and setting
 up examples and tests to help eliminate them.
 This is my attempt to organize notes made while trying to figure out Rust/embedded,
-and to monitor what is working or not using Travis CI.
-I have put them here in the hope they will be useful to others. 
+and to use Travis CI to monitor what is working or not.
+I have put the examples and notes here so they  can be useful to others. 
 There is a lot of confusing out-of-date information
 on the web, so my hope is that the CI links here will warn readers when this project 
 becomes old and broken.
@@ -156,7 +156,7 @@ See [Running Examples](#running-examples) for more details.
 
 This is the status of examples as of March 2020:
 
-| ----------------------- |  bluepill  | disc. f303 | nucleo-64  |
+| ---------------------------- | -- bluepill -- | -- disc. f303 -- | -- nucleo-64 -- |
 |:-----------------------:|:----------:|:----------:|:----------:|
 
 |  xxx                    | build |  run  | build |  run  | build |  run  | 

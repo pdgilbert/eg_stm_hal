@@ -32,15 +32,22 @@ use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Config, Serial, Sto
 use stm32f4xx_hal::{prelude::*, stm32::Peripherals, serial::{config::Config, Serial, config::StopBits}};
 
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
-use stm32f1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, StopBits}, };
+use stm32l1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, StopBits}, };
 
 
 #[entry]
 fn main() -> ! {
     let p = Peripherals::take().unwrap();
-    let mut flash = p.FLASH.constrain();
     let mut rcc = p.RCC.constrain();
+
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let mut flash = p.FLASH.constrain();
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
     let clocks = rcc.cfgr.freeze(&mut flash.acr);
+
+    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
+    let clocks = rcc.cfgr.freeze();
+
     let mut afio = p.AFIO.constrain(&mut rcc.apb2);
     let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
     // let mut gpiob = p.GPIOB.split(&mut rcc.apb2);

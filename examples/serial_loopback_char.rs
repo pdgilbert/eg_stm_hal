@@ -34,13 +34,14 @@ use nb::block;
 use stm32f1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, StopBits}, };
 
 #[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
-use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Config, Serial, StopBits}, };
+use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Serial}, };
+//use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Config, Serial, StopBits}, };
 
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
 use stm32f4xx_hal::{prelude::*, stm32::Peripherals, serial::{config::Config, Serial, config::StopBits}};
 
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
-use stm32f1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, StopBits}, };
+use stm32l1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, StopBits}, };
 
 
 #[entry]
@@ -51,17 +52,32 @@ fn main() -> ! {
     let p = Peripherals::take().unwrap();
 
     // Take ownership of raw flash and rcc devices and convert to HAL structs
-    let mut flash = p.FLASH.constrain();
     let mut rcc = p.RCC.constrain();
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let mut flash = p.FLASH.constrain();
 
     // Freeze  all system clocks  and store the frozen frequencies in `clocks`
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx", feature = "stm32f3xx"))]
     let clocks = rcc.cfgr.freeze(&mut flash.acr);
+
+    #[cfg(feature = "stm32f4xx")]
+    let clocks = rcc.cfgr.freeze();
+
 
     // Prepare the alternate function I/O registers
     let mut afio = p.AFIO.constrain(&mut rcc.apb2);
 
     // Prepare the GPIO peripheral
+
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
     let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
+
+    #[cfg(feature = "stm32f3xx")]
+    let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
+
+    #[cfg(feature = "stm32f4xx")]
+    let mut gpioa = p.GPIOA.split();
+
     // let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
 
     //    USART       (tx,                                             rx)
