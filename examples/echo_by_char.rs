@@ -1,7 +1,7 @@
-//! Echo console input (on usart1 pins pa9, pa10 to serial-usb converter), char by char,  + semihost output
+//! Echo console input back to console + semihost output, char by char
 //!
-//! Connect the Tx pin pa9  to the Rx pin of a serial-usb converter
-//! Connect the Rx pin pa10 to the Tx pin of a serial-usb converter
+//! Connect the Tx pin pa9  to the Rx pin of usb-ttl converter
+//! Connect the Rx pin pa10 to the Tx pin of usb-ttl converter
 //! Set up the serial console (e.g. minicom) with the same settings used here.
 //! (Using 9600bps, could be higher but needs serial console to be the same.)
 
@@ -26,10 +26,10 @@ use nb::block;
 use stm32f1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, StopBits}, };
 
 #[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
-use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Config, Serial, StopBits}, };
+use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{ Serial}, };
 
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
-use stm32f4xx_hal::{prelude::*, stm32::Peripherals, serial::{config::Config, Serial, config::StopBits}};
+use stm32f4xx_hal::{prelude::*, stm32::Peripherals, serial::{config::Config, Serial }};
 
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, StopBits}, };
@@ -37,34 +37,62 @@ use stm32l1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, Sto
 
 #[entry]
 fn main() -> ! {
-    let p = Peripherals::take().unwrap();
-    let mut rcc = p.RCC.constrain();
-
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
-    let mut flash = p.FLASH.constrain();
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
-    let clocks = rcc.cfgr.freeze(&mut flash.acr);
-
-    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
-    let clocks = rcc.cfgr.freeze();
-
-    let mut afio = p.AFIO.constrain(&mut rcc.apb2);
-    let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
-    // let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
-
+ 
     //see examples/serial_loopback_char.rs for more USART config notes.
+    let p = Peripherals::take().unwrap();
 
-    let serial = Serial::usart1(
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let mut rcc = p.RCC.constrain();
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let txrx = Serial::usart1(
         p.USART1,
         (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),  gpioa.pa10),
-        &mut afio.mapr,
+        &mut p.AFIO.constrain(&mut rcc.apb2).mapr,
         Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1),
         clocks,
         &mut rcc.apb2,
     );
 
-    // Split the serial struct into a receiving and a transmitting part
-    let (mut tx, mut rx) = serial.split();
+
+    #[cfg(feature = "stm32f3xx")]
+    let mut rcc = p.RCC.constrain();
+    #[cfg(feature = "stm32f3xx")]
+    let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
+    #[cfg(feature = "stm32f3xx")]
+    let mut gpioa = p.GPIOA.split(&mut rcc.ahb);  //ahb ?
+    #[cfg(feature = "stm32f3xx")]
+    let txrx = Serial::usart1(
+        p.USART1,
+        (gpioa.pa9.into_alternate_af7(),  gpioa.pa10.into_alternate_af7()),
+        9600.bps(),
+        clocks,
+        &mut rcc.apb2,
+    );
+
+
+    #[cfg(feature = "stm32f4xx")]
+    let clocks = p.RCC.constrain().cfgr.freeze();
+    //let clocks = rcc.cfgr.freeze();
+    #[cfg(feature = "stm32f4xx")]
+    let gpioa = p.GPIOA.split();
+    #[cfg(feature = "stm32f4xx")]
+    p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+    //let (tx,rx) = 
+    #[cfg(feature = "stm32f4xx")]
+    let txrx =  Serial::usart1(
+        p.USART1,
+    	(gpioa.pa9.into_alternate_af7(),  gpioa.pa10.into_alternate_af7()),    //WHAT IS AF7 ??
+    	Config::default() .baudrate(9600.bps()),
+    	clocks
+    ).unwrap(); 
+    
+
+    // Split the serial rxtx struct into a receiving and a transmitting part
+    let (mut tx, mut rx) =txrx.split();
 
     loop { // Read a byte and write
       let received = block!(rx.read()).unwrap();

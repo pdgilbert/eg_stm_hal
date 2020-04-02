@@ -39,7 +39,7 @@ use asm_delay::{ AsmDelay, bitrate, };
 fn main() -> ! {
 
     // 1. Get access to the device specific peripherals from the peripheral access crate
-    // 2. Take ownership over the raw rcc device and convert to  HAL structs
+    // 2. Take ownership over the raw rcc (Reset and Clock Control) device and convert to  HAL structs
     // 3. Configure gpio B pins 13,14,15 as a push-pull output. 
     //    On bluepill the `crh` register is passed to the function
     //    in order to configure the port. For pins 0-7, crl should be passed instead.
@@ -49,7 +49,7 @@ fn main() -> ! {
     //#[cfg(feature = "stm32f1xx")]
     //pub mod leds_on_13_14_15_stm32f1xx;
     #[cfg(feature = "stm32f1xx")]
-    let mut rcc = dp.RCC.constrain();
+    let mut rcc = dp.RCC.constrain(); 
     #[cfg(feature = "stm32f1xx")]
     let mut gpiob = dp.GPIOB.split(&mut rcc.apb2);
     #[cfg(feature = "stm32f1xx")]

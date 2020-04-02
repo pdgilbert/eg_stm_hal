@@ -38,7 +38,7 @@ use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Serial}, };
 //use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Config, Serial, StopBits}, };
 
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
-use stm32f4xx_hal::{prelude::*, stm32::Peripherals, serial::{config::Config, Serial, config::StopBits}};
+use stm32f4xx_hal::{prelude::*, stm32::Peripherals, serial::{config::Config, Serial}};
 
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, StopBits}, };
@@ -48,75 +48,102 @@ use stm32l1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, Sto
 fn main() -> ! {
     // EXPAND NOTES HERE
 
-    // Get access to the device specific peripherals from the peripheral access crate
-    let p = Peripherals::take().unwrap();
-
-    // Take ownership of raw flash and rcc devices and convert to HAL structs
-    let mut rcc = p.RCC.constrain();
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
-    let mut flash = p.FLASH.constrain();
-
-    // Freeze  all system clocks  and store the frozen frequencies in `clocks`
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx", feature = "stm32f3xx"))]
-    let clocks = rcc.cfgr.freeze(&mut flash.acr);
-
-    #[cfg(feature = "stm32f4xx")]
-    let clocks = rcc.cfgr.freeze();
-
-
-    // Prepare the alternate function I/O registers
-    let mut afio = p.AFIO.constrain(&mut rcc.apb2);
-
-    // Prepare the GPIO peripheral
-
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
-    let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
-
-    #[cfg(feature = "stm32f3xx")]
-    let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
-
-    #[cfg(feature = "stm32f4xx")]
-    let mut gpioa = p.GPIOA.split();
-
-    // let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
-
+    //  bluepill
     //    USART       (tx,                                             rx)
     // USART1     ( gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),  gpioa.pa10)
     // USART1 alt ( gpiob.pb6.into_alternate_push_pull(&mut gpiob.crl),  gpiob.pb7)
     // USART2     ( gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl).  gpioa.pa3)
     // USART3     ( gpiob.pb10.into_alternate_push_pull(&mut gpiob.crh), gpiob.pb11)
 
-    // .baudrate(115_200.bps()  .baudrate(9_600.bps()
-    //  WHAT IS THE DIFFERENCE BETWEEN (9_600.bps() AND 9600.bps()
-    // StopBits::STOP1   StopBits::STOP2
 
-    // Set up the usart device. Take ownership over the USART register and tx/rx pins.
-    // The rest of the registers are used to enable and configure the device.
-    let serial = Serial::usart2(
+    // 1. Get access to the device specific peripherals from the peripheral access crate
+    // 2. Take ownership of raw rcc and flash devices and convert to HAL structs
+    // 3. Freeze  all system clocks  and store the frozen frequencies in `clocks`
+    // 4. Prepare the alternate function I/O registers
+    // 5. Prepare the GPIO peripheral
+    // 6. Set up the usart device. Take ownership over the USART register and tx/rx pins.
+    //    The rest of the registers are used to enable and configure the device.
+
+    hprintln!("initializing ...").unwrap();
+
+    let p = Peripherals::take().unwrap();
+
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let mut rcc = p.RCC.constrain();
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let txrx = Serial::usart2(
         p.USART2,
         ( gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),   gpioa.pa3),
-        &mut afio.mapr,
+        &mut p.AFIO.constrain(&mut rcc.apb2).mapr,
         Config::default() .baudrate(115_200.bps())  .parity_odd() .stopbits(StopBits::STOP1),
         clocks,
         &mut rcc.apb1,
     );
 
+
+    #[cfg(feature = "stm32f3xx")]
+    let mut rcc = p.RCC.constrain();
+    #[cfg(feature = "stm32f3xx")]
+    let clocks = rcc.cfgr.freeze(&mut flash.acr);
+    #[cfg(feature = "stm32f3xx")]
+    let mut gpioa = p.GPIOA.split(&mut rcc.amb);
+    #[cfg(feature = "stm32f3xx")]
+    let txrx = Serial::usart2(
+        p.USART2,
+        ( gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),   gpioa.pa3),
+        Config::default() .baudrate(115_200.bps())  .parity_odd() .stopbits(StopBits::STOP1),
+        clocks,
+        &mut rcc.apb1,
+    );
+
+
+    #[cfg(feature = "stm32f4xx")]
+    let clocks = p.RCC.constrain().cfgr.freeze();
+    //let clocks = rcc.cfgr.freeze();
+    #[cfg(feature = "stm32f4xx")]
+    let gpioa = p.GPIOA.split();
+    //#[cfg(feature = "stm32f4xx")]
+    //p.USART2.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+    //let (tx,rx) = 
+    #[cfg(feature = "stm32f4xx")]
+    let txrx =  Serial::usart2(
+        p.USART2,
+    	(gpioa.pa2.into_alternate_af7(),  gpioa.pa3.into_alternate_af7()),
+    	Config::default() .baudrate(115_200.bps()),
+    	clocks
+    ).unwrap(); 
+    
+
+
+    // let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
+
+    // .baudrate(115_200.bps()  .baudrate(9_600.bps()
+    // StopBits::STOP1   StopBits::STOP2
+
     // Split the serial struct into a receiving and a transmitting part
-    let (mut tx, mut rx) = serial.split();
+    let (mut tx, mut rx) = txrx.split();
+
+    hprintln!("sending ...").unwrap();
 
     let sent = b'X';
 
     // Write `X` and wait until the write is successful
     block!(tx.write(sent)).ok();
 
+    hprintln!("receiving ...").unwrap();
+
     // Read the byte that was just sent. Blocks until the read is complete
     let received = block!(rx.read()).unwrap();
 
+    hprintln!("testing received = sent,  {} = {} byte", received, sent).unwrap();
     // With tx connected to rx, the sent byte should be the one received
     assert_eq!(received, sent, "testing received = sent,  {} = {}", received, sent);
 
     // PUT A TEST HERE THAT WILL SHOW FAILURE. ASSERT SEEMS TO PANIC HALT SO ...
-    hprintln!("testing received = sent,  {} = {} byte", received, sent).unwrap();
 
     // and now print as chararter rather than byte.
     // Note that sent above was u8 byte (b'X') because tx.write() requires that, but

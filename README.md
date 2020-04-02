@@ -156,7 +156,7 @@ See [Running Examples](#running-examples) for more details.
 
 This is the status of examples as of March 2020:
 
-| ---------------------------- | -- bluepill -- | -- disc. f303 -- | -- nucleo-64 -- |
+| ------------------------------- | -- bluepill --- | -- disc. f303 --- | -- nucleo-64 --- |
 |:-----------------------:|:----------:|:----------:|:----------:|
 
 |  xxx                    | build |  run  | build |  run  | build |  run  | 
