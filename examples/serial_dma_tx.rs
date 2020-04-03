@@ -16,7 +16,7 @@ extern crate panic_halt;
 use cortex_m_rt::entry;
 
 use cortex_m_semihosting::hprintln;
-use heapless::Vec;
+//use heapless::Vec;
 
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
 use stm32f1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, StopBits}, };
@@ -35,48 +35,67 @@ use stm32l1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, Sto
 fn main() -> ! {
     let p = Peripherals::take().unwrap();
 
-    let mut flash = p.FLASH.constrain();
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
     let mut rcc = p.RCC.constrain();
-
-    let clocks = rcc.cfgr.freeze(&mut flash.acr);
-
-    let mut afio = p.AFIO.constrain(&mut rcc.apb2);
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
     let channels = p.DMA1.split(&mut rcc.ahb);
-
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
     let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
-    // let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
-
-    let serial = Serial::usart1(
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let txrx = Serial::usart1(
         p.USART1,
         (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),   gpioa.pa10),
-        &mut afio.mapr,
-        Config::default()
-           .baudrate(9_600.bps()) .parity_odd() .stopbits(StopBits::STOP1),
+        &mut p.AFIO.constrain(&mut rcc.apb2).mapr,
+        Config::default() .baudrate(9_600.bps()) .parity_odd() .stopbits(StopBits::STOP1),
         clocks,
         &mut rcc.apb2,
     );
 
-    let tx = serial.split().0.with_dma(channels.4);
+
+    #[cfg(feature = "stm32f3xx")]
+    let mut rcc = p.RCC.constrain();
+    #[cfg(feature = "stm32f3xx")]
+    let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let channels = p.DMA1.split(&mut rcc.ahb);
+    #[cfg(feature = "stm32f3xx")]
+    let mut gpioa = p.GPIOA.split(&mut rcc.ahb);  //ahb ?
+    #[cfg(feature = "stm32f3xx")]
+    let txrx = Serial::usart1(
+        p.USART1,
+        (gpioa.pa9.into_alternate_af7(),  gpioa.pa10.into_alternate_af7()),
+        9600.bps(),
+        clocks,
+        &mut rcc.apb2,
+    );
+
+
+    #[cfg(feature = "stm32f4xx")]
+    let clocks = p.RCC.constrain().cfgr.freeze();
+    //let clocks = rcc.cfgr.freeze();
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let channels = p.DMA1.split(&mut rcc.ahb);
+    #[cfg(feature = "stm32f4xx")]
+    let gpioa = p.GPIOA.split();
+    #[cfg(feature = "stm32f4xx")]
+    p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+    //let (tx,rx) = 
+    #[cfg(feature = "stm32f4xx")]
+    let txrx =  Serial::usart1(
+        p.USART1,
+    	(gpioa.pa9.into_alternate_af7(),  gpioa.pa10.into_alternate_af7()),    //WHAT IS AF7 ??
+    	Config::default() .baudrate(9600.bps()),
+    	clocks
+    ).unwrap(); 
     
+
+    let tx = txrx.split().0.with_dma(channels.4);   
     let (_, tx) = tx.write(b"The quick brown fox").wait(); // static byte works but not very flexible
-
-    //let text = ["The ", "quick ", "brown ", "fox" ];  t in iter doesn't have a size known at compile-time
-    //let text = ("The ", "quick ", "brown ", "fox" );
-    //let txt = ["The ", "quick ", "brown ", "fox" ];
-    //let text :Vec<str> = ["The ", "quick ", "brown ", "fox" ];
-    //let text :Vec<&str> = txt.iter().map(AsRef::as_ref).collect();
-
-    //for t in text.iter() {
-    //   let (_, tx) = tx.write(t).wait();
-    //   let (_, tx) = tx.write(t.as_bytes()).wait();
-    //   hprintln!("sent {:?}. ", t).unwrap();
-    //}
-
     let (_, tx) = tx.write(b" jumps").wait();
     tx.write(b" over the lazy dog.").wait();
-
     //asm::bkpt();
-
     hprintln!("entering empty loop.").unwrap();
     loop {}
 }
