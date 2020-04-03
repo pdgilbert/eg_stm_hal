@@ -62,18 +62,15 @@ environments. Just the setup may change.)
 The overall Travis CI build status and the link for individual boards is given above.
 Testing if the code runs and does something resembling what it is supposed to do 
 requires hardware and is not as automatic as CI. 
-This is my summary as of March 2020. Boards indicated as in 'none-' mean that I do not
-have hardware to check this MCU. If you check the examples using one of these MCUs 
+This is my summary as of March 2020. If you check the examples using one of these MCUs 
 then please provide details 
 using [issues](https://github.com/pdgilbert/eg_stm_hal/issues) on this git project page.
 
-|      HAL       |    MCU    |      Board          |   Builds   |  Runs  |          Notes                             |
+|      HAL       | eg MCU    |   eg Board          |   Builds   |  Runs  |          Notes                             |
 | -------------- |:---------:|:-------------------:|:----------:|:------:| :----------------------------------------- |
-| stm32f1xx-hal  | stm32f103 |      bluepill       |   mostly   |  some  | Problems using serial.                     |
-| stm32f1xx-hal  | stm32f100 |   none-stm32f100    |   mostly   |   NA   |         |
-| stm32f1xx-hal  | stm32f101 |   none-stm32f101    |   mostly   |   NA   |         |
-| stm32f3xx-hal  | stm32f303 | discovery-stm32f303 |    no      |   no   | Hal differences.  Code adjustments needed  |
-| stm32f4xx-hal  | stm32f411 |      nucleo-64      |    no      |   no   | Hal differences.  Code adjustments needed  |
+| stm32f1xx-hal  | stm32f103 |      bluepill       |    yes     |  many  | Problems using serial in some examples     |
+| stm32f3xx-hal  | stm32f303 | discovery-stm32f303 |   some     |  some  | Hal differences.  Code adjustments needed  |
+| stm32f4xx-hal  | stm32f411 |      nucleo-64      |   some     |  some  | Hal differences.  Code adjustments needed  |
 | stm32l1xx-hal  | stm32l100 | discovery-stm32l100 |    no      |   no   | Hal does not build.                        |
 | stm32l1xx-hal  | stm32l151 | heltec-lora-node151 |    no      |   no   | Hal does not build.                        |
 

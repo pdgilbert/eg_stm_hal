@@ -58,7 +58,7 @@ fn main() -> ! {
     let mut rcc = p.RCC.constrain();
     #[cfg(feature = "stm32f3xx")]
     let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f3xx")]
     let channels = p.DMA1.split(&mut rcc.ahb);
     #[cfg(feature = "stm32f3xx")]
     let mut gpioa = p.GPIOA.split(&mut rcc.ahb);  //ahb ?
@@ -75,8 +75,8 @@ fn main() -> ! {
     #[cfg(feature = "stm32f4xx")]
     let clocks = p.RCC.constrain().cfgr.freeze();
     //let clocks = rcc.cfgr.freeze();
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
-    let channels = p.DMA1.split(&mut rcc.ahb);
+    #[cfg(feature = "stm32f4xx")]
+     let channels = p.DMA1.split(&mut rcc.ahb);
     #[cfg(feature = "stm32f4xx")]
     let gpioa = p.GPIOA.split();
     #[cfg(feature = "stm32f4xx")]

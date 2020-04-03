@@ -60,8 +60,7 @@ script:
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example blink
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example echo_by_char
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  serial_cross
-  # - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  serial_dma_tx
-  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  serial_fmt
+  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  serial_dma_tx
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  serial_gps_rw_by_char
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  serial_gps_rw
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  serial_loopback_char
