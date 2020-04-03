@@ -135,7 +135,6 @@ See [Running Examples](#running-examples) for more details.
 | ----------------------- |:-----:|:-------------------------------------------------------------- |
 | blink                   |   1   | Blinks off-board LEDs attached to  pb 13,14,15                 |
 | serial_loopback_char    |       | Single character loopback on usart2  + semihost output         |
-| serial_fmt              |       | Formatted string write to console on usart1                    |
 | serial_dma_tx           |       | String writes to console interface                             |
 | serial_pass_thru_string |       | Read 15 chars input from console, output to semihost, repeat   |
 | serial_loopback_string  |       | String interface loopback on usart2 + semihost output          |
@@ -163,11 +162,10 @@ This is the status of examples as of March 2020:
 |:-----------------------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
 | blink                   |  yes  | works |  yes  | works |  yes  | works | 
 | serial_loopback_char    |  yes  | works |	  |	  |	  |	  | 
-| serial_fmt              |  yes  | works |	  |	  |	  |	  | 
 | serial_dma_tx           |  no   |	  |	  |	  |	  |	  |
 | serial_pass_thru_string |  yes  | works |	  |	  |	  |	  | 
 | serial_loopback_string  |  yes  |	  |	  |	  |	  |	  |
-| echo_by_char            |  yes  | works |	  |	  |	  |	  | 
+| echo_by_char            |  yes  | works |	  |	  |  yes  | works | 
 | serial_gps_rw           |  yes  |	  |	  |	  |	  |	  |
 | serial_gps_rw_by_char   |  yes  |	  |	  |	  |	  |	  |
 | serial_cross            |  yes  |	  |	  |	  |	  |	  |	      
