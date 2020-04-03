@@ -1,3 +1,4 @@
+ REDUNDANT WITH ECH0. REMOVE
 //! Formatted string serial interface write with usart1 to serial-usb converter on pin pa9 (rx is pa10).
 //!
 //! Connect the Tx pin pa9 to the Rx pin of a serial-usb converter
@@ -21,10 +22,10 @@ use core::fmt::Write;
 use stm32f1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, StopBits}, };
 
 #[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
-use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Config, Serial, StopBits}, };
+use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Config, Serial}, };
 
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
-use stm32f4xx_hal::{prelude::*, stm32::Peripherals, serial::{config::Config, Serial, config::StopBits}};
+use stm32f4xx_hal::{prelude::*, stm32::Peripherals, serial::{config::Config, Serial }};
 
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, StopBits}, };
@@ -32,36 +33,72 @@ use stm32l1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, Sto
 
 #[entry]
 fn main() -> ! {
-    // Get access to the device specific peripherals from the peripheral access crate
-    let p = Peripherals::take().unwrap();
-
-    // Take ownership of raw flash and rcc devices and convert to HAL structs
-    let mut flash = p.FLASH.constrain();
-    let mut rcc = p.RCC.constrain();
-
-    // Freeze  all system clocks  and store the frozen frequencies in `clocks`
-    let clocks = rcc.cfgr.freeze(&mut flash.acr);
-
-    // Prepare the alternate function I/O registers
-    let mut afio = p.AFIO.constrain(&mut rcc.apb2);
-
-    // Prepare the GPIOB peripheral
-    let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
-    // let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
-
+ 
     //see examples/serial_loopback_char.rs for more USART config notes.
 
-    let serial = Serial::usart1(
+    // 1. Get access to the device specific peripherals from the peripheral access crate
+    // 2. Take ownership of raw rcc and flash devices and convert to HAL structs
+    // 3. Freeze  all system clocks  and store the frozen frequencies in `clocks`
+    // 4. Prepare the alternate function I/O registers
+    // 5. Prepare the GPIO peripheral
+    // 6. Set up the usart device. Take ownership over the USART register and tx/rx pins.
+    //    The rest of the registers are used to enable and configure the device.
+
+    let p = Peripherals::take().unwrap();
+
+ 
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let mut rcc = p.RCC.constrain();
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let txrx = Serial::usart1(
         p.USART1,
         (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),  gpioa.pa10),
-        &mut afio.mapr,
+        &mut p.AFIO.constrain(&mut rcc.apb2).mapr,
         Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1),
-         clocks,
+        clocks,
         &mut rcc.apb2,
     );
 
-    // Split the serial struct into a receiving and a transmitting part
-    let (mut tx, _rx) = serial.split();
+
+    #[cfg(feature = "stm32f3xx")]
+    let mut rcc = p.RCC.constrain();
+    #[cfg(feature = "stm32f3xx")]
+    let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
+    #[cfg(feature = "stm32f3xx")]
+    let mut gpioa = p.GPIOA.split(&mut rcc.ahb);  //ahb ?
+    #[cfg(feature = "stm32f3xx")]
+    let txrx = Serial::usart1(
+        p.USART1,
+        (gpioa.pa9.into_alternate_af7(),  gpioa.pa10.into_alternate_af7()),
+        9600.bps(),
+        clocks,
+        &mut rcc.apb2,
+    );
+
+
+    #[cfg(feature = "stm32f4xx")]
+    let clocks = p.RCC.constrain().cfgr.freeze();
+    //let clocks = rcc.cfgr.freeze();
+    #[cfg(feature = "stm32f4xx")]
+    let gpioa = p.GPIOA.split();
+    #[cfg(feature = "stm32f4xx")]
+    p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+    //let (tx,rx) = 
+    #[cfg(feature = "stm32f4xx")]
+    let txrx =  Serial::usart1(
+        p.USART1,
+    	(gpioa.pa9.into_alternate_af7(),  gpioa.pa10.into_alternate_af7()),    //WHAT IS AF7 ??
+    	Config::default() .baudrate(9600.bps()),
+    	clocks
+    ).unwrap(); 
+    
+
+    // Split the serial rxtx struct into a receiving and a transmitting part
+    let (mut tx, mut rx) =txrx.split();
 
     let number = 42;
     writeln!(tx, "\r\nHello {}. Converted number set to 42.\r\n", number).unwrap();

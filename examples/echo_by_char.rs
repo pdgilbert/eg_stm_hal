@@ -17,7 +17,7 @@ extern crate panic_halt;
 
 //use cortex_m::asm;
 use cortex_m_rt::entry;
-//use core::fmt::Write;
+use core::fmt::Write;  // for writeln
 use cortex_m_semihosting::hprintln;
 use core::str::from_utf8;
 use nb::block;
@@ -39,6 +39,15 @@ use stm32l1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, Sto
 fn main() -> ! {
  
     //see examples/serial_loopback_char.rs for more USART config notes.
+
+    // 1. Get access to the device specific peripherals from the peripheral access crate
+    // 2. Take ownership of raw rcc and flash devices and convert to HAL structs
+    // 3. Freeze  all system clocks  and store the frozen frequencies in `clocks`
+    // 4. Prepare the alternate function I/O registers
+    // 5. Prepare the GPIO peripheral
+    // 6. Set up the usart device. Take ownership over the USART register and tx/rx pins.
+    //    The rest of the registers are used to enable and configure the device.
+
     let p = Peripherals::take().unwrap();
 
     #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
@@ -94,7 +103,14 @@ fn main() -> ! {
     // Split the serial rxtx struct into a receiving and a transmitting part
     let (mut tx, mut rx) =txrx.split();
 
-    loop { // Read a byte and write
+
+    hprintln!("test formatted write to consile ...").unwrap();
+    let number = 42;
+    writeln!(tx, "\r\nHello {}. Converted number set to 42.\r\n", number).unwrap();
+ 
+   hprintln!("test read and write by char. Please type into the console ...").unwrap();
+
+   loop { // Read a byte and write
       let received = block!(rx.read()).unwrap();
       block!(tx.write(received)).ok();
       hprintln!("{}", from_utf8(&[received]).unwrap()).unwrap();
