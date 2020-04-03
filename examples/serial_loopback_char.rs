@@ -71,14 +71,16 @@ fn main() -> ! {
     #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
     let mut rcc = p.RCC.constrain();
     #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
     let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
     #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
     let txrx = Serial::usart2(
         p.USART2,
-        ( gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),   gpioa.pa3),
+        ( gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),   gpioa.pa3),  // (tx, rx)
         &mut p.AFIO.constrain(&mut rcc.apb2).mapr,
         Config::default() .baudrate(115_200.bps())  .parity_odd() .stopbits(StopBits::STOP1),
-        rcc.cfgr.freeze(&mut p.FLASH.constrain().acr), //clocks,
+        clocks,
         &mut rcc.apb1,
     );
 
@@ -86,17 +88,21 @@ fn main() -> ! {
     #[cfg(feature = "stm32f3xx")]
     let mut rcc = p.RCC.constrain();
     #[cfg(feature = "stm32f3xx")]
+    let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
+    #[cfg(feature = "stm32f3xx")]
     let mut gpioa = p.GPIOA.split(&mut rcc.amb);
     #[cfg(feature = "stm32f3xx")]
     let txrx = Serial::usart2(
         p.USART2,
         ( gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),   gpioa.pa3),
         Config::default() .baudrate(115_200.bps())  .parity_odd() .stopbits(StopBits::STOP1),
-        rcc.cfgr.freeze(&mut flash.acr), //clocks,
+        clocks,
         &mut rcc.apb1,
     );
 
 
+    #[cfg(feature = "stm32f4xx")]
+    let clocks = p.RCC.constrain().cfgr.freeze();
     #[cfg(feature = "stm32f4xx")]
     let gpioa = p.GPIOA.split();
     //#[cfg(feature = "stm32f4xx")]
@@ -107,7 +113,7 @@ fn main() -> ! {
         p.USART2,
     	(gpioa.pa2.into_alternate_af7(),  gpioa.pa3.into_alternate_af7()),
     	Config::default() .baudrate(115_200.bps()),
-    	p.RCC.constrain().cfgr.freeze(), //clocks
+    	clocks,
     ).unwrap(); 
     
 

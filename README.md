@@ -158,7 +158,7 @@ This is the status of examples as of March 2020:
 |  xxx                    | build |  run  | build |  run  | build |  run  | 
 |:-----------------------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
 | blink                   |  yes  | works |  yes  | works |  yes  | works | 
-| serial_loopback_char    |  yes  | works |	  |	  |	  |	  | 
+| serial_loopback_char    |  yes  | works |	  |	  |  yes  |	  | 
 | serial_dma_tx           |  no   |	  |	  |	  |	  |	  |
 | serial_pass_thru_string |  yes  | works |	  |	  |	  |	  | 
 | serial_loopback_string  |  yes  |	  |	  |	  |	  |	  |

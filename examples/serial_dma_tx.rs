@@ -40,8 +40,6 @@ fn main() -> ! {
     #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
     let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
     #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
-    let channels = p.DMA1.split(&mut rcc.ahb);
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
     let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
     #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
     let txrx = Serial::usart1(
@@ -52,14 +50,14 @@ fn main() -> ! {
         clocks,
         &mut rcc.apb2,
     );
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let channels = p.DMA1.split(&mut rcc.ahb);
 
 
     #[cfg(feature = "stm32f3xx")]
     let mut rcc = p.RCC.constrain();
     #[cfg(feature = "stm32f3xx")]
     let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
-    #[cfg(feature = "stm32f3xx")]
-    let channels = p.DMA1.split(&mut rcc.ahb);
     #[cfg(feature = "stm32f3xx")]
     let mut gpioa = p.GPIOA.split(&mut rcc.ahb);  //ahb ?
     #[cfg(feature = "stm32f3xx")]
@@ -70,13 +68,13 @@ fn main() -> ! {
         clocks,
         &mut rcc.apb2,
     );
+    #[cfg(feature = "stm32f3xx")]
+    let channels = p.DMA1.split(&mut rcc.ahb);
 
 
     #[cfg(feature = "stm32f4xx")]
     let clocks = p.RCC.constrain().cfgr.freeze();
     //let clocks = rcc.cfgr.freeze();
-    #[cfg(feature = "stm32f4xx")]
-     let channels = p.DMA1.split(&mut rcc.ahb);
     #[cfg(feature = "stm32f4xx")]
     let gpioa = p.GPIOA.split();
     #[cfg(feature = "stm32f4xx")]
@@ -89,7 +87,9 @@ fn main() -> ! {
     	Config::default() .baudrate(9600.bps()),
     	clocks
     ).unwrap(); 
-    
+     #[cfg(feature = "stm32f4xx")]
+    let channels = p.DMA1.split(&mut rcc.ahb);
+   
 
     let tx = txrx.split().0.with_dma(channels.4);   
     let (_, tx) = tx.write(b"The quick brown fox").wait(); // static byte works but not very flexible

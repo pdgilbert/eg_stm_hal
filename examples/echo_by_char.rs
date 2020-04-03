@@ -85,7 +85,6 @@ fn main() -> ! {
 
     #[cfg(feature = "stm32f4xx")]
     let clocks = p.RCC.constrain().cfgr.freeze();
-    //let clocks = rcc.cfgr.freeze();
     #[cfg(feature = "stm32f4xx")]
     let gpioa = p.GPIOA.split();
     #[cfg(feature = "stm32f4xx")]

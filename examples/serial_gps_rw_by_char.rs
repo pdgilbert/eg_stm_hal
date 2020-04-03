@@ -7,6 +7,7 @@
 //! Set up the serial console (e.g. minicom) with the same settings used here.
 //! (Using 9600bps, could be higher but needs serial console to be the same.)
 //!
+//!  usart3 to GPS, connect the Tx pin pb10 to the Rx pin of GPS
 //! GPS uses 9600bps, 8bit, odd parity, 1 stopbit. This can be confirmed by connecting GPS 
 //!  directly to the  USB-TTL and terminal with these settings (minicom 8-N-1) 
 //! usart3 connect the Rx pin pb11 to the Tx pin of GPS 
@@ -40,7 +41,7 @@ use stm32f1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, Sto
 use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Config, Serial, StopBits}, };
 
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
-use stm32f4xx_hal::{prelude::*, stm32::Peripherals, serial::{config::Config, Serial, config::StopBits}};
+use stm32f4xx_hal::{prelude::*, stm32::Peripherals, serial::{config::Config, Serial }};
 
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, StopBits}, };
@@ -48,38 +49,91 @@ use stm32l1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, Sto
 
 #[entry]
 fn main() -> ! {
-    let p = Peripherals::take().unwrap();
-    let mut flash = p.FLASH.constrain();
-    let mut rcc = p.RCC.constrain();
-    let clocks = rcc.cfgr.freeze(&mut flash.acr);
-    let mut afio = p.AFIO.constrain(&mut rcc.apb2);
-    let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
-    let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
-
     //see examples/serial_loopback_char.rs for more USART config notes.
 
-    let serial1 = Serial::usart1(
+    let p = Peripherals::take().unwrap();
+
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let mut rcc = p.RCC.constrain();
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let mut afio = p.AFIO.constrain(&mut rcc.apb2);
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let txrx1 = Serial::usart1(
         p.USART1,
         (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),  gpioa.pa10),
         &mut afio.mapr,
-        Config::default().baudrate(9600.bps()),
+        Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1),
         clocks,
         &mut rcc.apb2,
     );
-
-    //  usart3 to GPS, connect the Tx pin pb10 to the Rx pin of GPS
-    let serial3 = Serial::usart3(
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let txrx3 = Serial::usart3(
         p.USART3,
-        (gpiob.pb10.into_alternate_push_pull(&mut gpiob.crh),  gpiob.pb11),
+        ( gpiob.pb10.into_alternate_push_pull(&mut gpiob.crh),   gpiob.pb11),  // (tx, rx)
         &mut afio.mapr,
-        Config::default() .baudrate(9600.bps())  .parity_odd() .stopbits(StopBits::STOP1),
+        Config::default() .baudrate(115_200.bps())  .parity_odd() .stopbits(StopBits::STOP1),
         clocks,
-        &mut rcc.apb1,
+        &mut rcc.apb1,    // WHAT IS  rcc.apb1/2 ?
     );
 
+
+    #[cfg(feature = "stm32f3xx")]
+    let mut rcc = p.RCC.constrain();
+    #[cfg(feature = "stm32f3xx")]
+    let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
+    #[cfg(feature = "stm32f3xx")]
+    let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
+    #[cfg(feature = "stm32f3xx")]
+    let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
+    #[cfg(feature = "stm32f3xx")]
+    let txrx1 = Serial::usart1(
+        p.USART1,
+        (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),  gpioa.pa10),
+        Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1),
+        clocks,
+        &mut rcc.apb2,
+    );
+    #[cfg(feature = "stm32f3xx")]
+    let txrx3 = Serial::usart3(
+        p.USART3,
+        ( gpiob.pb10.into_alternate_push_pull(&mut gpiob.crh),   gpiob.pb11),  // (tx, rx)
+        Config::default() .baudrate(115_200.bps())  .parity_odd() .stopbits(StopBits::STOP1),
+        clocks,
+        &mut rcc.apb1,    // WHAT IS  rcc.apb1/2 ?
+    );
+
+
+    #[cfg(feature = "stm32f4xx")]
+    let clocks    =  p.RCC.constrain().cfgr.freeze();
+    #[cfg(feature = "stm32f4xx")]
+    let mut gpioa = p.GPIOA.split();
+    #[cfg(feature = "stm32f4xx")]
+    let mut gpiob = p.GPIOB.split();
+    #[cfg(feature = "stm32f4xx")]
+    let txrx1 = Serial::usart1(
+        p.USART1,
+        (gpioa.pa9.into_alternate_af7(),  gpioa.pa10.into_alternate_af7()),
+     	Config::default() .baudrate(9600.bps()),
+        clocks,
+    ).unwrap();
+    #[cfg(feature = "stm32f4xx")]
+    let txrx3 = Serial::usart6(
+        p.USART6,
+        (gpiob.pb11.into_alternate_af7(),  gpiob.pb12.into_alternate_af7()),  // (tx, rx)  NOTE PINS and USART!!!
+     	Config::default() .baudrate(115_200.bps()),
+        clocks,
+    ).unwrap();
+
+
     // Split the serial struct into a receiving and a transmitting part
-    let (mut tx1, mut _rx1) = serial1.split();  // console
-    let (mut _tx3, mut rx3) = serial3.split();  // GPS
+    let (mut tx1, mut _rx1) = txrx1.split();  // console
+    let (mut _tx3, mut rx3) = txrx3.split();  // GPS
 
     loop { // Read a byte and write
       let received = block!(rx3.read()).unwrap();

@@ -37,10 +37,11 @@ use eg_stm_hal::to_str;
 use stm32f1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, StopBits}, };
 
 #[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
-use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Config, Serial, StopBits}, };
+use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Serial}, };
+//use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Config, Serial, StopBits}, };
 
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
-use stm32f4xx_hal::{prelude::*, stm32::Peripherals, serial::{config::Config, Serial, config::StopBits}};
+use stm32f4xx_hal::{prelude::*, stm32::Peripherals, serial::{config::Config, Serial}};
 
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, StopBits}, };
@@ -51,58 +52,128 @@ use stm32l1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, Sto
 fn main() -> ! {
     
     //see examples/serial_loopback_char.rs for more notes regarding this setup.
+
     let p = Peripherals::take().unwrap();
-    let mut flash = p.FLASH.constrain();
+
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
     let mut rcc = p.RCC.constrain();
-    let clocks = rcc.cfgr.freeze(&mut flash.acr);
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
     let mut afio = p.AFIO.constrain(&mut rcc.apb2);
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
     let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
     let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
-
-    //see examples/serial_loopback_char.rs for more USART config notes.
-    //    USART    (tx, rx)
-
-    //   usart1 console
-    let serial1 = Serial::usart1(
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let txrx1 = Serial::usart1(
         p.USART1,
         (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),  gpioa.pa10),
         &mut afio.mapr,
-        Config::default() .baudrate(9600.bps()) .parity_odd() .stopbits(StopBits::STOP1),
+        Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1),
         clocks,
         &mut rcc.apb2,
     );
-
-    //  usart2 
-    let serial2 = Serial::usart2(
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let txrx2 = Serial::usart2(
         p.USART2,
-        (gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),  gpioa.pa3),
+        ( gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),   gpioa.pa3),  // (tx, rx)
         &mut afio.mapr,
         Config::default() .baudrate(115_200.bps())  .parity_odd() .stopbits(StopBits::STOP1),
         clocks,
         &mut rcc.apb1,
     );
-
-    //  usart3 
-    let serial3 = Serial::usart3(
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let txrx3 = Serial::usart3(
         p.USART3,
-        (gpiob.pb10.into_alternate_push_pull(&mut gpiob.crh),  gpiob.pb11),
+        ( gpiob.pb10.into_alternate_push_pull(&mut gpiob.crh),   gpiob.pb11),  // (tx, rx)
         &mut afio.mapr,
         Config::default() .baudrate(115_200.bps())  .parity_odd() .stopbits(StopBits::STOP1),
         clocks,
-        &mut rcc.apb1,
+        &mut rcc.apb1,    // WHAT IS  rcc.apb1/2 ?
     );
-    // WHAT IS  rcc.apb1/2 ?
-
-    // Split the serial struct into a receiving and a transmitting part
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
     let channels = p.DMA1.split(&mut rcc.ahb);
 
-    let tx1 = serial1.split().0.with_dma(channels.4);  
 
-    let (tx2, mut _rx2) = serial2.split();
+
+    #[cfg(feature = "stm32f3xx")]
+    let mut rcc = p.RCC.constrain();
+    #[cfg(feature = "stm32f3xx")]
+    let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
+    #[cfg(feature = "stm32f3xx")]
+    let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
+    #[cfg(feature = "stm32f3xx")]
+    let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
+    #[cfg(feature = "stm32f3xx")]
+    let txrx1 = Serial::usart1(
+        p.USART1,
+        (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),  gpioa.pa10),
+        Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1),
+        clocks,
+        &mut rcc.apb2,
+    );
+    #[cfg(feature = "stm32f3xx")]
+    let txrx2 = Serial::usart2(
+        p.USART2,
+        ( gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),   gpioa.pa3),  // (tx, rx)
+        Config::default() .baudrate(115_200.bps())  .parity_odd() .stopbits(StopBits::STOP1),
+        clocks,
+        &mut rcc.apb1,
+    );
+    #[cfg(feature = "stm32f3xx")]
+    let txrx3 = Serial::usart3(
+        p.USART3,
+        ( gpiob.pb10.into_alternate_push_pull(&mut gpiob.crh),   gpiob.pb11),  // (tx, rx)
+        Config::default() .baudrate(115_200.bps())  .parity_odd() .stopbits(StopBits::STOP1),
+        clocks,
+        &mut rcc.apb1,    // WHAT IS  rcc.apb1/2 ?
+    );
+    #[cfg(feature = "stm32f3xx")]
+    let channels = p.DMA1.split(&mut rcc.ahb);
+
+
+
+    #[cfg(feature = "stm32f4xx")]
+    let clocks = p.RCC.constrain().cfgr.freeze();
+    #[cfg(feature = "stm32f4xx")]
+    let mut gpioa = p.GPIOA.split();
+    #[cfg(feature = "stm32f4xx")]
+    let mut gpiob = p.GPIOB.split();
+    #[cfg(feature = "stm32f4xx")]
+    let txrx1 = Serial::usart1(
+        p.USART1,
+        (gpioa.pa9.into_alternate_af7(),  gpioa.pa10.into_alternate_af7()),
+        Config::default() .baudrate(9600.bps()),
+        clocks,
+    ).unwrap();
+    #[cfg(feature = "stm32f4xx")]
+    let txrx2 = Serial::usart2(
+        p.USART2,
+        ( gpioa.pa2.into_alternate_af7(),   gpioa.pa3.into_alternate_af7()),  // (tx, rx)
+        Config::default() .baudrate(115_200.bps()),  //  .parity_odd() .stopbits(StopBits::STOP1),
+        clocks,
+    ).unwrap();
+    #[cfg(feature = "stm32f4xx")]
+    let txrx3 = Serial::usart6(
+        p.USART6,
+        ( gpioa.pa11.into_alternate_af8(),   gpioa.pa12.into_alternate_af8()),  // (tx, rx)  NOTE PINS, USART, af8 !!!
+        Config::default() .baudrate(115_200.bps()) ,
+        clocks,
+    ).unwrap();
+    #[cfg(feature = "stm32f4xx")]
+    let channels = p.DMA1.split();
+
+
+    // Split the serial struct into a receiving and a transmitting part
+
+    let tx1 = txrx1.split().0.with_dma(channels.4);  
+
+    let (tx2, mut _rx2) = txrx2.split();
     let tx2 = tx2.with_dma(channels.7);    
     //let rx2 = rx2.with_dma(channels.6);
 
-    let (_tx3, rx3) = serial3.split();   
+    let (_tx3, rx3) = txrx3.split();   
     //let tx3 = tx3.with_dma(channels.2);    
     let rx3 = rx3.with_dma(channels.3);
 
