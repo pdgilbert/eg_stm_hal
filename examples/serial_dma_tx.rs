@@ -33,6 +33,9 @@ use stm32l1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, Sto
 
 #[entry]
 fn main() -> ! {
+ 
+    //see serial_loopback_char.rs and serial_cross.rs in examples/ for more USART config notes.
+
     let p = Peripherals::take().unwrap();
 
     #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
@@ -80,14 +83,15 @@ fn main() -> ! {
     #[cfg(feature = "stm32f4xx")]
     p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
     //let (tx,rx) = 
+    // See examples/serail_cross.rs for stm32f411re uart and alternate function notes.
     #[cfg(feature = "stm32f4xx")]
     let txrx =  Serial::usart1(
         p.USART1,
-    	(gpioa.pa9.into_alternate_af7(),  gpioa.pa10.into_alternate_af7()),    //WHAT IS AF7 ??
+    	(gpioa.pa9.into_alternate_af7(),  gpioa.pa10.into_alternate_af7()), 
     	Config::default() .baudrate(9600.bps()),
     	clocks
     ).unwrap(); 
-     #[cfg(feature = "stm32f4xx")]
+    #[cfg(feature = "stm32f4xx")]
     let channels = p.DMA1.split(&mut rcc.ahb);
    
 

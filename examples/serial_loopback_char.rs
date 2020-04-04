@@ -47,6 +47,8 @@ use stm32l1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, Sto
 #[entry]
 fn main() -> ! {
     // EXPAND NOTES HERE
+    //see serial_loopback_char.rs and serial_cross.rs in examples/ for more USART config notes.
+    //and examples/echo_by_char.rs for additional comments.
 
     //  bluepill
     //    USART       (tx,                                             rx)
@@ -75,7 +77,7 @@ fn main() -> ! {
     #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
     let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
     #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
-    let txrx = Serial::usart2(
+    let txrx2 = Serial::usart2(
         p.USART2,
         ( gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),   gpioa.pa3),  // (tx, rx)
         &mut p.AFIO.constrain(&mut rcc.apb2).mapr,
@@ -90,12 +92,12 @@ fn main() -> ! {
     #[cfg(feature = "stm32f3xx")]
     let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
     #[cfg(feature = "stm32f3xx")]
-    let mut gpioa = p.GPIOA.split(&mut rcc.amb);
+    let mut gpioa = p.GPIOA.split(&mut rcc.ahb);
     #[cfg(feature = "stm32f3xx")]
-    let txrx = Serial::usart2(
+    let txrx2 = Serial::usart2(
         p.USART2,
-        ( gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),   gpioa.pa3),
-        Config::default() .baudrate(115_200.bps())  .parity_odd() .stopbits(StopBits::STOP1),
+        (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl), gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)), //(tx,rx)
+        115_200.bps(),
         clocks,
         &mut rcc.apb1,
     );
@@ -108,8 +110,9 @@ fn main() -> ! {
     //#[cfg(feature = "stm32f4xx")]
     //p.USART2.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
     //let (tx,rx) = 
+    // See examples/serail_cross.rs for stm32f411re uart and alternate function notes.
     #[cfg(feature = "stm32f4xx")]
-    let txrx =  Serial::usart2(
+    let txrx2 =  Serial::usart2(
         p.USART2,
     	(gpioa.pa2.into_alternate_af7(),  gpioa.pa3.into_alternate_af7()),
     	Config::default() .baudrate(115_200.bps()),
@@ -124,7 +127,7 @@ fn main() -> ! {
     // StopBits::STOP1   StopBits::STOP2
 
     // Split the serial struct into a receiving and a transmitting part
-    let (mut tx, mut rx) = txrx.split();
+    let (mut tx, mut rx) = txrx2.split();
 
     hprintln!("sending ...").unwrap();
 

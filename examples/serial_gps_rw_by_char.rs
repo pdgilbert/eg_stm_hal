@@ -49,7 +49,8 @@ use stm32l1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, Sto
 
 #[entry]
 fn main() -> ! {
-    //see examples/serial_loopback_char.rs for more USART config notes.
+ 
+    //see serial_loopback_char.rs and serial_cross.rs in examples/ for more USART config notes.
 
     let p = Peripherals::take().unwrap();
 
@@ -125,7 +126,7 @@ fn main() -> ! {
     #[cfg(feature = "stm32f4xx")]
     let txrx3 = Serial::usart6(
         p.USART6,
-        (gpiob.pb11.into_alternate_af7(),  gpiob.pb12.into_alternate_af7()),  // (tx, rx)  NOTE PINS and USART!!!
+        (gpiob.pb11.into_alternate_af8(),  gpiob.pb12.into_alternate_af8()),  // (tx, rx)  NOTE PINS and USART!!!
      	Config::default() .baudrate(115_200.bps()),
         clocks,
     ).unwrap();

@@ -38,7 +38,7 @@ use stm32l1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, Sto
 #[entry]
 fn main() -> ! {
  
-    //see examples/serial_loopback_char.rs for more USART config notes.
+    //see serial_loopback_char.rs and serial_cross.rs in examples/ for more USART config notes.
 
     // 1. Get access to the device specific peripherals from the peripheral access crate
     // 2. Take ownership of raw rcc and flash devices and convert to HAL structs
@@ -57,7 +57,7 @@ fn main() -> ! {
     #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
     let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
     #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
-    let txrx = Serial::usart1(
+    let txrx1 = Serial::usart1(
         p.USART1,
         (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),  gpioa.pa10),
         &mut p.AFIO.constrain(&mut rcc.apb2).mapr,
@@ -74,9 +74,9 @@ fn main() -> ! {
     #[cfg(feature = "stm32f3xx")]
     let mut gpioa = p.GPIOA.split(&mut rcc.ahb);  //ahb ?
     #[cfg(feature = "stm32f3xx")]
-    let txrx = Serial::usart1(
+    let txrx1 = Serial::usart1(
         p.USART1,
-        (gpioa.pa9.into_alternate_af7(),  gpioa.pa10.into_alternate_af7()),
+        (gpioa.pa9.into_af7(&mut gpioa.moder, &mut gpioa.afrh),  gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)),
         9600.bps(),
         clocks,
         &mut rcc.apb2,
@@ -90,34 +90,36 @@ fn main() -> ! {
     #[cfg(feature = "stm32f4xx")]
     p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
     //let (tx,rx) = 
+    // See examples/serail_cross.rs for stm32f411re uart and alternate function notes.
     #[cfg(feature = "stm32f4xx")]
-    let txrx =  Serial::usart1(
+     let txrx1 =  Serial::usart1(
         p.USART1,
-    	(gpioa.pa9.into_alternate_af7(),  gpioa.pa10.into_alternate_af7()),    //WHAT IS AF7 ??
+    	(gpioa.pa9.into_alternate_af7(),  gpioa.pa10.into_alternate_af7()), 
     	Config::default() .baudrate(9600.bps()),
     	clocks
     ).unwrap(); 
     
 
-    // Split the serial rxtx struct into a receiving and a transmitting part
-    let (mut tx, mut rx) =txrx.split();
+    // Split the serial txrx1 struct into a receiving and a transmitting part
+    let (mut tx, mut rx) =txrx1.split();
 
 
     hprintln!("test formatted write to consile ...").unwrap();
     let number = 42;
+    // NEXT IS CAUSING A PROBLEM IN stm32f3xx
     writeln!(tx, "\r\nHello {}. Converted number set to 42.\r\n", number).unwrap();
  
-   hprintln!("test read and write by char. Please type into the console ...").unwrap();
+    hprintln!("test read and write by char. Please type into the console ...").unwrap();
 
-   loop { // Read a byte and write
-      let received = block!(rx.read()).unwrap();
-      block!(tx.write(received)).ok();
-      hprintln!("{}", from_utf8(&[received]).unwrap()).unwrap();
-    }
+    loop { // Read a byte and write
+       let received = block!(rx.read()).unwrap();
+       block!(tx.write(received)).ok();
+       hprintln!("{}", from_utf8(&[received]).unwrap()).unwrap();
+     }
 
-    // PUT A TEST HERE THAT WILL SHOW FAILURE. ASSERT SEEMS TO PANIC HALT SO ...
+     // PUT A TEST HERE THAT WILL SHOW FAILURE. ASSERT SEEMS TO PANIC HALT SO ...
 
-    // Trigger a breakpoint to inspect the values
-    //asm::bkpt();
+     // Trigger a breakpoint to inspect the values
+     //asm::bkpt();
 
 }

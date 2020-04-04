@@ -53,6 +53,9 @@ fn main() -> ! {
     
     //see examples/serial_loopback_char.rs for more notes regarding this setup.
 
+    // Split the serial struct into a receiving and a transmitting parts is HAL specific
+    // because dma does not seem to be implemented/needed? for all HALs
+
     let p = Peripherals::take().unwrap();
 
     #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
@@ -77,7 +80,7 @@ fn main() -> ! {
     #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
     let txrx2 = Serial::usart2(
         p.USART2,
-        ( gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),   gpioa.pa3),  // (tx, rx)
+        (gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),   gpioa.pa3),  // (tx, rx)
         &mut afio.mapr,
         Config::default() .baudrate(115_200.bps())  .parity_odd() .stopbits(StopBits::STOP1),
         clocks,
@@ -94,8 +97,28 @@ fn main() -> ! {
     );
     #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
     let channels = p.DMA1.split(&mut rcc.ahb);
+ 
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let tx1 = txrx1.split().0.with_dma(channels.4);  
+
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let (tx2, mut _rx2) = txrx2.split();
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let tx2 = tx2.with_dma(channels.7);    
+    //let rx2 = rx2.with_dma(channels.6);
+
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let (_tx3, rx3) = txrx3.split();   
+    //let tx3 = tx3.with_dma(channels.2);    
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let rx3 = rx3.with_dma(channels.3);
 
 
+    // stm32f303vct  alternate funtion modes see  
+    // https://www.rlocman.ru/i/File/dat/STMicroelectronics/Microcontrollers_MCU/STM32F303VCT6.pdf p42
+    // AF7 on PA9  is usart1_Tx, on PA10 is usart1_Rx,
+    // AF7 on PA2  is usart2_Tx, on PA3  is usart2_Rx,
+    // AF7 on PB10 is usart3_Tx, on PB11  is usart3_Rx,
 
     #[cfg(feature = "stm32f3xx")]
     let mut rcc = p.RCC.constrain();
@@ -108,7 +131,7 @@ fn main() -> ! {
     #[cfg(feature = "stm32f3xx")]
     let txrx1 = Serial::usart1(
         p.USART1,
-        (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),  gpioa.pa10),
+        (gpioa.pa9.into_af7(&mut gpioa.moder, &mut gpioa.afrh),  gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)),
         Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1),
         clocks,
         &mut rcc.apb2,
@@ -116,7 +139,7 @@ fn main() -> ! {
     #[cfg(feature = "stm32f3xx")]
     let txrx2 = Serial::usart2(
         p.USART2,
-        ( gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),   gpioa.pa3),  // (tx, rx)
+        (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrh), gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)), //(tx,rx)
         Config::default() .baudrate(115_200.bps())  .parity_odd() .stopbits(StopBits::STOP1),
         clocks,
         &mut rcc.apb1,
@@ -124,7 +147,7 @@ fn main() -> ! {
     #[cfg(feature = "stm32f3xx")]
     let txrx3 = Serial::usart3(
         p.USART3,
-        ( gpiob.pb10.into_alternate_push_pull(&mut gpiob.crh),   gpiob.pb11),  // (tx, rx)
+        (gpiob.pb10.into_af7(&mut gpioa.moder, &mut gpioa.afrh), gpiob.pb11.into_af7(&mut gpioa.moder, &mut gpiob.afrh)), 
         Config::default() .baudrate(115_200.bps())  .parity_odd() .stopbits(StopBits::STOP1),
         clocks,
         &mut rcc.apb1,    // WHAT IS  rcc.apb1/2 ?
@@ -132,7 +155,24 @@ fn main() -> ! {
     #[cfg(feature = "stm32f3xx")]
     let channels = p.DMA1.split(&mut rcc.ahb);
 
+    #[cfg(feature = "stm32f3xx")]
+    let tx1 = txrx1.split().0.with_dma(channels.4);  
+    #[cfg(feature = "stm32f3xx")]
+    let (tx2, mut _rx2) = txrx2.split();
+    #[cfg(feature = "stm32f3xx")]
+    let tx2 = tx2.with_dma(channels.7);    
+    #[cfg(feature = "stm32f3xx")]
+    let (_tx3, rx3) = txrx3.split();   
+    #[cfg(feature = "stm32f3xx")]
+    let rx3 = rx3.with_dma(channels.3);
 
+
+
+    // stm32f411re implements only usarts 1, 2, and 6. These can be configured on different pins.
+    // alternate funtion modes see https://www.st.com/resource/en/datasheet/stm32f411re.pdf  p47.
+    // AF7 on PA9  is usart1_Tx, on PA10 is usart1_Rx,
+    // AF7 on PA2  is usart2_Tx, on PA3  is usart2_Rx,
+    // AF8 on PA11 is usart6_Tx, on PA12 is usart6_Rx
 
     #[cfg(feature = "stm32f4xx")]
     let clocks = p.RCC.constrain().cfgr.freeze();
@@ -157,25 +197,17 @@ fn main() -> ! {
     #[cfg(feature = "stm32f4xx")]
     let txrx3 = Serial::usart6(
         p.USART6,
-        ( gpioa.pa11.into_alternate_af8(),   gpioa.pa12.into_alternate_af8()),  // (tx, rx)  NOTE PINS, USART, af8 !!!
+        ( gpioa.pa11.into_alternate_af8(),   gpioa.pa12.into_alternate_af8()),  // (tx, rx)  NOTE PINS, USART !!!
         Config::default() .baudrate(115_200.bps()) ,
         clocks,
     ).unwrap();
     #[cfg(feature = "stm32f4xx")]
-    let channels = p.DMA1.split();
-
-
-    // Split the serial struct into a receiving and a transmitting part
-
-    let tx1 = txrx1.split().0.with_dma(channels.4);  
-
+    let tx1 = txrx1.split().0;  
+    #[cfg(feature = "stm32f4xx")]
     let (tx2, mut _rx2) = txrx2.split();
-    let tx2 = tx2.with_dma(channels.7);    
-    //let rx2 = rx2.with_dma(channels.6);
-
+    #[cfg(feature = "stm32f4xx")]
     let (_tx3, rx3) = txrx3.split();   
-    //let tx3 = tx3.with_dma(channels.2);    
-    let rx3 = rx3.with_dma(channels.3);
+
 
     hprintln!("Now try write ...").unwrap(); 
 
@@ -185,7 +217,7 @@ fn main() -> ! {
     hprintln!("and read.").unwrap(); 
     // read on usart3
     let buf = singleton!(: [u8; 8] = [0; 8]).unwrap();
-    // SEEMS TO STALL HERE. MISSED MESSAGE AND WAITING?
+    // bluepill SEEMS TO STALL HERE. MISSED MESSAGE AND WAITING?
     let (buf, _rx3) = rx3.read(buf).wait();  //buf mutable borrow occurs here
     let bufs = to_str(buf);                // borrow of `*buf` occurs here
 
