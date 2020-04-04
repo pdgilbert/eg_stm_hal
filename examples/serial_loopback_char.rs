@@ -88,13 +88,13 @@ fn main() -> ! {
 
 
     #[cfg(feature = "stm32f3xx")]
-    let mut rcc = p.RCC.constrain();
+    let mut rcc   = p.RCC.constrain();
     #[cfg(feature = "stm32f3xx")]
-    let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
+    let clocks    = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
     #[cfg(feature = "stm32f3xx")]
     let mut gpioa = p.GPIOA.split(&mut rcc.ahb);
     #[cfg(feature = "stm32f3xx")]
-    let txrx2 = Serial::usart2(
+    let txrx2     = Serial::usart2(
         p.USART2,
         (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl), gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)), //(tx,rx)
         115_200.bps(),

@@ -38,7 +38,8 @@ use nb::block;
 use stm32f1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, StopBits}, };
 
 #[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
-use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Config, Serial, StopBits}, };
+use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Serial}, };
+//use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Config, Serial, StopBits}, };
 
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
 use stm32f4xx_hal::{prelude::*, stm32::Peripherals, serial::{config::Config, Serial }};
@@ -85,26 +86,26 @@ fn main() -> ! {
 
 
     #[cfg(feature = "stm32f3xx")]
-    let mut rcc = p.RCC.constrain();
+    let mut rcc   = p.RCC.constrain();
     #[cfg(feature = "stm32f3xx")]
-    let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
+    let clocks    = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
     #[cfg(feature = "stm32f3xx")]
-    let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
+    let mut gpioa = p.GPIOA.split(&mut rcc.ahb);
     #[cfg(feature = "stm32f3xx")]
-    let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
+    let mut gpiob = p.GPIOB.split(&mut rcc.ahb);
     #[cfg(feature = "stm32f3xx")]
-    let txrx1 = Serial::usart1(
+    let txrx1     = Serial::usart1(
         p.USART1,
-        (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),  gpioa.pa10),
-        Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1),
+        (gpioa.pa9.into_af7(&mut gpioa.moder, &mut gpioa.afrh), gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)),
+        9600.bps(),
         clocks,
         &mut rcc.apb2,
     );
     #[cfg(feature = "stm32f3xx")]
     let txrx3 = Serial::usart3(
         p.USART3,
-        ( gpiob.pb10.into_alternate_push_pull(&mut gpiob.crh),   gpiob.pb11),  // (tx, rx)
-        Config::default() .baudrate(115_200.bps())  .parity_odd() .stopbits(StopBits::STOP1),
+        (gpiob.pb10.into_af7(&mut gpiob.moder, &mut gpiob.afrh), gpiob.pb11.into_af7(&mut gpiob.moder, &mut gpiob.afrh)), 
+        115_200.bps(),
         clocks,
         &mut rcc.apb1,    // WHAT IS  rcc.apb1/2 ?
     );
@@ -113,9 +114,7 @@ fn main() -> ! {
     #[cfg(feature = "stm32f4xx")]
     let clocks    =  p.RCC.constrain().cfgr.freeze();
     #[cfg(feature = "stm32f4xx")]
-    let mut gpioa = p.GPIOA.split();
-    #[cfg(feature = "stm32f4xx")]
-    let mut gpiob = p.GPIOB.split();
+    let gpioa = p.GPIOA.split();
     #[cfg(feature = "stm32f4xx")]
     let txrx1 = Serial::usart1(
         p.USART1,
@@ -126,8 +125,8 @@ fn main() -> ! {
     #[cfg(feature = "stm32f4xx")]
     let txrx3 = Serial::usart6(
         p.USART6,
-        (gpiob.pb11.into_alternate_af8(),  gpiob.pb12.into_alternate_af8()),  // (tx, rx)  NOTE PINS and USART!!!
-     	Config::default() .baudrate(115_200.bps()),
+        ( gpioa.pa11.into_alternate_af8(),   gpioa.pa12.into_alternate_af8()),  // (tx, rx)  NOTE PINS, USART !!!
+        Config::default() .baudrate(115_200.bps()) ,
         clocks,
     ).unwrap();
 

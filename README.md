@@ -164,7 +164,7 @@ This is the status of examples as of March 2020:
 | serial_loopback_string  |  yes  |	  |	  |	  |	  |	  |
 | echo_by_char            |  yes  | works |	  |	  |  yes  | works | 
 | serial_gps_rw           |  yes  |	  |	  |	  |	  |	  |
-| serial_gps_rw_by_char   |  yes  |	  |	  |	  |	  |	  |
+| serial_gps_rw_by_char   |  yes  |	  |  yes  |	  |  yes  |	  |
 | serial_cross            |  yes  |	  |	  |	  |	  |	  |	      
 
 

@@ -125,9 +125,9 @@ fn main() -> ! {
     #[cfg(feature = "stm32f3xx")]
     let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
     #[cfg(feature = "stm32f3xx")]
-    let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
+    let mut gpioa = p.GPIOA.split(&mut rcc.ahb);
     #[cfg(feature = "stm32f3xx")]
-    let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
+    let mut gpiob = p.GPIOB.split(&mut rcc.ahb);
     #[cfg(feature = "stm32f3xx")]
     let txrx1 = Serial::usart1(
         p.USART1,
@@ -147,8 +147,8 @@ fn main() -> ! {
     #[cfg(feature = "stm32f3xx")]
     let txrx3 = Serial::usart3(
         p.USART3,
-        (gpiob.pb10.into_af7(&mut gpioa.moder, &mut gpioa.afrh), gpiob.pb11.into_af7(&mut gpioa.moder, &mut gpiob.afrh)), 
-        Config::default() .baudrate(115_200.bps())  .parity_odd() .stopbits(StopBits::STOP1),
+        (gpiob.pb10.into_af7(&mut gpiob.moder, &mut gpiob.afrh), gpiob.pb11.into_af7(&mut gpiob.moder, &mut gpiob.afrh)), 
+        115_200.bps(),
         clocks,
         &mut rcc.apb1,    // WHAT IS  rcc.apb1/2 ?
     );
