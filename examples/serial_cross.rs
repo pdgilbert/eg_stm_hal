@@ -129,18 +129,18 @@ fn main() -> ! {
     #[cfg(feature = "stm32f3xx")]
     let mut gpiob = p.GPIOB.split(&mut rcc.ahb);
     #[cfg(feature = "stm32f3xx")]
-    let txrx1 = Serial::usart1(
+    let txrx1     = Serial::usart1(
         p.USART1,
-        (gpioa.pa9.into_af7(&mut gpioa.moder, &mut gpioa.afrh),  gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)),
-        Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1),
+        (gpioa.pa9.into_af7(&mut gpioa.moder, &mut gpioa.afrh), gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)),
+        9600.bps(),
         clocks,
         &mut rcc.apb2,
     );
     #[cfg(feature = "stm32f3xx")]
     let txrx2 = Serial::usart2(
         p.USART2,
-        (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrh), gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)), //(tx,rx)
-        Config::default() .baudrate(115_200.bps())  .parity_odd() .stopbits(StopBits::STOP1),
+        (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl), gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)), //(tx,rx)
+        115_200.bps(),
         clocks,
         &mut rcc.apb1,
     );

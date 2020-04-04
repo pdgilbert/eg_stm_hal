@@ -22,7 +22,7 @@ use cortex_m_semihosting::hprintln;
 use stm32f1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, StopBits}, };
 
 #[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
-use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Config, Serial, StopBits}, };
+use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Serial}, };
 
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
 use stm32f4xx_hal::{prelude::*, stm32::Peripherals, serial::{config::Config, Serial, config::StopBits}};
@@ -64,9 +64,9 @@ fn main() -> ! {
     #[cfg(feature = "stm32f3xx")]
     let mut gpioa = p.GPIOA.split(&mut rcc.ahb);  //ahb ?
     #[cfg(feature = "stm32f3xx")]
-    let txrx = Serial::usart1(
+    let txrx1     = Serial::usart1(
         p.USART1,
-        (gpioa.pa9.into_alternate_af7(),  gpioa.pa10.into_alternate_af7()),
+        (gpioa.pa9.into_af7(&mut gpioa.moder, &mut gpioa.afrh), gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)),
         9600.bps(),
         clocks,
         &mut rcc.apb2,
