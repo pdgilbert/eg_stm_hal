@@ -159,7 +159,7 @@ This is the status of examples as of March 2020:
 |:-----------------------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
 | blink                   |  yes  | works |  yes  | works |  yes  | works | 
 | serial_loopback_char    |  yes  | works |  yes  |	  |  yes  |	  | 
-| serial_dma_tx           |  yes   |	  |	  |	  |	  |	  |
+| serial_dma_tx           |  yes  |	  |	  |	  |	  |	  |
 | serial_pass_thru_string |  yes  | works |	  |	  |	  |	  | 
 | serial_loopback_string  |  yes  |	  |	  |	  |	  |	  |
 | echo_by_char            |  yes  | works |	  |	  |  yes  | works | 

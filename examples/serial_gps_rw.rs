@@ -139,7 +139,7 @@ fn main() -> ! {
     #[cfg(feature = "stm32f4xx")]
     let txrx3 = Serial::usart6(
         p.USART6,
-        ( gpiob.pb11.into_alternate_af8(),   gpiob.pb12.into_alternate_af8(),  // (tx, rx)
+        ( gpiob.pb11.into_alternate_af8(),   gpiob.pb12.into_alternate_af8()),  // (tx, rx)
         Config::default() .baudrate(115_200.bps()),
         clocks,
     );
