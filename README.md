@@ -132,7 +132,7 @@ See [Running Examples](#running-examples) for more details.
 | ----------------------- |:-----:|:-------------------------------------------------------------- |
 | blink                   |   1   | Blinks off-board LEDs attached to  pb 13,14,15                 |
 | serial_loopback_char    |       | Single character loopback on usart2  + semihost output         |
-| serial_dma_tx           |       | String writes to console interface                             |
+| serial_string_tx        |       | String writes to console interface (usart/serial)              |
 | serial_pass_thru_string |       | Read 15 chars input from console, output to semihost, repeat   |
 | serial_loopback_string  |       | String interface loopback on usart2 + semihost output          |
 | echo_by_char            |   2   | Echo console input, char by char,  + semihost output           |
@@ -159,7 +159,7 @@ This is the status of examples as of March 2020:
 |:-----------------------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
 | blink                   |  yes  | works |  yes  | works |  yes  | works | 
 | serial_loopback_char    |  yes  | works |  yes  |	  |  yes  |	  | 
-| serial_dma_tx           |  yes  |	  |	  |	  |	  |	  |
+| serial_string_tx        |  yes  |	  |  yes  |	  |  yes  | works |
 | serial_pass_thru_string |  yes  | works |	  |	  |	  |	  | 
 | serial_loopback_string  |  yes  |	  |	  |	  |	  |	  |
 | echo_by_char            |  yes  | works |	  |	  |  yes  | works | 
