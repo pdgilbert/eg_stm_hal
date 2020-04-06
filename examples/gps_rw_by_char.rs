@@ -105,7 +105,7 @@ fn main() -> ! {
     let txrx3 = Serial::usart3(
         p.USART3,
         (gpiob.pb10.into_af7(&mut gpiob.moder, &mut gpiob.afrh), gpiob.pb11.into_af7(&mut gpiob.moder, &mut gpiob.afrh)), 
-        115_200.bps(),
+        9600.bps(),       // 115_200.bps(),
         clocks,
         &mut rcc.apb1,    // WHAT IS  rcc.apb1/2 ?
     );
@@ -135,9 +135,12 @@ fn main() -> ! {
     let (mut tx1, mut _rx1) = txrx1.split();  // console
     let (mut _tx3, mut rx3) = txrx3.split();  // GPS
 
+    hprintln!("entering read/write loop...").unwrap();
     loop { // Read a byte and write
       let received = block!(rx3.read()).unwrap();
+      hprintln!("received from gps ...").unwrap();
       block!(tx1.write(received)).ok();
+      hprintln!("sent to console ...").unwrap();
       hprintln!("{}", from_utf8(&[received]).unwrap()).unwrap();
     }
 

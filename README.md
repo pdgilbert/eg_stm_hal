@@ -128,17 +128,15 @@ Here is a brief summary. 'Console' means a terminal session
 See [Running Examples](#running-examples) for more details.
 
 
-| xxx                     | notes |   Description                                                  |
-| ----------------------- |:-----:|:-------------------------------------------------------------- |
-| blink                   |   1   | Blinks off-board LEDs attached to  pb 13,14,15                 |
-| serial_loopback_char    |       | Single character loopback on usart2  + semihost output         |
-| serial_string_tx        |       | String writes to console interface (usart/serial)              |
-| serial_pass_thru_string |       | Read 15 chars input from console, output to semihost, repeat   |
-| serial_loopback_string  |       | String interface loopback on usart2 + semihost output          |
-| echo_by_char            |   2   | Echo console input, char by char,  + semihost output           |
-| serial_gps_rw           |   3   | Read by str  from GPS with echo to console + semihost output   |
-| serial_gps_rw_by_char   |       | Read by char from GPS with echo to console + semihost output   |
-| serial_cross            |       | Str write from one usart and read on another + semihost output |
+| xxx                  | notes |   Description                                                  |
+| -------------------- |:-----:|:-------------------------------------------------------------- |
+| blink                |   1   | Blinks off-board LEDs attached to  pb 13,14,15                 |
+| serial_char          |       | Single char between usarts 2 and 3, console and semihost output|
+| serial_string        |       | String writes between usarts 2 and 3, console and semihost output|
+| echo_console_by_char |   2   | Echo console input, char by char,  + semihost output           |
+| echo_console_string  |       | Read 15 chars input from console, output to semihost, repeat   |
+| gps_rw_by_char       |       | Read by char from GPS with echo to console + semihost output   |
+| gps_rw               |   3   | Read by str  from GPS with echo to console + semihost output   |
 
 
 0.  Using the git versions of HALs (in Nov 2019 much is changing and release in crates.io is old). 
@@ -152,21 +150,26 @@ See [Running Examples](#running-examples) for more details.
 
 This is the status of examples as of March 2020:
 
-| ------------------------------- | -- bluepill --- | -- disc. f303 --- | -- nucleo-64 --- |
-|:-----------------------:|:----------:|:----------:|:----------:|
+MOVE TOWARD blink serial_char serial_string echo_by_char echo_by_string gps_rw_by_char gps_rw_by_string
+
+| ---------------------------- | -- bluepill --- | -- disc. f303 --- | -- nucleo-64 --- |
+|:--------------------:|:----------:|:----------:|:----------:|
 
 |  xxx                    | build |  run  | build |  run  | build |  run  | 
-|:-----------------------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
-| blink                   |  yes  | works |  yes  | works |  yes  | works | 
-| serial_loopback_char    |  yes  | works |  yes  |	  |  yes  |	  | 
-| serial_string_tx        |  yes  |	  |  yes  |	  |  yes  | works |
-| serial_pass_thru_string |  yes  | works |	  |	  |	  |	  | 
-| serial_loopback_string  |  yes  |	  |	  |	  |	  |	  |
-| echo_by_char            |  yes  | works |	  |	  |  yes  | works | 
-| serial_gps_rw           |  yes  |	  |	  |	  |	  |	  |
-| serial_gps_rw_by_char   |  yes  |	  |  yes  |	  |  yes  |	  |
-| serial_cross            |  yes  |	  |	  |	  |	  |	  |	      
+|:--------------------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
+| blink                |  yes  | works |  yes  | works |  yes  | works | 
+| serial_char          |  yes  |   1   |  yes  |  1c   |  yes  |   1b  |
+| serial_string CHECK  |  yes  | works |  yes  |   2   |  yes  | works |
+| echo_console_by_char |  yes  | works |	  |	  |  yes  | works | 
+| echo_console_string  |  yes  | works |       |	  |	  |	  | 
+| gps_rw_by_char       |  yes  |   3   |  yes  |	  |  yes  |   3   |
+| gps_rw               |  yes  |	  |	  |	  |	  |	  |
 
+1.   tx2 to rx3 works. tx3 to rx2 fails unwrapping err value on receive.
+1b.  Stalls waiting to receive.
+1c.  Usart2 with Usart3 connection works both ways but jibberish written on console.
+2.   Jibberish written on console.
+3.   Fails reading gps. 
 
 ## Building Examples
 
