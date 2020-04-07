@@ -1,16 +1,6 @@
-//! Serial interface read GPS on usart3 and write on usart1 to USB-TTL to console (minicom) and to semihost 
-//!
-//! THESE ARE BLUE PILL PIN NUMBERS. Confirm pin numbers for other boards.
-//! usart3 connect the Rx pin pb11 to the Tx pin of GPS 
-//! usart3 connect the Tx pin pb10 to the Rx pin of GPS
-//! GPS works  by default at 9600bps. This can be confirmed by connecting GPS 
-//!  directly to the  USB-TTL and terminal with these settings (minicom 8-N-1) 
-//! I use 8 bit, odd parity, 1 stopbit (minicom 8-N-1), but only 9600bps seems important. 
-//! 
-//!  usart1 sending to console 
-//! See examples/serial_loopback_char.rs for notes about connecting usart1 to 
-//!   serial-usb converter on computer for console output.
-//! That file also has more notes regarding setup below.
+//! Serial interface read GPS on usart2 and write on usart1 to USB-TTL to console (minicom) and to semihost.
+//! This example is similar to gps_rw_by_char but tries to buffer strings of data.
+//! See example is gps_rw_by_char for usart settings and pin connections.
 
 #![deny(unsafe_code)]
 #![no_main]
@@ -78,17 +68,16 @@ fn main() -> ! {
         &mut rcc.apb2,
     );
     // WHAT IS  rcc.apb1/2 ?
+
     #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
-    let txrx3 = Serial::usart3(
-        p.USART3,
-        ( gpiob.pb10.into_alternate_push_pull(&mut gpiob.crh),   gpiob.pb11),  // (tx, rx)
+    let txrx2 = Serial::usart2(
+        p.USART2,
+        (gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),   gpioa.pa3),  // (tx, rx)
         &mut afio.mapr,
-        Config::default() .baudrate(115_200.bps())  .parity_odd() .stopbits(StopBits::STOP1),
+        Config::default() .baudrate(9_600.bps())  .parity_odd() .stopbits(StopBits::STOP1),
         clocks,
-        &mut rcc.apb1,    // WHAT IS  rcc.apb1/2 ?
+        &mut rcc.apb1,
     );
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
-    let channels = p.DMA1.split(&mut rcc.ahb);
 
 
 
@@ -100,6 +89,7 @@ fn main() -> ! {
     let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
     #[cfg(feature = "stm32f3xx")]
     let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
+
     #[cfg(feature = "stm32f3xx")]
     let txrx1 = Serial::usart1(
         p.USART1,
@@ -108,17 +98,15 @@ fn main() -> ! {
         clocks,
         &mut rcc.apb2,
     );
+
     #[cfg(feature = "stm32f3xx")]
-    let txrx3 = Serial::usart3(
-        p.USART3,
-        (gpiob.pb10.into_af7(&mut gpiob.moder, &mut gpiob.afrh), gpiob.pb11.into_af7(&mut gpiob.moder, &mut gpiob.afrh)), 
+    let txrx2 = Serial::usart2(
+        p.USART2,
+        (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl), gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)), //(tx,rx)
         115_200.bps(),
         clocks,
-        &mut rcc.apb1,    // WHAT IS  rcc.apb1/2 ?
+        &mut rcc.apb1,
     );
-    #[cfg(feature = "stm32f3xx")]
-    let channels = p.DMA1.split(&mut rcc.ahb);
-
 
 
     #[cfg(feature = "stm32f4xx")]
@@ -136,41 +124,35 @@ fn main() -> ! {
         Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1),
         clocks,
     );
-    #[cfg(feature = "stm32f4xx")]
-    let txrx3 = Serial::usart6(
-        p.USART6,
-        ( gpiob.pb11.into_alternate_af8(),   gpiob.pb12.into_alternate_af8()),  // (tx, rx)
-        Config::default() .baudrate(115_200.bps()),
+
+   #[cfg(feature = "stm32f4xx")]
+    let txrx2 = Serial::usart2(
+        p.USART2,
+        ( gpioa.pa2.into_alternate_af7(),   gpioa.pa3.into_alternate_af7()),  // (tx, rx)
+        Config::default() .baudrate(115_200.bps()),  //  .parity_odd() .stopbits(StopBits::STOP1),
         clocks,
-    );
-    #[cfg(feature = "stm32f4xx")]
-    let channels = p.DMA1.split(&mut rcc.ahb);
+    ).unwrap();
 
 
     // Split the serial struct into a receiving and a transmitting part
 
+    //let mut tx1     = txrx1.split().0;  
     let (tx1, _rx1) = txrx1.split();   
-    let tx1 = tx1.with_dma(channels.4);    
-    //let rx1 = rx1.with_dma(channels.5);
+    //let tx1 = tx1.with_dma(channels.4);    
 
-    //let (tx3, rx3) = txrx3.split();   
-    //let tx3 = tx3.with_dma(channels.2);    
-    //let rx3 = rx3.with_dma(channels.3);
-    let rx3 = txrx3.split().1.with_dma(channels.3);
+    let rx2 = txrx2.split().1; 
+    //let (mut tx2, mut rx2)  = txrx2.split();
 
     // setup buffer 
     
-    let (bufs, tx1) = tx1.write(b"First line of simple test writing to tx1.\r\n").wait();
+    let (bufs, tx1) = tx1.write(b"Hello to console.\r\n").wait();
     hprintln!("sent console {}", to_str(bufs)).unwrap();
-    let (bufs, tx1) = tx1.write(b" and second line.").wait();
-    hprintln!("sent console {}", to_str(bufs)).unwrap();
-
 
     let buf0 = singleton!(: [u8; 8] = [0; 8]).unwrap();
       
-    // read gps on usart3
+    // read gps on usart2
     hprintln!("about to read GPS").unwrap();
-    let (buf, _rx3) = rx3.read(buf0).wait();  // STALLS HERE WAITING
+    let (buf, _rx2) = rx2.read(buf0).wait();  
     hprintln!("done reading GPS").unwrap();
 
     // write  buf (in bytes ) to semihost

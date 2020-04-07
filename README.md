@@ -155,21 +155,22 @@ MOVE TOWARD blink serial_char serial_string echo_by_char echo_by_string gps_rw_b
 | ---------------------------- | -- bluepill --- | -- disc. f303 --- | -- nucleo-64 --- |
 |:--------------------:|:----------:|:----------:|:----------:|
 
-|  xxx                    | build |  run  | build |  run  | build |  run  | 
+|  xxx                 | build |  run  | build |  run  | build |  run  | 
 |:--------------------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
 | blink                |  yes  | works |  yes  | works |  yes  | works | 
 | serial_char          |  yes  |   1   |  yes  |  1c   |  yes  |   1b  |
-| serial_string CHECK  |  yes  | works |  yes  |   2   |  yes  | works |
-| echo_console_by_char |  yes  | works |	  |	  |  yes  | works | 
-| echo_console_string  |  yes  | works |       |	  |	  |	  | 
-| gps_rw_by_char       |  yes  |   3   |  yes  |	  |  yes  |   3   |
-| gps_rw               |  yes  |	  |	  |	  |	  |	  |
+| serial_string CHECK  |  no   |       |       |       |       |       |
+| echo_console_by_char |  yes  | works |       |       |  yes  | works | 
+| echo_console_string  |  yes  |   4   |       |       |       |       | 
+| gps_rw_by_char       |  yes  |   3   |  yes  |       |  yes  |   3   |
+| gps_rw               |  yes  |       |       |       |       |       |
 
 1.   tx2 to rx3 works. tx3 to rx2 fails unwrapping err value on receive.
 1b.  Stalls waiting to receive.
 1c.  Usart2 with Usart3 connection works both ways but jibberish written on console.
 2.   Jibberish written on console.
 3.   Fails reading gps. 
+4.   Works once, repeat problems.
 
 ## Building Examples
 

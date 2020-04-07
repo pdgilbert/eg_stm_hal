@@ -1,17 +1,15 @@
-//! Serial interface char-by-char read GPS on usart3 and write on usart1 
-//! to USB-TTL connected to console (minicom) and write to semihost 
+//! Serial interface char-by-char read GPS on usart2 and write on usart1 
+//! to USB-TTL connected to console (minicom) and also write to semihost. 
 //!
-//! THESE ARE BLUE PILL PIN NUMBERS. CONFIRM PIN NUMBERS OF OTHER BOARDS
 //! usart1 connect the Tx pin pa9  to the Rx pin of a serial-usb converter
 //! usart1 connect the Rx pin pa10 to the Tx pin of a serial-usb converter
 //! Set up the serial console (e.g. minicom) with the same settings used here.
 //! (Using 9600bps, could be higher but needs serial console to be the same.)
 //!
-//!  usart3 to GPS, connect the Tx pin pb10 to the Rx pin of GPS
 //! GPS uses 9600bps, 8bit, odd parity, 1 stopbit. This can be confirmed by connecting GPS 
 //!  directly to the  USB-TTL and terminal with these settings (minicom 8-N-1) 
-//! usart3 connect the Rx pin pb11 to the Tx pin of GPS 
-//! usart3 connect the Tx pin pb10 to the Rx pin of GPS
+//! usart2 connect the Rx pin pa3 to the Tx pin of GPS 
+//! usart2 connect the Tx pin pa2 to the Rx pin of GPS
 //! 
 //! See examples/serial_loopback_char.rs for notes about connecting usart1 to 
 //!   serial-usb converter on computer for console output.
@@ -74,14 +72,15 @@ fn main() -> ! {
         clocks,
         &mut rcc.apb2,
     );
+
     #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
-    let txrx3 = Serial::usart3(
-        p.USART3,
-        ( gpiob.pb10.into_alternate_push_pull(&mut gpiob.crh),   gpiob.pb11),  // (tx, rx)
+    let txrx2 = Serial::usart2(
+        p.USART2,
+        (gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),   gpioa.pa3),  // (tx, rx)
         &mut afio.mapr,
-        Config::default() .baudrate(115_200.bps())  .parity_odd() .stopbits(StopBits::STOP1),
+        Config::default() .baudrate(9_600.bps())  .parity_odd() .stopbits(StopBits::STOP1),
         clocks,
-        &mut rcc.apb1,    // WHAT IS  rcc.apb1/2 ?
+        &mut rcc.apb1,
     );
 
 
@@ -93,6 +92,7 @@ fn main() -> ! {
     let mut gpioa = p.GPIOA.split(&mut rcc.ahb);
     #[cfg(feature = "stm32f3xx")]
     let mut gpiob = p.GPIOB.split(&mut rcc.ahb);
+
     #[cfg(feature = "stm32f3xx")]
     let txrx1     = Serial::usart1(
         p.USART1,
@@ -101,13 +101,14 @@ fn main() -> ! {
         clocks,
         &mut rcc.apb2,
     );
+
     #[cfg(feature = "stm32f3xx")]
-    let txrx3 = Serial::usart3(
-        p.USART3,
-        (gpiob.pb10.into_af7(&mut gpiob.moder, &mut gpiob.afrh), gpiob.pb11.into_af7(&mut gpiob.moder, &mut gpiob.afrh)), 
-        9600.bps(),       // 115_200.bps(),
+    let txrx2 = Serial::usart2(
+        p.USART2,
+        (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl), gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)), //(tx,rx)
+        115_200.bps(),
         clocks,
-        &mut rcc.apb1,    // WHAT IS  rcc.apb1/2 ?
+        &mut rcc.apb1,
     );
 
 
@@ -122,22 +123,25 @@ fn main() -> ! {
      	Config::default() .baudrate(9600.bps()),
         clocks,
     ).unwrap();
-    #[cfg(feature = "stm32f4xx")]
-    let txrx3 = Serial::usart6(
-        p.USART6,
-        ( gpioa.pa11.into_alternate_af8(),   gpioa.pa12.into_alternate_af8()),  // (tx, rx)  NOTE PINS, USART !!!
-        Config::default() .baudrate(115_200.bps()) ,
+
+   #[cfg(feature = "stm32f4xx")]
+    let txrx2 = Serial::usart2(
+        p.USART2,
+        ( gpioa.pa2.into_alternate_af7(),   gpioa.pa3.into_alternate_af7()),  // (tx, rx)
+        Config::default() .baudrate(115_200.bps()),  //  .parity_odd() .stopbits(StopBits::STOP1),
         clocks,
     ).unwrap();
 
 
+
     // Split the serial struct into a receiving and a transmitting part
     let (mut tx1, mut _rx1) = txrx1.split();  // console
-    let (mut _tx3, mut rx3) = txrx3.split();  // GPS
+    let (mut _tx2, mut rx2) = txrx2.split();  // GPS
 
     hprintln!("entering read/write loop...").unwrap();
+
     loop { // Read a byte and write
-      let received = block!(rx3.read()).unwrap();
+      let received = block!(rx2.read()).unwrap();
       hprintln!("received from gps ...").unwrap();
       block!(tx1.write(received)).ok();
       hprintln!("sent to console ...").unwrap();

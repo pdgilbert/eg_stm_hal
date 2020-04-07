@@ -37,8 +37,7 @@ use stm32l1xx_hal::{prelude::*,   pac::Peripherals, };
 #[entry]
 fn main() -> ! {
      
-    //see serial_loopback_char.rs and serial_cross.rs in examples/ for more USART config notes.
-    //and examples/echo_by_char.rs for additional comments.
+    //see serial_char.rs and  echo_console_by_char.rs for additional comments.
 
     let p = Peripherals::take().unwrap();
 
@@ -96,8 +95,13 @@ fn main() -> ! {
     
 
 
-    
-    // cannot get this to work in loop as (buf, rx) so ...
+ 
+    // Split the serial struct into a receiving and a transmitting part
+    let mut tx1             = txrx1.split().0;  
+    let (mut tx2, mut rx2)  = txrx2.split();
+    let (mut tx3, mut rx3)  = txrx3.split();   
+   
+    // This to works with bluepill but not 
     let mut bufrx = (singleton!(: [u8; 15] = [0; 15]).unwrap(),
                      txrx.split().1.with_dma(channels.5));
 

@@ -191,27 +191,30 @@ fn main() -> ! {
  
     let sent =  b"The quick brown fox";
     for byte in sent {
-       block!(tx.write(*byte)).unwrap();
+       block!(tx1.write(*byte)).unwrap();
     }
     let s =  b" jumps\n";
     for byte in s.iter() {
-       block!(tx.write(*byte)).unwrap();
+       block!(tx1.write(*byte)).unwrap();
     }
     for byte in  b" over the lazy dog.\r\n" {
-       block!(tx.write(*byte)).unwrap();
+       block!(tx1.write(*byte)).unwrap();
     }
 
 
     hprintln!("testing  tx2 to rx3").unwrap();
     hprintln!("   sending on tx2 ...").unwrap();
+    
+    // This really needs buffering and separate processes to be done properly!!!
 
     // Write `The quick brown fox` and wait until the write is successful
-    block!(tx2.write(sent)).ok();
+    // Read the byte that was just sent. Blocks until the read is complete
+    for byte in  sent {
+       block!(tx2.write(byte)).ok();
+       let received = block!(rx3.read()).unwrap();
+    }
 
     hprintln!("   receiving on rx3 ...").unwrap();
-
-    // Read the byte that was just sent. Blocks until the read is complete
-    let received = block!(rx3.read()).unwrap();
 
     hprintln!("  checking received = sent,  {} = {} byte", received, sent).unwrap();
 
