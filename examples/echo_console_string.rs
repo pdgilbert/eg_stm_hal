@@ -45,11 +45,9 @@ fn main() -> ! {
     #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
     let mut rcc = p.RCC.constrain();
     #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
-    let channels  = p.DMA1.split(&mut rcc.ahb);
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
     let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
     #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
-    let txrx = Serial::usart1(
+    let txrx1 = Serial::usart1(
         p.USART1,
         (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),  gpioa.pa10),
         &mut p.AFIO.constrain(&mut rcc.apb2).mapr,
@@ -62,11 +60,9 @@ fn main() -> ! {
     #[cfg(feature = "stm32f3xx")]
     let mut rcc = p.RCC.constrain();
     #[cfg(feature = "stm32f3xx")]
-    let channels  = p.DMA1.split(&mut rcc.ahb);
-    #[cfg(feature = "stm32f3xx")]
     let mut gpioa = p.GPIOA.split(&mut rcc.ahb);  //ahb ?
     #[cfg(feature = "stm32f3xx")]
-    let txrx = Serial::usart1(
+    let txrx1 = Serial::usart1(
         p.USART1,
         (gpioa.pa9.into_alternate_af7(),  gpioa.pa10.into_alternate_af7()),
         9600.bps(),
@@ -79,14 +75,12 @@ fn main() -> ! {
     let mut rcc = p.RCC.constrain();
     //let clocks = rcc.cfgr.freeze();
     #[cfg(feature = "stm32f4xx")]
-    let channels  = p.DMA1.split(&mut rcc.cfgr);
-    #[cfg(feature = "stm32f4xx")]
     let gpioa = p.GPIOA.split();
     #[cfg(feature = "stm32f4xx")]
     p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
     //let (tx,rx) = 
     #[cfg(feature = "stm32f4xx")]
-    let txrx =  Serial::usart1(
+    let txrx1 =  Serial::usart1(
         p.USART1,
     	(gpioa.pa9.into_alternate_af7(),  gpioa.pa10.into_alternate_af7()), 
     	Config::default() .baudrate(9600.bps()),
@@ -98,19 +92,18 @@ fn main() -> ! {
  
     // Split the serial struct into a receiving and a transmitting part
     let mut tx1             = txrx1.split().0;  
-    let (mut tx2, mut rx2)  = txrx2.split();
-    let (mut tx3, mut rx3)  = txrx3.split();   
    
-    // This to works with bluepill but not 
+    // This works with bluepill but not ...
     let mut bufrx = (singleton!(: [u8; 15] = [0; 15]).unwrap(),
-                     txrx.split().1.with_dma(channels.5));
+                     txrx1.split().1);
+    //               txrx1.split().1.with_dma(channels.5));
 
     hprintln!("Use ^C in gdb to exit.").unwrap();
 
     //each pass in loop waits for input of 15 chars typed in console
 
     loop { 
-        bufrx = bufrx.1.read(bufrx.0).wait();  
+        bufrx = bufrx.1.read().wait();  
         hprintln!("received {:?}", to_str(bufrx.0)).unwrap();
     }
 }

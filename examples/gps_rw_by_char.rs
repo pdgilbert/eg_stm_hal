@@ -62,8 +62,6 @@ fn main() -> ! {
     #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
     let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
     #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
-    let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
     let txrx1 = Serial::usart1(
         p.USART1,
         (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),  gpioa.pa10),
@@ -78,11 +76,12 @@ fn main() -> ! {
         p.USART2,
         (gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),   gpioa.pa3),  // (tx, rx)
         &mut afio.mapr,
-        Config::default() .baudrate(9_600.bps())  .parity_odd() .stopbits(StopBits::STOP1),
+        Config::default() .baudrate(9_600.bps()) ,
         clocks,
         &mut rcc.apb1,
     );
 
+    //  Config::default() .baudrate(9_600.bps())  .parity_odd() .stopbits(StopBits::STOP1),
 
     #[cfg(feature = "stm32f3xx")]
     let mut rcc   = p.RCC.constrain();
@@ -139,12 +138,12 @@ fn main() -> ! {
     let (mut _tx2, mut rx2) = txrx2.split();  // GPS
 
     hprintln!("entering read/write loop...").unwrap();
+    hprintln!("received from gps ").unwrap();
 
     loop { // Read a byte and write
       let received = block!(rx2.read()).unwrap();
-      hprintln!("received from gps ...").unwrap();
+      hprintln!(".").unwrap();
       block!(tx1.write(received)).ok();
-      hprintln!("sent to console ...").unwrap();
       hprintln!("{}", from_utf8(&[received]).unwrap()).unwrap();
     }
 
