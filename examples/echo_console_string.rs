@@ -55,6 +55,11 @@ fn main() -> ! {
         rcc.cfgr.freeze(&mut p.FLASH.constrain().acr),  //clocks
         &mut rcc.apb2,
     );
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let channels = p.DMA1.split(&mut rcc.ahb);
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let mut bufrx = (singleton!(: [u8; 15] = [0; 15]).unwrap(), 
+                     txrx1.split().1.with_dma(channels.5));
 
 
     #[cfg(feature = "stm32f3xx")]
@@ -69,6 +74,8 @@ fn main() -> ! {
         rcc.cfgr.freeze(&mut p.FLASH.constrain().acr), //clocks
         &mut rcc.apb2,
     );
+    #[cfg(feature = "stm32f3xx")]
+    let mut bufrx = (singleton!(: [u8; 15] = [0; 15]).unwrap(), txrx1.split().1);
 
 
     #[cfg(feature = "stm32f4xx")]
@@ -85,25 +92,25 @@ fn main() -> ! {
     	(gpioa.pa9.into_alternate_af7(),  gpioa.pa10.into_alternate_af7()), 
     	Config::default() .baudrate(9600.bps()),
     	p.RCC.constrain().cfgr.freeze(), //clocks
-    ).unwrap(); 
-    
+    ).unwrap();    
+    #[cfg(feature = "stm32f4xx")]
+    let mut bufrx = (singleton!(: [u8; 15] = [0; 15]).unwrap(), txrx1.split().1);
 
-
- 
     // Split the serial struct into a receiving and a transmitting part
-    let mut tx1             = txrx1.split().0;  
-   
-    // This works with bluepill but not ...
-    let mut bufrx = (singleton!(: [u8; 15] = [0; 15]).unwrap(),
-                     txrx1.split().1);
-    //               txrx1.split().1.with_dma(channels.5));
+    //let mut tx1             = txrx1.split().0;  
+    
+    hprintln!("Use ^C in gdb to exit.").unwrap();
+
+    // cannot get this to work in loop as (buf, rx1), there seem to be circular problems
+    // with move/borrow/mut  but something like this works ...
+    //let mut bufrx = (singleton!(: [u8; 15] = [0; 15]).unwrap(), 
+    //                 txrx1.split().1.with_dma(channels.5));
 
     hprintln!("Use ^C in gdb to exit.").unwrap();
 
     //each pass in loop waits for input of 15 chars typed in console
-
     loop { 
-        bufrx = bufrx.1.read().wait();  
+        bufrx = bufrx.1.read(bufrx.0).wait();  
         hprintln!("received {:?}", to_str(bufrx.0)).unwrap();
     }
 }

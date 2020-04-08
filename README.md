@@ -148,27 +148,30 @@ See [Running Examples](#running-examples) for more details.
       completely eliminating the development board. 
       (If the dongle power is used. 5v if preferred on mine.)
 
-This is the status of examples as of April 2020:
+Following is the status of examples as of April 2020. Examples are run on a 'bluepill' (stm32f1xx),
+'Discovery kit STM32F303' (stm32f3xx), and 'Nucleo-64 STM32F411' (stm32f4xx).
 
-| ---------------------------- | -- bluepill --- | -- disc. f303 --- | -- nucleo-64 --- |
-|:--------------------:|:----------:|:----------:|:----------:|
+| ------------------------- | -- stm32f1xx --- | -- stm32f3xx --- | -- stm32f4xx --- |
+|:--------------------:|:------------:|:------------:|:------------:|
 
 |  xxx                 | build |  run  | build |  run  | build |  run  | 
 |:--------------------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
 | blink                |  yes  | works |  yes  | works |  yes  | works | 
 | serial_char          |  yes  |   1   |  yes  |  1c   |  yes  |   1b  |
 | serial_string        |  no   |       |       |       |       |       |
-| echo_console_by_char |  yes  | works |       |       |  yes  | works | 
-| echo_console_string  |  no   |       |       |       |       |       | 
-| gps_rw_by_char       |  yes  |   3   |  yes  |       |  yes  |   3   |
+| echo_console_by_char |  yes  | works |   5   |       |  yes  | works | 
+| echo_console_string  |  yes  |   3   |       |       |       |       | 
+| gps_rw_by_char       |  yes  |   4   |  yes  |       |  yes  |   4   |
 | gps_rw               |       |       |       |       |       |       |
 
-1.   tx2 to rx3 works. tx3 to rx2 fails unwrapping err value on receive.
+1.   tx2 to rx3 works. tx3 to rx2 works sometimes but often fails unwrapping err value on receive.
 1b.  Stalls waiting to receive.
 1c.  Usart2 with Usart3 connection works both ways but jibberish written on console.
-2.   Jibberish written on console.
-3.   Fails reading gps. 
-4.   Works once, repeat problems.
+x.   Jibberish written on console.
+3.   Works on bluepill as long a typing is slow.
+4.   Fails reading gps. 
+x.   Works once, repeat problems.
+5.   Writeln! macro missing from stm32f3xx ?
 
 ## Building Examples
 

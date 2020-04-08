@@ -234,7 +234,7 @@ fn main() -> ! {
     // Read the byte that was just sent. Blocks until the read is complete
     let received = block!(rx3.read()).unwrap();
 
-    hprintln!("  checking received = sent,  {} = {} byte", received, sent).unwrap();
+    hprintln!("   checking tx2 to rx3 received = sent,  {} = {} byte", received, sent).unwrap();
 
     // The sent byte should be the one received
     assert_eq!(received, sent, "testing received = sent,  {} = {}", received, sent);
@@ -248,7 +248,7 @@ fn main() -> ! {
     hprintln!("   tx2 to rx3  characters,  {} = {}", 
         from_utf8(&[received]).unwrap(), from_utf8(&[sent]).unwrap()).unwrap();
 
-    hprintln!("sending received to console on tx1 ...").unwrap();
+    hprintln!("   sending received to console on tx1 ...").unwrap();
 
     for byte in  b"tx2 to rx3 test with X\r\n" {  // iterator fails if string is too long
        block!(tx1.write(*byte)).unwrap();
@@ -259,6 +259,8 @@ fn main() -> ! {
        block!(tx1.write(*byte)).unwrap();
     }
 
+    // Trigger a breakpoint 
+    // asm::bkpt();
 
     hprintln!("testing  tx3 to rx2").unwrap();
     hprintln!("   sending on tx3 ...").unwrap();
@@ -273,15 +275,15 @@ fn main() -> ! {
     // Read the byte that was just sent. Blocks until the read is complete
     let received = block!(rx2.read()).unwrap();
 
-    hprintln!("   checking tx3 to rx2  received = sent,  {} = {} byte", received, sent).unwrap();
+    hprintln!("    checking tx3 to rx2  received = sent,  {} = {} byte", received, sent).unwrap();
 
     // The sent byte should be the one received
     assert_eq!(received, sent, "testing received = sent,  {} = {}", received, sent);
     
-    hprintln!(" tx3 to rx2  characters,  {} = {}", 
+    hprintln!("   tx3 to rx2  characters,  {} = {}", 
         from_utf8(&[received]).unwrap(), from_utf8(&[sent]).unwrap()).unwrap();
 
-    hprintln!("sending received from rx2  to console on tx1 ...").unwrap();
+    hprintln!("   sending received from rx2  to console on tx1 ...").unwrap();
 
     for byte in  b"tx3 to rx2 test with Y\r\n" {  // iterator fails if string is too long
        block!(tx1.write(*byte)).unwrap();
