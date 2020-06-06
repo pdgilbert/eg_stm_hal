@@ -81,6 +81,9 @@ optional = true
 
 [dependencies.stm32l1xx-hal]
 git = "https://github.com/stm32-rs/stm32l1xx-hal"
+default-features = false
+features = ["stm32l151", "rt"]
+version = "^0.1"
 #version = "0.1.0"
 optional = true
 

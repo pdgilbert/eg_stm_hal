@@ -209,6 +209,7 @@ fn main() -> ! {
 
     // Write `The quick brown fox` and wait until the write is successful
     // Read the byte that was just sent. Blocks until the read is complete
+    let mut received =  b"start empty";
     for byte in  sent {
        block!(tx2.write(byte)).ok();
        let received = block!(rx3.read()).unwrap();

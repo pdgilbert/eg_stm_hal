@@ -57,7 +57,7 @@ environments. Just the setup may change.)
 
 
 ##  Status Summary
- (March 2020) work in progress ...
+ (June 2020) work in progress ...
 
 The overall Travis CI build status and the link for individual boards is given above.
 Testing if the code runs and does something resembling what it is supposed to do 
@@ -139,7 +139,7 @@ See [Running Examples](#running-examples) for more details.
 | gps_rw               |   3   | Read by str  from GPS with echo to console + semihost output   |
 
 
-0.  Using the git versions of HALs (in Nov 2019 much is changing and release in crates.io is old). 
+0.  Using the git versions of HALs (in June 2020 much is changing and release in crates.io is old). 
 1.  Blink does not blink when stepping in gdb, use continue.
 2.  With local echo on in console the characters are doubled, `<cr>` adds a single `<lf>`.
      Without local echo there is no `<lf>`. There is trouble if you type too fast.
