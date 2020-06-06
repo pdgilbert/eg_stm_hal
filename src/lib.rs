@@ -21,7 +21,8 @@ pub fn to_str( x:&[u8] ) -> &str {
    }
 }
 
-//      Err(error) => panic!("problem converting u8 to str {:?}", error),
+//      Err(_error) => "problem converting u8 to str ",
+//      Err(error) => panic!("problem converting str from u8 {:?}", error),
 
 #[cfg(test)]
 mod tests {

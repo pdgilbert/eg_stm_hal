@@ -134,17 +134,29 @@ fn main() -> ! {
 
 
     // Split the serial struct into a receiving and a transmitting part
-    let (mut tx1, mut _rx1) = txrx1.split();  // console
-    let (mut _tx2, mut rx2) = txrx2.split();  // GPS
+    let (mut  tx1, mut _rx1) = txrx1.split();  // console
+    let (mut _tx2, mut  rx2) = txrx2.split();  // GPS
+
+    hprintln!("testing console output...").unwrap();
+ 
+    for byte in b"Just confirming console works.\r\n" {
+       block!(tx1.write(*byte)).unwrap();
+    }
 
     hprintln!("entering read/write loop...").unwrap();
-    hprintln!("received from gps ").unwrap();
+    //hprintln!("received from gps ").unwrap();
 
+    let e: u8 = 9;
     loop { // Read a byte and write
-      let received = block!(rx2.read()).unwrap();
-      hprintln!(".").unwrap();
-      block!(tx1.write(received)).ok();
+      //let received = block!(rx2.read()).unwrap();
+      let received = match block!(rx2.read()) {
+         Ok(str)     => str,
+         Err(_error) => e,
+      };
       hprintln!("{}", from_utf8(&[received]).unwrap()).unwrap();
+      //hprintln!(".").unwrap();
+      block!(tx1.write(received)).ok();
+      for byte in b"\r\n" { block!(tx1.write(*byte)).unwrap(); }
     }
 
     // PUT A TEST HERE THAT WILL SHOW FAILURE. ASSERT SEEMS TO PANIC HALT SO ...

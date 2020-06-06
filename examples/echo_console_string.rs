@@ -41,7 +41,6 @@ fn main() -> ! {
 
     let p = Peripherals::take().unwrap();
 
-
     #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
     let mut rcc = p.RCC.constrain();
     #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
@@ -55,11 +54,6 @@ fn main() -> ! {
         rcc.cfgr.freeze(&mut p.FLASH.constrain().acr),  //clocks
         &mut rcc.apb2,
     );
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
-    let channels = p.DMA1.split(&mut rcc.ahb);
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
-    let mut bufrx = (singleton!(: [u8; 15] = [0; 15]).unwrap(), 
-                     txrx1.split().1.with_dma(channels.5));
 
 
     #[cfg(feature = "stm32f3xx")]
@@ -74,8 +68,6 @@ fn main() -> ! {
         rcc.cfgr.freeze(&mut p.FLASH.constrain().acr), //clocks
         &mut rcc.apb2,
     );
-    #[cfg(feature = "stm32f3xx")]
-    let mut bufrx = (singleton!(: [u8; 15] = [0; 15]).unwrap(), txrx1.split().1);
 
 
     #[cfg(feature = "stm32f4xx")]
@@ -93,21 +85,29 @@ fn main() -> ! {
     	Config::default() .baudrate(9600.bps()),
     	p.RCC.constrain().cfgr.freeze(), //clocks
     ).unwrap();    
-    #[cfg(feature = "stm32f4xx")]
-    let mut bufrx = (singleton!(: [u8; 15] = [0; 15]).unwrap(), txrx1.split().1);
 
-    // Split the serial struct into a receiving and a transmitting part
-    //let mut tx1             = txrx1.split().0;  
+
     
-    hprintln!("Use ^C in gdb to exit.").unwrap();
+    let buf = singleton!(: [u8; 15] = [0; 15]).unwrap();
 
     // cannot get this to work in loop as (buf, rx1), there seem to be circular problems
     // with move/borrow/mut  but something like this works ...
-    //let mut bufrx = (singleton!(: [u8; 15] = [0; 15]).unwrap(), 
-    //                 txrx1.split().1.with_dma(channels.5));
 
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let channels = p.DMA1.split(&mut rcc.ahb);
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let mut bufrx = (buf,  txrx1.split().1.with_dma(channels.5));
+    #[cfg(feature = "stm32f3xx")]
+    let mut bufrx = (buf, txrx1.split().1);
+    #[cfg(feature = "stm32f4xx")]
+    let mut bufrx = (buf, txrx1.split().1);
+
+    hprintln!("Enter 15 characters in console. Repeat.").unwrap();
     hprintln!("Use ^C in gdb to exit.").unwrap();
 
+    bufrx = bufrx.1.read(bufrx.0).wait();  
+    hprintln!("received {:?}", to_str(bufrx.0)).unwrap();
+ 
     //each pass in loop waits for input of 15 chars typed in console
     loop { 
         bufrx = bufrx.1.read(bufrx.0).wait();  

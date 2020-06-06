@@ -35,6 +35,7 @@ use stm32f4xx_hal::{prelude::*, stm32::Peripherals, serial::{config::Config, Ser
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, StopBits}, };
 
+//use heapless::{consts, Vec};
 
 #[entry]
 
@@ -43,10 +44,11 @@ fn main() -> ! {
     //see serial_loopback_char.rs and serial_cross.rs in examples/ for more USART config notes.
     //    USART    (tx, rx)
 
-    hprintln!("{}", to_str("just checking to_str".as_bytes())).expect("hprintln error."); 
-    hprintln!("{:?}",      "just checking to_str".as_bytes()).expect("hprintln error."); 
+    //hprintln!("{}", to_str("just checking to_str".as_bytes())).expect("hprintln error."); 
+    //hprintln!("{:?}",      "just checking to_str".as_bytes()).expect("hprintln error."); 
 
     let p = Peripherals::take().unwrap();
+
 
     #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
     let mut rcc = p.RCC.constrain();
@@ -68,16 +70,19 @@ fn main() -> ! {
         &mut rcc.apb2,
     );
     // WHAT IS  rcc.apb1/2 ?
-
     #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
     let txrx2 = Serial::usart2(
         p.USART2,
-        (gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),   gpioa.pa3),  // (tx, rx)
+        //(gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),  gpioa.pa3),  // (tx, rx)
+        //(gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),  gpioa.pa3.into_floating_input(&mut gpioa.crl)),
+        //   not implemented   gpioa.pa3.into_pull_down_input(&mut gpioa.crl)),
+        //   not implemented   gpioa.pa3.into_pull_up_input(&mut gpioa.crl)),
         &mut afio.mapr,
-        Config::default() .baudrate(9_600.bps())  .parity_odd() .stopbits(StopBits::STOP1),
+        Config::default() .baudrate(9_600.bps()),  //  .parity_odd() .stopbits(StopBits::STOP1),
         clocks,
         &mut rcc.apb1,
     );
+
 
 
 
@@ -89,7 +94,6 @@ fn main() -> ! {
     let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
     #[cfg(feature = "stm32f3xx")]
     let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
-
     #[cfg(feature = "stm32f3xx")]
     let txrx1 = Serial::usart1(
         p.USART1,
@@ -98,15 +102,15 @@ fn main() -> ! {
         clocks,
         &mut rcc.apb2,
     );
-
     #[cfg(feature = "stm32f3xx")]
     let txrx2 = Serial::usart2(
         p.USART2,
         (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl), gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)), //(tx,rx)
-        115_200.bps(),
+        9600.bps(), //115_200.bps(),
         clocks,
         &mut rcc.apb1,
     );
+
 
 
     #[cfg(feature = "stm32f4xx")]
@@ -124,44 +128,79 @@ fn main() -> ! {
         Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1),
         clocks,
     );
-
    #[cfg(feature = "stm32f4xx")]
     let txrx2 = Serial::usart2(
         p.USART2,
         ( gpioa.pa2.into_alternate_af7(),   gpioa.pa3.into_alternate_af7()),  // (tx, rx)
-        Config::default() .baudrate(115_200.bps()),  //  .parity_odd() .stopbits(StopBits::STOP1),
+        Config::default() .baudrate(9_600.bps()),  //  .parity_odd() .stopbits(StopBits::STOP1),
         clocks,
     ).unwrap();
 
+//    pub fn to_str_lossy( x:&[u8] ) -> &str {
+//       for byte in  x {
+//          match core::str::from_utf8(byte) {
+//          Ok(str)     => &str,
+//          Err(error) => '.'asUtf8,
+//       }
+//    }
+
 
     // Split the serial struct into a receiving and a transmitting part
+    //let (mut  tx1, mut _rx1) = txrx1.split();  // console
+    //let (mut _tx2, mut  rx2) = txrx2.split();   // GPS
 
-    //let mut tx1     = txrx1.split().0;  
-    let (tx1, _rx1) = txrx1.split();   
-    //let tx1 = tx1.with_dma(channels.4);    
+    //let mut buf1: Vec<u8, consts::U32> = Vec::new();
 
-    let rx2 = txrx2.split().1; 
-    //let (mut tx2, mut rx2)  = txrx2.split();
+    let buf  = singleton!(: [u8; 32] = [0; 32]).unwrap();    //trait core::array::LengthAtMost32
+    let bufx = singleton!(: [u8; 32] = [0; 32]).unwrap();
 
-    // setup buffer 
-    
-    let (bufs, tx1) = tx1.write(b"Hello to console.\r\n").wait();
-    hprintln!("sent console {}", to_str(bufs)).unwrap();
+    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    let channels = p.DMA1.split(&mut rcc.ahb);
 
-    let buf0 = singleton!(: [u8; 8] = [0; 8]).unwrap();
-      
+    let tx1 = txrx1.split().0.with_dma(channels.4);
+    let rx2 = txrx2.split().1.with_dma(channels.6); 
+
+    //#[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    //let mut buftx1 = (buf1,  txrx1.split().0.with_dma(channels.4));
+    //#[cfg(feature  = "stm32f3xx")]
+    //let mut buftx1 = (buf1,  txrx1.split().0);
+    //#[cfg(feature  = "stm32f4xx")]
+    //let mut buftx1 = (buf1,  txrx1.split().0);
+    //
+    //#[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    //let bufrx2     =  (buf2,  txrx2.split().1.with_dma(channels.6)); 
+    //#[cfg(feature  = "stm32f3xx")]
+    //let buftx2     =  (buf2,  txrx2.split().1);
+    //#[cfg(feature  = "stm32f4xx")]
+    //let buftx2     = ( buf2,  txrx2.split().1);
+
+    // SEE  https://github.com/stm32-rs/stm32f1xx-hal/blob/v0.5.3/examples/adc-dma-rx.rs
+    //USES U16
+
+    let (_, tx1) = tx1.write(b"\r\nconsole connect check.\r\n").wait(); 
+   
     // read gps on usart2
     hprintln!("about to read GPS").unwrap();
-    let (buf, _rx2) = rx2.read(buf0).wait();  
-    hprintln!("done reading GPS").unwrap();
+    //  OFTEN STALL AFTER PRINTING THIS LINE, BUT NOT ALWAYS
+    //  PROBABLY wait() ??
+    
+    let mut br = (buf, rx2);
+    br = br.1.read(br.0).wait();                 //RxDma VS read  !!!!!!!!!!!!!
+    // and bufx should really not be needed
+    let mut bt = (bufx, tx1); 
 
-    // write  buf (in bytes ) to semihost
-    hprintln!("should echo buf to semihost here").unwrap();
-    hprintln!("buf is {:?}", buf).unwrap();  // eg [44, 186, 53, 19, 114, 54, 76, 202]
+    //let str2 = to_str(buf2);
+    //asm::bkpt();
 
-    // write  buf (in bytes ) to console on tx1
-    let (buf, _tx1) = tx1.write(buf).wait(); 
-    hprintln!("sent console {:?}", buf).unwrap(); //would not need :? if these were not [u8; 8]
+    hprintln!("buf is  {:?}", br.0).unwrap(); 
+    //hprintln!("to_str(buf2) is {:?}", to_str(bbr.0)).unwrap();  
+
+    //hprintln!("about to write  buf2 to console").unwrap();
+    //hprintln!("sending console {:?}", buf2).unwrap(); //would not need :? if these were not [u8; 8]
+
+    //let bufx = buftx1.1.write(bufrx2.0); 
+    //let bufx = buftx1.1.TxDma(bufrx2.0);  // wait(); //TxDma VS read  !!!!!!!!!!!!!
+    //hprintln!("sent console {:?}", bufx).unwrap(); //would not need :? if these were not [u8; 8]
 
 
     // convert buf from bytes to characters ??
@@ -172,9 +211,17 @@ fn main() -> ! {
     //let rxstr = ascii::escape_default(buf);  
     //let rxstr = ascii::from(buf);  
 
-    asm::bkpt();
-    hprintln!("going into empty loop ...").unwrap();
-    loop { 
+    //asm::bkpt();
+
+    hprintln!("going into write/read loop ^C to exit ...").unwrap();
+
+    // NB: bt uses br's buffer and br uses bt's buffer,
+    //   whereas in the first read above br used it's own buffer.
+    loop {
+       //hprintln!(".").unwrap();
+       bt = bt.1.write(br.0).wait(); 
+       //hprintln!("-").unwrap();
+       br = br.1.read(bt.0).wait();
     }
 
     // PUT A TEST HERE THAT WILL SHOW FAILURE. ASSERT SEEMS TO PANIC HALT SO ...
