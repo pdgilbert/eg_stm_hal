@@ -32,7 +32,7 @@ use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{ Serial}, };
 use stm32f4xx_hal::{prelude::*, stm32::Peripherals, serial::{config::Config, Serial }};
 
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
-use stm32l1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, StopBits}, };
+use stm32l1xx_hal::{prelude::*, stm32::Peripherals, serial::{config::Config, Serial }};
 
 
 #[entry]
@@ -50,13 +50,13 @@ fn main() -> ! {
 
     let p = Peripherals::take().unwrap();
 
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f1xx")]
     let mut rcc = p.RCC.constrain();
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f1xx")]
     let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f1xx")]
     let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f1xx")]
     let txrx1 = Serial::usart1(
         p.USART1,
         (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),  gpioa.pa10),
@@ -83,16 +83,16 @@ fn main() -> ! {
     );
 
 
-    #[cfg(feature = "stm32f4xx")]
+    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
     let clocks = p.RCC.constrain().cfgr.freeze();
-    #[cfg(feature = "stm32f4xx")]
+    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
     let gpioa = p.GPIOA.split();
-    #[cfg(feature = "stm32f4xx")]
+    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
     p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
     //let (tx,rx) = 
     // See examples/serail_cross.rs for stm32f411re uart and alternate function notes.
-    #[cfg(feature = "stm32f4xx")]
-     let txrx1 =  Serial::usart1(
+    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
+    let txrx1 =  Serial::usart1(
         p.USART1,
     	(gpioa.pa9.into_alternate_af7(),  gpioa.pa10.into_alternate_af7()), 
     	Config::default() .baudrate(9600.bps()),

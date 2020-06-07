@@ -151,18 +151,18 @@ See [Running Examples](#running-examples) for more details.
 Following is the status of examples as of April 2020. Examples are run on a 'bluepill' (stm32f1xx),
 'Discovery kit STM32F303' (stm32f3xx), and 'Nucleo-64 STM32F411' (stm32f4xx).
 
-| ------------------------- | -- stm32f1xx --- | -- stm32f3xx --- | -- stm32f4xx --- |
-|:--------------------:|:------------:|:------------:|:------------:|
+| ----------------------- | -- stm32f1xx --- | -- stm32f3xx --- | -- stm32f4xx --- | -- stm32l1xx --- |
+|:-----------------------:|:------------:|:------------:|:------------:|:------------:|
 
-|  xxx                 | build |  run  | build |  run  | build |  run  | 
-|:--------------------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
-| blink                |  yes  | works |  yes  | works |  yes  | works | 
-| serial_char          |  yes  |   1   |  yes  |  1c   |  yes  |   1b  |
-| serial_string        |  no   |       |       |       |       |       |
-| echo_console_by_char |  yes  | works |   5   |       |  yes  | works | 
-| echo_console_string  |  yes  |   3   |       |       |       |       | 
-| gps_rw_by_char       |  yes  |   4   |  yes  |       |  yes  |   4   |
-| gps_rw               |       |       |       |       |       |       |
+|  xxx                 | build |  run  | build |  run  | build |  run  | build |  run  | 
+|:--------------------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
+| blink                |  yes  | works |  yes  | works |  yes  | works |  yes  |       | 
+| serial_char          |  yes  |   1   |  yes  |  1c   |  yes  |   1b  |       |       |
+| serial_string        |  no   |       |       |       |       |       |       |       |
+| echo_console_by_char |  yes  | works |   5   |       |  yes  | works |       |       | 
+| echo_console_string  |  yes  |   3   |       |       |       |       |       |       | 
+| gps_rw_by_char       |  yes  |   4   |  yes  |       |  yes  |   4   |       |       |
+| gps_rw               |       |       |       |       |       |       |       |       |
 
 1.   tx2 to rx3 works. tx3 to rx2 works sometimes but often fails unwrapping err value on receive.
 1b.  Stalls waiting to receive.

@@ -28,7 +28,7 @@ use stm32f3xx_hal::{prelude::*, stm32::Peripherals, };
 use stm32f4xx_hal::{prelude::*, stm32::Peripherals, };
 
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
-use stm32l1xx_hal::{prelude::*,   pac::Peripherals, };
+use {stm32l1xx_hal::{prelude::*, stm32::Peripherals, }, embedded_hal::digital::v2::OutputPin };
 
 use cortex_m_rt::entry;
 
@@ -70,25 +70,14 @@ fn main() -> ! {
     #[cfg(feature = "stm32f3xx")]
     let mut led3 = gpiob.pb15.into_push_pull_output(&mut gpiob.moder, &mut gpiob.otyper);
 
-    #[cfg(feature = "stm32f4xx")]
+    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
     let gpiob = dp.GPIOB.split();
-    #[cfg(feature = "stm32f4xx")]
+    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
     let mut led1 = gpiob.pb13.into_push_pull_output();
-    #[cfg(feature = "stm32f4xx")]
+    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
     let mut led2 = gpiob.pb14.into_push_pull_output();
-    #[cfg(feature = "stm32f4xx")]
+    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
     let mut led3 = gpiob.pb15.into_push_pull_output();
-
-    #[cfg(feature = "stm32l1xx")]
-    let mut rcc = dp.RCC.constrain();
-    #[cfg(feature = "stm32l1xx")]
-    let mut gpiob = dp.GPIOB.split(&mut rcc.apb2);
-    #[cfg(feature = "stm32l1xx")]
-    let mut led1 = gpiob.pb13.into_push_pull_output(&mut gpiob.crh);
-    #[cfg(feature = "stm32l1xx")]
-    let mut led2 = gpiob.pb14.into_push_pull_output(&mut gpiob.crh);
-    #[cfg(feature = "stm32l1xx")]
-    let mut led3 = gpiob.pb15.into_push_pull_output(&mut gpiob.crh);
 
     //this works on bluepill but need to be more specific about timer using other chips/HALs
     // may need different timer, like Struct stm32f3xx_hal::stm32::SYST

@@ -43,7 +43,7 @@ use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Serial}, };
 use stm32f4xx_hal::{prelude::*, stm32::Peripherals, serial::{config::Config, Serial }};
 
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
-use stm32l1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, StopBits}, };
+use {stm32l1xx_hal::{prelude::*, stm32::Peripherals, }, embedded_hal::digital::v2::OutputPin };
 
 
 #[entry]
@@ -53,15 +53,15 @@ fn main() -> ! {
 
     let p = Peripherals::take().unwrap();
 
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f1xx")]
     let mut rcc = p.RCC.constrain();
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f1xx")]
     let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f1xx")]
     let mut afio = p.AFIO.constrain(&mut rcc.apb2);
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f1xx")]
     let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f1xx")]
     let txrx1 = Serial::usart1(
         p.USART1,
         (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),  gpioa.pa10),
@@ -71,7 +71,7 @@ fn main() -> ! {
         &mut rcc.apb2,
     );
 
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f1xx")]
     let txrx2 = Serial::usart2(
         p.USART2,
         (gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),   gpioa.pa3),  // (tx, rx)
@@ -111,11 +111,11 @@ fn main() -> ! {
     );
 
 
-    #[cfg(feature = "stm32f4xx")]
+    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
     let clocks    =  p.RCC.constrain().cfgr.freeze();
-    #[cfg(feature = "stm32f4xx")]
+    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
     let gpioa = p.GPIOA.split();
-    #[cfg(feature = "stm32f4xx")]
+    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
     let txrx1 = Serial::usart1(
         p.USART1,
         (gpioa.pa9.into_alternate_af7(),  gpioa.pa10.into_alternate_af7()),
@@ -123,7 +123,7 @@ fn main() -> ! {
         clocks,
     ).unwrap();
 
-   #[cfg(feature = "stm32f4xx")]
+    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
     let txrx2 = Serial::usart2(
         p.USART2,
         ( gpioa.pa2.into_alternate_af7(),   gpioa.pa3.into_alternate_af7()),  // (tx, rx)

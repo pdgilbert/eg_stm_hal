@@ -404,6 +404,16 @@ version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
+name = "stm32-usbd"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "cortex-m 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "usb-device 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "vcell 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "stm32f1"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -451,6 +461,7 @@ dependencies = [
  "cortex-m-rt 0.6.12 (registry+https://github.com/rust-lang/crates.io-index)",
  "embedded-hal 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "nb 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "stm32-usbd 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "stm32f3 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "void 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -543,6 +554,11 @@ version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
+name = "usb-device"
+version = "0.2.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
 name = "vcell"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -609,6 +625,7 @@ dependencies = [
 "checksum serde 1.0.106 (registry+https://github.com/rust-lang/crates.io-index)" = "36df6ac6412072f67cf767ebbde4133a5b2e88e76dc6187fa7104cd16f783399"
 "checksum serde_derive 1.0.106 (registry+https://github.com/rust-lang/crates.io-index)" = "9e549e3abf4fb8621bd1609f11dfc9f5e50320802273b12f3811a67e6716ea6c"
 "checksum stable_deref_trait 1.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "dba1a27d3efae4351c8051072d619e3ade2820635c3958d826bfea39d59b54c8"
+"checksum stm32-usbd 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)" = "70d13eca735cae37df697f599777b000cc0ee924df8452f2b4bfaa6798ab0338"
 "checksum stm32f1 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)" = "31467fc08dc12aef253d01844f9149f2f2965a5d442b81f841c4f86ed267fca1"
 "checksum stm32f1xx-hal 0.5.3 (git+https://github.com/stm32-rs/stm32f1xx-hal)" = "<none>"
 "checksum stm32f3 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)" = "40809cfa10dd7d7ee4c414addb1145ce1214e2123489e1eba3d13045a3de32d5"
@@ -622,6 +639,7 @@ dependencies = [
 "checksum typenum 1.11.2 (registry+https://github.com/rust-lang/crates.io-index)" = "6d2783fe2d6b8c1101136184eb41be8b1ad379e4657050b8aaff0c79ee7575f9"
 "checksum unicode-xid 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "fc72304796d0818e357ead4e000d19c9c174ab23dc11093ac919054d20a6a7fc"
 "checksum unicode-xid 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "826e7639553986605ec5979c7dd957c7895e93eabed50ab2ffa7f6128a75097c"
+"checksum usb-device 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)" = "0e5e2b9ba23f0d9ef7a34e498b6581c9d67944a1916542bfc7238bf1dc0d6acd"
 "checksum vcell 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)" = "876e32dcadfe563a4289e994f7cb391197f362b6315dc45e8ba4aa6f564a4b3c"
 "checksum void 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)" = "6a02e4885ed3bc0f2de90ea6dd45ebcbb66dacffe03547fadbb0eeae2770887d"
 "checksum volatile-register 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "0d67cb4616d99b940db1d6bd28844ff97108b498a6ca850e5b6191a532063286"
