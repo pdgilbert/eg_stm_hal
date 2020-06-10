@@ -131,10 +131,10 @@ See [Running Examples](#running-examples) for more details.
 | xxx                  | notes |   Description                                                  |
 | -------------------- |:-----:|:-------------------------------------------------------------- |
 | blink                |   1   | Blinks off-board LEDs attached to  pb 13,14,15                 |
-| serial_char          |       | Single char between usarts 2 and 3, console and semihost output|
-| serial_string        |       | String writes between usarts 2 and 3, console and semihost output|
 | echo_console_by_char |   2   | Echo console input, char by char,  + semihost output           |
 | echo_console_string  |       | Read 15 chars input from console, output to semihost, repeat   |
+| serial_char          |       | Single char between usarts 2 and 3, console and semihost output|
+| serial_string        |       | String writes between usarts 2 and 3, console and semihost output|
 | gps_rw_by_char       |       | Read by char from GPS with echo to console + semihost output   |
 | gps_rw               |   3   | Read by str  from GPS with echo to console + semihost output   |
 
@@ -151,16 +151,16 @@ See [Running Examples](#running-examples) for more details.
 Following is the status of examples as of April 2020. Examples are run on a 'bluepill' (stm32f1xx),
 'Discovery kit STM32F303' (stm32f3xx), and 'Nucleo-64 STM32F411' (stm32f4xx).
 
-| -------------------------- | -- stm32f1xx -- | -- stm32f3xx -- | -- stm32f4xx -- | -- stm32l1xx -- |
-|:--------------------------:|:-----------:|:-----------:|:-----------:|:-----------:|
+| ---------------------------- | - stm32f1xx - | - stm32f3xx - | - stm32f4xx - | - stm32l1xx - |
+|:----------------------------:|:-----------:|:-----------:|:-----------:|:-----------:|
 
 |  xxx                 | build |  run  | build |  run  | build |  run  | build |  run  | 
 |:--------------------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
 | blink                |  yes  | works |  yes  | works |  yes  | works |  yes  |       | 
-| serial_char          |  yes  |   1   |  yes  |   3   |  yes  |   2   |       |       |
-| serial_string        |  yes  |       |   9   |       |   9   |       |   9   |       |
 | echo_console_by_char |  yes  | works |   8   |       |  yes  | works |       |       | 
 | echo_console_string  |  yes  |   5   |       |       |       |       |       |       | 
+| serial_char          |  yes  |   1   |  yes  |   3   |  yes  |   2   |       |       |
+| serial_string        |  yes  |       |   9   |       |   9   |       |   9   |       |
 | gps_rw_by_char       |  yes  |   6   |  yes  |       |  yes  |   6   |  no   |       |
 | gps_rw               |  yes  |       |       |       |       |       |       |       |
 
