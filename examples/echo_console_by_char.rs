@@ -106,7 +106,7 @@ fn main() -> ! {
 
     hprintln!("test formatted write to consile ...").unwrap();
     let number = 42;
-    // NEXT IS CAUSING A PROBLEM IN stm32f3xx
+    // write! and writeln! cause method not found in `stm32f3xx_hal but works in other HALs
     writeln!(tx, "\r\nHello {}. Converted number set to 42.\r\n", number).unwrap();
  
     hprintln!("test read and write by char. Please type into the console ...").unwrap();

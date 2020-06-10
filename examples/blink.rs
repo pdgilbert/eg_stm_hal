@@ -70,13 +70,22 @@ fn main() -> ! {
     #[cfg(feature = "stm32f3xx")]
     let mut led3 = gpiob.pb15.into_push_pull_output(&mut gpiob.moder, &mut gpiob.otyper);
 
-    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f4xx")]
     let gpiob = dp.GPIOB.split();
-    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f4xx")]
     let mut led1 = gpiob.pb13.into_push_pull_output();
-    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f4xx")]
     let mut led2 = gpiob.pb14.into_push_pull_output();
-    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f4xx")]
+    let mut led3 = gpiob.pb15.into_push_pull_output();
+
+    #[cfg(feature = "stm32l1xx")]
+    let gpiob = dp.GPIOB.split();
+    #[cfg(feature = "stm32l1xx")]
+    let mut led1 = gpiob.pb13.into_push_pull_output();
+    #[cfg(feature = "stm32l1xx")]
+    let mut led2 = gpiob.pb14.into_push_pull_output();
+    #[cfg(feature = "stm32l1xx")]
     let mut led3 = gpiob.pb15.into_push_pull_output();
 
     //this works on bluepill but need to be more specific about timer using other chips/HALs

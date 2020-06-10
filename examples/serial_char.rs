@@ -1,4 +1,3 @@
-//! WHEN THIS WORKS REMOVE serial_loopback_char as it will be redundant.
 //! Serial interface test writing a single character between two usarts and
 //! echo to the computer consol connected by usb-ttl dongle on another usart.
 //! 
@@ -23,7 +22,7 @@
 
 
 // This example contains the most extensive notes. 
-// ANY NOTES SHOULD BE EXAPANDED HERE IF THEY APPLY HERE, 
+// ANY NOTES SHOULD BE EXPANDED HERE IF THEY APPLY HERE, 
 // OTHERWISE PUT THEM IN THE EXAMPLE WHERE THEY APPLY !
 
 #![deny(unsafe_code)]
@@ -53,7 +52,7 @@ use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Serial}, };
 use stm32f4xx_hal::{prelude::*, stm32::Peripherals, serial::{config::Config, Serial}};
 
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
-use stm32l1xx_hal::{prelude::*, stm32::Peripherals, serial::{Config, Serial, StopBits}};
+use stm32l1xx_hal::{prelude::*, stm32::Peripherals, serial::{Config, Serial}};
 
 
 #[entry]
@@ -93,7 +92,8 @@ fn main() -> ! {
     #[cfg(feature = "stm32f1xx")]
     let txrx1 = Serial::usart1(
         p.USART1,
-        (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),   gpioa.pa10),
+        (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),  
+	 gpioa.pa10),
         &mut afio.mapr,
         Config::default() .baudrate(9_600.bps()) .parity_odd() .stopbits(StopBits::STOP1),
         clocks,
@@ -107,7 +107,8 @@ fn main() -> ! {
     #[cfg(feature = "stm32f1xx")]
     let txrx2 = Serial::usart2(
         p.USART2,
-        (gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),   gpioa.pa3),  // (tx, rx)
+        (gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),  
+	 gpioa.pa3),  // (tx, rx)
         &mut afio.mapr,
         Config::default() .baudrate(9_600.bps())  .parity_odd() .stopbits(StopBits::STOP1),
         clocks,
@@ -118,7 +119,8 @@ fn main() -> ! {
     #[cfg(feature = "stm32f1xx")]
     let txrx3 = Serial::usart3(
         p.USART3,
-        ( gpiob.pb10.into_alternate_push_pull(&mut gpiob.crh),   gpiob.pb11),  // (tx, rx)
+        ( gpiob.pb10.into_alternate_push_pull(&mut gpiob.crh),  
+	  gpiob.pb11),  // (tx, rx)
         &mut afio.mapr,
         Config::default() .baudrate(9_600.bps())  .parity_odd() .stopbits(StopBits::STOP1),
         clocks,
@@ -144,7 +146,8 @@ fn main() -> ! {
     #[cfg(feature = "stm32f3xx")]
     let txrx1     = Serial::usart1(
         p.USART1,
-        (gpioa.pa9.into_af7(&mut gpioa.moder, &mut gpioa.afrh), gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)),
+        (gpioa.pa9.into_af7(&mut gpioa.moder, &mut gpioa.afrh),
+	 gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)),
         9600.bps(),
         clocks,
         &mut rcc.apb2,
@@ -153,7 +156,8 @@ fn main() -> ! {
     #[cfg(feature = "stm32f3xx")]
     let txrx2 = Serial::usart2(
         p.USART2,
-        (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl), gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)), //(tx,rx)
+        (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl),
+	 gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)), //(tx,rx)
         115_200.bps(),
         clocks,
         &mut rcc.apb1,
@@ -164,7 +168,8 @@ fn main() -> ! {
     #[cfg(feature = "stm32f3xx")]
     let txrx3 = Serial::usart3(
         p.USART3,
-        (gpiob.pb10.into_af7(&mut gpiob.moder, &mut gpiob.afrh), gpiob.pb11.into_af7(&mut gpiob.moder, &mut gpiob.afrh)), 
+        (gpiob.pb10.into_af7(&mut gpiob.moder, &mut gpiob.afrh),
+	 gpiob.pb11.into_af7(&mut gpiob.moder, &mut gpiob.afrh)), 
         115_200.bps(),
         clocks,
         &mut rcc.apb1,    // WHAT IS  rcc.apb1/2 ?
@@ -180,36 +185,80 @@ fn main() -> ! {
     // AF7 on PA2  is usart2_Tx, on PA3  is usart2_Rx,
     // AF8 on PA11 is usart6_Tx, on PA12 is usart6_Rx
 
-    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f4xx")]
     let rcc = p.RCC.constrain();
-    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f4xx")]
     let clocks = rcc.cfgr.freeze();
-    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f4xx")]
     let gpioa = p.GPIOA.split();
-    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f4xx")]
     p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
     //let (tx,rx) = 
 
-    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f4xx")]
     let txrx1 =  Serial::usart1(
         p.USART1,
-    	(gpioa.pa9.into_alternate_af7(),  gpioa.pa10.into_alternate_af7()), 
+    	(gpioa.pa9.into_alternate_af7(), 
+	 gpioa.pa10.into_alternate_af7()), 
     	Config::default() .baudrate(9600.bps()),
     	clocks
     ).unwrap(); 
 
-    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f4xx")]
     let txrx2 = Serial::usart2(
         p.USART2,
-        ( gpioa.pa2.into_alternate_af7(),   gpioa.pa3.into_alternate_af7()),  // (tx, rx)
+        ( gpioa.pa2.into_alternate_af7(),  
+	  gpioa.pa3.into_alternate_af7()),  // (tx, rx)
         Config::default() .baudrate(115_200.bps()),  //  .parity_odd() .stopbits(StopBits::STOP1),
         clocks,
     ).unwrap();
 
-    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f4xx")]
     let txrx3 = Serial::usart6(      // (tx, rx)  NOTE PINS and USART6 !!!
         p.USART6,
-        ( gpioa.pa11.into_alternate_af8(),   gpioa.pa12.into_alternate_af8()),
+        ( gpioa.pa11.into_alternate_af8(),  
+	  gpioa.pa12.into_alternate_af8()),
+        Config::default() .baudrate(115_200.bps()) ,
+        clocks,
+    ).unwrap();
+
+
+
+    // stm32l1xx 
+
+    #[cfg(feature = "stm32l1xx")]
+    let rcc = p.RCC.constrain();
+    #[cfg(feature = "stm32l1xx")]
+    let clocks = rcc.cfgr.freeze();
+    #[cfg(feature = "stm32l1xx")]
+    let gpioa = p.GPIOA.split();
+    #[cfg(feature = "stm32l1xx")]
+    p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+    //let (tx,rx) = 
+
+    #[cfg(feature = "stm32l1xx")]
+    let txrx1 =  Serial::usart1(
+        p.USART1,
+    	(gpioa.pa9.into_alternate_af7(), 
+	 gpioa.pa10.into_alternate_af7()), 
+    	Config::default() .baudrate(9600.bps()),
+    	clocks
+    ).unwrap(); 
+
+    #[cfg(feature = "stm32l1xx")]
+    let txrx2 = Serial::usart2(
+        p.USART2,
+        ( gpioa.pa2.into_alternate_af7(),  
+	  gpioa.pa3.into_alternate_af7()),  // (tx, rx)
+        Config::default() .baudrate(115_200.bps()),  //  .parity_odd() .stopbits(StopBits::STOP1),
+        clocks,
+    ).unwrap();
+
+    #[cfg(feature = "stm32l1xx")]
+    let txrx3 = Serial::usart6(      // (tx, rx)  NOTE PINS and USART6 !!!
+        p.USART6,
+        ( gpioa.pa11.into_alternate_af8(),  
+	  gpioa.pa12.into_alternate_af8()),
         Config::default() .baudrate(115_200.bps()) ,
         clocks,
     ).unwrap();
@@ -226,29 +275,29 @@ fn main() -> ! {
     hprintln!("testing  tx2 to rx3").unwrap();
     hprintln!("   sending on tx2 ...").unwrap();
 
-    let sent = b'X';
+    let send = b'X';
 
     // Write `X` and wait until the write is successful
-    block!(tx2.write(sent)).ok();
+    block!(tx2.write(send)).ok();
 
     hprintln!("   receiving on rx3 ...").unwrap();
 
-    // Read the byte that was just sent. Blocks until the read is complete
+    // Read the byte that was just send. Blocks until the read is complete
     let received = block!(rx3.read()).unwrap();
 
-    hprintln!("   checking tx2 to rx3 received = sent,  {} = {} byte", received, sent).unwrap();
+    hprintln!("   checking tx2 to rx3 received = send,  {} = {} byte", received, send).unwrap();
 
-    // The sent byte should be the one received
-    assert_eq!(received, sent, "testing received = sent,  {} = {}", received, sent);
+    // The send byte should be the one received
+    assert_eq!(received, send, "testing received = send,  {} = {}", received, send);
 
     // PUT A TEST HERE THAT WILL SHOW FAILURE. ASSERT SEEMS TO PANIC HALT SO ...
 
     // Now print to semi-host as character rather than byte.
-    // Note that sent above was u8 byte (b'X') because tx.write() requires that, but
-    //    hprintln!() needs a str and from_utf8() needs a slice, thus [sent].
+    // Note that send above was u8 byte (b'X') because tx.write() requires that, but
+    //    hprintln!() needs a str and from_utf8() needs a slice, thus [send].
     
     hprintln!("   tx2 to rx3  characters,  {} = {}", 
-        from_utf8(&[received]).unwrap(), from_utf8(&[sent]).unwrap()).unwrap();
+        from_utf8(&[received]).unwrap(), from_utf8(&[send]).unwrap()).unwrap();
 
     hprintln!("   sending received to console on tx1 ...").unwrap();
 
@@ -267,23 +316,23 @@ fn main() -> ! {
     hprintln!("testing  tx3 to rx2").unwrap();
     hprintln!("   sending on tx3 ...").unwrap();
 
-    let sent = b'Y';
+    let send = b'Y';
 
     // Write `Y` and wait until the write is successful
-    block!(tx3.write(sent)).ok();
+    block!(tx3.write(send)).ok();
 
     hprintln!("   receiving on rx2 ...").unwrap();
 
-    // Read the byte that was just sent. Blocks until the read is complete
+    // Read the byte that was just send. Blocks until the read is complete
     let received = block!(rx2.read()).unwrap();
 
-    hprintln!("    checking tx3 to rx2  received = sent,  {} = {} byte", received, sent).unwrap();
+    hprintln!("    checking tx3 to rx2  received = send,  {} = {} byte", received, send).unwrap();
 
-    // The sent byte should be the one received
-    assert_eq!(received, sent, "testing received = sent,  {} = {}", received, sent);
+    // The send byte should be the one received
+    assert_eq!(received, send, "testing received = send,  {} = {}", received, send);
     
     hprintln!("   tx3 to rx2  characters,  {} = {}", 
-        from_utf8(&[received]).unwrap(), from_utf8(&[sent]).unwrap()).unwrap();
+        from_utf8(&[received]).unwrap(), from_utf8(&[send]).unwrap()).unwrap();
 
     hprintln!("   sending received from rx2  to console on tx1 ...").unwrap();
 

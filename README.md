@@ -71,8 +71,8 @@ using [issues](https://github.com/pdgilbert/eg_stm_hal/issues) on this git proje
 | stm32f1xx-hal  | stm32f103 |      bluepill       |    yes     |  many  | Problems using serial in some examples     |
 | stm32f3xx-hal  | stm32f303 | discovery-stm32f303 |   some     |  some  | Hal differences.  Code adjustments needed  |
 | stm32f4xx-hal  | stm32f411 |      nucleo-64      |   some     |  some  | Hal differences.  Code adjustments needed  |
-| stm32l1xx-hal  | stm32l100 | discovery-stm32l100 |    no      |   no   | Hal does not build.                        |
-| stm32l1xx-hal  | stm32l151 | heltec-lora-node151 |    no      |   no   | Hal does not build.                        |
+| stm32l1xx-hal  | stm32l100 | discovery-stm32l100 |   blink    |   no   | Hal CI tests fail. Code adjustments needed |
+| stm32l1xx-hal  | stm32l151 | heltec-lora-node151 |   blink    |   no   | Hal CI tests fail. Code adjustments needed |
 
 This project's examples depend on HALs. 
 See [HALs on Github](https://github.com/stm32-rs) and on [Travis CI.](https://travis-ci.com/stm32-rs)
@@ -151,27 +151,28 @@ See [Running Examples](#running-examples) for more details.
 Following is the status of examples as of April 2020. Examples are run on a 'bluepill' (stm32f1xx),
 'Discovery kit STM32F303' (stm32f3xx), and 'Nucleo-64 STM32F411' (stm32f4xx).
 
-| ----------------------- | -- stm32f1xx --- | -- stm32f3xx --- | -- stm32f4xx --- | -- stm32l1xx --- |
-|:-----------------------:|:------------:|:------------:|:------------:|:------------:|
+| -------------------------- | -- stm32f1xx -- | -- stm32f3xx -- | -- stm32f4xx -- | -- stm32l1xx -- |
+|:--------------------------:|:-----------:|:-----------:|:-----------:|:-----------:|
 
 |  xxx                 | build |  run  | build |  run  | build |  run  | build |  run  | 
 |:--------------------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
 | blink                |  yes  | works |  yes  | works |  yes  | works |  yes  |       | 
-| serial_char          |  yes  |   1   |  yes  |  1c   |  yes  |   1b  |       |       |
-| serial_string        |  no   |       |       |       |       |       |       |       |
-| echo_console_by_char |  yes  | works |   5   |       |  yes  | works |       |       | 
-| echo_console_string  |  yes  |   3   |       |       |       |       |       |       | 
-| gps_rw_by_char       |  yes  |   4   |  yes  |       |  yes  |   4   |       |       |
-| gps_rw               |       |       |       |       |       |       |       |       |
+| serial_char          |  yes  |   1   |  yes  |   3   |  yes  |   2   |       |       |
+| serial_string        |  no   |       |   9   |       |   9   |       |   9   |       |
+| echo_console_by_char |  yes  | works |   8   |       |  yes  | works |       |       | 
+| echo_console_string  |  yes  |   5   |       |       |       |       |       |       | 
+| gps_rw_by_char       |  yes  |   6   |  yes  |       |  yes  |   6   |  no   |       |
+| gps_rw               |  yes  |       |       |       |       |       |       |       |
 
-1.   tx2 to rx3 works. tx3 to rx2 works sometimes but often fails unwrapping err value on receive.
-1b.  Stalls waiting to receive.
-1c.  Usart2 with Usart3 connection works both ways but jibberish written on console.
-x.   Jibberish written on console.
-3.   Works on bluepill as long a typing is slow.
-4.   Fails reading gps. 
-x.   Works once, repeat problems.
-5.   Writeln! macro missing from stm32f3xx ?
+1.  tx2 to rx3 works. tx3 to rx2 works sometimes but often fails unwrapping err value on receive.
+2.  Stalls waiting to receive.
+3.  Usart2 with Usart3 connection works both ways but jibberish written on console.
+4.  Jibberish written on console.
+5.  Works on bluepill as long a typing is slow.
+6.  Fails reading gps. 
+7.  Works once, repeat problems.
+8.  Writeln! macro missing from stm32f3xx ?
+9.  Uses dma buffering in stm32f1xx. Have not figured out how to do that with other HALs.
 
 ## Building Examples
 

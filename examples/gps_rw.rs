@@ -13,7 +13,7 @@ extern crate panic_semihosting;
 extern crate panic_halt;
 
 //use cortex_m::asm;
-use cortex_m::{asm, singleton};
+use cortex_m::singleton;
 use cortex_m_rt::entry;
 //use core::fmt::Write;
 use cortex_m_semihosting::hprintln;
@@ -21,7 +21,7 @@ use cortex_m_semihosting::hprintln;
 //use core::ascii;
 //use nb::block;
 
-use eg_stm_hal::to_str;
+//use eg_stm_hal::to_str;
 
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
 use stm32f1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, StopBits}, };
@@ -33,7 +33,7 @@ use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Serial}, };
 use stm32f4xx_hal::{prelude::*, stm32::Peripherals, serial::{config::Config, Serial, config::StopBits}};
 
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
-use {stm32l1xx_hal::{prelude::*, stm32::Peripherals, }, embedded_hal::digital::v2::OutputPin };
+use stm32l1xx_hal::{prelude::*, stm32::Peripherals, serial::{Config, Serial}};
 
 //use heapless::{consts, Vec};
 
@@ -49,130 +49,146 @@ fn main() -> ! {
 
     let p = Peripherals::take().unwrap();
 
-
-    #[cfg(feature = "stm32f1xx")]
     let mut rcc = p.RCC.constrain();
+
     #[cfg(feature = "stm32f1xx")]
     let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
     #[cfg(feature = "stm32f1xx")]
     let mut afio = p.AFIO.constrain(&mut rcc.apb2);
     #[cfg(feature = "stm32f1xx")]
     let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
-    #[cfg(feature = "stm32f1xx")]
-    let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
+    //#[cfg(feature = "stm32f1xx")]
+    //let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
     #[cfg(feature = "stm32f1xx")]
     let txrx1 = Serial::usart1(
         p.USART1,
-        (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),  gpioa.pa10),
+        (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),
+	 gpioa.pa10),
         &mut afio.mapr,
         Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1),
         clocks,
-        &mut rcc.apb2,
-    );
-    // WHAT IS  rcc.apb1/2 ?
+        &mut rcc.apb2,   // WHAT IS  rcc.apb1/2 ?
+        );
+    #[cfg(feature = "stm32f1xx")]
+    let channels = p.DMA1.split(&mut rcc.ahb);
+
     #[cfg(feature = "stm32f1xx")]
     let txrx2 = Serial::usart2(
         p.USART2,
-        //(gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),  gpioa.pa3),  // (tx, rx)
-        //(gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),  gpioa.pa3.into_floating_input(&mut gpioa.crl)),
-        //   not implemented   gpioa.pa3.into_pull_down_input(&mut gpioa.crl)),
-        //   not implemented   gpioa.pa3.into_pull_up_input(&mut gpioa.crl)),
+        (gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl), 
+	 gpioa.pa3),  // (tx, rx)
         &mut afio.mapr,
-        Config::default() .baudrate(9_600.bps()),  //  .parity_odd() .stopbits(StopBits::STOP1),
+        Config::default() .baudrate(9_600.bps())  .parity_odd() .stopbits(StopBits::STOP1),
         clocks,
         &mut rcc.apb1,
-    );
+        );
+    #[cfg(feature = "stm32f1xx")]
+    let tx1 = txrx1.split().0.with_dma(channels.4);  // console
+    #[cfg(feature = "stm32f1xx")]
+    let rx2 = txrx2.split().1.with_dma(channels.6);  // GPS
 
 
 
-
-    #[cfg(feature = "stm32f3xx")]
-    let mut rcc = p.RCC.constrain();
     #[cfg(feature = "stm32f3xx")]
     let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
     #[cfg(feature = "stm32f3xx")]
     let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
-    #[cfg(feature = "stm32f3xx")]
-    let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
+    //#[cfg(feature = "stm32f3xx")]
+    //let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
     #[cfg(feature = "stm32f3xx")]
     let txrx1 = Serial::usart1(
         p.USART1,
-        (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),  gpioa.pa10),
-        Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1),
+        (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh), 
+	 gpioa.pa10),
+        9600.bps(),
         clocks,
         &mut rcc.apb2,
-    );
+        );
+
     #[cfg(feature = "stm32f3xx")]
     let txrx2 = Serial::usart2(
         p.USART2,
-        (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl), gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)), //(tx,rx)
+        (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl),
+	 gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)), //(tx,rx)
         9600.bps(), //115_200.bps(),
         clocks,
         &mut rcc.apb1,
-    );
+        );
+    #[cfg(feature = "stm32f3xx")]
+    let tx1 = txrx1.split().0;      // console
+    #[cfg(feature = "stm32f3xx")]
+    let rx2 = txrx2.split().1;      // GPS
 
 
 
-    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
-    let mut rcc = p.RCC.constrain();
-    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f4xx")]
     let clocks =  rcc.cfgr.freeze();
-    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f4xx")]
     let mut gpioa = p.GPIOA.split();
-    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f4xx")]
     let mut gpiob = p.GPIOB.split();
-    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f4xx")]
     let txrx1 = Serial::usart1(
         p.USART1,
-        (gpioa.pa9.into_alternate_af7(),  gpioa.pa10.into_alternate_af7()),
+        (gpioa.pa9.into_alternate_af7(), 
+	 gpioa.pa10.into_alternate_af7()),
         Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1),
         clocks,
-    );
-    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
+        );
+
+    #[cfg(feature = "stm32f4xx")]
     let txrx2 = Serial::usart2(
         p.USART2,
-        ( gpioa.pa2.into_alternate_af7(),   gpioa.pa3.into_alternate_af7()),  // (tx, rx)
+        ( gpioa.pa2.into_alternate_af7(), 
+	  gpioa.pa3.into_alternate_af7()),  // (tx, rx)
         Config::default() .baudrate(9_600.bps()),  //  .parity_odd() .stopbits(StopBits::STOP1),
         clocks,
-    ).unwrap();
+        ).unwrap();
+    #[cfg(feature = "stm32f4xx")]
+    let tx1 = txrx1.split().0;      // console
+    #[cfg(feature = "stm32f4xx")]
+    let rx2 = txrx2.split().1;      // GPS
+
+
+
+    #[cfg(feature = "stm32l1xx")]
+    let clocks =  rcc.cfgr.freeze();
+    #[cfg(feature = "stm32l1xx")]
+    let mut gpioa = p.GPIOA.split();
+    #[cfg(feature = "stm32l1xx")]
+    let mut gpiob = p.GPIOB.split();
+    #[cfg(feature = "stm32l1xx")]
+    let txrx1 = Serial::usart1(
+        p.USART1,
+        (gpioa.pa9.into_alternate_af7(),
+	 gpioa.pa10.into_alternate_af7()),
+        Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1),
+        clocks,
+        );
+
+    #[cfg(feature = "stm32l1xx")]
+    let txrx2 = Serial::usart2(
+        p.USART2,
+        ( gpioa.pa2.into_alternate_af7(), 
+	  gpioa.pa3.into_alternate_af7()),  // (tx, rx)
+        Config::default() .baudrate(9_600.bps()),  //  .parity_odd() .stopbits(StopBits::STOP1),
+        clocks,
+        ).unwrap();
+    #[cfg(feature = "stm32l1xx")]
+    let tx1 = txrx1.split().0;      // console
+    #[cfg(feature = "stm32l1xx")]
+    let rx2 = txrx2.split().1;      // GPS
+
+
 
 //    pub fn to_str_lossy( x:&[u8] ) -> &str {
 //       for byte in  x {
 //          match core::str::from_utf8(byte) {
 //          Ok(str)     => &str,
 //          Err(error) => '.'asUtf8,
+//          }
 //       }
-//    }
 
-
-    // Split the serial struct into a receiving and a transmitting part
-    //let (mut  tx1, mut _rx1) = txrx1.split();  // console
-    //let (mut _tx2, mut  rx2) = txrx2.split();   // GPS
-
-    //let mut buf1: Vec<u8, consts::U32> = Vec::new();
-
-    let buf  = singleton!(: [u8; 32] = [0; 32]).unwrap();    //trait core::array::LengthAtMost32
-    let bufx = singleton!(: [u8; 32] = [0; 32]).unwrap();
-
-    #[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
-    let channels = p.DMA1.split(&mut rcc.ahb);
-
-    let tx1 = txrx1.split().0.with_dma(channels.4);
-    let rx2 = txrx2.split().1.with_dma(channels.6); 
-
-    //#[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
-    //let mut buftx1 = (buf1,  txrx1.split().0.with_dma(channels.4));
-    //#[cfg(feature  = "stm32f3xx")]
-    //let mut buftx1 = (buf1,  txrx1.split().0);
-    //#[cfg(feature  = "stm32f4xx")]
-    //let mut buftx1 = (buf1,  txrx1.split().0);
-    //
-    //#[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
-    //let bufrx2     =  (buf2,  txrx2.split().1.with_dma(channels.6)); 
-    //#[cfg(feature  = "stm32f3xx")]
-    //let buftx2     =  (buf2,  txrx2.split().1);
-    //#[cfg(feature  = "stm32f4xx")]
-    //let buftx2     = ( buf2,  txrx2.split().1);
 
     // SEE  https://github.com/stm32-rs/stm32f1xx-hal/blob/v0.5.3/examples/adc-dma-rx.rs
     //USES U16
@@ -184,10 +200,15 @@ fn main() -> ! {
     //  OFTEN STALL AFTER PRINTING THIS LINE, BUT NOT ALWAYS
     //  PROBABLY wait() ??
     
-    let mut br = (buf, rx2);
-    br = br.1.read(br.0).wait();                 //RxDma VS read  !!!!!!!!!!!!!
-    // and bufx should really not be needed
-    let mut bt = (bufx, tx1); 
+    //Vec<u8, consts::U32> = Vec::new();
+    //singleton!(: [u8; 32] = [0; 32]).unwrap();  //trait core::array::LengthAtMost32
+
+    // (buf, rx)  tuple for RxDma VS read() a single u8
+    let mut br = (singleton!(: [u8; 32] = [0; 32]).unwrap(), rx2);
+    br = br.1.read(br.0).wait();                
+
+    // (buf, tx)  tuple for TxDma VS write() a single u8. Why is buffer is needed?
+    let mut bt = (singleton!(: [u8; 32] = [0; 32]).unwrap(), tx1); 
 
     //let str2 = to_str(buf2);
     //asm::bkpt();
@@ -222,7 +243,7 @@ fn main() -> ! {
        bt = bt.1.write(br.0).wait(); 
        //hprintln!("-").unwrap();
        br = br.1.read(bt.0).wait();
-    }
+       }
 
     // PUT A TEST HERE THAT WILL SHOW FAILURE. ASSERT SEEMS TO PANIC HALT SO ...
 }

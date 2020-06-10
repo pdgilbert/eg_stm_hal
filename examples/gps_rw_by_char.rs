@@ -43,7 +43,7 @@ use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Serial}, };
 use stm32f4xx_hal::{prelude::*, stm32::Peripherals, serial::{config::Config, Serial }};
 
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
-use {stm32l1xx_hal::{prelude::*, stm32::Peripherals, }, embedded_hal::digital::v2::OutputPin };
+use stm32l1xx_hal::{prelude::*, stm32::Peripherals, serial::{Config, Serial}};
 
 
 #[entry]
@@ -111,11 +111,11 @@ fn main() -> ! {
     );
 
 
-    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f4xx")]
     let clocks    =  p.RCC.constrain().cfgr.freeze();
-    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f4xx")]
     let gpioa = p.GPIOA.split();
-    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f4xx")]
     let txrx1 = Serial::usart1(
         p.USART1,
         (gpioa.pa9.into_alternate_af7(),  gpioa.pa10.into_alternate_af7()),
@@ -123,7 +123,28 @@ fn main() -> ! {
         clocks,
     ).unwrap();
 
-    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f4xx")]
+    let txrx2 = Serial::usart2(
+        p.USART2,
+        ( gpioa.pa2.into_alternate_af7(),   gpioa.pa3.into_alternate_af7()),  // (tx, rx)
+        Config::default() .baudrate(115_200.bps()),  //  .parity_odd() .stopbits(StopBits::STOP1),
+        clocks,
+    ).unwrap();
+
+
+    #[cfg(feature = "stm32l1xx")]
+    let clocks    =  p.RCC.constrain().cfgr.freeze();
+    #[cfg(feature = "stm32l1xx")]
+    let gpioa = p.GPIOA.split();
+    #[cfg(feature = "stm32l1xx")]
+    let txrx1 = Serial::usart1(
+        p.USART1,
+        (gpioa.pa9.into_alternate_af7(),  gpioa.pa10.into_alternate_af7()),
+     	Config::default() .baudrate(9600.bps()),
+        clocks,
+    ).unwrap();
+
+    #[cfg(feature = "stm32l1xx")]
     let txrx2 = Serial::usart2(
         p.USART2,
         ( gpioa.pa2.into_alternate_af7(),   gpioa.pa3.into_alternate_af7()),  // (tx, rx)
