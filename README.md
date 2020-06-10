@@ -4,7 +4,7 @@ The [status for individual boards described below can be
 seen at Travis CI.](https://travis-ci.org/pdgilbert/eg_stm_hal)
 
 This project's overall Travis CI build status is 
-[![Build Status](https://travis-ci.org/pdgilbert/eg_stm_hal.svg?branch=master)](https://travis-ci.org/pdgilbert/eg_stm_hal).
+[![Build Status](https://api.travis-ci.org/pdgilbert/eg_stm_hal.svg?branch=master)](https://travis-ci.org/pdgilbert/eg_stm_hal).
 This will indicate an error if any examples fail on any boards, 
 so often will indicate `error` even when most examples work on most boards.
 
@@ -158,7 +158,7 @@ Following is the status of examples as of April 2020. Examples are run on a 'blu
 |:--------------------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
 | blink                |  yes  | works |  yes  | works |  yes  | works |  yes  |       | 
 | serial_char          |  yes  |   1   |  yes  |   3   |  yes  |   2   |       |       |
-| serial_string        |  no   |       |   9   |       |   9   |       |   9   |       |
+| serial_string        |  yes  |       |   9   |       |   9   |       |   9   |       |
 | echo_console_by_char |  yes  | works |   8   |       |  yes  | works |       |       | 
 | echo_console_string  |  yes  |   5   |       |       |       |       |       |       | 
 | gps_rw_by_char       |  yes  |   6   |  yes  |       |  yes  |   6   |  no   |       |
