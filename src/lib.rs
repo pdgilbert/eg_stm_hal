@@ -24,6 +24,14 @@ pub fn to_str( x:&[u8] ) -> &str {
 //      Err(_error) => "problem converting u8 to str ",
 //      Err(error) => panic!("problem converting str from u8 {:?}", error),
 
+//    pub fn to_str_lossy( x:&[u8] ) -> &str {
+//       for byte in  x {
+//          match core::str::from_utf8(byte) {
+//          Ok(str)     => &str,
+//          Err(error) => '.'asUtf8,
+//          }
+//       }
+
 #[cfg(test)]
 mod tests {
     #[test]

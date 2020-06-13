@@ -301,7 +301,7 @@ fn main() -> ! {
 
     hprintln!("   sending received to console on tx1 ...").unwrap();
 
-    for byte in  b"tx2 to rx3 test with X\r\n" {  // iterator fails if string is too long
+    for byte in  b"\r\ntx2 to rx3 with X\r\n" {  // iterator fails if string is too long
        block!(tx1.write(*byte)).unwrap();
     }
     //block!(tx1.write(received)).unwrap();
@@ -329,7 +329,7 @@ fn main() -> ! {
     hprintln!("    checking tx3 to rx2  received = send,  {} = {} byte", received, send).unwrap();
 
     // The send byte should be the one received
-    assert_eq!(received, send, "testing received = send,  {} = {}", received, send);
+    //assert_eq!(received, send, "testing received = send,  {} = {}", received, send);
     
     hprintln!("   tx3 to rx2  characters,  {} = {}", 
         from_utf8(&[received]).unwrap(), from_utf8(&[send]).unwrap()).unwrap();

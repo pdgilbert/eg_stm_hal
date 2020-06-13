@@ -153,6 +153,8 @@ fn main() -> ! {
     ).unwrap();
 
 
+    // END COMMON USART SETUP
+
 
     // Split the serial struct into a receiving and a transmitting part
     let (mut  tx1, mut _rx1) = txrx1.split();  // console
@@ -165,19 +167,15 @@ fn main() -> ! {
     }
 
     hprintln!("entering read/write loop...").unwrap();
-    //hprintln!("received from gps ").unwrap();
 
+    // note that putting hprintln! in loop slows it too much and loses data.
     let e: u8 = 9;
     loop { // Read a byte and write
-      //let received = block!(rx2.read()).unwrap();
       let received = match block!(rx2.read()) {
          Ok(str)     => str,
          Err(_error) => e,
-      };
-      hprintln!("{}", from_utf8(&[received]).unwrap()).unwrap();
-      //hprintln!(".").unwrap();
+         };
       block!(tx1.write(received)).ok();
-      for byte in b"\r\n" { block!(tx1.write(*byte)).unwrap(); }
     }
 
     // PUT A TEST HERE THAT WILL SHOW FAILURE. ASSERT SEEMS TO PANIC HALT SO ...

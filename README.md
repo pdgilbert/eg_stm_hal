@@ -136,7 +136,7 @@ See [Running Examples](#running-examples) for more details.
 | serial_char          |       | Single char between usarts 2 and 3, console and semihost output|
 | serial_string        |       | String writes between usarts 2 and 3, console and semihost output|
 | gps_rw_by_char       |       | Read by char from GPS with echo to console + semihost output   |
-| gps_rw               |   3   | Read by str  from GPS with echo to console + semihost output   |
+| gps_rw               |   3   | Read a line  from GPS with echo to console + semihost output   |
 
 
 0.  Using the git versions of HALs (in June 2020 much is changing and release in crates.io is old). 
@@ -151,21 +151,21 @@ See [Running Examples](#running-examples) for more details.
 Following is the status of examples as of April 2020. Examples are run on a 'bluepill' (stm32f1xx),
 'Discovery kit STM32F303' (stm32f3xx), and 'Nucleo-64 STM32F411' (stm32f4xx).
 
-| ---------------------------- | - stm32f1xx - | - stm32f3xx - | - stm32f4xx - | - stm32l1xx - |
-|:----------------------------:|:-----------:|:-----------:|:-----------:|:-----------:|
+| ------------------------------- | - stm32f1xx - | - stm32f3xx - | - stm32f4xx - | - stm32l1xx - |
+|:-------------------------------:|:-----------:|:-----------:|:-----------:|:-----------:|
 
 |  xxx                 | build |  run  | build |  run  | build |  run  | build |  run  | 
 |:--------------------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
 | blink                |  yes  | works |  yes  | works |  yes  | works |  yes  |       | 
 | echo_console_by_char |  yes  | works |   8   |       |  yes  | works |       |       | 
-| echo_console_string  |  yes  |   5   |       |       |       |       |       |       | 
+| echo_console_string  |  yes  |   5   |   9   |       |   9   |       |   9   |       | 
 | serial_char          |  yes  |   1   |  yes  |   3   |  yes  |   2   |       |       |
-| serial_string        |  yes  |       |   9   |       |   9   |       |   9   |       |
-| gps_rw_by_char       |  yes  |   6   |  yes  |       |  yes  |   6   |  no   |       |
-| gps_rw               |  yes  |       |       |       |       |       |       |       |
+| serial_string        |  yes  |   2   |   9   |       |   9   |       |   9   |       |
+| gps_rw_by_char       |  yes  | works |  yes  |       |  yes  |   6   |  no   |       |
+| gps_rw               |  yes  | works |       |       |       |       |       |       |
 
-1.  tx2 to rx3 works. tx3 to rx2 works sometimes but often fails unwrapping err value on receive.
-2.  Stalls waiting to receive.
+1.  tx2 to rx3 works. tx3 to rx2 works sometimes but often fails unwrapping err value Overrun on receive.
+2.  Stalls waiting to receive. Possibly need thread to receive started before send?
 3.  Usart2 with Usart3 connection works both ways but jibberish written on console.
 4.  Jibberish written on console.
 5.  Works on bluepill as long a typing is slow.

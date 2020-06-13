@@ -98,33 +98,25 @@ fn main() -> ! {
     let channels = p.DMA1.split(&mut rcc.ahb);
     //#[cfg(feature = "stm32f1xx")]
     let mut tx1 = txrx1.split().0.with_dma(channels.4);      // console
-    // ok let (_, tx1) = tx1.write(b"The quick brown fox").wait(); 
-    // No (_, tx1) = tx1.write(b"The quick brown fox").wait(); 
-    tx1 = tx1.write(b"The quick brown fox").wait().1; 
+    // ok let (_, tx1) = tx1.write(b"console connect check.").wait(); 
+    // No (_, tx1) = tx1.write(b"console connect check.").wait(); 
+    tx1 = tx1.write(b"console connect check.").wait().1; 
 
-    //let (mut tx2, mut rx2)  = (txrx2.split().0.with_dma(channels.7), txrx2.split().1.with_dma(channels.6));
-    #[cfg(feature = "stm32f1xx")]
-    let mut tx2  = txrx2.split().0.with_dma(channels.7);
-    //#[cfg(feature = "stm32f1xx")]
-    //let mut rx2  = txrx2.split().1.with_dma(channels.6);
-
-    //let (mut tx3, mut rx3)  = (txrx3.split().0.with_dma(channels.2), txrx3.split().1.with_dma(channels.3));
-    #[cfg(feature = "stm32f1xx")]
-    let rx3  = txrx3.split().1.with_dma(channels.3);
-    //#[cfg(feature = "stm32f1xx")]
-    //rx2 = rx2.with_dma(channels.6);
-    //#[cfg(feature = "stm32f1xx")]
-    //tx2 = tx2.with_dma(channels.6);
-    //#[cfg(feature = "stm32f1xx")]
-    //let (mut tx3, mut rx3)  = txrx3.split();   
-    //#[cfg(feature = "stm32f1xx")]
-    //rx3 = rx3.with_dma(channels.6);
-    //#[cfg(feature = "stm32f1xx")]
-    //tx3 = tx3.with_dma(channels.6);
+    // re dma read see  https://github.com/stm32-rs/stm32f1xx-hal/blob/v0.5.3/examples/adc-dma-rx.rs
 
     #[cfg(feature = "stm32f1xx")]
-    let (_, tx1) = tx1.write(b"\r\nconsole connect check.\r\n").wait(); 
+    let (mut tx2, mut rx2)  = txrx2.split();
+    #[cfg(feature = "stm32f1xx")]
+    let mut tx2  = tx2.with_dma(channels.7);
+    #[cfg(feature = "stm32f1xx")]
+    let mut rx2  = rx2.with_dma(channels.6);
 
+    #[cfg(feature = "stm32f1xx")]
+    let (mut tx3, mut rx3)  = txrx3.split();
+    #[cfg(feature = "stm32f1xx")]
+    let mut tx3  = tx3.with_dma(channels.2);
+    #[cfg(feature = "stm32f1xx")]
+    let mut rx3  = rx3.with_dma(channels.3);
 
 
     // stm32f3xx
@@ -283,6 +275,8 @@ fn main() -> ! {
     #[cfg(feature = "stm32l1xx")]
     for byte in b"\r\nconsole connect check.\r\n" { block!(tx1.write(*byte)).ok(); }
 
+    // END COMMON USART SETUP
+
 //    fn putTx1(string: &[u8] ) -> usize {
 //	 tx1.write(string).ok() ;
 //	 string.len()
@@ -316,8 +310,6 @@ fn main() -> ! {
 //       i += 1;
 //    }
 
-    // END COMMON USART SETUP
-
     hprintln!("testing  tx2 to rx3").unwrap();
     hprintln!("   sending on tx2 ...").unwrap();
 
@@ -333,14 +325,15 @@ fn main() -> ! {
     //putTx1(send);
     //for byte in send.iter() { block!(tx1.write(*byte)).unwrap(); }   // using iter
 
-    hprintln!("   receiving on rx3 ...").unwrap();
-
     // For .read() the buffer is maintained as part of the tuple, but buf and rx need 
     // to be separated when it is used.
     // (buf, rx)  tuple for RxDma VS read() a single u8
     let mut br3 = (singleton!(: [u8; 32] = [0; 32]).unwrap(),  rx3);
+
+    hprintln!("   receiving on rx3 ...").unwrap();
+
     br3 = br3.1.read(br3.0).wait();
-    
+  
     hprintln!("  checking received = send,  {} = {} byte", to_str(br3.0), to_str(send)).unwrap();
 
 

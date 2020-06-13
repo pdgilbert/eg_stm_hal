@@ -100,20 +100,22 @@ fn main() -> ! {
     ).unwrap(); 
     
 
+    // END COMMON USART SETUP
+
     // Split the serial txrx1 struct into a receiving and a transmitting part
-    let (mut tx, mut rx) =txrx1.split();
+    let (mut tx1, mut rx1) =txrx1.split();
 
 
-    hprintln!("test formatted write to consile ...").unwrap();
+    hprintln!("test formatted write to console ...").unwrap();
     let number = 42;
     // write! and writeln! cause method not found in `stm32f3xx_hal but works in other HALs
-    writeln!(tx, "\r\nHello {}. Converted number set to 42.\r\n", number).unwrap();
+    writeln!(tx1, "\r\nHello {}. Converted number set to 42.\r\n", number).unwrap();
  
     hprintln!("test read and write by char. Please type into the console ...").unwrap();
 
     loop { // Read a byte and write
-       let received = block!(rx.read()).unwrap();
-       block!(tx.write(received)).ok();
+       let received = block!(rx1.read()).unwrap();
+       block!(tx1.write(received)).ok();
        hprintln!("{}", from_utf8(&[received]).unwrap()).unwrap();
      }
 

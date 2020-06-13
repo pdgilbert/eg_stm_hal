@@ -13,13 +13,19 @@ extern crate panic_semihosting;
 extern crate panic_halt;
 
 //use cortex_m::asm;
-use cortex_m::singleton;
+
+//use cortex_m::singleton;
+//or ?
+use heapless::{consts, Vec};
+
+use eg_stm_hal::to_str;
+
 use cortex_m_rt::entry;
-//use core::fmt::Write;
+use core::fmt::Write;  // for writeln
 use cortex_m_semihosting::hprintln;
 //use core::str;
 //use core::ascii;
-//use nb::block;
+use nb::block;
 
 //use eg_stm_hal::to_str;
 
@@ -69,8 +75,6 @@ fn main() -> ! {
         clocks,
         &mut rcc.apb2,   // WHAT IS  rcc.apb1/2 ?
         );
-    #[cfg(feature = "stm32f1xx")]
-    let channels = p.DMA1.split(&mut rcc.ahb);
 
     #[cfg(feature = "stm32f1xx")]
     let txrx2 = Serial::usart2(
@@ -78,15 +82,11 @@ fn main() -> ! {
         (gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl), 
 	 gpioa.pa3),  // (tx, rx)
         &mut afio.mapr,
-        Config::default() .baudrate(9_600.bps())  .parity_odd() .stopbits(StopBits::STOP1),
+        Config::default() .baudrate(9600.bps())  .stopbits(StopBits::STOP1),
         clocks,
         &mut rcc.apb1,
         );
-    #[cfg(feature = "stm32f1xx")]
-    let tx1 = txrx1.split().0.with_dma(channels.4);  // console
-    #[cfg(feature = "stm32f1xx")]
-    let rx2 = txrx2.split().1.with_dma(channels.6);  // GPS
-
+//.parity_odd() 
 
 
     #[cfg(feature = "stm32f3xx")]
@@ -114,10 +114,6 @@ fn main() -> ! {
         clocks,
         &mut rcc.apb1,
         );
-    #[cfg(feature = "stm32f3xx")]
-    let tx1 = txrx1.split().0;      // console
-    #[cfg(feature = "stm32f3xx")]
-    let rx2 = txrx2.split().1;      // GPS
 
 
 
@@ -141,13 +137,9 @@ fn main() -> ! {
         p.USART2,
         ( gpioa.pa2.into_alternate_af7(), 
 	  gpioa.pa3.into_alternate_af7()),  // (tx, rx)
-        Config::default() .baudrate(9_600.bps()),  //  .parity_odd() .stopbits(StopBits::STOP1),
+        Config::default() .baudrate(9600.bps()),  //  .parity_odd() .stopbits(StopBits::STOP1),
         clocks,
         ).unwrap();
-    #[cfg(feature = "stm32f4xx")]
-    let tx1 = txrx1.split().0;      // console
-    #[cfg(feature = "stm32f4xx")]
-    let rx2 = txrx2.split().1;      // GPS
 
 
 
@@ -171,49 +163,53 @@ fn main() -> ! {
         p.USART2,
         ( gpioa.pa2.into_alternate_af7(), 
 	  gpioa.pa3.into_alternate_af7()),  // (tx, rx)
-        Config::default() .baudrate(9_600.bps()),  //  .parity_odd() .stopbits(StopBits::STOP1),
+        Config::default() .baudrate(9600.bps()),  //  .parity_odd() .stopbits(StopBits::STOP1),
         clocks,
         ).unwrap();
-    #[cfg(feature = "stm32l1xx")]
-    let tx1 = txrx1.split().0;      // console
-    #[cfg(feature = "stm32l1xx")]
-    let rx2 = txrx2.split().1;      // GPS
 
+    // END COMMON USART SETUP
 
+    let mut tx1 = txrx1.split().0;      // console
+    let mut rx2 = txrx2.split().1;      // GPS
 
-//    pub fn to_str_lossy( x:&[u8] ) -> &str {
-//       for byte in  x {
-//          match core::str::from_utf8(byte) {
-//          Ok(str)     => &str,
-//          Err(error) => '.'asUtf8,
-//          }
-//       }
+    writeln!(tx1, "\r\nconsole connect check.\r\n").unwrap();
 
-
-    // SEE  https://github.com/stm32-rs/stm32f1xx-hal/blob/v0.5.3/examples/adc-dma-rx.rs
-    //USES U16
-
-    let (_, tx1) = tx1.write(b"\r\nconsole connect check.\r\n").wait(); 
-   
     // read gps on usart2
     hprintln!("about to read GPS").unwrap();
-    //  OFTEN STALL AFTER PRINTING THIS LINE, BUT NOT ALWAYS
-    //  PROBABLY wait() ??
     
-    //Vec<u8, consts::U32> = Vec::new();
-    //singleton!(: [u8; 32] = [0; 32]).unwrap();  //trait core::array::LengthAtMost32
+    // byte buffer length 80
+    let mut buffer: Vec<u8, consts::U80> = Vec::new();
+    hprintln!("buffer at {} of {}", buffer.len(), buffer.capacity()).unwrap();  //0 of 100
+    buffer.clear();
 
-    // (buf, rx)  tuple for RxDma VS read() a single u8
-    let mut br = (singleton!(: [u8; 32] = [0; 32]).unwrap(), rx2);
-    br = br.1.read(br.0).wait();                
+//    while (i < r.len()) && !buffer.push(r[i]).is_err() {
+    hprintln!("going into write/read loop ^C to exit ...").unwrap();
+    let e: u8 = 9;
+    loop {
+        //let byte = rx2.rdr.read().rdr().bits() as u8;
+        //let byte = block!(rx2.read()).unwrap();  
+        //let byte = block!(rx2.read()).ok();  
+        let byte = match block!(rx2.read()) {
+	    Ok(byt)	  => byt,
+	    Err(_error) => e,
+	    };
+        //block!(tx1.write(byte)).ok();
+        if buffer.push(byte).is_err() ||  byte == 13  {  //  \r is 13, \n is 10
+           writeln!(tx1, "{}", to_str(&buffer)).unwrap();
+           hprintln!(    "{}", to_str(&buffer)).unwrap(); 
+           //hprintln!("buffer at {} of {}", buffer.len(), buffer.capacity()).unwrap();
+           buffer.clear();
+	   //break; 
+	   };
+	}
 
-    // (buf, tx)  tuple for TxDma VS write() a single u8. Why is buffer is needed?
-    let mut bt = (singleton!(: [u8; 32] = [0; 32]).unwrap(), tx1); 
-
-    //let str2 = to_str(buf2);
     //asm::bkpt();
 
-    hprintln!("buf is  {:?}", br.0).unwrap(); 
+
+    // (buf, rx)  tuple for RxDma VS read() a single u8
+    //let mut br = (singleton!(: [u8; 100] = [0; 100]).unwrap(), rx2);
+    //br = br.1.read(br.0).wait();                
+    //hprintln!("buf is  {:?}", br.0).unwrap(); 
     //hprintln!("to_str(buf2) is {:?}", to_str(bbr.0)).unwrap();  
 
     //hprintln!("about to write  buf2 to console").unwrap();
@@ -223,27 +219,12 @@ fn main() -> ! {
     //let bufx = buftx1.1.TxDma(bufrx2.0);  // wait(); //TxDma VS read  !!!!!!!!!!!!!
     //hprintln!("sent console {:?}", bufx).unwrap(); //would not need :? if these were not [u8; 8]
 
-
-    // convert buf from bytes to characters ??
-    //let rxstr = buf.to_owned();                
-    //let rxstr = buf.clone();                
-    //let rxstr = buf.copy;                
-    //let rxstr = to_str(buf);                
-    //let rxstr = ascii::escape_default(buf);  
-    //let rxstr = ascii::from(buf);  
-
-    //asm::bkpt();
-
-    hprintln!("going into write/read loop ^C to exit ...").unwrap();
-
-    // NB: bt uses br's buffer and br uses bt's buffer,
+    // NB: bt uses br's buffer. And br use bt's buffer, but not sure why.
     //   whereas in the first read above br used it's own buffer.
-    loop {
-       //hprintln!(".").unwrap();
-       bt = bt.1.write(br.0).wait(); 
-       //hprintln!("-").unwrap();
-       br = br.1.read(bt.0).wait();
-       }
+    //loop {
+    //   bt = bt.1.write(br.0).wait(); 
+    //   br = br.1.read(bt.0).wait();
+    //   }
 
     // PUT A TEST HERE THAT WILL SHOW FAILURE. ASSERT SEEMS TO PANIC HALT SO ...
 }

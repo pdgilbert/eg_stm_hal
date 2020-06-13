@@ -17,7 +17,23 @@ use cortex_m_semihosting::hprintln;
 use core::str;
 //use nb::block;
 
+use cortex_m::singleton;
+
 use heapless::{consts, Vec};
+
+use eg_stm_hal::to_str;
+
+#[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
+use stm32f1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, StopBits}, };
+
+#[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
+use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{ Serial}, };
+
+#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
+use stm32f4xx_hal::{prelude::*, stm32::Peripherals, serial::{config::Config, Serial }};
+
+#[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
+use stm32l1xx_hal::{prelude::*, stm32::Peripherals, serial::{config::Config, Serial }};
 
 // see https://doc.rust-lang.org/std/string/struct.String.html#method.as_bytes
 //     https://doc.rust-lang.org/std/str/fn.from_utf8.html
@@ -78,23 +94,62 @@ fn main() -> ! {
     }
 
     let mut buffer: Vec<u8, consts::U32> = Vec::new();
-    hprintln!("{}", buffer.len()).unwrap();  //0
-    hprintln!("{}", buffer.capacity()).unwrap();  //32
+    hprintln!("buffer at {} of {}", buffer.len(), buffer.capacity()).unwrap();  //0 of 32
     buffer.clear();
     for byte in r.iter() {
-            if buffer.push(*byte).is_err() {
-                // buffer full
+            if buffer.push(*byte).is_err() { // buffer full
                 hprintln!("buffer full").unwrap(); 
-                //for byte in b"error: buffer full\n\r" {
-                //    while usart1.isr.read().txe().bit_is_clear() {}
-                //    usart1.tdr.write(|w| w.tdr().bits(u16::from(*byte)));
                 }
-    }
+            }
     hprintln!("{:?}", buffer ).unwrap();  //[88, 89, 90]
     hprintln!("{:#?}", buffer ).unwrap();  //[88, 89, 90] on separate lines
+    hprintln!("{}", to_str(&buffer) ).unwrap();  //XYZ
 
     //asm::bkpt();
 
+    // check buffer full error
+
+    let mut buffer: Vec<u8, consts::U8> = Vec::new();
+    hprintln!("buffer at {} of {}", buffer.len(), buffer.capacity()).unwrap();  //0 of 8
+    buffer.clear();
+    for byte in "1234567890".as_bytes().iter() {
+            if buffer.push(*byte).is_err() { // buffer full
+                hprintln!("buffer full").unwrap(); 
+                }
+            }
+    hprintln!("{}", to_str(&buffer) ).unwrap();  //XYZ
+
+    let mut buffer : Vec<u8, consts::U8> = Vec::new();
+    //no let mut buffer = singleton!(: [u8; 8] = [0; 8]).unwrap();
+    hprintln!("buffer at {} of {}", buffer.len(), buffer.capacity()).unwrap();  //0 of 8
+    buffer.clear();
+    let r = "1234567890".as_bytes();
+    let mut i = 0;
+    while !buffer.push(r[i]).is_err() {
+        i += 1 ;
+	}
+    hprintln!("buffer at {} of {}", buffer.len(), buffer.capacity()).unwrap();  //8 of 8
+    hprintln!("{}", to_str(&buffer) ).unwrap();  //XYZ
+
+    let mut buffer : Vec<u8, consts::U8> = Vec::new();
+    //no let mut buffer = singleton!(: [u8; 8] = [0; 8]).unwrap();
+    hprintln!("buffer at {} of {}", buffer.len(), buffer.capacity()).unwrap();  //0 of 8
+    buffer.clear();
+    let r = "1234\n\r7".as_bytes();
+    let mut i = 0;
+    // note this is < not <= since && does both sides , so last r[i] gets pushed
+    // so this puts \n\r on the end of buffer.
+    while (i < r.len()) && !buffer.push(r[i]).is_err() {
+        if r[i] == 13  { break; }   // "\r".as_bytes() is 13, \n is 10
+	i += 1 ;
+	}
+    hprintln!("{:?}", buffer ).unwrap();  
+    hprintln!("buffer at {} of {}", buffer.len(), buffer.capacity()).unwrap();  //6 of 8
+    hprintln!("{}", to_str(&buffer) ).unwrap();  //XYZ
+   
+    //for byte in b"error: buffer full\n\r" {
+    //    while usart1.isr.read().txe().bit_is_clear() {}
+    //    usart1.tdr.write(|w| w.tdr().bits(u16::from(*byte)));
 
     loop {}
 }

@@ -17,6 +17,7 @@ extern crate panic_halt;
 
 use cortex_m::singleton;
 use cortex_m_rt::entry;
+use core::fmt::Write;  // for writeln
 use cortex_m_semihosting::hprintln;
 
 use eg_stm_hal::to_str;
@@ -60,7 +61,10 @@ fn main() -> ! {
     #[cfg(feature = "stm32f1xx")]
     let channels = p.DMA1.split(&mut rcc.ahb);
     #[cfg(feature = "stm32f1xx")]
-    let rx1 =txrx1.split().1.with_dma(channels.5);
+    let (mut tx1, mut rx1)  = txrx1.split();
+    #[cfg(feature = "stm32f1xx")]
+    let rx1 =rx1.with_dma(channels.5);
+    writeln!(tx1, "\r\ncheck console output.\r\n").unwrap();
 
 
     #[cfg(feature = "stm32f3xx")]
@@ -120,12 +124,16 @@ fn main() -> ! {
     let rx1 = txrx1.split().1.with_dma(channels.5);
 
 
+    // END COMMON USART SETUP
+
     //let mut buf = [0u8; 64];
     let buf = singleton!(: [u8; 15] = [0; 15]).unwrap();
     let mut bufrx = (buf,  rx1);
 
     hprintln!("Enter 15 characters in console. Repeat.").unwrap();
     hprintln!("Use ^C in gdb to exit.").unwrap();
+
+    writeln!(tx1, "\r\nEnter 15 characters here in the console. Repeat.\r\n").unwrap();
 
     //#[cfg(feature = "stm32f1xx")]
     bufrx = bufrx.1.read(bufrx.0).wait();  
@@ -134,16 +142,20 @@ fn main() -> ! {
     //serial.read(&mut buf)
    
     hprintln!("received {:?}", to_str(bufrx.0)).unwrap();
+    writeln!(tx1, "{}", to_str(bufrx.0)).unwrap();
+    //bt = tx1.write(bufrx.0).wait(); 
+    //let (_, mut tx1) = tx1.write(bufrx.0).wait();
 
     // cannot get this to work in loop as (buf, rx1), there seem to be circular problems
     // with move/borrow/mut  but something like this works ...
  
     //each pass in loop waits for input of 15 chars typed in console
     loop { 
-       //#[cfg(feature = "stm32f1xx")]
-       //bufrx = bufrx.1.read(bufrx.0).wait();  
+       //#[cfg(feature = "stm32f1xx")]  //removing ... not supported in this position
+       bufrx = bufrx.1.read(bufrx.0).wait();  
        //else
        //bufrx = bufrx.read();
        hprintln!("received {:?}", to_str(bufrx.0)).unwrap();
+       writeln!(tx1, "{}", to_str(bufrx.0)).unwrap();
        }
 }
