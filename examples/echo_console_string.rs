@@ -64,13 +64,12 @@ fn main() -> ! {
     let (mut tx1, mut rx1)  = txrx1.split();
     #[cfg(feature = "stm32f1xx")]
     let rx1 =rx1.with_dma(channels.5);
-    writeln!(tx1, "\r\ncheck console output.\r\n").unwrap();
 
 
     #[cfg(feature = "stm32f3xx")]
     let clocks    = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
     #[cfg(feature = "stm32f3xx")]
-    let mut gpioa = p.GPIOA.split(&mut rcc.ahb);  //ahb ?
+    let mut gpioa = p.GPIOA.split(&mut rcc.ahb); 
     #[cfg(feature = "stm32f3xx")]
     let txrx1 = Serial::usart1(
         p.USART1,
@@ -79,9 +78,9 @@ fn main() -> ! {
         9600.bps(),
         clocks,
         &mut rcc.apb2,
-    ).unwrap();
+    );
     #[cfg(feature = "stm32f3xx")]
-    let rx1 = txrx1.split().1;
+    let (mut tx1, mut rx1)  = txrx1.split();
 
 
     #[cfg(feature = "stm32f4xx")]
@@ -100,7 +99,7 @@ fn main() -> ! {
     	clocks,
     ).unwrap();    
     #[cfg(feature = "stm32f4xx")]
-    let rx1 = txrx1.split().1;
+    let (mut tx1, mut rx1)  = txrx1.split();
 
 
     #[cfg(feature = "stm32l1xx")]
@@ -119,12 +118,12 @@ fn main() -> ! {
     	clocks,
     ).unwrap();    
     #[cfg(feature = "stm32l1xx")]
-    let channels = p.DMA1.split(&mut rcc.ahb);
-    #[cfg(feature = "stm32l1xx")]
-    let rx1 = txrx1.split().1.with_dma(channels.5);
+    let (mut tx1, mut rx1)  = txrx1.split();
 
 
     // END COMMON USART SETUP
+
+    writeln!(tx1, "\r\ncheck console output.\r\n").unwrap();
 
     //let mut buf = [0u8; 64];
     let buf = singleton!(: [u8; 15] = [0; 15]).unwrap();

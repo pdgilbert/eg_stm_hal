@@ -96,7 +96,7 @@ fn main() -> ! {
     // Split the serial struct into a receiving and a transmitting part
     #[cfg(feature = "stm32f1xx")]
     let channels = p.DMA1.split(&mut rcc.ahb);
-    //#[cfg(feature = "stm32f1xx")]
+    #[cfg(feature = "stm32f1xx")]
     let mut tx1 = txrx1.split().0.with_dma(channels.4);      // console
     // ok let (_, tx1) = tx1.write(b"console connect check.").wait(); 
     // No (_, tx1) = tx1.write(b"console connect check.").wait(); 
