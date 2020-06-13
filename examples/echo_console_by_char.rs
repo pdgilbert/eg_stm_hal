@@ -38,7 +38,7 @@ use stm32l1xx_hal::{prelude::*, stm32::Peripherals, serial::{config::Config, Ser
 #[entry]
 fn main() -> ! {
  
-    //see serial_loopback_char.rs and serial_cross.rs in examples/ for more USART config notes.
+    //see serial_char.rs and serial_string.rs in examples/ for more USART config notes.
 
     // 1. Get access to the device specific peripherals from the peripheral access crate
     // 2. Take ownership of raw rcc and flash devices and convert to HAL structs
@@ -59,7 +59,8 @@ fn main() -> ! {
     #[cfg(feature = "stm32f1xx")]
     let txrx1 = Serial::usart1(
         p.USART1,
-        (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),  gpioa.pa10),
+        (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh), 
+	 gpioa.pa10),
         &mut p.AFIO.constrain(&mut rcc.apb2).mapr,
         Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1),
         clocks,
@@ -76,7 +77,8 @@ fn main() -> ! {
     #[cfg(feature = "stm32f3xx")]
     let txrx1 = Serial::usart1(
         p.USART1,
-        (gpioa.pa9.into_af7(&mut gpioa.moder, &mut gpioa.afrh),  gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)),
+        (gpioa.pa9.into_af7(&mut gpioa.moder, &mut gpioa.afrh), 
+	 gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)),
         9600.bps(),
         clocks,
         &mut rcc.apb2,
@@ -90,11 +92,12 @@ fn main() -> ! {
     #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
     p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
     //let (tx,rx) = 
-    // See examples/serail_cross.rs for stm32f411re uart and alternate function notes.
+    // See examples/serial_by_char.rs for stm32f411re uart and alternate function notes.
     #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
     let txrx1 =  Serial::usart1(
         p.USART1,
-    	(gpioa.pa9.into_alternate_af7(),  gpioa.pa10.into_alternate_af7()), 
+    	(gpioa.pa9.into_alternate_af7(),
+         gpioa.pa10.into_alternate_af7()), 
     	Config::default() .baudrate(9600.bps()),
     	clocks
     ).unwrap(); 

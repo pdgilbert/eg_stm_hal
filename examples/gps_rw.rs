@@ -55,8 +55,8 @@ fn main() -> ! {
 
     let p = Peripherals::take().unwrap();
 
+    #[cfg(feature = "stm32f1xx")]
     let mut rcc = p.RCC.constrain();
-
     #[cfg(feature = "stm32f1xx")]
     let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
     #[cfg(feature = "stm32f1xx")]
@@ -88,6 +88,8 @@ fn main() -> ! {
 
 
     #[cfg(feature = "stm32f3xx")]
+    let mut rcc = p.RCC.constrain();
+    #[cfg(feature = "stm32f3xx")]
     let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
     #[cfg(feature = "stm32f3xx")]
     let mut gpioa = p.GPIOA.split(&mut rcc.ahb);
@@ -114,11 +116,18 @@ fn main() -> ! {
 
 
     #[cfg(feature = "stm32f4xx")]
+    let rcc = p.RCC.constrain();
+    #[cfg(feature = "stm32f4xx")]
     let clocks =  rcc.cfgr.freeze();
     #[cfg(feature = "stm32f4xx")]
-    let mut gpioa = p.GPIOA.split();
+    let gpioa = p.GPIOA.split();
     #[cfg(feature = "stm32f4xx")]
-    let mut gpiob = p.GPIOB.split();
+    p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+    //#[cfg(feature = "stm32f4xx")]
+    //p.USART2.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+    //#[cfg(feature = "stm32f4xx")]
+    //let mut gpiob = p.GPIOB.split();
+
     #[cfg(feature = "stm32f4xx")]
     let txrx1 = Serial::usart1(
         p.USART1,
@@ -126,7 +135,7 @@ fn main() -> ! {
 	 gpioa.pa10.into_alternate_af7()),
         Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1),
         clocks,
-        );
+        ).unwrap();
 
     #[cfg(feature = "stm32f4xx")]
     let txrx2 = Serial::usart2(
@@ -140,11 +149,16 @@ fn main() -> ! {
 
 
     #[cfg(feature = "stm32l1xx")]
+    let mut rcc = p.RCC.constrain();
+    #[cfg(feature = "stm32l1xx")]
     let clocks =  rcc.cfgr.freeze();
     #[cfg(feature = "stm32l1xx")]
     let mut gpioa = p.GPIOA.split();
     #[cfg(feature = "stm32l1xx")]
-    let mut gpiob = p.GPIOB.split();
+    p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+    //#[cfg(feature = "stm32l1xx")]
+    //let mut gpiob = p.GPIOB.split();
+
     #[cfg(feature = "stm32l1xx")]
     let txrx1 = Serial::usart1(
         p.USART1,
@@ -152,7 +166,7 @@ fn main() -> ! {
 	 gpioa.pa10.into_alternate_af7()),
         Config::default() .baudrate(9600.bps()),
         clocks,
-        );
+        ).unwrap();
 
     #[cfg(feature = "stm32l1xx")]
     let txrx2 = Serial::usart2(
@@ -187,7 +201,7 @@ fn main() -> ! {
 	    Ok(byt)	  => byt,
 	    Err(_error) => e,
 	    };
-        //block!(tx1.write(byte)).ok();
+        block!(tx1.write(byte)).ok();
         if   byte == 36  {  //  $ is 36. start of a line
 	   buffer.clear();
 	   good = true;     //start capturing line

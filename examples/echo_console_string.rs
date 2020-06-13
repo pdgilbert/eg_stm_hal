@@ -79,7 +79,7 @@ fn main() -> ! {
         9600.bps(),
         clocks,
         &mut rcc.apb2,
-    );
+    ).unwrap();
     #[cfg(feature = "stm32f3xx")]
     let rx1 = txrx1.split().1;
 

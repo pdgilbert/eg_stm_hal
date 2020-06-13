@@ -20,7 +20,7 @@ use cortex_m::singleton;
 use cortex_m_rt::entry;
 use cortex_m_semihosting::hprintln;
 //use core::str::from_utf8;
-//use nb::block;
+use nb::block;
 
 use eg_stm_hal::to_str;
 

@@ -11,7 +11,7 @@
 //! usart2 connect the Rx pin pa3 to the Tx pin of GPS 
 //! usart2 connect the Tx pin pa2 to the Rx pin of GPS
 //! 
-//! See examples/serial_loopback_char.rs for notes about connecting usart1 to 
+//! See examples/serial_char.rs for notes about connecting usart1 to 
 //!   serial-usb converter on computer for console output.
 //! That file also has for more notes regarding setup below.
 
@@ -49,7 +49,7 @@ use stm32l1xx_hal::{prelude::*, stm32::Peripherals, serial::{Config, Serial}};
 #[entry]
 fn main() -> ! {
  
-    //see serial_loopback_char.rs and serial_cross.rs in examples/ for more USART config notes.
+    //see serial_char.rs and serial_string.rs in examples/ for more USART config notes.
 
     let p = Peripherals::take().unwrap();
 

@@ -148,7 +148,7 @@ See [Running Examples](#running-examples) for more details.
       completely eliminating the development board. 
       (If the dongle power is used. 5v if preferred on mine.)
 
-Following is the status of examples as of April 2020. Examples are run on a 'bluepill' (stm32f1xx),
+Following is the status of examples as of June 2020. Examples are run on a 'bluepill' (stm32f1xx),
 'Discovery kit STM32F303' (stm32f3xx), and 'Nucleo-64 STM32F411' (stm32f4xx).
 
 | ------------------------------- | - stm32f1xx - | - stm32f3xx - | - stm32f4xx - | - stm32l1xx - |
@@ -157,12 +157,12 @@ Following is the status of examples as of April 2020. Examples are run on a 'blu
 |  xxx                 | build |  run  | build |  run  | build |  run  | build |  run  | 
 |:--------------------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
 | blink                |  yes  | works |  yes  | works |  yes  | works |  yes  |       | 
-| echo_console_by_char |  yes  | works |   8   |       |  yes  | works |       |       | 
+| echo_console_by_char |  yes  | works |   8   |       |  yes  | works |  no   |       | 
 | echo_console_string  |  yes  |   5   |   9   |       |   9   |       |   9   |       | 
-| serial_char          |  yes  |   1   |  yes  |   3   |  yes  |   2   |       |       |
+| serial_char          |  yes  |   1   |  yes  |   3   |  yes  |   2   |  no   |       |
 | serial_string        |  yes  |   2   |   9   |       |   9   |       |   9   |       |
 | gps_rw_by_char       |  yes  | works |  yes  |       |  yes  |   6   |  no   |       |
-| gps_rw               |  yes  | works |       |       |       |       |       |       |
+| gps_rw               |  yes  | works |   8   |       |  yes  |   6   |  no   |       |
 
 1.  tx2 to rx3 works. tx3 to rx2 works sometimes but often fails unwrapping err value Overrun on receive.
 2.  Stalls waiting to receive. Possibly need thread to receive started before send?
