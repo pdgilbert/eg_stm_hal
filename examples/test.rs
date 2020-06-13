@@ -135,7 +135,7 @@ fn main() -> ! {
     //no let mut buffer = singleton!(: [u8; 8] = [0; 8]).unwrap();
     hprintln!("buffer at {} of {}", buffer.len(), buffer.capacity()).unwrap();  //0 of 8
     buffer.clear();
-    let r = "1234\n\r7".as_bytes();
+    let r = "$234\n\r7".as_bytes();
     let mut i = 0;
     // note this is < not <= since && does both sides , so last r[i] gets pushed
     // so this puts \n\r on the end of buffer.

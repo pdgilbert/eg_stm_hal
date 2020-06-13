@@ -63,8 +63,6 @@ fn main() -> ! {
     let mut afio = p.AFIO.constrain(&mut rcc.apb2);
     #[cfg(feature = "stm32f1xx")]
     let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
-    //#[cfg(feature = "stm32f1xx")]
-    //let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
     #[cfg(feature = "stm32f1xx")]
     let txrx1 = Serial::usart1(
         p.USART1,
@@ -82,24 +80,22 @@ fn main() -> ! {
         (gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl), 
 	 gpioa.pa3),  // (tx, rx)
         &mut afio.mapr,
-        Config::default() .baudrate(9600.bps())  .stopbits(StopBits::STOP1),
+        Config::default() .baudrate(9600.bps())  .stopbits(StopBits::STOP1), //.parity_odd() 
         clocks,
         &mut rcc.apb1,
         );
-//.parity_odd() 
+
 
 
     #[cfg(feature = "stm32f3xx")]
     let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
     #[cfg(feature = "stm32f3xx")]
-    let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
-    //#[cfg(feature = "stm32f3xx")]
-    //let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
+    let mut gpioa = p.GPIOA.split(&mut rcc.ahb);
     #[cfg(feature = "stm32f3xx")]
     let txrx1 = Serial::usart1(
         p.USART1,
-        (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh), 
-	 gpioa.pa10),
+        (gpioa.pa9.into_af7(&mut gpioa.moder, &mut gpioa.afrh),
+	 gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)),
         9600.bps(),
         clocks,
         &mut rcc.apb2,
@@ -154,7 +150,7 @@ fn main() -> ! {
         p.USART1,
         (gpioa.pa9.into_alternate_af7(),
 	 gpioa.pa10.into_alternate_af7()),
-        Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1),
+        Config::default() .baudrate(9600.bps()),
         clocks,
         );
 
@@ -185,21 +181,25 @@ fn main() -> ! {
 //    while (i < r.len()) && !buffer.push(r[i]).is_err() {
     hprintln!("going into write/read loop ^C to exit ...").unwrap();
     let e: u8 = 9;
+    let mut good = false;
     loop {
-        //let byte = rx2.rdr.read().rdr().bits() as u8;
-        //let byte = block!(rx2.read()).unwrap();  
-        //let byte = block!(rx2.read()).ok();  
         let byte = match block!(rx2.read()) {
 	    Ok(byt)	  => byt,
 	    Err(_error) => e,
 	    };
         //block!(tx1.write(byte)).ok();
-        if buffer.push(byte).is_err() ||  byte == 13  {  //  \r is 13, \n is 10
-           writeln!(tx1, "{}", to_str(&buffer)).unwrap();
-           hprintln!(    "{}", to_str(&buffer)).unwrap(); 
-           //hprintln!("buffer at {} of {}", buffer.len(), buffer.capacity()).unwrap();
-           buffer.clear();
-	   //break; 
+        if   byte == 36  {  //  $ is 36. start of a line
+	   buffer.clear();
+	   good = true;     //start capturing line
+	   };
+	if good {
+	   if buffer.push(byte).is_err() ||  byte == 13  {  //  \r is 13, \n is 10
+              writeln!(tx1, "{}", to_str(&buffer)).unwrap();
+              //hprintln!("buffer at {} of {}", buffer.len(), buffer.capacity()).unwrap();
+              buffer.clear();
+	      good = false;
+	      //break; 
+	      };
 	   };
 	}
 
