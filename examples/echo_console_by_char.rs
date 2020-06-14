@@ -132,9 +132,10 @@ fn main() -> ! {
     hprintln!("test formatted write to console ...").unwrap();
     let number = 42;
     // write! and writeln! cause method not found in `stm32f3xx_hal but works in other HALs
-    writeln!(tx1, "\r\nHello {}. Converted number set to 42.\r\n", number).unwrap();
+    writeln!(tx1, "\r\nHello {}. Converted number 42 for formatted write.\r\n", number).unwrap();
  
     hprintln!("test read and write by char. Please type into the console ...").unwrap();
+    writeln!(tx1, "\r\nPlease type (slowly) into the console below:\r\n").unwrap();
 
     loop { // Read a byte and write
        let received = block!(rx1.read()).unwrap();
