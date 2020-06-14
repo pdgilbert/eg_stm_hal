@@ -158,7 +158,7 @@ fn main() -> ! {
         p.USART2,
         (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl),
 	 gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)), //(tx,rx)
-        115_200.bps(),
+        9600.bps(),    // 115_200.bps(),
         clocks,
         &mut rcc.apb1,
     );

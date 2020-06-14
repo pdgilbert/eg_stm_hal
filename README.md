@@ -161,7 +161,7 @@ Following is the status of examples as of June 2020. Examples are run on a 'blue
 | echo_console_string  |  yes  |   5   |  8,9  |       |   9   |       |   9   |       | 
 | serial_char          |  yes  |   1   |  yes  |   3   |  yes  |   2   |  no   |       |
 | serial_string        |  yes  |   2   |  8,9  |       |   9   |       |   9   |       |
-| gps_rw_by_char       |  yes  | works |  yes  |       |  yes  |   6   |  no   |       |
+| gps_rw_by_char       |  yes  | works |  yes  |   4   |  yes  |   6   |  no   |       |
 | gps_rw               |  yes  | works |   8   |       |  yes  |   6   |  no   |       |
 
 1.  tx2 to rx3 works. tx3 to rx2 works sometimes but often fails unwrapping err value Overrun on receive.

@@ -29,7 +29,7 @@ extern crate panic_halt;
 use cortex_m_rt::entry;
 //use core::fmt::Write;
 use cortex_m_semihosting::hprintln;
-use core::str::from_utf8;
+//use core::str::from_utf8;
 use nb::block;
 
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
@@ -66,7 +66,7 @@ fn main() -> ! {
         p.USART1,
         (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),  gpioa.pa10),
         &mut afio.mapr,
-        Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1),
+        Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1),    // .parity_odd() 
         clocks,
         &mut rcc.apb2,
     );
@@ -81,7 +81,7 @@ fn main() -> ! {
         &mut rcc.apb1,
     );
 
-    //  Config::default() .baudrate(9_600.bps())  .parity_odd() .stopbits(StopBits::STOP1),
+
 
     #[cfg(feature = "stm32f3xx")]
     let mut rcc   = p.RCC.constrain();
@@ -89,13 +89,14 @@ fn main() -> ! {
     let clocks    = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
     #[cfg(feature = "stm32f3xx")]
     let mut gpioa = p.GPIOA.split(&mut rcc.ahb);
-    #[cfg(feature = "stm32f3xx")]
-    let mut gpiob = p.GPIOB.split(&mut rcc.ahb);
+    //#[cfg(feature = "stm32f3xx")]
+    //let mut gpiob = p.GPIOB.split(&mut rcc.ahb);
 
     #[cfg(feature = "stm32f3xx")]
     let txrx1     = Serial::usart1(
         p.USART1,
-        (gpioa.pa9.into_af7(&mut gpioa.moder, &mut gpioa.afrh), gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)),
+        (gpioa.pa9.into_af7(&mut gpioa.moder, &mut gpioa.afrh),
+	 gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)),
         9600.bps(),
         clocks,
         &mut rcc.apb2,
@@ -104,11 +105,13 @@ fn main() -> ! {
     #[cfg(feature = "stm32f3xx")]
     let txrx2 = Serial::usart2(
         p.USART2,
-        (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl), gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)), //(tx,rx)
-        115_200.bps(),
+        (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl),
+	 gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)), //(tx,rx)
+        9600.bps(),
         clocks,
         &mut rcc.apb1,
     );
+
 
 
     #[cfg(feature = "stm32f4xx")]

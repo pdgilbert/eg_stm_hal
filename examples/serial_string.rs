@@ -100,6 +100,7 @@ fn main() -> ! {
     let mut tx1 = txrx1.split().0.with_dma(channels.4);      // console
     // ok let (_, tx1) = tx1.write(b"console connect check.").wait(); 
     // No (_, tx1) = tx1.write(b"console connect check.").wait(); 
+    #[cfg(feature = "stm32f1xx")]
     tx1 = tx1.write(b"console connect check.").wait().1; 
 
     // re dma read see  https://github.com/stm32-rs/stm32f1xx-hal/blob/v0.5.3/examples/adc-dma-rx.rs
