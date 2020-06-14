@@ -85,15 +85,16 @@ fn main() -> ! {
     );
 
 
-    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
-    let clocks = p.RCC.constrain().cfgr.freeze();
-    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f4xx")]
+    let rcc = p.RCC.constrain();
+    #[cfg(feature = "stm32f4xx")]
+    let clocks = rcc.cfgr.freeze();
+    #[cfg(feature = "stm32f4xx")]
     let gpioa = p.GPIOA.split();
-    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f4xx")]
     p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
-    //let (tx,rx) = 
     // See examples/serial_by_char.rs for stm32f411re uart and alternate function notes.
-    #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
+    #[cfg(feature = "stm32f4xx")]
     let txrx1 =  Serial::usart1(
         p.USART1,
     	(gpioa.pa9.into_alternate_af7(),
@@ -101,7 +102,26 @@ fn main() -> ! {
     	Config::default() .baudrate(9600.bps()),
     	clocks
     ).unwrap(); 
-    
+ 
+
+    #[cfg(feature = "stm32l1xx")]
+    let rcc = p.RCC.constrain();
+    #[cfg(feature = "stm32l1xx")]
+    let clocks = rcc.cfgr.freeze();
+    #[cfg(feature = "stm32l1xx")]
+    let gpioa = p.GPIOA.split();
+    #[cfg(feature = "stm32l1xx")]
+    p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+    // See examples/serial_by_char.rs for stm32f411re uart and alternate function notes.
+    #[cfg(feature = "stm32l1xx")]
+    let txrx1 =  Serial::usart1(
+        p.USART1,
+    	(gpioa.pa9.into_alternate_af7(),
+         gpioa.pa10.into_alternate_af7()), 
+    	Config::default() .baudrate(9600.bps()),
+    	clocks
+    ).unwrap(); 
+   
 
     // END COMMON USART SETUP
 
