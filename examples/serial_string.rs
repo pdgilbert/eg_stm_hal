@@ -1,6 +1,6 @@
 //! Serial interface test writing a buffer of bytes between two usarts and
 //! echo to the computer console connected by usb-ttl dongle on another usart.
-//! This example differs from example serial_char only in attempting to send 
+//! This example differs from example serial_char in that it attempts to send 
 //! a whole buffer rather than a single byte.
 //! See example serial_char regarding the usart details, pins connections,
 //! and additional comments.
@@ -20,6 +20,8 @@ use cortex_m::singleton;
 use cortex_m_rt::entry;
 use cortex_m_semihosting::hprintln;
 //use core::str::from_utf8;
+
+#[cfg(not(feature = "stm32f1xx"))]
 use nb::block;
 
 use eg_stm_hal::to_str;
@@ -97,27 +99,28 @@ fn main() -> ! {
     #[cfg(feature = "stm32f1xx")]
     let channels = p.DMA1.split(&mut rcc.ahb);
     #[cfg(feature = "stm32f1xx")]
-    let mut tx1 = txrx1.split().0.with_dma(channels.4);      // console
+    let tx1 = txrx1.split().0.with_dma(channels.4);      // console
     // ok let (_, tx1) = tx1.write(b"console connect check.").wait(); 
     // No (_, tx1) = tx1.write(b"console connect check.").wait(); 
     #[cfg(feature = "stm32f1xx")]
-    tx1 = tx1.write(b"console connect check.").wait().1; 
+    let tx1 = tx1.write(b"console connect check.").wait().1; 
+    //for byte in b"\r\nconsole connect check.\r\n" { block!(tx1.write(*byte)).ok(); }
 
     // re dma read see  https://github.com/stm32-rs/stm32f1xx-hal/blob/v0.5.3/examples/adc-dma-rx.rs
 
     #[cfg(feature = "stm32f1xx")]
-    let (mut tx2, mut rx2)  = txrx2.split();
+    let ( tx2, rx2)  = txrx2.split();
     #[cfg(feature = "stm32f1xx")]
     let mut tx2  = tx2.with_dma(channels.7);
     #[cfg(feature = "stm32f1xx")]
-    let mut rx2  = rx2.with_dma(channels.6);
+    let _rx2  = rx2.with_dma(channels.6);
 
     #[cfg(feature = "stm32f1xx")]
-    let (mut tx3, mut rx3)  = txrx3.split();
+    let ( tx3, rx3)  = txrx3.split();
     #[cfg(feature = "stm32f1xx")]
-    let mut tx3  = tx3.with_dma(channels.2);
+    let _tx3  = tx3.with_dma(channels.2);
     #[cfg(feature = "stm32f1xx")]
-    let mut rx3  = rx3.with_dma(channels.3);
+    let rx3  = rx3.with_dma(channels.3);
 
 
     // stm32f3xx

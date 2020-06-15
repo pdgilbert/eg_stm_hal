@@ -29,28 +29,28 @@ name = "blink"
 path = "examples/blink.rs"
 
 [[example]]
-name = "serial_loopback_char"
-path = "examples/serial_loopback_char.rs"
+name = "echo_console_by_char"
+path = "examples/echo_console_by_char.rs"
 
 [[example]]
-name = "serial_fmt"
-path = "examples/serial_fmt.rs"
+name = "echo_console_string"
+path = "examples/echo_console_string.rs"
 
 [[example]]
-name = "serial_loopback_string"
-path = "examples/serial_loopback_string.rs"
+name = "serial_char"
+path = "examples/serial_char.rs"
 
 [[example]]
-name = "echo_by_char"
-path = "examples/echo_by_char.rs"
+name = "serial_string"
+path = "examples/serial_string.rs"
 
 [[example]]
-name = "serial_gps_rw"
-path = "examples/serial_gps_rw.rs"
+name = "gps_rw_by_char"
+path = "examples/gps_rw_by_char.rs"
 
 [[example]]
-name = "serial_gps_rw_by_char"
-path = "examples/serial_gps_rw_by_char.rs"
+name = "gps_rw"
+path = "examples/gps_rw.rs"
 
 [dependencies]
 cortex-m = "0.6.0"
