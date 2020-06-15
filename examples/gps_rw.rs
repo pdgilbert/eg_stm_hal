@@ -18,10 +18,10 @@ extern crate panic_halt;
 //or ?
 use heapless::{consts, Vec};
 
-use eg_stm_hal::to_str;
+//use eg_stm_hal::to_str;
 
 use cortex_m_rt::entry;
-use core::fmt::Write;  // for writeln
+//use core::fmt::Write;  // for writeln
 use cortex_m_semihosting::hprintln;
 //use core::str;
 //use core::ascii;
@@ -36,7 +36,7 @@ use stm32f1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, Sto
 use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Serial}, };
 
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
-use stm32f4xx_hal::{prelude::*, stm32::Peripherals, serial::{config::Config, Serial, config::StopBits}};
+use stm32f4xx_hal::{prelude::*, pac::Peripherals, serial::{config::Config, Serial, config::StopBits}};
 
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{prelude::*, stm32::Peripherals, serial::{Config, Serial}};
@@ -182,7 +182,8 @@ fn main() -> ! {
     let mut tx1 = txrx1.split().0;      // console
     let mut rx2 = txrx2.split().1;      // GPS
 
-    writeln!(tx1, "\r\nconsole connect check.\r\n").unwrap();
+    //writeln!(tx1, "\r\nconsole connect check.\r\n").unwrap();
+    for byte in b"\r\nconsole connect check.\r\n" { block!(tx1.write(*byte)).ok(); }
 
     // read gps on usart2
     hprintln!("about to read GPS").unwrap();
@@ -208,7 +209,8 @@ fn main() -> ! {
 	   };
 	if good {
 	   if buffer.push(byte).is_err() ||  byte == 13  {  //  \r is 13, \n is 10
-              writeln!(tx1, "{}", to_str(&buffer)).unwrap();
+              //writeln!(tx1, "{}", to_str(&buffer)).unwrap();
+              for byte in &buffer { block!(tx1.write(*byte)).ok(); }
               //hprintln!("buffer at {} of {}", buffer.len(), buffer.capacity()).unwrap();
               buffer.clear();
 	      good = false;
