@@ -157,7 +157,7 @@ Following is the status of examples as of June 2020. Examples are run on a 'blue
 |  xxx                 | build |  run  | build |  run  | build |  run  | build |  run  | 
 |:--------------------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
 | blink                |  yes  | works |  yes  | works |  yes  | works |  yes  |       | 
-| echo_console_by_char |  yes  | works |   8   |       |  yes  | works |  no   |       | 
+| echo_console_by_char |  yes  | works |  yes  |   4   |  yes  | works |  no   |       | 
 | echo_console_string  |  yes  |   5   |  8,9  |       |   9   |       |   9   |       | 
 | serial_char          |  yes  |   1   |  yes  |   3   |  yes  |   2   |  no   |       |
 | serial_string        |  yes  |   2   |   9   |       |   9   |       |   9   |       |
@@ -258,7 +258,7 @@ With the 'blue pill' beware that it
 should have 1.5K pull up resistor on D+ (R10 on board). Ones I purchased do,
 but some versions are shipped with 10K or 4.7K. Googling suggests some PCs will tolerate this.
 Also, the 3.3v regulator is small (300mA) and apparently feeds the input voltage through 
-when it fails! Don't exceed 100mA.
+when it fails! Don't exceed 100mA. For the blue pill you might also consult https://github.com/TeXitoi/blue-pill-quickstart.
 
 FILL IN LAYOUT
 
