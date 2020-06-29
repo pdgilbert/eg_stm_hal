@@ -30,7 +30,8 @@ use nb::block;
 //use eg_stm_hal::to_str;
 
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
-use stm32f1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, StopBits}, };
+use stm32f1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial }, }; 
+//use stm32f1xx_hal::{prelude::*, pac::Peripherals, serial::{Config, Serial, StopBits}, };
 
 #[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
 use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Serial}, };
@@ -64,14 +65,19 @@ fn main() -> ! {
     #[cfg(feature = "stm32f1xx")]
     let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
     #[cfg(feature = "stm32f1xx")]
+    let pin_rx1 = gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh);  //pa9
+    #[cfg(feature = "stm32f1xx")]
+    let pin_tx1 = gpioa.pa10;                                          //pa10
+    #[cfg(feature = "stm32f1xx")]
     let txrx1 = Serial::usart1(
         p.USART1,
-        (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),
-	 gpioa.pa10),
+        (pin_rx1, pin_tx1),
+        #[cfg(feature = "stm32f1xx")]
         &mut afio.mapr,
         Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1),
         clocks,
-        &mut rcc.apb2,   // WHAT IS  rcc.apb1/2 ?
+        #[cfg(feature = "stm32f1xx")]
+        &mut rcc.apb2,   // WHAT IS  rcc.apb1/2 ? why is it needed here?
         );
 
     #[cfg(feature = "stm32f1xx")]

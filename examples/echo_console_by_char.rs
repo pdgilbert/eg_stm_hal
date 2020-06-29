@@ -21,17 +21,20 @@ use cortex_m_semihosting::hprintln;
 use core::str::from_utf8;
 use nb::block;
 
+//use embedded_hal::prelude::*, serial::{Config, Serial } ;
+
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
-use stm32f1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial }, };   //StopBits}
+use stm32f1xx_hal::{prelude::*,  pac::Peripherals, serial::{Config, Serial }, 
+       rcc::RccExt, flash::FlashExt, }; 
 
 #[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
-use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{ Serial}, };
+use stm32f3xx_hal::{prelude::*,  stm32::Peripherals, serial::{ Serial}, };
 
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
 use stm32f4xx_hal::{prelude::*,  pac::Peripherals, serial::{config::Config, Serial }};
 
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
-use stm32l1xx_hal::{prelude::*, stm32::Peripherals, serial::{Config, Serial }};
+use stm32l1xx_hal::{prelude::*,  stm32::Peripherals, serial::{Config, Serial }};
 
 
 #[entry]
@@ -60,7 +63,7 @@ fn main() -> ! {
 
 
     #[cfg(feature = "stm32f1xx")]
-    let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
+    let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr); 
     #[cfg(feature = "stm32f3xx")]
     let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
     #[cfg(feature = "stm32f4xx")]
@@ -70,9 +73,9 @@ fn main() -> ! {
 
 
     #[cfg(feature = "stm32f1xx")]
-    let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
+    let mut gpioa = p.GPIOA.split(&mut rcc.apb2);   // why an argument and why mutable?
     #[cfg(feature = "stm32f3xx")]
-    let mut gpioa = p.GPIOA.split(&mut rcc.ahb);  //ahb ?
+    let mut gpioa = p.GPIOA.split(&mut rcc.ahb); 
     #[cfg(feature = "stm32f4xx")]
     let gpioa = p.GPIOA.split();
     #[cfg(feature = "stm32l1xx")]
@@ -100,7 +103,7 @@ fn main() -> ! {
 
 
     #[cfg(feature = "stm32f1xx")]
-    let cnfg = Config::default() .baudrate(9600.bps());  //.stopbits(StopBits::STOP1),
+    let cnfg =  Config::default() .baudrate(9600.bps());  //.stopbits(StopBits::STOP1),
     #[cfg(feature = "stm32f3xx")]
     let cnfg = 9600.bps();
     #[cfg(feature = "stm32f4xx")]
@@ -129,7 +132,7 @@ fn main() -> ! {
     #[cfg(any(feature = "stm32f4xx", feature = "stm32l1xx"))]
     let txrx1 = txrx1.unwrap();
 
-    // end hal specific condtional setup
+    // end hal specific conditional setup
 
     // Split the serial txrx1 struct into a receiving and a transmitting part
     let (mut tx1, mut rx1) =txrx1.split();

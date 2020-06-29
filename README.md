@@ -74,7 +74,7 @@ using [issues](https://github.com/pdgilbert/eg_stm_hal/issues) on this git proje
 | stm32l1xx-hal  | stm32l100 | discovery-stm32l100 |   blink    |   no   | Hal CI tests fail. Code adjustments needed |
 | stm32l1xx-hal  | stm32l151 | heltec-lora-node151 |   blink    |   no   | Hal CI tests fail. Code adjustments needed |
 
-This project's examples depend on HALs. 
+This project's examples depend on embedded_hal (https://docs.rs/embedded-hal/) and several stm32 HALs. 
 See [HALs on Github](https://github.com/stm32-rs) and on [Travis CI.](https://travis-ci.com/stm32-rs)
 
 |   HAL git                         |       HAL Travis CI  Status           | 
@@ -167,7 +167,7 @@ Following is the status of examples as of June 2020. Examples are run on a 'blue
 1.  tx2 to rx3 works. tx3 to rx2 works sometimes but often fails unwrapping err value Overrun on receive.
 2.  Stalls waiting to receive. Possibly need thread to receive started before send?
 3.  Usart2 with Usart3 connection works both ways but jibberish written on console.
-4.  Jibberish written on console.
+4.  Gibberish written on console.
 5.  Works on bluepill as long a typing is slow.
 6.  Fails reading gps. 
 7.  Works once, repeat problems.

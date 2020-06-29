@@ -25,7 +25,7 @@ use {stm32f1xx_hal::{prelude::*,   pac::Peripherals, }, embedded_hal::digital::v
 use stm32f3xx_hal::{prelude::*, stm32::Peripherals, };
 
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
-use stm32f4xx_hal::{prelude::*, stm32::Peripherals, };
+use stm32f4xx_hal::{prelude::*,   pac::Peripherals, };
 
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use {stm32l1xx_hal::{prelude::*, stm32::Peripherals, }, embedded_hal::digital::v2::OutputPin };
@@ -100,13 +100,21 @@ fn main() -> ! {
     // let mut timer = Timer::syst(cp.SYST, &clocks).start_count_down(1.hz());
     // /block!(timer.wait()).unwrap(); 
 
+    // Now clean up setup MCU/HAL specific stuff that should no longer be needed.
+    //drop(dp);     already moved
+    //drop(gpiob);  already moved
+    #[cfg(feature = "stm32f1xx")]
+    drop(rcc);
+
+    // start application code that should be generic
+
     let mut d  = AsmDelay::new(bitrate::U32BitrateExt::mhz(16));
     let on  : u32 = 1000;
     let off : u32 = 3000;
 
     // Wait for the timer to trigger an update and change the state of the LED
     loop {
-        //block!(timer.wait()).unwrap(); this works on bluepill but need to be more specific about timer on other chips
+        //block!(timer.wait()).unwrap();  works on bluepill but need to be more specific about timer on other chips
         //cortex_m::asm::delay(500_000); this is in clock cycles
         d.delay_ms(off);
         let _r = led1.set_high();

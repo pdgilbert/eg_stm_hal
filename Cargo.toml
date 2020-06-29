@@ -60,6 +60,17 @@ cortex-m-rt = "0.6.8"
 #as-slice = "0.1.2"
 #as-slice = "0.1"
 panic-halt = "0.2.0"
+dht11 = "0.3.1"
+dht-sensor = "0.1.1"
+stm32f1 = "0.11.0"
+stm32f3 = "0.11"
+stm32f4 = "0.11"
+stm32l1 = "0.5.0"
+
+#[dependencies.dht11]
+#git = "https://github.com/plorefice/dht11-rs"
+#version = "0.3.1"
+#optional = true
 
 [dependencies.stm32f1xx-hal]
 git = "https://github.com/stm32-rs/stm32f1xx-hal"

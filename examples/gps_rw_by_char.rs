@@ -130,7 +130,8 @@ fn main() -> ! {
     let txrx2 = Serial::usart2(
         p.USART2,
         ( gpioa.pa2.into_alternate_af7(),   gpioa.pa3.into_alternate_af7()),  // (tx, rx)
-        Config::default() .baudrate(115_200.bps()),  //  .parity_odd() .stopbits(StopBits::STOP1),
+        Config::default() .baudrate(9600.bps()),  
+        //Config::default() .baudrate(115_200.bps()),  .parity_odd() .stopbits(StopBits::STOP1),
         clocks,
     ).unwrap();
 
@@ -151,7 +152,8 @@ fn main() -> ! {
     let txrx2 = Serial::usart2(
         p.USART2,
         ( gpioa.pa2.into_alternate_af7(),   gpioa.pa3.into_alternate_af7()),  // (tx, rx)
-        Config::default() .baudrate(115_200.bps()),  //  .parity_odd() .stopbits(StopBits::STOP1),
+        Config::default() .baudrate(9600.bps()), 
+	// Config::default()  .baudrate(115_200.bps()), .parity_odd() .stopbits(StopBits::STOP1),
         clocks,
     ).unwrap();
 

@@ -1,4 +1,7 @@
 // see https://github.com/stm32-rs/stm32f1xx-hal/blob/master/examples/adc.rs
+// for stm32f4xx see examples in
+//     https://docs.rs/stm32f4xx-hal/0.8.3/stm32f4xx_hal/adc/struct.Adc.html
+// http://ctms.engin.umich.edu/CTMS/Content/Activities/TMP35_36_37.pdf
 #![deny(unsafe_code)]
 #![no_main]
 #![no_std]
@@ -16,6 +19,10 @@ use stm32f3xx_hal::{prelude::*, stm32::Peripherals, adc };
 
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
 use stm32f4xx_hal::{prelude::*, pac::Peripherals, adc };
+//use stm32f4xx_hal::{ gpio::gpioa, adc::{ Adc, config::AdcConfig, config::SampleTime, }, };
+//use stm32f4xx_hal::{ gpio::gpioa, adc::{ Adc, config::AdcConfig, config::{SampleTime,
+//           Sequence, Eoc, Scan, Clock}, }, };
+
 
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{prelude::*, stm32::Peripherals, adc };
@@ -45,8 +52,14 @@ fn main() -> ! {
     hprintln!("sysclk freq: {}", clocks.sysclk().0).unwrap();  
     hprintln!("adc freq: {}", clocks.adcclk().0).unwrap();    
 
+
     // Setup ADC1 for internal MCU temperature
+
+    #[cfg(feature = "stm32f1xx")] 
     let mut mcuadc = adc::Adc::adc1(p.ADC1, &mut rcc.apb2, clocks);
+
+    #[cfg(feature = "stm32f4xx")]
+    let mut mcuadc = adc:Adc::adc1(device.ADC1, true, AdcConfig::default());
 
 
     let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
@@ -55,37 +68,36 @@ fn main() -> ! {
     //let mut adc1 = adc::Adc::adc1(p.ADC1, &mut rcc.apb2, clocks);
     //let mut ch0 = gpiob.pb0.into_analog(&mut gpiob.crl);
 
-    // Setup external analog temperature sensor (eg TMP36)
-    // input on pin pb1 using ADC2
+    // Setup external analog temperature sensor (eg TMP36) input on pin pb1 using ADC2
     let mut adc2 = adc::Adc::adc2(p.ADC2, &mut rcc.apb2, clocks);
     let mut ch1 = gpiob.pb1.into_analog(&mut gpiob.crl);
 
+
+
     // Vin = 3.3v * ADCvalue / 4096     (12 bit adc has  2**12 = 4096 steps)
     // TMP35 scale is 100 deg C per 1.0v (slope 10mV/deg C) and goes through 
-    //     point <50C, 1.0v>,  so 0.0v is  -50C.
+    //   <50C, 1.0v>,  so 0.0v is  -50C.
     // see https://www.analog.com/media/en/technical-documentation/data-sheets/TMP35_36_37.pdf
     // so ADCtemp = (100 * 3.3 * ADCvalue / 4096 )  - 50 = 0.0805664 * ADCvalue - 50
+
+    // In following loop, this compiles but the link fails because the bin is 
+    // too big for flash on bluepill
+    //   let adc_temp: f64 = (0.0805664 * adc_value as f64 ) - 50.0 ;	
+    // this works
+    //   let adc_temp:  i16 = ((0.0805664f32 * adc_value as f32 ) - 50.0f32) as i16 ;
+    // and this works
+    //   let adc_temp:  i16 = (0.0805664f32 * adc_value as f32 ) as i16 - 50  ;
+    // and this works
+    //   let adc_temp:  i16 = (adc_value as f32 / 12.412122 ) as i16 - 50  ;
+    // and this works but the rounding is bad (a few degrees off)
+    //   let adc_temp:  i16 = (adc_value / 12 ) as i16 - 50  ;
 
     loop {
         let mcutemp = mcuadc.read_temp();
         hprintln!("MCU temp: {}", mcutemp).unwrap();
 
-        //let data: u16 = adc1.read(&mut ch0).unwrap();
-        //hprintln!("external analog temp sensor: {}", data).unwrap();
-
 	let adc_value: u16 = adc2.read(&mut ch1).unwrap();
-
-        // this compiles but the link fails because the bin is too big for flash on bluepill
-	//let adc_temp: f64 = (0.0805664 * adc_value as f64 ) - 50.0 ;      
-	// this works
-	//let adc_temp:  i16 = ((0.0805664f32 * adc_value as f32 ) - 50.0f32) as i16 ;
-	// and this works
-	//let adc_temp:  i16 = (0.0805664f32 * adc_value as f32 ) as i16 - 50  ;
-	// and this works
 	let adc_temp:  i16 = (adc_value as f32 / 12.412122 ) as i16 - 50  ;
-	// and this works but the rounding is bad (a few degrees off)
-	//let adc_temp:  i16 = (adc_value / 12 ) as i16 - 50  ;
-
         hprintln!("adc2: {}", adc_temp).unwrap();
         }
 }
