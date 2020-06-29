@@ -1,7 +1,3 @@
-//  Using serial1_setup returning serial. Very messy return type and needs to use 
-//  even more chip secific parts of crate.
-//  compiles for stm32f1xx and stm32f4xx, not for stm32f3xx nor stm32l1xx
-//
 //! Echo console input back to console + semihost output, char by char
 //!
 //! Connect the Tx pin pa9  to the Rx pin of usb-ttl converter
@@ -26,94 +22,81 @@ use core::str::from_utf8;
 use nb::block;
 
 //use embedded_hal::serial;
+//use embedded_hal::blocking::serial::{Write, Read};
+//use embedded_hal::serial::{Write, Read};
 
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
-use {stm32f1,    stm32f1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial }} }; 
+use stm32f1xx_hal::{prelude::*,   
+                    pac::Peripherals, 
+                    serial::{Config, Serial, Tx, Rx},  
+		    device::USART1 }; 
 
 #[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
-use {stm32f3,  stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{ Serial }}};
+use stm32f3xx_hal::{prelude::*, 
+                    stm32::Peripherals,
+                    serial::{ Serial, Tx, Rx},
+		    stm32::USART1 };
 
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
-use {stm32f4, stm32f4xx_hal::{prelude::*,  pac::Peripherals, serial::{config::Config, Serial }}};
+use stm32f4xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::USART1 };
 
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
-use {stm32l1, stm32l1xx_hal::{prelude::*, stm32::Peripherals, serial::{Config, Serial }}};
+use stm32l1xx_hal::{prelude::*, 
+		    stm32::Peripherals, 
+		    serial::{Config, Serial, Tx, Rx},
+		    stm32::USART1 };
 
 
 #[entry]
 fn main() -> ! {
 
-    #[cfg(feature  = "stm32f1xx")]
-    type SerialType = stm32f1xx_hal::serial::Serial<stm32f1::stm32f103::USART1,
-  (stm32f1xx_hal::gpio::gpioa::PA9<stm32f1xx_hal::gpio::Alternate<stm32f1xx_hal::gpio::PushPull>>,
-   stm32f1xx_hal::gpio::gpioa::PA10<stm32f1xx_hal::gpio::Input<stm32f1xx_hal::gpio::Floating>>)>;
+    // A simple abstraction for returning the result of Serial::usart1()  
+    //  without  .split() inside serial1_setup()  still defeats me. 
 
     #[cfg(feature = "stm32f1xx")]
-    fn serial1_setup() ->  SerialType  {
-        let cnfg = Config::default() .baudrate(9600.bps());
-	let p = Peripherals::take().unwrap();
+    fn serial1_setup() ->  (Tx<USART1>, Rx<USART1>)  {
+        let p = Peripherals::take().unwrap();
     	let mut rcc = p.RCC.constrain();  
 	let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr); 
-        //let mut afio = p.AFIO.constrain(&mut rcc.apb2);
+        let mut afio = p.AFIO.constrain(&mut rcc.apb2);
     	let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
-    	// next consumes (moves) all arguments but clocks and  &mut rcc.apb2
-	// but if afio is set above and used in next then it is not consumed.
-	let s = Serial::usart1(
+    	// next consumes (moves) arguments other than clocks,  &mut rcc.apb2 and afio.
+	Serial::usart1(
     	    p.USART1,
     	    (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),     //rx pa9, 
 	     gpioa.pa10),					     //tx pa10
-    	    &mut p.AFIO.constrain(&mut rcc.apb2).mapr,
-    	    //&mut afio.mapr,
-    	    cnfg,             //.stopbits(StopBits::STOP1
+    	    &mut afio.mapr,
+    	    Config::default() .baudrate(9600.bps()),        //.stopbits(StopBits::STOP1
     	    clocks,
     	    &mut rcc.apb2,
-    	    );
-	//let z = p.USART1;   //was moved
-	//let z = gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh); //was moved
-	//let z =gpioa.pa10;  //was moved
-	//let z = p.AFIO.constrain(&mut rcc.apb2).mapr; //was moved
-	//let z = afio.mapr; // NOT moved
-	//let z = cnfg;      //was moved
-	//let z = clocks;    // NOT moved
-	//let z = rcc.apb2;  // NOT moved
-	drop(clocks);
-	drop(rcc.apb2);
-	s
+    	    ).split()
 	}
 
 
-    #[cfg(feature =  "stm32f3xx")]
-    type SerialType = stm32f3xx_hal::serial::Serial<stm32f3::stm32f303::USART1,
-             (stm32f3xx_hal::gpio::gpioa::PA9<stm32f3xx_hal::gpio::AF7>,
-              stm32f3xx_hal::gpio::gpioa::PA10<stm32f3xx_hal::gpio::AF7>)>;
-
     #[cfg(feature = "stm32f3xx")]
-    fn serial1_setup() -> SerialType {
-    	let cnfg = 9600.bps();
+    	fn serial1_setup() -> (Tx<USART1>, Rx<USART1>) {
         let p = Peripherals::take().unwrap();
     	let mut rcc = p.RCC.constrain();
     	let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
     	let mut gpioa = p.GPIOA.split(&mut rcc.ahb); 
+    	//let cnfg = 9600.bps();
     	Serial::usart1(
     	    p.USART1,
     	    (gpioa.pa9.into_af7(&mut gpioa.moder, &mut gpioa.afrh),   //rx pa9
 	     gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)), //tx pa10
-    	    cnfg,
+    	    9600.bps(),
     	    clocks,
     	    &mut rcc.apb2,
-    	    )
+    	    ).split()
     	}
 
 
 
-    #[cfg(feature  = "stm32f4xx")]
-    type SerialType = stm32f4xx_hal::serial::Serial<stm32f4::stm32f411::USART1,
-    (stm32f4xx_hal::gpio::gpioa::PA9<stm32f4xx_hal::gpio::Alternate<stm32f4xx_hal::gpio::AF7>>,
-     stm32f4xx_hal::gpio::gpioa::PA10<stm32f4xx_hal::gpio::Alternate<stm32f4xx_hal::gpio::AF7>>)>;
-
     #[cfg(feature = "stm32f4xx")]
-    fn serial1_setup() -> SerialType {
-        let cnfg = Config::default() .baudrate(9600.bps());
+    fn serial1_setup() -> (Tx<USART1>, Rx<USART1>) {
         let p = Peripherals::take().unwrap();
     	let rcc = p.RCC.constrain();
     	let clocks = rcc.cfgr.freeze();
@@ -123,19 +106,15 @@ fn main() -> ! {
     	    p.USART1,
     	    (gpioa.pa9.into_alternate_af7(),			      //rx pa9
 	     gpioa.pa10.into_alternate_af7()),  		      //tx pa10
-    	    cnfg,
+    	    Config::default() .baudrate(9600.bps()),
     	    clocks,
-    	    ).unwrap()
+    	    ).unwrap().split()
 	}
 
 
 
-    #[cfg(feature  = "stm32l1xx")]
-    type SerialType = stm32l1xx_hal::serial::Serial<stm32l1::stm32l151::USART1>;
-
     #[cfg(feature = "stm32l1xx")]
-    fn serial1_setup() -> SerialType {
-        let cnfg = Config::default() .baudrate(9600.bps());
+    fn serial1_setup() -> (Tx<USART1>, Rx<USART1>) {
         let p = Peripherals::take().unwrap();
     	let rcc = p.RCC.constrain();
     	let clocks = rcc.cfgr.freeze();
@@ -146,28 +125,26 @@ fn main() -> ! {
     	    p.USART1,
     	    (gpioa.pa9.into_alternate_af7(),			      //rx pa9
 	     gpioa.pa10.into_alternate_af7()),  		      //tx pa10
-    	    cnfg,
+    	    Config::default() .baudrate(9600.bps()),
     	    clocks,
-    	    ).unwrap()
+    	    ).unwrap().split()
     	}
 
-    // end hal specific conditional setup
+    // End of hal/MCU specific setup. Following should be generic code.
 
-    let mut txrx1 = serial1_setup(); 
-    //let (mut tx1, mut rx1) =txrx1.split(); // Split into  tx and rx
-
+    let (mut tx1, mut rx1) = serial1_setup();
 
     hprintln!("testwrite to console ...").unwrap();
 
-    for byte in b"\r\nconsole connect check.\r\n" { block!(txrx1.write(*byte)).ok(); }
+    for byte in b"\r\nconsole connect check.\r\n" { block!(tx1.write(*byte)).ok(); }
 
     hprintln!("test read and write by char. Please type into the console ...").unwrap();
     //writeln!(tx1, "\r\nPlease type (slowly) into the console below:\r\n").unwrap();
-    for byte in b"\r\nType (slowly) below:\r\n" { block!(txrx1.write(*byte)).ok(); }
+    for byte in b"\r\nType (slowly) below:\r\n" { block!(tx1.write(*byte)).ok(); }
 
     loop { // Read a byte and write
-       let received = block!(txrx1.read()).unwrap();
-       block!(txrx1.write(received)).ok();
+       let received = block!(rx1.read()).unwrap();
+       block!(tx1.write(received)).ok();
        hprintln!("{}", from_utf8(&[received]).unwrap()).unwrap();
-     }
+      }
 }
