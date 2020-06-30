@@ -39,14 +39,22 @@ use stm32f1xx_hal::{prelude::*,
 		    device::{USART1, USART2}  }; 
 
 #[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
-use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Serial}, };
-//use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Config, Serial, StopBits}, };
+use stm32f3xx_hal::{prelude::*, 
+                    stm32::Peripherals,
+                    serial::{ Serial, Tx, Rx},
+		    stm32::{USART1, USART2} };
 
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
-use stm32f4xx_hal::{prelude::*, pac::Peripherals, serial::{config::Config, Serial }};
+use stm32f4xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::{USART1, USART2} };
 
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
-use stm32l1xx_hal::{prelude::*, stm32::Peripherals, serial::{Config, Serial}};
+use stm32l1xx_hal::{prelude::*, 
+		    stm32::Peripherals, 
+		    serial::{Config, Serial, Tx, Rx},
+		    stm32::{USART1, USART2} };
 
 
 #[entry]
@@ -90,78 +98,84 @@ fn main() -> ! {
 
 
     #[cfg(feature = "stm32f3xx")]
-    let mut rcc   = p.RCC.constrain();
-    #[cfg(feature = "stm32f3xx")]
-    let clocks    = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
-    #[cfg(feature = "stm32f3xx")]
-    let mut gpioa = p.GPIOA.split(&mut rcc.ahb);
-    //#[cfg(feature = "stm32f3xx")]
-    //let mut gpiob = p.GPIOB.split(&mut rcc.ahb);
+    fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2> )  {
+        let p = Peripherals::take().unwrap();
+    	let mut rcc = p.RCC.constrain();  
+	let clocks  = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr); 
+        //Why does next need arg, there is only one possibility?
+        let mut gpioa = p.GPIOA.split(&mut rcc.ahb); 
+        let (tx1, rx1)  = Serial::usart1(
+            p.USART1,
+            (gpioa.pa9.into_af7( &mut gpioa.moder, &mut gpioa.afrh),   //rx pa9
+	     gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)),  //tx pb10
+            9600.bps(),
+            clocks,
+            &mut rcc.apb2,
+            ).split();
 
-    #[cfg(feature = "stm32f3xx")]
-    let txrx1     = Serial::usart1(
-        p.USART1,
-        (gpioa.pa9.into_af7(&mut gpioa.moder, &mut gpioa.afrh),
-	 gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)),
-        9600.bps(),
-        clocks,
-        &mut rcc.apb2,
-    );
-
-    #[cfg(feature = "stm32f3xx")]
-    let txrx2 = Serial::usart2(
-        p.USART2,
-        (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl),
-	 gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)), //(tx,rx)
-        9600.bps(),
-        clocks,
-        &mut rcc.apb1,
-    );
-
+        let (tx2, rx2) = Serial::usart2(
+            p.USART2,
+            (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl),    //rx pa2
+             gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)),   //tx pa3
+            9600.bps(),    // 115_200.bps(),
+            clocks,
+            &mut rcc.apb1,
+            ).split();
+        (tx1, rx1,   tx2, rx2 )
+	}
 
 
     #[cfg(feature = "stm32f4xx")]
-    let clocks    =  p.RCC.constrain().cfgr.freeze();
-    #[cfg(feature = "stm32f4xx")]
-    let gpioa = p.GPIOA.split();
-    #[cfg(feature = "stm32f4xx")]
-    let txrx1 = Serial::usart1(
-        p.USART1,
-        (gpioa.pa9.into_alternate_af7(),  gpioa.pa10.into_alternate_af7()),
-     	Config::default() .baudrate(9600.bps()),
-        clocks,
-    ).unwrap();
+    fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2> )  {
+        let p = Peripherals::take().unwrap();
+        let clocks    =  p.RCC.constrain().cfgr.freeze();
+        let gpioa = p.GPIOA.split();
+        let (tx1, rx1) =  Serial::usart1(
+           p.USART1,
+    	   (gpioa.pa9.into_alternate_af7(),            //rx pa9
+	    gpioa.pa10.into_alternate_af7()),          //tx pa10
+    	   Config::default() .baudrate(9600.bps()),
+    	   clocks
+           ).unwrap().split(); 
 
-    #[cfg(feature = "stm32f4xx")]
-    let txrx2 = Serial::usart2(
-        p.USART2,
-        ( gpioa.pa2.into_alternate_af7(),   gpioa.pa3.into_alternate_af7()),  // (tx, rx)
-        Config::default() .baudrate(9600.bps()),  
-        //Config::default() .baudrate(115_200.bps()),  .parity_odd() .stopbits(StopBits::STOP1),
-        clocks,
-    ).unwrap();
+    	// this probably needs fix here. rx2.read() stalls and does not return.
+	//p.USART2.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+        let (tx2, rx2) = Serial::usart2(
+           p.USART2,
+           (gpioa.pa2.into_alternate_af7(),            //rx pa2
+	    gpioa.pa3.into_alternate_af7()),           //tx pa3
+           Config::default() .baudrate(9600.bps()), 
+           clocks,
+           ).unwrap().split();
+
+        (tx1, rx1,   tx2, rx2 )
+	}
 
 
-    #[cfg(feature = "stm32l1xx")]
-    let clocks    =  p.RCC.constrain().cfgr.freeze();
-    #[cfg(feature = "stm32l1xx")]
-    let gpioa = p.GPIOA.split();
-    #[cfg(feature = "stm32l1xx")]
-    let txrx1 = Serial::usart1(
-        p.USART1,
-        (gpioa.pa9.into_alternate_af7(),  gpioa.pa10.into_alternate_af7()),
-     	Config::default() .baudrate(9600.bps()),
-        clocks,
-    ).unwrap();
 
     #[cfg(feature = "stm32l1xx")]
-    let txrx2 = Serial::usart2(
-        p.USART2,
-        ( gpioa.pa2.into_alternate_af7(),   gpioa.pa3.into_alternate_af7()),  // (tx, rx)
-        Config::default() .baudrate(9600.bps()), 
-	// Config::default()  .baudrate(115_200.bps()), .parity_odd() .stopbits(StopBits::STOP1),
-        clocks,
-    ).unwrap();
+    fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2> )  {
+        let p = Peripherals::take().unwrap();
+	let clocks    =  p.RCC.constrain().cfgr.freeze();
+        let gpioa = p.GPIOA.split();
+        let (tx1, rx1) =  Serial::usart1(
+           p.USART1,
+           (gpioa.pa9.into_alternate_af7(),            //rx pa9
+	    gpioa.pa10.into_alternate_af7()),          //tx pa10
+    	   Config::default() .baudrate(9600.bps()),
+    	   clocks
+           ).unwrap().split(); 
+
+        let (tx2, rx2) = Serial::usart2(
+            p.USART2,
+            (gpioa.pa2.into_alternate_af7(),           //rx pa2
+	     gpioa.pa3.into_alternate_af7()),          //tx pa3
+            Config::default() .baudrate(9600.bps()), 
+            clocks,
+            ).unwrap().split();
+
+        (tx1, rx1,   tx2, rx2 )
+	}
 
 
     // End of hal/MCU specific setup. Following should be generic code.
@@ -183,6 +197,7 @@ fn main() -> ! {
          Ok(str)     => str,
          Err(_error) => e,
          };
+      //hprintln!("in loop...").unwrap(); //debugging only, too slow
       block!(tx1.write(received)).ok();
     }
 
