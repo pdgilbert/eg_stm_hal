@@ -33,7 +33,10 @@ use cortex_m_semihosting::hprintln;
 use nb::block;
 
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
-use stm32f1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, StopBits}, };
+use stm32f1xx_hal::{prelude::*,   
+                    pac::Peripherals, 
+                    serial::{Config, Serial, StopBits, Tx, Rx},  
+		    device::{USART1, USART2}  }; 
 
 #[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
 use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Serial}, };
@@ -51,35 +54,38 @@ fn main() -> ! {
  
     //see serial_char.rs and serial_string.rs in examples/ for more USART config notes.
 
-    let p = Peripherals::take().unwrap();
+    #[cfg(feature = "stm32f1xx")]
+    fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>)  {
+        let p = Peripherals::take().unwrap();
+    	let mut rcc = p.RCC.constrain();  
+	let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr); 
+        let mut afio = p.AFIO.constrain(&mut rcc.apb2);
+    	let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
 
-    #[cfg(feature = "stm32f1xx")]
-    let mut rcc = p.RCC.constrain();
-    #[cfg(feature = "stm32f1xx")]
-    let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
-    #[cfg(feature = "stm32f1xx")]
-    let mut afio = p.AFIO.constrain(&mut rcc.apb2);
-    #[cfg(feature = "stm32f1xx")]
-    let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
-    #[cfg(feature = "stm32f1xx")]
-    let txrx1 = Serial::usart1(
-        p.USART1,
-        (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),  gpioa.pa10),
-        &mut afio.mapr,
-        Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1),    // .parity_odd() 
-        clocks,
-        &mut rcc.apb2,
-    );
+    	// next consumes (moves) arguments other than clocks,  &mut rcc.apb2 and afio.
+	let (tx1, rx1) = Serial::usart1(
+    	    p.USART1,
+    	    (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),     //rx pa9, 
+	     gpioa.pa10),					     //tx pa10
+    	    &mut afio.mapr,
+    	    Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1), //.parity_odd()
+    	    clocks,
+    	    &mut rcc.apb2,
+    	    ).split();
 
-    #[cfg(feature = "stm32f1xx")]
-    let txrx2 = Serial::usart2(
-        p.USART2,
-        (gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),   gpioa.pa3),  // (tx, rx)
-        &mut afio.mapr,
-        Config::default() .baudrate(9_600.bps()) ,
-        clocks,
-        &mut rcc.apb1,
-    );
+        let (tx2, rx2) = Serial::usart2(
+            p.USART2,
+            (gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),     //rx pa2 
+             gpioa.pa3), 					     //tx pa3
+            &mut afio.mapr,
+            Config::default() .baudrate(9_600.bps()), 
+            clocks,
+            &mut rcc.apb1,
+        ).split();
+
+        (tx1, rx1,   tx2, rx2 )
+	}
+
 
 
 
@@ -158,12 +164,9 @@ fn main() -> ! {
     ).unwrap();
 
 
-    // END COMMON USART SETUP
+    // End of hal/MCU specific setup. Following should be generic code.
 
-
-    // Split the serial struct into a receiving and a transmitting part
-    let (mut  tx1, mut _rx1) = txrx1.split();  // console
-    let (mut _tx2, mut  rx2) = txrx2.split();  // GPS
+    let (mut tx1, mut _rx1, mut _tx2, mut rx2) = setup();  // 1 is console, 2 is GPS
 
     hprintln!("testing console output...").unwrap();
  
