@@ -60,8 +60,16 @@ cortex-m-rt = "0.6.8"
 #as-slice = "0.1.2"
 #as-slice = "0.1"
 panic-halt = "0.2.0"
+
 dht11 = "0.3.1"
 dht-sensor = "0.1.1"
+
+## need rust 1.40.0 for #[non_exhaustive] 
+#embedded-graphics = "0.4.9" # "0.6.2" # for ads1015-adc-display
+#ssd1306 = "0.2.6" # "0.3.1"  # for ads1015-adc-display
+#ads1x1x = "0.2"  # for ads1015-adc-display
+#shared-bus = { version = "0.1.4", features = ["cortexm"] }# for ads1015-adc-display
+
 stm32f1 = "0.11.0"
 stm32f3 = "0.11"
 stm32f4 = "0.11"
@@ -81,9 +89,6 @@ optional = true
 git = "https://github.com/stm32-rs/stm32f3xx-hal"
 #version = "0.3.0"
 optional = true
-
-##[dependencies.alt-stm32f30x-hal]
-##version = "0.6.1"
 
 [dependencies.stm32f4xx-hal]
 git = "https://github.com/stm32-rs/stm32f4xx-hal"
@@ -123,8 +128,9 @@ default-features = false
 version = "0.2.2"
 
 [dependencies.embedded-hal]
-version = "0.2.3"
+version = "0.2.4"
 features = ["unproven"]
+#version = "1.0.0-alpha.1"   July 2020 gives ... led3.set_low() method not found ...
 
 [dependencies.asm-delay]
 version = "0.7.0"

@@ -1,5 +1,5 @@
 //! Blinks off-board LEDs attached to  pb 13,14,15. 
-//! Following stm32f1xx_hal example blinky.rs.
+//! compare stm32f1xx_hal example blinky.rs.
 
 #![deny(unsafe_code)]
 #![no_std]
@@ -11,116 +11,138 @@ extern crate panic_semihosting;
 #[cfg(not(debug_assertions))]
 extern crate panic_halt;
 
-// extern crate panic_halt; // you can put a breakpoint on `rust_begin_unwind` to catch panics
-// extern crate panic_abort; // requires nightly
-// extern crate panic_itm; // logs messages over ITM; requires ITM support
+// extern crate panic_halt;  // put a breakpoint on `rust_begin_unwind` to catch panics
+// extern crate panic_abort; // may still require nightly?
+// extern crate panic_itm;   // logs messages over ITM; requires ITM support
 // extern crate panic_semihosting; // logs messages to the host stderr; requires a debugger
 
 // use nb::block;
+use cortex_m_rt::entry;
+use asm_delay::{ AsmDelay, bitrate, };
+
 
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
-use {stm32f1xx_hal::{prelude::*,   pac::Peripherals, }, embedded_hal::digital::v2::OutputPin };
+use stm32f1xx_hal::{prelude::*,   
+                     pac::Peripherals,
+		     gpio::{gpiob::{PB13, PB14, PB15}, Output, PushPull,}, 
+		     };
+
+#[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
+use embedded_hal::digital::v2::OutputPin;
+
+
 
 #[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
-use stm32f3xx_hal::{prelude::*, stm32::Peripherals, };
+use  stm32f3xx_hal::{prelude::*,
+                     stm32::Peripherals, 
+		     gpio::{gpiob::{PB13, PB14, PB15}, Output, PushPull,}, 
+		     };
+
 
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
-use stm32f4xx_hal::{prelude::*,   pac::Peripherals, };
+use  stm32f4xx_hal::{prelude::*,   
+                     pac::Peripherals, 
+		     gpio::{gpiob::{PB13, PB14, PB15}, Output, PushPull,}, 
+		     };
+
+#[cfg(feature = "stm32f4xx")]  //  eg Nucleo-64  stm32f411
+use embedded_hal::digital::v2::OutputPin;
+
 
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
-use {stm32l1xx_hal::{prelude::*, stm32::Peripherals, }, embedded_hal::digital::v2::OutputPin };
+use stm32l1xx_hal::{prelude::*, 
+                     stm32::Peripherals,
+		     gpio::{gpiob::{PB13, PB14, PB15}, Output, PushPull,}, 
+                     };
 
-use cortex_m_rt::entry;
+#[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
+use embedded_hal::digital::v2::OutputPin;
 
-// use embedded_hal::prelude::*;
-use asm_delay::{ AsmDelay, bitrate, };
 
 #[entry]
 fn main() -> ! {
 
-    // 1. Get access to the device specific peripherals from the peripheral access crate
-    // 2. Take ownership over the raw rcc (Reset and Clock Control) device and convert to  HAL structs
-    // 3. Configure gpio B pins 13,14,15 as a push-pull output. 
+    // 1. Get device specific peripherals
+    // 2. Take ownership of the raw rcc (Reset and Clock Control) device and convert to  HAL structs
+    // 3. Configure gpio B pins 13,14,15 as a push-pull output (bluepill). 
     //    On bluepill the `crh` register is passed to the function
     //    in order to configure the port. For pins 0-7, crl should be passed instead.
 
-    let dp = Peripherals::take().unwrap();
+    #[cfg(feature = "stm32f1xx")]
+    fn setup() -> (PB13<Output<PushPull>>, PB14<Output<PushPull>>, PB15<Output<PushPull>>) {
+       
+       let dp        = Peripherals::take().unwrap();
+       let mut rcc   = dp.RCC.constrain(); 
+       let mut gpiob = dp.GPIOB.split(&mut rcc.apb2);
 
-    //#[cfg(feature = "stm32f1xx")]
-    //pub mod leds_on_13_14_15_stm32f1xx;
-    #[cfg(feature = "stm32f1xx")]
-    let mut rcc = dp.RCC.constrain(); 
-    #[cfg(feature = "stm32f1xx")]
-    let mut gpiob = dp.GPIOB.split(&mut rcc.apb2);
-    #[cfg(feature = "stm32f1xx")]
-    let mut led1 = gpiob.pb13.into_push_pull_output(&mut gpiob.crh);
-    #[cfg(feature = "stm32f1xx")]
-    let mut led2 = gpiob.pb14.into_push_pull_output(&mut gpiob.crh);
-    #[cfg(feature = "stm32f1xx")]
-    let mut led3 = gpiob.pb15.into_push_pull_output(&mut gpiob.crh);
+       // return (led1, led2, led3)
+       (gpiob.pb13.into_push_pull_output(&mut gpiob.crh),  // led on pb13
+        gpiob.pb14.into_push_pull_output(&mut gpiob.crh),  // led on pb14
+        gpiob.pb15.into_push_pull_output(&mut gpiob.crh))  // led on pb15
+       };
 
     #[cfg(feature = "stm32f3xx")]
-    let mut rcc = dp.RCC.constrain();
-    #[cfg(feature = "stm32f3xx")]
-    let mut gpiob = dp.GPIOB.split(&mut rcc.ahb);
-    #[cfg(feature = "stm32f3xx")]
-    let mut led1 = gpiob.pb13.into_push_pull_output(&mut gpiob.moder, &mut gpiob.otyper);
-    #[cfg(feature = "stm32f3xx")]
-    let mut led2 = gpiob.pb14.into_push_pull_output(&mut gpiob.moder, &mut gpiob.otyper);
-    #[cfg(feature = "stm32f3xx")]
-    let mut led3 = gpiob.pb15.into_push_pull_output(&mut gpiob.moder, &mut gpiob.otyper);
+    fn setup() -> (PB13<Output<PushPull>>, PB14<Output<PushPull>>, PB15<Output<PushPull>>) {
+
+       let dp        = Peripherals::take().unwrap();
+       let mut rcc   = dp.RCC.constrain();
+       let mut gpiob = dp.GPIOB.split(&mut rcc.ahb);
+
+       // return (led1, led2, led3)
+       (gpiob.pb13.into_push_pull_output(&mut gpiob.moder, &mut gpiob.otyper), //led on pb12
+        gpiob.pb14.into_push_pull_output(&mut gpiob.moder, &mut gpiob.otyper), //led on pb14
+        gpiob.pb15.into_push_pull_output(&mut gpiob.moder, &mut gpiob.otyper)) //led on pb15
+       };
 
     #[cfg(feature = "stm32f4xx")]
-    let gpiob = dp.GPIOB.split();
-    #[cfg(feature = "stm32f4xx")]
-    let mut led1 = gpiob.pb13.into_push_pull_output();
-    #[cfg(feature = "stm32f4xx")]
-    let mut led2 = gpiob.pb14.into_push_pull_output();
-    #[cfg(feature = "stm32f4xx")]
-    let mut led3 = gpiob.pb15.into_push_pull_output();
+    fn setup() -> (PB13<Output<PushPull>>, PB14<Output<PushPull>>, PB15<Output<PushPull>>) {
+
+       let dp    = Peripherals::take().unwrap();
+       let gpiob = dp.GPIOB.split();
+
+       // return (led1, led2, led3)
+       (gpiob.pb13.into_push_pull_output(),  // led on pb12
+        gpiob.pb14.into_push_pull_output(),  // led on pb14
+        gpiob.pb15.into_push_pull_output())  // led on pb15
+       };
 
     #[cfg(feature = "stm32l1xx")]
-    let gpiob = dp.GPIOB.split();
-    #[cfg(feature = "stm32l1xx")]
-    let mut led1 = gpiob.pb13.into_push_pull_output();
-    #[cfg(feature = "stm32l1xx")]
-    let mut led2 = gpiob.pb14.into_push_pull_output();
-    #[cfg(feature = "stm32l1xx")]
-    let mut led3 = gpiob.pb15.into_push_pull_output();
+    fn setup() -> (PB13<Output<PushPull>>, PB14<Output<PushPull>>, PB15<Output<PushPull>>) {
 
-    //this works on bluepill but need to be more specific about timer using other chips/HALs
-    // may need different timer, like Struct stm32f3xx_hal::stm32::SYST
-    //use stm32f1xx_hal::{ prelude::*, pac::Peripherals, timer::Timer, };
-    //let cp = cortex_m::Peripherals::take().unwrap();//get core peripherals
-    // Take ownership over the raw flash device and convert to  HAL structs
-    // let mut flash = dp.FLASH.constrain();
-    // Freeze the configuration of all clocks and store frozen frequencies in `clocks`
-    // let clocks = rcc.cfgr.freeze(&mut flash.acr);
-    // Configure the syst timer to trigger an update every second
+       let dp    = Peripherals::take().unwrap();
+       let gpiob = dp.GPIOB.split();
+
+       // return (led1, led2, led3)
+       (gpiob.pb13.into_push_pull_output(),  // led on pb12
+        gpiob.pb14.into_push_pull_output(),  // led on pb14
+        gpiob.pb15.into_push_pull_output())  // led on pb15
+       };
+
+
+    // End of hal/MCU specific setup. Following should be generic code.
+
+
+    let (mut led1, mut led2, mut led3) = setup();
+
+
+    //works for delay on bluepill but not others
+    //use stm32f1xx_hal::timer::Timer;
+    // trigger an update every second
     // let mut timer = Timer::syst(cp.SYST, &clocks).start_count_down(1.hz());
     // /block!(timer.wait()).unwrap(); 
 
-    // Now clean up setup MCU/HAL specific stuff that should no longer be needed.
-    //drop(dp);     already moved
-    //drop(gpiob);  already moved
-    #[cfg(feature = "stm32f1xx")]
-    drop(rcc);
-
-    // start application code that should be generic
-
+    //cortex_m::asm::delay(500_000); this is in clock cycles
     let mut d  = AsmDelay::new(bitrate::U32BitrateExt::mhz(16));
     let on  : u32 = 1000;
     let off : u32 = 3000;
 
-    // Wait for the timer to trigger an update and change the state of the LED
+    // Wait for the timer to trigger an update and change the state of the LEDs
     loop {
-        //block!(timer.wait()).unwrap();  works on bluepill but need to be more specific about timer on other chips
-        //cortex_m::asm::delay(500_000); this is in clock cycles
         d.delay_ms(off);
         let _r = led1.set_high();
         let _r = led2.set_high();
         let _r = led3.set_high();
-        //block!(timer.wait()).unwrap();
+
         d.delay_ms(on);
         let _r = led1.set_low();
         let _r = led2.set_low();
