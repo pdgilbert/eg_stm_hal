@@ -16,7 +16,7 @@ extern crate panic_semihosting;
 extern crate panic_halt;
 
 use cortex_m_rt::entry;
-//use core::fmt::Write;  // for writeln
+//use core::fmt::Write;  // for writeln, but not supported by stm32f3xx_hal
 use cortex_m_semihosting::hprintln;
 use core::str::from_utf8;
 use nb::block;
@@ -66,8 +66,8 @@ fn main() -> ! {
     	// next consumes (moves) arguments other than clocks,  &mut rcc.apb2 and afio.
 	Serial::usart1(
     	    p.USART1,
-    	    (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),     //rx pa9, 
-	     gpioa.pa10),					     //tx pa10
+    	    (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),     //tx pa9
+	     gpioa.pa10),					     //rx pa10
     	    &mut afio.mapr,
     	    Config::default() .baudrate(9600.bps()),        //.stopbits(StopBits::STOP1
     	    clocks,
@@ -85,8 +85,8 @@ fn main() -> ! {
     	//let cnfg = 9600.bps();
     	Serial::usart1(
     	    p.USART1,
-    	    (gpioa.pa9.into_af7(&mut gpioa.moder, &mut gpioa.afrh),   //rx pa9
-	     gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)), //tx pa10
+    	    (gpioa.pa9.into_af7(&mut gpioa.moder, &mut gpioa.afrh),   //tx pa9
+	     gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)), //rx pa10
     	    9600.bps(),
     	    clocks,
     	    &mut rcc.apb2,
@@ -104,8 +104,8 @@ fn main() -> ! {
     	p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
     	Serial::usart1(
     	    p.USART1,
-    	    (gpioa.pa9.into_alternate_af7(),			      //rx pa9
-	     gpioa.pa10.into_alternate_af7()),  		      //tx pa10
+    	    (gpioa.pa9.into_alternate_af7(),			      //tx pa9
+	     gpioa.pa10.into_alternate_af7()),  		      //rx pa10
     	    Config::default() .baudrate(9600.bps()),
     	    clocks,
     	    ).unwrap().split()
@@ -123,8 +123,8 @@ fn main() -> ! {
     	p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
     	Serial::usart1(
     	    p.USART1,
-    	    (gpioa.pa9.into_alternate_af7(),			      //rx pa9
-	     gpioa.pa10.into_alternate_af7()),  		      //tx pa10
+    	    (gpioa.pa9.into_alternate_af7(),			      //tx pa9
+	     gpioa.pa10.into_alternate_af7()),  		      //rx pa10
     	    Config::default() .baudrate(9600.bps()),
     	    clocks,
     	    ).unwrap().split()
@@ -134,7 +134,7 @@ fn main() -> ! {
 
     let (mut tx1, mut rx1) = serial1_setup();
 
-    hprintln!("testwrite to console ...").unwrap();
+    hprintln!("test write to console ...").unwrap();
 
     for byte in b"\r\nconsole connect check.\r\n" { block!(tx1.write(*byte)).ok(); }
 

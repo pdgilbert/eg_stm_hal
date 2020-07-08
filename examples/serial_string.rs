@@ -123,6 +123,11 @@ fn main() -> ! {
     let rx3  = rx3.with_dma(channels.3);
 
 
+    //#[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
+    //let channels = p.DMA1.split(&mut rcc.ahb);
+    //let mut tx = txrx1.split().0.with_dma(channels.4);     //works on stm32f1xx_hal but not others
+    //let (_, tx) = tx.write(b"The quick brown fox").wait(); //works on stm32f1xx_hal but not others
+
     // stm32f3xx
 
     // stm32f303vct  alternate funtion modes see  

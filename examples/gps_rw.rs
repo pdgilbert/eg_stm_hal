@@ -79,8 +79,8 @@ fn main() -> ! {
     	// next consumes (moves) arguments other than clocks,  &mut rcc.apb2 and afio.
 	let (tx1, rx1) = Serial::usart1(
     	    p.USART1,
-    	    (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),     //rx pa9, 
-	     gpioa.pa10),					     //tx pa10
+    	    (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),     //tx pa9
+	     gpioa.pa10),					     //rx pa10
     	    &mut afio.mapr,
     	    Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1), //.parity_odd()
     	    clocks,
@@ -89,8 +89,8 @@ fn main() -> ! {
 
         let (tx2, rx2) = Serial::usart2(
             p.USART2,
-            (gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),     //rx pa2 
-             gpioa.pa3), 					     //tx pa3
+            (gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),     //tx pa2 
+             gpioa.pa3), 					     //rx pa3
             &mut afio.mapr,
             Config::default() .baudrate(9_600.bps()), 
             clocks,
@@ -111,7 +111,7 @@ fn main() -> ! {
         let mut gpioa = p.GPIOA.split(&mut rcc.ahb); 
         let (tx1, rx1)  = Serial::usart1(
             p.USART1,
-            (gpioa.pa9.into_af7( &mut gpioa.moder, &mut gpioa.afrh),   //rx pa9
+            (gpioa.pa9.into_af7( &mut gpioa.moder, &mut gpioa.afrh),   //tx pa9
 	     gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)),  //tx pb10
             9600.bps(),
             clocks,
@@ -120,8 +120,8 @@ fn main() -> ! {
 
         let (tx2, rx2) = Serial::usart2(
             p.USART2,
-            (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl),    //rx pa2
-             gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)),   //tx pa3
+            (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl),    //tx pa2
+             gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)),   //rx pa3
             9600.bps(),    // 115_200.bps(),
             clocks,
             &mut rcc.apb1,
@@ -139,8 +139,8 @@ fn main() -> ! {
         let gpioa = p.GPIOA.split();
         let (tx1, rx1) =  Serial::usart1(
            p.USART1,
-    	   (gpioa.pa9.into_alternate_af7(),            //rx pa9
-	    gpioa.pa10.into_alternate_af7()),          //tx pa10
+    	   (gpioa.pa9.into_alternate_af7(),            //tx pa9
+	    gpioa.pa10.into_alternate_af7()),          //rx pa10
     	   Config::default() .baudrate(9600.bps()),
     	   clocks
            ).unwrap().split(); 
@@ -149,8 +149,8 @@ fn main() -> ! {
 	//p.USART2.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
         let (tx2, rx2) = Serial::usart2(
            p.USART2,
-           (gpioa.pa2.into_alternate_af7(),            //rx pa2
-	    gpioa.pa3.into_alternate_af7()),           //tx pa3
+           (gpioa.pa2.into_alternate_af7(),            //tx pa2
+	    gpioa.pa3.into_alternate_af7()),           //rx pa3
            Config::default() .baudrate(9600.bps()), 
            clocks,
            ).unwrap().split();
@@ -168,16 +168,16 @@ fn main() -> ! {
         let gpioa = p.GPIOA.split();
         let (tx1, rx1) =  Serial::usart1(
            p.USART1,
-           (gpioa.pa9.into_alternate_af7(),            //rx pa9
-	    gpioa.pa10.into_alternate_af7()),          //tx pa10
+           (gpioa.pa9.into_alternate_af7(),            //tx pa9
+	    gpioa.pa10.into_alternate_af7()),          //rx pa10
     	   Config::default() .baudrate(9600.bps()),
     	   clocks
            ).unwrap().split(); 
 
         let (tx2, rx2) = Serial::usart2(
             p.USART2,
-            (gpioa.pa2.into_alternate_af7(),           //rx pa2
-	     gpioa.pa3.into_alternate_af7()),          //tx pa3
+            (gpioa.pa2.into_alternate_af7(),           //tx pa2
+	     gpioa.pa3.into_alternate_af7()),          //rx pa3
             Config::default() .baudrate(9600.bps()), 
             clocks,
             ).unwrap().split();

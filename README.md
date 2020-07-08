@@ -62,9 +62,9 @@ environments. Just the setup may change.)
 The overall Travis CI build status and the link for individual boards is given above.
 Testing if the code runs and does something resembling what it is supposed to do 
 requires hardware and is not as automatic as CI. 
-This is my summary as of March 2020. If you check the examples using one of these MCUs 
+This is my summary as of June 2020. If you check the examples using other MCUs 
 then please provide details 
-using [issues](https://github.com/pdgilbert/eg_stm_hal/issues) on this git project page.
+using [issues](https://github.com/pdgilbert/eg_stm_hal/issues) for this git project.
 
 |      HAL       | eg MCU    |   eg Board          |   Builds   |  Runs  |          Notes                             |
 | -------------- |:---------:|:-------------------:|:----------:|:------:| :----------------------------------------- |
@@ -74,8 +74,8 @@ using [issues](https://github.com/pdgilbert/eg_stm_hal/issues) on this git proje
 | stm32l1xx-hal  | stm32l100 | discovery-stm32l100 |   blink    |   no   | Hal CI tests fail. Code adjustments needed |
 | stm32l1xx-hal  | stm32l151 | heltec-lora-node151 |   blink    |   no   | Hal CI tests fail. Code adjustments needed |
 
-This project's examples depend on embedded_hal (https://docs.rs/embedded-hal/) and several stm32 HALs. 
-See [HALs on Github](https://github.com/stm32-rs) and on [Travis CI.](https://travis-ci.com/stm32-rs)
+This project's examples depend on [embedded_hal](https://docs.rs/embedded-hal/) and several stm32 HALs. 
+See [stm32 HALs on Github](https://github.com/stm32-rs) and on [Travis CI.](https://travis-ci.com/stm32-rs)
 
 |   HAL git                         |       HAL Travis CI  Status           | 
 |:---------------------------------:|:-------------------------------------:|
@@ -157,22 +157,23 @@ Following is the status of examples as of June 2020. Examples are run on a 'blue
 |  xxx                 | build |  run  | build |  run  | build |  run  | build |  run  | 
 |:--------------------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
 | blink                |  yes  | works |  yes  | works |  yes  | works |  yes  |       | 
-| echo_console_by_char |  yes  | works |  yes  |   4   |  yes  | works |  no   |       | 
-| echo_console_string  |  yes  |   5   |  8,9  |       |   9   |       |   9   |       | 
-| serial_char          |  yes  |   1   |  yes  |   3   |  yes  |   2   |  no   |       |
-| serial_string        |  yes  |   2   |   9   |       |   9   |       |   9   |       |
-| gps_rw_by_char       |  yes  | works |  yes  |   4   |  yes  |   6   |  no   |       |
-| gps_rw               |  yes  | works |  yes  |   6   |  yes  |   6   |  no   |       |
+| echo_console_by_char |  yes  | yes-5 |  yes  |   5   |  yes  | yes-5 |  no   |       | 
+| echo_console_string  |broken |   5   |  8,9  |       |   9   |       |   9   |       | 
+| serial_char          |  yes  | yes-1 |  yes  |   1   |  yes  | no-2  |  no   |       |
+| serial_string        |  yes  |  no-2 |   9   |       |   9   |       |   9   |       |
+| gps_rw_by_char       |  yes  | works |  yes  | works |  yes  | no-6  |  no   |       |
+| gps_rw               |  yes  | works |  yes  |  10   |  yes  | no-6  |  no   |       |
 
-1.  tx2 to rx3 works. tx3 to rx2 works sometimes but often fails unwrapping err value Overrun on receive.
+1.  tx2 to rx3 works. tx3 to rx2 works sometimes but sometimes fails unwrapping err value Overrun on receive.
 2.  Stalls waiting to receive. Possibly need thread to receive started before send?
 3.  Usart2 with Usart3 connection works both ways but jibberish written on console.
 4.  Gibberish written on console.
-5.  Works on bluepill as long a typing is slow.
-6.  Fails reading gps. 
+5.  Works as long a typing is slow.
+6.  Fails reading gps (does not return). 
 7.  Works once, repeat problems.
 8.  Writeln! macro missing from stm32f3xx ?
 9.  Uses dma buffering in stm32f1xx. Have not figured out how to do that with other HALs.
+10. Some lines miss begining.
 
 ## Building Examples
 
@@ -288,7 +289,14 @@ Info : stm32f1x.cpu: hardware has 6 breakpoints, 4 watchpoints
 ```
 
 Some of the other causes for the `in procedure 'ocd_bouncer'` can be that the board is not 
-properly powered up, or has some other boot loader pre-burned into it.
+properly powered up, or has some other boot loader pre-burned into it. (In the later case
+try booting once in "System Memory" mode, see 
+https://www.electronicshub.org/getting-started-with-stm32f103c8t6-blue-pill/.)
+The message `Warn : UNEXPECTED idcode: 0x...` seems to require editing the openocd cfg
+file which gets installed in various places, possibly 
+`/usr/share/openocd/scripts/target/stm32f1x.cfg`. Changing the CPUTAPID or change the
+line `swj_newdap ... -expected-id $_CPUTAPID` to `swj_newdap ... -expected-id 0` so the
+shop ID is ignored.
 
 Development boards I have tried:
 ```

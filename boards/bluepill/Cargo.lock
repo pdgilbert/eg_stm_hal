@@ -449,7 +449,7 @@ dependencies = [
 [[package]]
 name = "stm32f1xx-hal"
 version = "0.6.1"
-source = "git+https://github.com/stm32-rs/stm32f1xx-hal#4bbff64ed47049adf1d665cde0056692fac4918c"
+source = "git+https://github.com/stm32-rs/stm32f1xx-hal#d19a96c7c501f87154073d3e053106e76bb4473a"
 dependencies = [
  "as-slice 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "cast 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -502,7 +502,7 @@ dependencies = [
 [[package]]
 name = "stm32f4xx-hal"
 version = "0.8.3"
-source = "git+https://github.com/stm32-rs/stm32f4xx-hal#76a26de818385d63ab95d8a93d3a55e7d241824e"
+source = "git+https://github.com/stm32-rs/stm32f4xx-hal#44f2f01e711981e89d031b4331b541e07643094d"
 dependencies = [
  "bare-metal 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "cast 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
