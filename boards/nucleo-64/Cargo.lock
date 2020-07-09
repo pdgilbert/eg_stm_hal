@@ -172,7 +172,7 @@ dependencies = [
  "dht-sensor 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "dht11 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "either 1.5.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "embedded-hal 1.0.0-alpha.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "embedded-hal 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "enc28j60 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "heapless 0.4.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "m 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -206,14 +206,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "nb 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "void 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "embedded-hal"
-version = "1.0.0-alpha.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-dependencies = [
- "nb 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -628,7 +620,6 @@ dependencies = [
 "checksum dht11 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "fa82acd8985622297d3feb1e2bf1ce177aaa1d6518df69524110410d08c7fb06"
 "checksum either 1.5.3 (registry+https://github.com/rust-lang/crates.io-index)" = "bb1f6b1ce1c140482ea30ddd3335fc0024ac7ee112895426e0a629a6c20adfe3"
 "checksum embedded-hal 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)" = "fa998ce59ec9765d15216393af37a58961ddcefb14c753b4816ba2191d865fcb"
-"checksum embedded-hal 1.0.0-alpha.1 (registry+https://github.com/rust-lang/crates.io-index)" = "8a5f661e931005fe7709649150bb2774b68d8faf28b9969cb73442be34518f56"
 "checksum enc28j60 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "48c49dc5c4d6d372288d7300607ed3829f12104f1cb206730c49b3c9394106e1"
 "checksum generic-array 0.11.1 (registry+https://github.com/rust-lang/crates.io-index)" = "8107dafa78c80c848b71b60133954b4a58609a3a1a5f9af037ecc7f67280f369"
 "checksum generic-array 0.12.3 (registry+https://github.com/rust-lang/crates.io-index)" = "c68f0274ae0e023facc3c97b2e00f076be70e254bc851d972503b328db79b2ec"
