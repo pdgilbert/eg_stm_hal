@@ -158,7 +158,7 @@ Following is the status of examples as of June 2020. Examples are run on a 'blue
 |:--------------------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
 | blink                |  yes  | works |  yes  | works |  yes  | works |  yes  |       | 
 | echo_console_by_char |  yes  | yes-5 |  yes  |   5   |  yes  | yes-5 |  no   |       | 
-| echo_console_string  |broken |   5   |  8,9  |       |   9   |       |   9   |       | 
+| echo_console_string  |  yes  |   5   |  8,9  |       |   9   |       |   9   |       | 
 | serial_char          |  yes  | yes-1 |  yes  |   1   |  yes  | no-2  |  no   |       |
 | serial_string        |  yes  |  no-2 |   9   |       |   9   |       |   9   |       |
 | gps_rw_by_char       |  yes  | works |  yes  | works |  yes  | no-6  |  no   |       |

@@ -175,16 +175,7 @@ fn main() -> ! {
     //let (_, tx1) =  tx1.write(b"\r\nEnter 15 characters below. Repeat.\r\n").wait();
     //let tx1buf = tx1buf.1.write(b"\r\nEnter 15 characters below. Repeat.\r\n").wait();
 
-    rx1buf = rx1buf.1.read(rx1buf.0).wait();
-   
-    hprintln!("received {:?}", to_str(rx1buf.0)).unwrap();
-    writeln!(tx1, "{}", to_str(rx1buf.0)).unwrap();
-    //let (_, tx1) = tx1.write(rx1buf.0).wait();
-    //let mut x = rx1buf.0.clone();
-    //tx1buf = tx1buf.1.write(& mut x).wait();
-    //tx1buf = tx1buf.1.write(rx1buf.0).wait();
-
-    // cannot get loop to work with (buf, rx1), there seem to be circular problems
+    // cannot get loop to work with tuple (buf, rx1), there seem to be circular problems
     // with move/borrow/mut  but rx1buf structure works ...
 
     //each pass in loop waits for input of 15 chars typed in console
@@ -192,6 +183,7 @@ fn main() -> ! {
        rx1buf = rx1buf.1.read(rx1buf.0).wait();
        hprintln!("received {:?}", to_str(rx1buf.0)).unwrap();
        //tx1buf = tx1buf.1.write(rx1buf.0).wait();
-       writeln!(tx1, "{}", to_str(rx1buf.0)).unwrap();
+       //tx1.write(rx1buf.0).wait();
+       writeln!(tx1, "{}\r", to_str(rx1buf.0)).unwrap();
        }
 }
