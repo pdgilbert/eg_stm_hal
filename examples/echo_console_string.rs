@@ -1,5 +1,5 @@
-//! Serial DMA RX transfer. Read 15 chars input from console on USART1, output to semihost. Repeat.
-//! There is no echo on the console and it does not handle fast typing.
+//! Serial DMA RX transfer. Read 15 chars input from console on USART1, echo back to console, 
+//!  and output to semihost. Repeat.
 //! 
 //! See examples/serial_char.rs for notes about connecting usart1 to 
 //!   serial ttl-usb converter on computer for console output.
@@ -58,7 +58,7 @@ fn main() -> ! {
     //see serial_char.rs and  echo_console_by_char.rs for additional comments.
     
     #[cfg(feature = "stm32f1xx")]
-    fn serial1_setup() ->  (Tx<USART1>, RxDma<Rx<USART1>, C5>)  {
+    fn setup() ->  (Tx<USART1>, RxDma<Rx<USART1>, C5>)  {
        
        // with TxDma return    TxDma<Tx<USART1>, C4>
        let p = Peripherals::take().unwrap();
@@ -88,7 +88,7 @@ fn main() -> ! {
 
 
     #[cfg(feature = "stm32f3xx")]
-    fn serial1_setup() ->  (Tx<USART1>, Rx<USART1>)  {
+    fn setup() ->  (Tx<USART1>, Rx<USART1>)  {
 
        let p = Peripherals::take().unwrap();
        let mut rcc = p.RCC.constrain();  
@@ -110,7 +110,7 @@ fn main() -> ! {
 
 
     #[cfg(feature = "stm32f4xx")]
-    fn serial1_setup() ->  (Tx<USART1>, Rx<USART1>)  {
+    fn setup() ->  (Tx<USART1>, Rx<USART1>)  {
 
        let p = Peripherals::take().unwrap();
        let mut rcc = p.RCC.constrain();  
@@ -132,7 +132,7 @@ fn main() -> ! {
 
 
     #[cfg(feature = "stm32l1xx")]
-    fn serial1_setup() ->  (Tx<USART1>, Rx<USART1>)  {
+    fn setup() ->  (Tx<USART1>, Rx<USART1>)  {
 
        let p = Peripherals::take().unwrap();
        let mut rcc = p.RCC.constrain();  
@@ -154,7 +154,7 @@ fn main() -> ! {
 
     // End of hal/MCU specific setup. Following should be generic code.
 
-    let (mut tx1, rx1) = serial1_setup();
+    let (mut tx1, rx1) = setup();
 
     let mut rx1buf = (singleton!(: [u8; 15] = [0; 15]).unwrap(), rx1);
     //let mut tx1buf = (singleton!(: [u8; 15] = [0; 15]).unwrap(), tx1);

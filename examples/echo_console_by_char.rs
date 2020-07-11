@@ -58,10 +58,10 @@ use stm32l1xx_hal::{prelude::*,
 fn main() -> ! {
 
     // A simple abstraction for returning the result of Serial::usart1()  
-    //  without  .split() inside serial1_setup()  still defeats me. 
+    //  without  .split() inside setup()  still defeats me. 
 
     #[cfg(feature = "stm32f1xx")]
-    fn serial1_setup() ->  (Tx<USART1>, Rx<USART1>)  {
+    fn setup() ->  (Tx<USART1>, Rx<USART1>)  {
         let p = Peripherals::take().unwrap();
     	let mut rcc = p.RCC.constrain();  
 	let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr); 
@@ -81,7 +81,7 @@ fn main() -> ! {
 
 
     #[cfg(feature = "stm32f3xx")]
-    	fn serial1_setup() -> (Tx<USART1>, Rx<USART1>) {
+    	fn setup() -> (Tx<USART1>, Rx<USART1>) {
         let p = Peripherals::take().unwrap();
     	let mut rcc = p.RCC.constrain();
     	let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
@@ -100,7 +100,7 @@ fn main() -> ! {
 
 
     #[cfg(feature = "stm32f4xx")]
-    fn serial1_setup() -> (Tx<USART1>, Rx<USART1>) {
+    fn setup() -> (Tx<USART1>, Rx<USART1>) {
         let p = Peripherals::take().unwrap();
     	let rcc = p.RCC.constrain();
     	let clocks = rcc.cfgr.freeze();
@@ -118,7 +118,7 @@ fn main() -> ! {
 
 
     #[cfg(feature = "stm32l1xx")]
-    fn serial1_setup() -> (Tx<USART1>, Rx<USART1>) {
+    fn setup() -> (Tx<USART1>, Rx<USART1>) {
         let p = Peripherals::take().unwrap();
     	let rcc = p.RCC.constrain();
     	let clocks = rcc.cfgr.freeze();
@@ -136,7 +136,7 @@ fn main() -> ! {
 
     // End of hal/MCU specific setup. Following should be generic code.
 
-    let (mut tx1, mut rx1) = serial1_setup();
+    let (mut tx1, mut rx1) = setup();
 
     hprintln!("test write to console ...").unwrap();
 

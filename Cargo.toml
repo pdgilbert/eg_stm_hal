@@ -52,6 +52,24 @@ path = "examples/gps_rw_by_char.rs"
 name = "gps_rw"
 path = "examples/gps_rw.rs"
 
+[[example]]
+name = "temperature"
+path = "examples/temperature.rs"
+
+
+[[example]]
+name = "dht"
+path = "examples/dht.rs"
+
+[[example]]
+name = "dht11"
+path = "examples/dht11.rs"
+
+[[example]]
+name = "ads1015-display"
+path = "examples/ads1015-display.rs"
+
+
 [dependencies]
 cortex-m = "0.6.0"
 nb = "0.1.2"
@@ -61,14 +79,15 @@ cortex-m-rt = "0.6.8"
 #as-slice = "0.1"
 panic-halt = "0.2.0"
 
+# for example  ads1015-display
 dht11 = "0.3.1"
 dht-sensor = "0.1.1"
 
-## need rust 1.40.0 for #[non_exhaustive] 
-#embedded-graphics = "0.4.9" # "0.6.2" # for ads1015-adc-display
-#ssd1306 = "0.2.6" # "0.3.1"  # for ads1015-adc-display
-#ads1x1x = "0.2"  # for ads1015-adc-display
-#shared-bus = { version = "0.1.4", features = ["cortexm"] }# for ads1015-adc-display
+# for  ads1015-display example.    need rust 1.40.0 for #[non_exhaustive] 
+embedded-graphics = "0.4.4" # "0.4.9"  "0.6.2" 
+ssd1306 = "0.2.6" # "0.3.1" 
+ads1x1x = "0.2" 
+shared-bus = { version = "0.1.4", features = ["cortexm"] }
 
 stm32f1 = "0.11.0"
 stm32f3 = "0.11"
