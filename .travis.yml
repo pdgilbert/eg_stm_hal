@@ -64,3 +64,9 @@ script:
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  serial_string
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  gps_rw_by_char
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  gps_rw
+
+  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  temperature
+
+  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  dht
+  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  dht11
+  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  ads1015-display
