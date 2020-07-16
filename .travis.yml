@@ -57,6 +57,7 @@ script:
   # verify this is already in boards/${BOARD} from install
   - echo  PWD= ${PWD}
   - echo BOARD= ${BOARD} TARGET= ${TARGET}  HAL= ${HAL} MCU= ${MCU}
+  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  blink
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  blink3
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  echo_console_by_char
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  echo_console_string
