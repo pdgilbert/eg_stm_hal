@@ -47,10 +47,37 @@ use stm32f4xx_hal::{prelude::*,
 
 
 
+//#![feature(extern_crate_item_prelude)]
+//extern crate sx127x_lora;
+//extern crate linux_embedded_hal as hal;
+
+//use hal::spidev::{self, SpidevOptions};
+//use hal::{Pin, Spidev};
+//use hal::sysfs_gpio::Direction;
+//use hal::Delay;
+//
+//const LORA_CS_PIN: u64 = 8;
+//const LORA_RESET_PIN: u64 = 21;
+
 const FREQUENCY: i64 = 915;
 
 #[entry]
 fn main() -> !{
+    //    let mut spi = Spidev::open("/dev/spidev0.0").unwrap();
+    //    let options = SpidevOptions::new()
+    //        .bits_per_word(8)
+    //        .max_speed_hz(20_000)
+    //        .mode(spidev::SPI_MODE_0)
+    //        .build();
+    //    spi.configure(&options).unwrap();
+    //
+    //    let cs = Pin::new(LORA_CS_PIN);
+    //    cs.export().unwrap();
+    //    cs.set_direction(Direction::Out).unwrap();
+    //
+    //    let reset = Pin::new(LORA_RESET_PIN);
+    //    reset.export().unwrap();
+    //    reset.set_direction(Direction::Out).unwrap();
 
     #[cfg(feature = "stm32f1xx")]
     fn setup() ->  sx127x_lora::LoRa< Spi<SPI1,  Spi1NoRemap,
@@ -86,8 +113,10 @@ fn main() -> !{
                               gpiob.pb14.into_push_pull_output(&mut gpiob.crh),     //  cs   on PB14
                               gpiob.pb13.into_push_pull_output(&mut gpiob.crh),     // reset on PB13
                               FREQUENCY, 
-                              Delay::new(cp.SYST, clocks) ).unwrap()  // delay
+                              Delay::new(cp.SYST, clocks) ).unwrap()                // delay
+			      // .expect("Failed to communicate with radio module!")
        };
+
 
     #[cfg(feature = "stm32f3xx")]
     fn setup() ->  sx127x_lora::LoRa<Spi<SPI1, (PA5<AF5>, PA6<AF5>, PA7<AF5>)>,
@@ -163,26 +192,29 @@ fn main() -> !{
        };
 
 
-
     // End of hal/MCU specific setup. Following should be generic code.
 
 
     let mut lora =  setup();
-    
-    loop {
-        let poll = lora.poll_irq(Some(30)); //30 Second timeout
-        match poll {
-            Ok(size) =>{
-                hprintln!("New Packet with size {} and RSSI: {}", size, lora.get_packet_rssi().unwrap()).unwrap();
-                let buffer = lora.read_packet().unwrap(); // Received buffer. NOTE: 255 bytes are always returned
-                hprint!("with Payload: ").unwrap();
-                for i in 0..size{
-                    hprint!("{}", buffer[i] as char).unwrap();
-                }
-                hprintln!().unwrap();
-            },
-            Err(_error) => hprintln!("Timeout").unwrap(),
-        }
+
+    //    let mut lora = sx127x_lora::LoRa::new(
+    //        spi, cs, reset,  FREQUENCY, Delay)
+    //        .expect("Failed to communicate with radio module!");
+
+    lora.set_tx_power(17,1).unwrap(); //Using PA_BOOST. See your board for correct pin.
+
+    let message = "Hello, world!";
+    let mut buffer = [0;255];
+    for (i,c) in message.chars().enumerate() {
+        buffer[i] = c as u8;
     }
 
+    let transmit = lora.transmit_payload(buffer, message.len());
+    match transmit {
+    	Ok(_size)   => hprintln!("Sent packet: {}", message).unwrap(),
+    	//Ok(size) => hprintln!("Sent packet with size: {}", size).unwrap(),
+    	Err(_error) => hprintln!("Error").unwrap(),
+    };
+
+    loop { };
 }
