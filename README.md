@@ -130,7 +130,8 @@ See [Running Examples](#running-examples) for more details.
 
 | xxx                  | notes |   Description                                                  |
 | -------------------- |:-----:|:-------------------------------------------------------------- |
-| blink3               |   1   | Blinks off-board LEDs attached to  pb 13,14,15                 |
+| blink                |   1   | Blink on-board LED                                             |
+| blink3               |   1   | Blink off-board LEDs attached to  pb 13,14,15                  |
 | echo_console_by_char |   2   | Echo console input, char by char,  + semihost output           |
 | echo_console_string  |       | Read 15 chars input from console, output to semihost, repeat   |
 | serial_char          |       | Single char between usarts 2 and 3, console and semihost output|
@@ -156,7 +157,8 @@ Following is the status of examples as of June 2020. Examples are run on a 'blue
 
 |  xxx                 | build |  run  | build |  run  | build |  run  | build |  run  | 
 |:--------------------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
-| blink3               |  yes  | works |  yes  | works |  yes  | works |  yes  |       | 
+| blink                |  yes  |works-0|  yes  | works |  yes  | works |  yes  | works | 
+| blink3               |  yes  |works-0|  yes  | works |  yes  | works |  yes  | works | 
 | echo_console_by_char |  yes  | yes-5 |  yes  |   5   |  yes  | yes-5 |  no   |       | 
 | echo_console_string  |  yes  |   5   |  8,9  |       |   9   |       |   9   |       | 
 | serial_char          |  yes  | yes-1 |  yes  |   1   |  yes  | no-2  |  no   |       |
@@ -164,6 +166,7 @@ Following is the status of examples as of June 2020. Examples are run on a 'blue
 | gps_rw_by_char       |  yes  | works |  yes  | works |  yes  | no-6  |  no   |       |
 | gps_rw               |  yes  | works |  yes  |  10   |  yes  | no-6  |  no   |       |
 
+0.  set_high / set_low seem reversed on blupill.
 1.  tx2 to rx3 works. tx3 to rx2 works sometimes but sometimes fails unwrapping err value Overrun on receive.
 2.  Stalls waiting to receive. Possibly need thread to receive started before send?
 3.  Usart2 with Usart3 connection works both ways but jibberish written on console.
@@ -324,7 +327,7 @@ the blue pill and other things attached.
 Here are settings I have used
 ```
   export  PROC=stm32f1x  # bluepill
-  export  PROC=stm32l1x  # MCU on Discovery STM32L100
+  export  PROC=stm32l1   # MCU on Discovery STM32L100
   export  PROC=stm32f3x  # MCU on Discovery STM32F303
 ```
 and
