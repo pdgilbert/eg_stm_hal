@@ -71,8 +71,8 @@ using [issues](https://github.com/pdgilbert/eg_stm_hal/issues) for this git proj
 | stm32f1xx-hal  | stm32f103 |      bluepill       |    yes     |  many  | Problems using serial in some examples     |
 | stm32f3xx-hal  | stm32f303 | discovery-stm32f303 |   some     |  some  | Hal differences.  Code adjustments needed  |
 | stm32f4xx-hal  | stm32f411 |      nucleo-64      |   some     |  some  | Hal differences.  Code adjustments needed  |
-| stm32l1xx-hal  | stm32l100 | discovery-stm32l100 |   blink    |   no   | Hal CI tests fail. Code adjustments needed |
-| stm32l1xx-hal  | stm32l151 | heltec-lora-node151 |   blink    |   no   | Hal CI tests fail. Code adjustments needed |
+| stm32l1xx-hal  | stm32l100 | discovery-stm32l100 |   blink3   |   no   | Hal CI tests fail. Code adjustments needed |
+| stm32l1xx-hal  | stm32l151 | heltec-lora-node151 |   blink3   |   no   | Hal CI tests fail. Code adjustments needed |
 
 This project's examples depend on [embedded_hal](https://docs.rs/embedded-hal/) and several stm32 HALs. 
 See [stm32 HALs on Github](https://github.com/stm32-rs) and on [Travis CI.](https://travis-ci.com/stm32-rs)
@@ -130,7 +130,7 @@ See [Running Examples](#running-examples) for more details.
 
 | xxx                  | notes |   Description                                                  |
 | -------------------- |:-----:|:-------------------------------------------------------------- |
-| blink                |   1   | Blinks off-board LEDs attached to  pb 13,14,15                 |
+| blink3               |   1   | Blinks off-board LEDs attached to  pb 13,14,15                 |
 | echo_console_by_char |   2   | Echo console input, char by char,  + semihost output           |
 | echo_console_string  |       | Read 15 chars input from console, output to semihost, repeat   |
 | serial_char          |       | Single char between usarts 2 and 3, console and semihost output|
@@ -140,7 +140,7 @@ See [Running Examples](#running-examples) for more details.
 
 
 0.  Using the git versions of HALs (in June 2020 much is changing and release in crates.io is old). 
-1.  Blink does not blink when stepping in gdb, use continue.
+1.  blink3 does not blink when stepping in gdb, use continue.
 2.  With local echo on in console the characters are doubled, `<cr>` adds a single `<lf>`.
      Without local echo there is no `<lf>`. There is trouble if you type too fast.
 4.  Ublox GPS by default uses 9600bps, odd Parity, 1 stop bit (minicom 8-N-1). 
@@ -156,7 +156,7 @@ Following is the status of examples as of June 2020. Examples are run on a 'blue
 
 |  xxx                 | build |  run  | build |  run  | build |  run  | build |  run  | 
 |:--------------------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
-| blink                |  yes  | works |  yes  | works |  yes  | works |  yes  |       | 
+| blink3               |  yes  | works |  yes  | works |  yes  | works |  yes  |       | 
 | echo_console_by_char |  yes  | yes-5 |  yes  |   5   |  yes  | yes-5 |  no   |       | 
 | echo_console_string  |  yes  |   5   |  8,9  |       |   9   |       |   9   |       | 
 | serial_char          |  yes  | yes-1 |  yes  |   1   |  yes  | no-2  |  no   |       |

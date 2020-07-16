@@ -29,6 +29,10 @@ name = "blink"
 path = "examples/blink.rs"
 
 [[example]]
+name = "blink3"
+path = "examples/blink3.rs"
+
+[[example]]
 name = "echo_console_by_char"
 path = "examples/echo_console_by_char.rs"
 
