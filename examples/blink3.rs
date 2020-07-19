@@ -60,6 +60,11 @@ use stm32l1xx_hal::{prelude::*,
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use embedded_hal::digital::v2::OutputPin;
 
+pub trait LED {
+   fn  on(&mut self)  -> () ;
+   fn off(&mut self)  -> () ;
+}
+
 
 #[entry]
 fn main() -> ! {
@@ -77,6 +82,22 @@ fn main() -> ! {
        // let mut timer = Timer::syst(cp.SYST, &clocks).start_count_down(1.hz());
        // /block!(timer.wait()).unwrap(); 
 
+       // all leds wire with pin as source, cathode connect to ground though a resistor.
+       impl LED for PB13<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           };
+
+       impl LED for PB14<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           };
+
+       impl LED for PB15<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           };
+
 
        // return (led1, led2, led3, delay)
        (gpiob.pb13.into_push_pull_output(&mut gpiob.crh),  // led on pb13
@@ -93,6 +114,23 @@ fn main() -> ! {
        let mut rcc   = dp.RCC.constrain();
        let mut gpiob = dp.GPIOB.split(&mut rcc.ahb);
 
+       // all leds wire with pin as source, cathode connect to ground though a resistor.
+       impl LED for PB13<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           };
+
+       impl LED for PB14<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           };
+
+       impl LED for PB15<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           };
+
+
        // return (led1, led2, led3, delay)
        (gpiob.pb13.into_push_pull_output(&mut gpiob.moder, &mut gpiob.otyper), //led on pb13
         gpiob.pb14.into_push_pull_output(&mut gpiob.moder, &mut gpiob.otyper), //led on pb14
@@ -106,6 +144,23 @@ fn main() -> ! {
        let dp    = Peripherals::take().unwrap();
        let gpiob = dp.GPIOB.split();
 
+       // all leds wire with pin as source, cathode connect to ground though a resistor.
+       impl LED for PB13<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           };
+
+       impl LED for PB14<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           };
+
+       impl LED for PB15<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           };
+
+
        // return (led1, led2, led3, delay)
        (gpiob.pb13.into_push_pull_output(),  // led on pb13
         gpiob.pb14.into_push_pull_output(),  // led on pb14
@@ -118,6 +173,23 @@ fn main() -> ! {
 
        let dp    = Peripherals::take().unwrap();
        let gpiob = dp.GPIOB.split();
+
+       // all leds wire with pin as source, cathode connect to ground though a resistor.
+       impl LED for PB13<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           };
+
+       impl LED for PB14<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           };
+
+       impl LED for PB15<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           };
+
 
        // return (led1, led2, led3, delay)
        (gpiob.pb13.into_push_pull_output(),  // led on pb13
@@ -137,14 +209,14 @@ fn main() -> ! {
 
     // Wait for the timer to trigger an update and change the state of the LEDs
     loop {
-        delay.delay_ms(off);
-        let _r = led1.set_high();
-        let _r = led2.set_high();
-        let _r = led3.set_high();
-
+        let _r = led1.on();
+        let _r = led2.on();
+        let _r = led3.on();
         delay.delay_ms(on);
-        let _r = led1.set_low();
-        let _r = led2.set_low();
-        let _r = led3.set_low();
+
+        let _r = led1.off();
+        let _r = led2.off();
+        let _r = led3.off();
+        delay.delay_ms(off);
     }
 }

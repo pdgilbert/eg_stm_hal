@@ -157,8 +157,8 @@ Following is the status of examples as of June 2020. Examples are run on a 'blue
 
 |  xxx                 | build |  run  | build |  run  | build |  run  | build |  run  | 
 |:--------------------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
-| blink                |  yes  |works-0|  yes  | works |  yes  | works |  yes  | works | 
-| blink3               |  yes  |works-0|  yes  | works |  yes  | works |  yes  | works | 
+| blink                |  yes  | works |  yes  | works |  yes  | works |  yes  | works | 
+| blink3               |  yes  | works |  yes  | works |  yes  | works |  yes  | works | 
 | echo_console_by_char |  yes  | yes-5 |  yes  |   5   |  yes  | yes-5 |  no   |       | 
 | echo_console_string  |  yes  |   5   |  8,9  |       |   9   |       |   9   |       | 
 | serial_char          |  yes  | yes-1 |  yes  |   1   |  yes  | no-2  |  no   |       |
@@ -166,7 +166,6 @@ Following is the status of examples as of June 2020. Examples are run on a 'blue
 | gps_rw_by_char       |  yes  | works |  yes  | works |  yes  | no-6  |  no   |       |
 | gps_rw               |  yes  | works |  yes  |  10   |  yes  | no-6  |  no   |       |
 
-0.  set_high / set_low seem reversed on blupill.
 1.  tx2 to rx3 works. tx3 to rx2 works sometimes but sometimes fails unwrapping err value Overrun on receive.
 2.  Stalls waiting to receive. Possibly need thread to receive started before send?
 3.  Usart2 with Usart3 connection works both ways but jibberish written on console.
