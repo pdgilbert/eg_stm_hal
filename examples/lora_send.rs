@@ -20,7 +20,7 @@ use stm32f1xx_hal::{prelude::*,
                     spi::{Spi, Spi1NoRemap},
                     delay::Delay,
 		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, Input, Floating,  
-                           gpiob::{PB13, PB14}, Output, PushPull},
+                           gpioa::{PA0, PA1}, Output, PushPull},
 		    device::SPI1,
 		    }; 
 
@@ -30,7 +30,7 @@ use stm32f3xx_hal::{prelude::*,
                     spi::{Spi},
                     delay::Delay,
 		    gpio::{gpioa::{PA5, PA6, PA7}, AF5,  
-                           gpiob::{PB13, PB14}, Output, PushPull},
+                           gpioa::{PA0, PA1}, Output, PushPull},
 		    stm32::SPI1,
 		    };
 
@@ -40,7 +40,7 @@ use stm32f4xx_hal::{prelude::*,
                     spi::{Spi},
                     delay::Delay,
 		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5,  
-                           gpiob::{PB13, PB14}, Output, PushPull},
+                           gpioa::{PA0, PA1}, Output, PushPull},
                     time::MegaHertz,
 		    pac::SPI1,
 		    }; 
@@ -82,7 +82,7 @@ fn main() -> !{
     #[cfg(feature = "stm32f1xx")]
     fn setup() ->  sx127x_lora::LoRa< Spi<SPI1,  Spi1NoRemap,
                          (PA5<Alternate<PushPull>>, PA6<Input<Floating>>, PA7<Alternate<PushPull>>)>,
-                      PB14<Output<PushPull>>,  PB13<Output<PushPull>>, Delay> {
+                      PA1<Output<PushPull>>,  PA0<Output<PushPull>>, Delay> {
 
        let cp = cortex_m::Peripherals::take().unwrap();
        let p  = Peripherals::take().unwrap();
@@ -92,7 +92,8 @@ fn main() -> !{
        
        let mut afio = p.AFIO.constrain(&mut rcc.apb2);
        let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
-       
+       //let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
+    
        let spi = Spi::spi1(
            p.SPI1,
            (gpioa.pa5.into_alternate_push_pull(&mut gpioa.crl),  //   sck   on PA5
@@ -106,12 +107,11 @@ fn main() -> !{
            &mut rcc.apb2,
            );
 
-       let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
      
        // return LoRa object
        sx127x_lora::LoRa::new(spi, 
-                              gpiob.pb14.into_push_pull_output(&mut gpiob.crh),     //  cs   on PB14
-                              gpiob.pb13.into_push_pull_output(&mut gpiob.crh),     // reset on PB13
+                              gpioa.pa1.into_push_pull_output(&mut gpioa.crl),     //  cs   on PA1
+                              gpioa.pa0.into_push_pull_output(&mut gpioa.crl),     // reset on PA0
                               FREQUENCY, 
                               Delay::new(cp.SYST, clocks) ).unwrap()                // delay
 			      // .expect("Failed to communicate with radio module!")
@@ -120,8 +120,8 @@ fn main() -> !{
 
     #[cfg(feature = "stm32f3xx")]
     fn setup() ->  sx127x_lora::LoRa<Spi<SPI1, (PA5<AF5>, PA6<AF5>, PA7<AF5>)>,
-                                     PB14<Output<PushPull>>, 
-                                     PB13<Output<PushPull>>, 
+                                     PA1<Output<PushPull>>, 
+                                     PA0<Output<PushPull>>, 
                                      Delay> {
        
        let cp = cortex_m::Peripherals::take().unwrap();
@@ -131,7 +131,7 @@ fn main() -> !{
        let clocks = rcc.cfgr.sysclk(64.mhz()).pclk1(32.mhz()).freeze(&mut p.FLASH.constrain().acr);
        
        let mut gpioa = p.GPIOA.split(&mut rcc.ahb);
-       let mut gpiob = p.GPIOB.split(&mut rcc.ahb);
+       //let mut gpiob = p.GPIOB.split(&mut rcc.ahb);
 
        let spi = Spi::spi1(
            p.SPI1,
@@ -147,8 +147,8 @@ fn main() -> !{
        
        // return LoRa object
        sx127x_lora::LoRa::new(spi, 
-                          gpiob.pb14.into_push_pull_output(&mut gpiob.moder, &mut gpiob.otyper), //  cs  on PB14
-                          gpiob.pb13.into_push_pull_output(&mut gpiob.moder, &mut gpiob.otyper), //reset on PB13
+                          gpioa.pa1.into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper), //  cs  on PA1
+                          gpioa.pa0.into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper), //reset on PA0
                           FREQUENCY, 
                           Delay::new(cp.SYST, clocks) ).unwrap()                                 // delay
        };
@@ -156,8 +156,8 @@ fn main() -> !{
 
     #[cfg(feature = "stm32f4xx")]
     fn setup() ->  sx127x_lora::LoRa<Spi<SPI1, (PA5<Alternate<AF5>>, PA6<Alternate<AF5>>, PA7<Alternate<AF5>>)>,
-                                     PB14<Output<PushPull>>, 
-                                     PB13<Output<PushPull>>, 
+                                     PA1<Output<PushPull>>, 
+                                     PA0<Output<PushPull>>, 
                                      Delay> {
 
        let cp = cortex_m::Peripherals::take().unwrap();
@@ -167,7 +167,7 @@ fn main() -> !{
        let clocks = rcc.cfgr.sysclk(64.mhz()).pclk1(32.mhz()).freeze();
        
        let gpioa = p.GPIOA.split();
-       let gpiob = p.GPIOB.split();
+       //let gpiob = p.GPIOB.split();
 
        let spi = Spi::spi1(
            p.SPI1,
@@ -185,8 +185,8 @@ fn main() -> !{
        
        // return LoRa object
        sx127x_lora::LoRa::new(spi, 
-                              gpiob.pb14.into_push_pull_output(),     //  cs   on PB14
-                              gpiob.pb13.into_push_pull_output(),     // reset on PB13
+                              gpioa.pa1.into_push_pull_output(),     //  cs   on PA1
+                              gpioa.pa0.into_push_pull_output(),     // reset on PA0
                               FREQUENCY, 
                               Delay::new(cp.SYST, clocks) ).unwrap()  // delay
        };
