@@ -73,6 +73,14 @@ path = "examples/dht11.rs"
 name = "ads1015-display"
 path = "examples/ads1015-display.rs"
 
+[[example]]
+name = "lora_send"
+path = "examples/lora_send.rs"
+
+[[example]]
+name = "lora_receive"
+path = "examples/lora_receive.rs"
+
 
 [dependencies]
 cortex-m = "0.6.0"
@@ -93,13 +101,15 @@ ssd1306 = "0.2.6" # "0.3.1"
 ads1x1x = "0.2" 
 shared-bus = { version = "0.1.4", features = ["cortexm"] }
 
-# for LoRa 
-sx127x_lora = "0.3.1"
-
 stm32f1 = "0.11.0"
 stm32f3 = "0.11"
 stm32f4 = "0.11"
 stm32l1 = "0.5.0"
+
+[dependencies.sx127x_lora]
+#git = "https://github.com/mvniekerk/sx127x_lora"
+version = "0.3.1"
+#optional = true
 
 #[dependencies.dht11]
 #git = "https://github.com/plorefice/dht11-rs"
