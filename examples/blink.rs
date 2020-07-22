@@ -4,7 +4,7 @@
 //! stm32f1xx below uses PC13  which is onboard green LED on Bluepill.
 //! stm32f3xx below uses PE15  which is onboard green LD6 (West) LED on STM32F303 Discovery kit.
 //! stm32f4xx below uses PA5   which is onboard green LD2  LED on STM32F411RET6 Nucleo-64 board,
-//!                              but can be configures to PB13.
+//!                              but can be configured to PB13.
 //! stm32l1xx below uses PB6   On some STM32L1.. Discovery boards there are onboard LD3 and LD4 LEDs on PB7 
 //!                            and PB6 but mine are defective and so tested with off board LED on PB6.
 //! 

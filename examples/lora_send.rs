@@ -1,3 +1,13 @@
+//   Using  sck, miso, mosi, cs, and reset.
+//   See hardware sections below for pin setup.
+//   Not yet using D00, D01, D02, D03
+
+//DIO0  triggers RxDone/TxDone status.
+//DIO1  triggers RxTimeout and other errors status.
+//MOSI, MISO, SCLK for SPI communication. 
+//NSS is the chip select (CS) signal. 
+//REST is reset.
+
 #![no_std]
 #![no_main]
 
@@ -11,6 +21,7 @@ extern crate panic_halt;
 use cortex_m_rt::entry;
 use cortex_m_semihosting::*;
 //use asm_delay::{ AsmDelay, bitrate, };
+//use cortex_m::asm;  //for breakpoint
 
 use sx127x_lora;
 
@@ -108,13 +119,25 @@ fn main() -> !{
            );
 
      
-       // return LoRa object
-       sx127x_lora::LoRa::new(spi, 
+       let lora = sx127x_lora::LoRa::new(spi, 
                               gpioa.pa1.into_push_pull_output(&mut gpioa.crl),     //  cs   on PA1
                               gpioa.pa0.into_push_pull_output(&mut gpioa.crl),     // reset on PA0
                               FREQUENCY, 
-                              Delay::new(cp.SYST, clocks) ).unwrap()                // delay
+                              Delay::new(cp.SYST, clocks) );                       // delay
 			      // .expect("Failed to communicate with radio module!")
+       
+       let lora =  lora.unwrap();
+
+       //let mut lora =  match lora {
+    	//  Ok(v)   => v,
+    	//  Err(error) => {hprintln!("Setup Error: {:?}", error);
+	//                 asm::bkpt();
+	//                 //panic();
+	//                 }
+        //  };
+
+       // return LoRa object
+       lora
        };
 
 

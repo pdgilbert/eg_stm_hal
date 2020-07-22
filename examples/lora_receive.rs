@@ -2,6 +2,12 @@
 //   See hardware sections below for pin setup.
 //   Not yet using D00, D01, D02, D03
 
+//DIO0  triggers RxDone/TxDone status.
+//DIO1  triggers RxTimeout and other errors status.
+//MOSI, MISO, SCLK for SPI communication. 
+//NSS is the chip select (CS) signal. 
+//REST is reset.
+
 #![no_std]
 #![no_main]
 

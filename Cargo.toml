@@ -108,6 +108,7 @@ stm32l1 = "0.5.0"
 
 [dependencies.sx127x_lora]
 #git = "https://github.com/mvniekerk/sx127x_lora"
+#features = ["version_0x12"]
 version = "0.3.1"
 #optional = true
 
