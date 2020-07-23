@@ -299,8 +299,8 @@ https://www.electronicshub.org/getting-started-with-stm32f103c8t6-blue-pill/.)
 The message `Warn : UNEXPECTED idcode: 0x...` seems to require editing the openocd cfg
 file which gets installed in various places, possibly 
 `/usr/share/openocd/scripts/target/stm32f1x.cfg`. Changing the CPUTAPID or change the
-line `swj_newdap ... -expected-id $_CPUTAPID` to `swj_newdap ... -expected-id 0` so the
-shop ID is ignored.
+line `swj_newdap ... -expected-id $_CPUTAPID` to `swj_newdap ... -expected-id 0` so that
+CPUTAID is ignored.
 
 Development boards I have tried:
 ```

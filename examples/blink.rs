@@ -138,7 +138,7 @@ fn main() -> ! {
            };
 
        // return tuple  (led, delay)
-       (gpioa.pc13.into_push_pull_output(),                        // led on pc13 with on/off
+       (gpioc.pc13.into_push_pull_output(),                        // led on pc13 with on/off
         AsmDelay::new(bitrate::U32BitrateExt::mhz(32)) )           // delay
        };
 
