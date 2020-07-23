@@ -39,6 +39,12 @@ matrix:
         - name: "nucleo-64"
           env: HAL="stm32f4xx"  MCU="stm32f411"  TARGET="thumbv7em-none-eabihf"  BOARD="nucleo-64"
 
+        - name: "blackpill-stm32f411"
+          env: HAL="stm32f4xx"  MCU="stm32f411"  TARGET="thumbv7em-none-eabihf"  BOARD="blackpill-stm32f411"
+
+        - name: "blackpill-stm32f401"
+          env: HAL="stm32f4xx"  MCU="stm32f401"  TARGET="thumbv7em-none-eabihf"  BOARD="blackpill-stm32f401"
+
         - name: "discovery-stm32l100"
           env: HAL="stm32l1xx"  MCU="stm32l100"  TARGET="thumbv7m-none-eabi"     BOARD="discovery-stm32l100"
 

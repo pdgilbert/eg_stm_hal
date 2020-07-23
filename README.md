@@ -189,13 +189,15 @@ environment variables for your processor (and corresponding to the board directo
 Variables `HAL`  and `MCU` overlap, it should be possible to determine  `HAL`  based on `MCU`.
 The variable `HAL` is used in the example code whereas some of the underlying HAL packages
 actually need the specific `MCU`.
-Boards indicated above use one of 
+Board directories use one of 
 ```
   export HAL=stm32f1xx MCU=stm32f103   TARGET=thumbv7m-none-eabi     # bluepill            Cortex-M3
   export HAL=stm32f1xx MCU=stm32f100   TARGET=thumbv7m-none-eabi     # none-stm32f100      Cortex-M3
   export HAL=stm32f1xx MCU=stm32f101   TARGET=thumbv7m-none-eabi     # none-stm32f101      Cortex-M3
   export HAL=stm32f3xx MCU=stm32f303xc TARGET=thumbv7em-none-eabihf  # discovery-stm32f303 Cortex-M3
   export HAL=stm32f4xx MCU=stm32f411   TARGET=thumbv7em-none-eabihf  # nucleo-64           Cortex-M4
+  export HAL=stm32f4xx MCU=stm32f411   TARGET=thumbv7em-none-eabihf  # blackpill-stm32f401 Cortex-M4
+  export HAL=stm32f4xx MCU=stm32f411   TARGET=thumbv7em-none-eabihf  # blackpill-stm32f411 Cortex-M4
   export HAL=stm32l1xx MCU=stm32l100   TARGET=thumbv7m-none-eabi     # discovery-stm32l100 Cortex-M3
   export HAL=stm32l1xx MCU=stm32l151   TARGET=thumbv7m-none-eabi     # heltec-lora-node151 Cortex-M3
 ```
@@ -328,10 +330,11 @@ Here are settings I have used
   export  PROC=stm32f1x  # bluepill
   export  PROC=stm32l1   # MCU on Discovery STM32L100
   export  PROC=stm32f3x  # MCU on Discovery STM32F303
+  export  PROC=stm32f4x  # blackpills  with STM32F401 and STM32F411
 ```
 and
 ```
-  export INTERFACE=stlink-v2   #  WaveGat dongle
+  export INTERFACE=stlink-v2   #  WaveGat and other cheapo dongles
   export INTERFACE=stlink-v2   #  STlink on Discovery STM32L100
   export INTERFACE=stlink-v2-1 #  STlink on Discovery STM32F303
 ```

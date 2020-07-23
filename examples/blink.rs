@@ -3,8 +3,8 @@
 //! 
 //! stm32f1xx below uses PC13  which is onboard green LED on Bluepill.
 //! stm32f3xx below uses PE15  which is onboard green LD6 (West) LED on STM32F303 Discovery kit.
-//! stm32f4xx below uses PA5   which is onboard green LD2  LED on STM32F411RET6 Nucleo-64 board,
-//!                              but can be configured to PB13.
+//! stm32f4xx below uses PC13  which is onboard green C13  LED on my STM32F411CEU6 blackpill board,
+//!  another option would be PA5  which is onboard green LD2 LED on STM32F411RET6 Nucleo-64 board.
 //! stm32l1xx below uses PB6   On some STM32L1.. Discovery boards there are onboard LD3 and LD4 LEDs on PB7 
 //!                            and PB6 but mine are defective and so tested with off board LED on PB6.
 //! 
@@ -50,7 +50,8 @@ use stm32f3xx_hal::{prelude::*,
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
 use stm32f4xx_hal::{prelude::*,   
                     pac::Peripherals, 
-                    gpio::{gpioa::PA5, Output, PushPull,}, 
+                    gpio::{gpioc::PC13, Output, PushPull,}, 
+                    //gpio::{gpioa::PA5, Output, PushPull,}, 
                     };
 
 #[cfg(feature = "stm32f4xx")]  
@@ -126,18 +127,18 @@ fn main() -> ! {
 
 
     #[cfg(feature = "stm32f4xx")]
-    fn setup() -> (PA5<Output<PushPull>>, AsmDelay) {
+    fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {    //(PA5<Output<PushPull>>, AsmDelay) {
 
        let dp    = Peripherals::take().unwrap();
-       let gpioa = dp.GPIOA.split();
+       let gpioc = dp.GPIOC.split();
        
-       impl LED for PA5<Output<PushPull>> {
+       impl LED for PC13<Output<PushPull>> {
            fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
            fn  off(&mut self)  -> () { self.set_low().unwrap() }
            };
 
        // return tuple  (led, delay)
-       (gpioa.pa5.into_push_pull_output(),                         // led on pa5 with on/off
+       (gpioa.pc13.into_push_pull_output(),                        // led on pc13 with on/off
         AsmDelay::new(bitrate::U32BitrateExt::mhz(32)) )           // delay
        };
 
