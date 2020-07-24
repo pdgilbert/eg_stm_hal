@@ -1,12 +1,13 @@
 # Examples Using embedded Rust
 
-The [status for individual boards described below can be 
-seen at Travis CI.](https://travis-ci.org/pdgilbert/eg_stm_hal)
-
 This project's overall Travis CI build status is 
 [![Build Status](https://api.travis-ci.org/pdgilbert/eg_stm_hal.svg?branch=master)](https://travis-ci.org/pdgilbert/eg_stm_hal).
-This will indicate an error if any examples fail on any boards, 
-so often will indicate `failing` even when most examples work on most boards.
+This will indicate `failing` if any examples fail on any boards, 
+so will usually indicate `failing` even if most examples work on most boards.
+The [status for individual boards described below can be 
+seen at Travis CI.](https://travis-ci.org/pdgilbert/eg_stm_hal). 
+That, or the [Status of Examples](#status-of-examples) section below give a better 
+indication of actual status of the project.
 
 ## Preamble
 These are newbie notes. I really am new to embedded programming and to Rust. 
@@ -46,6 +47,7 @@ environments. Just the setup may change.)
 - [Status Summary](#status-summary)
 - [This Package Setup](#this-package-setup)
 - [Summary of Examples](#summary-of-examples)
+- [Status of Examples](#status-of-examples)
 - [Building Examples](#building-examples)
 - [Running Examples](#running-examples)
 - [Hardware Notes](#hardware-notes)
@@ -57,22 +59,15 @@ environments. Just the setup may change.)
 
 
 ##  Status Summary
- (June 2020) work in progress ...
+ (July 2020) work in progress ...
 
 The overall Travis CI build status and the link for individual boards is given above.
 Testing if the code runs and does something resembling what it is supposed to do 
 requires hardware and is not as automatic as CI. 
-This is my summary as of June 2020. If you check the examples using other MCUs 
+My summary as of July 2020 is given below in section [Summary of Examples](#summary-of-examples). 
+If you check the examples using other MCUs 
 then please provide details 
 using [issues](https://github.com/pdgilbert/eg_stm_hal/issues) for this git project.
-
-|      HAL       | eg MCU    |   eg Board          |   Builds   |  Runs  |          Notes                             |
-| -------------- |:---------:|:-------------------:|:----------:|:------:| :----------------------------------------- |
-| stm32f1xx-hal  | stm32f103 |      bluepill       |    yes     |  many  | Problems using serial in some examples     |
-| stm32f3xx-hal  | stm32f303 | discovery-stm32f303 |   some     |  some  | Hal differences.  Code adjustments needed  |
-| stm32f4xx-hal  | stm32f411 |      nucleo-64      |   some     |  some  | Hal differences.  Code adjustments needed  |
-| stm32l1xx-hal  | stm32l100 | discovery-stm32l100 |   blink3   |   no   | Hal CI tests fail. Code adjustments needed |
-| stm32l1xx-hal  | stm32l151 | heltec-lora-node151 |   blink3   |   no   | Hal CI tests fail. Code adjustments needed |
 
 This project's examples depend on [embedded_hal](https://docs.rs/embedded-hal/) and several stm32 HALs. 
 See [stm32 HALs on Github](https://github.com/stm32-rs) and on [Travis CI.](https://travis-ci.com/stm32-rs)
@@ -149,41 +144,25 @@ See [Running Examples](#running-examples) for more details.
       completely eliminating the development board. 
       (If the dongle power is used. 5v if preferred on mine.)
 
-Following is the status of examples as of July 2020. Examples are run with 'stm32f1xx_hal' on a 'bluepill',
-'stm32f3xx_hal' on a 'Discovery kit STM32F303', stm32l1xx_hal' on a 'STM32L100C Discovery', and 'stm32f4xx_hal' on a 'Nucleo-64 STM32F411', a blackpill with MCU stm32f401, and a blackpill with MCU stm32f411. Abreviations in the table headings are:
-echo_1 is 'echo_console_by_char',
-echo_2 is 'echo_console_string',
-ser_1  is 'serial_char',
-ser_2  is 'serial_string', and
-gps_1  is 'gps_rw_by_char'.
+
+## Status of Examples
+
+Following is the status of examples as of July 2020. Examples are run with `stm32f1xx_hal` on a `bluepill`,
+`stm32f3xx_hal` on a `Discovery kit STM32F303`, stm32l1xx_hal` on a `STM32L100C Discovery`, 
+and `stm32f4xx_hal` on a `Nucleo-64 STM32F411`, a blackpill with MCU stm32f401, and a blackpill with MCU stm32f411.
 In the table cells: 
-'runs' means builds and runs correctly, or as noted; 'builds' means builds but run not tested; 'no' means does not build, or builds but fails badly as noted. 
+`runs` means builds and runs correctly, or as noted; `builds` means builds but run not tested; 
+`no` means does not build, or builds but fails badly as noted. 
 
-|    hal    |         board        | blink | blink3 | echo_1 | echo_2 | ser_1  | ser_2  | gps_1  | gps_rw |
-|:---------:|:--------------------:|:-----:|:------:|:------:|:------:|:------:|:------:|:------:|:------:|
-| stm32f1xx | bluepill             | runs  | runs   | runs-5 | runs-5 | runs-1 |  no-2  |  runs  |  runs  |	     
-| stm32f3xx | discovery-stm32f303  | runs  | runs   | runs-5 | no-8,9 | runs-1 |  no-9  |  runs  | runs-10|
-| stm32f4xx | nucleo-64 	   | runs  | runs   | runs-5 |  no-9  |  no-2  |  no-9  |  no-6  |  no-6  |
-| stm32f4xx | blackpill-stm32f401  | runs  | runs   | runs-5 |  no-9  |  runs  |  no-9  | runs-10| runs-10|
-| stm32f4xx | blackpill-stm32f411  | runs  | runs   | no-12  |  no-9  |  runs  |  no-9  |  runs  |  runs  |
-| stm32l1xx | discovery-stm32l100  | runs  | runs   |   no   |   no   |   no   |   no   |   no   |   no   |
+|    hal    |         board        | blink | blink3 | echo_by_char | echo_string | serial_char | serial_string | gps_rw_by_char | gps_rw |
+|:---------:|:--------------------:|:-----:|:------:|:------------:|:-----------:|:-----------:|:-------------:|:--------------:|:------:|
+| stm32f1xx | bluepill             | runs  | runs   |    runs-5    |   runs-5    |    runs-1   |     no-2      |     runs       |  runs  |      
+| stm32f3xx | discovery-stm32f303  | runs  | runs   |    runs-5    |   no-8,9    |    runs-1   |     no-9      |     runs       | runs-10|
+| stm32f4xx | nucleo-64 	   | runs  | runs   |    runs-5    |    no-9     |     no-2    |     no-9      |     no-6       |  no-6  |
+| stm32f4xx | blackpill-stm32f401  | runs  | runs   |    runs-5    |    no-9     |     runs    |     no-9      |    runs-10     | runs-10|
+| stm32f4xx | blackpill-stm32f411  | runs  | runs   |    no-12     |    no-9     |     runs    |     no-9      |     runs       |  runs  |
+| stm32l1xx | discovery-stm32l100  | runs  | runs   |      no      |     no      |      no     |      no       |      no        |   no   |
 
-
-IN PROCESS OF RECONSIDERING FORMAT
-
-| ------------------------------- | - stm32f1xx - | - stm32f3xx - | - stm32f4xx - | - stm32l1xx - |
-|:-------------------------------:|:-----------:|:-----------:|:-----------:|:-----------:|
-
-|  xxx                 | build |  run  | build |  run  | build |  run  | build |  run  | 
-|:--------------------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
-| blink                |  yes  | works |  yes  | works |  yes  | works |  yes  | works | 
-| blink3               |  yes  | works |  yes  | works |  yes  | works |  yes  | works | 
-| echo_console_by_char |  yes  | yes-5 |  yes  |   5   |  yes  | yes-5 |  no   |       | 
-| echo_console_string  |  yes  |   5   |  8,9  |       |   9   |       |   9   |       | 
-| serial_char          |  yes  | yes-1 |  yes  |   1   |  yes  | no-2  |  no   |       |
-| serial_string        |  yes  |  no-2 |   9   |       |   9   |       |   9   |       |
-| gps_rw_by_char       |  yes  | works |  yes  | works |  yes  | no-6  |  no   |       |
-| gps_rw               |  yes  | works |  yes  |  10   |  yes  | no-6  |  no   |       |
 
 1.  tx2 to rx3 works. tx3 to rx2 works sometimes but sometimes fails unwrapping err value Overrun on receive.
 2.  Stalls waiting to receive. Possibly need thread to receive started before send?

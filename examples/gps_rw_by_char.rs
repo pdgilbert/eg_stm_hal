@@ -1,5 +1,5 @@
-//! Serial interface char-by-char read GPS on usart2 and write on usart1 
-//! to USB-TTL connected to console (minicom) and also write to semihost. 
+//! Serial interface char-by-char read GPS on one usart2 and write on another 
+//! to USB-TTL connected to console (minicom). 
 //!
 //! usart1 connect the Tx pin pa9  to the Rx pin of a serial-usb converter
 //! usart1 connect the Rx pin pa10 to the Tx pin of a serial-usb converter
@@ -8,8 +8,7 @@
 //!
 //! GPS uses 9600bps, 8bit, odd parity, 1 stopbit. This can be confirmed by connecting GPS 
 //!  directly to the  USB-TTL and terminal with these settings (minicom 8-N-1) 
-//! usart2 connect the Rx pin pa3 to the Tx pin of GPS 
-//! usart2 connect the Tx pin pa2 to the Rx pin of GPS
+//! The usart and pins for the GPS depend on the board. For specifics see setup() sections below. 
 //! 
 //! See examples/serial_char.rs for notes about connecting usart1 to 
 //!   serial-usb converter on computer for console output.
@@ -36,7 +35,7 @@ use nb::block;
 use stm32f1xx_hal::{prelude::*,   
                     pac::Peripherals, 
                     serial::{Config, Serial, StopBits, Tx, Rx},  
-		    device::{USART1, USART2}  }; 
+		    device::{USART1, USART3}  }; 
 
 #[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
 use stm32f3xx_hal::{prelude::*, 
@@ -63,7 +62,7 @@ fn main() -> ! {
     //see serial_char.rs and serial_string.rs in examples/ for more USART config notes.
 
     #[cfg(feature = "stm32f1xx")]
-    fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>)  {
+    fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART3>, Rx<USART3>)  {
         let p = Peripherals::take().unwrap();
     	let mut rcc = p.RCC.constrain();  
 	let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr); 
@@ -73,25 +72,26 @@ fn main() -> ! {
     	// next consumes (moves) arguments other than clocks,  &mut rcc.apb2 and afio.
 	let (tx1, rx1) = Serial::usart1(
     	    p.USART1,
-    	    (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),     //tx pa9, 
-	     gpioa.pa10),					     //rx pa10
+    	    (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),     //tx pa9  for console
+	     gpioa.pa10),					     //rx pa10 for console
     	    &mut afio.mapr,
     	    Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1), //.parity_odd()
     	    clocks,
     	    &mut rcc.apb2,
     	    ).split();
 
-        let (tx2, rx2) = Serial::usart2(
-            p.USART2,
-            (gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),     //tx pa2 
-             gpioa.pa3), 					     //rx pa3
+	let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
+        let (tx3, rx3) = Serial::usart3(
+            p.USART3,
+            (gpiob.pb10.into_alternate_push_pull(&mut gpiob.crh),     //tx pb10  for GPS
+             gpiob.pb11), 					      //rx pb11  for GPS
             &mut afio.mapr,
             Config::default() .baudrate(9_600.bps()), 
             clocks,
             &mut rcc.apb1,
         ).split();
 
-        (tx1, rx1,   tx2, rx2 )
+        (tx1, rx1,   tx3, rx3 )
 	}
 
 
@@ -106,8 +106,8 @@ fn main() -> ! {
         let mut gpioa = p.GPIOA.split(&mut rcc.ahb); 
         let (tx1, rx1)  = Serial::usart1(
             p.USART1,
-            (gpioa.pa9.into_af7( &mut gpioa.moder, &mut gpioa.afrh),   //tx pa9
-	     gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)),  //tx pb10
+            (gpioa.pa9.into_af7( &mut gpioa.moder, &mut gpioa.afrh),   //tx pa9  for console
+	     gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)),  //tx pb10 for console
             9600.bps(),
             clocks,
             &mut rcc.apb2,
@@ -115,8 +115,8 @@ fn main() -> ! {
 
         let (tx2, rx2) = Serial::usart2(
             p.USART2,
-            (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl),    //tx pa2
-             gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)),   //rx pa3
+            (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl),    //tx pa2  for GPS
+             gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)),   //rx pa3  for GPS
             9600.bps(),    // 115_200.bps(),
             clocks,
             &mut rcc.apb1,
@@ -132,8 +132,8 @@ fn main() -> ! {
         let gpioa = p.GPIOA.split();
         let (tx1, rx1) =  Serial::usart1(
            p.USART1,
-    	   (gpioa.pa9.into_alternate_af7(),            //tx pa9
-	    gpioa.pa10.into_alternate_af7()),          //rx pa10
+    	   (gpioa.pa9.into_alternate_af7(),            //tx pa9  for console
+	    gpioa.pa10.into_alternate_af7()),          //rx pa10 for console
     	   Config::default() .baudrate(9600.bps()),
     	   clocks
            ).unwrap().split(); 
@@ -142,8 +142,8 @@ fn main() -> ! {
 	//p.USART2.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
         let (tx2, rx2) = Serial::usart2(
            p.USART2,
-           (gpioa.pa2.into_alternate_af7(),            //tx pa2
-	    gpioa.pa3.into_alternate_af7()),           //rx pa3
+           (gpioa.pa2.into_alternate_af7(),            //tx pa2  for GPS
+	    gpioa.pa3.into_alternate_af7()),           //rx pa3  for GPS
            Config::default() .baudrate(9600.bps()), 
            clocks,
            ).unwrap().split();
@@ -160,16 +160,16 @@ fn main() -> ! {
         let gpioa = p.GPIOA.split();
         let (tx1, rx1) =  Serial::usart1(
            p.USART1,
-           (gpioa.pa9.into_alternate_af7(),            //tx pa9
-	    gpioa.pa10.into_alternate_af7()),          //rx pa10
+           (gpioa.pa9.into_alternate_af7(),            //tx pa9  for console
+	    gpioa.pa10.into_alternate_af7()),          //rx pa10 for console
     	   Config::default() .baudrate(9600.bps()),
     	   clocks
            ).unwrap().split(); 
 
         let (tx2, rx2) = Serial::usart2(
             p.USART2,
-            (gpioa.pa2.into_alternate_af7(),           //tx pa2
-	     gpioa.pa3.into_alternate_af7()),          //rx pa3
+            (gpioa.pa2.into_alternate_af7(),           //tx pa2  for GPS
+	     gpioa.pa3.into_alternate_af7()),          //rx pa3  for GPS
             Config::default() .baudrate(9600.bps()), 
             clocks,
             ).unwrap().split();
@@ -180,12 +180,12 @@ fn main() -> ! {
 
     // End of hal/MCU specific setup. Following should be generic code.
 
-    let (mut tx1, mut _rx1, mut _tx2, mut rx2) = setup();  // 1 is console, 2 is GPS
+    let (mut tx_con, mut _rx_con,   mut _tx_gps, mut rx_gps) = setup();  // console,  GPS
 
     hprintln!("testing console output...").unwrap();
  
     for byte in b"Just confirming console works.\r\n" {
-       block!(tx1.write(*byte)).unwrap();
+       block!(tx_con.write(*byte)).unwrap();
     }
 
     hprintln!("entering read/write loop...").unwrap();
@@ -193,17 +193,12 @@ fn main() -> ! {
     // note that putting hprintln! in loop slows it too much and loses data.
     let e: u8 = 9;
     loop { // Read a byte and write
-      let received = match block!(rx2.read()) {
+      let received = match block!(rx_gps.read()) {
          Ok(str)     => str,
          Err(_error) => e,
          };
       //hprintln!("in loop...").unwrap(); //debugging only, too slow
-      block!(tx1.write(received)).ok();
-    }
-
-    // PUT A TEST HERE THAT WILL SHOW FAILURE. ASSERT SEEMS TO PANIC HALT SO ...
-
-    // Trigger a breakpoint to inspect the values
-    //asm::bkpt();
+      block!(tx_con.write(received)).ok();
+      }
 
 }

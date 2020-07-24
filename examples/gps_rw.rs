@@ -1,4 +1,4 @@
-//! Serial interface read GPS on usart2 and write on usart1 to USB-TTL to console (minicom) and to semihost.
+//! Serial interface read GPS one usart and write on another usart to USB-TTL console (minicom).
 //! This example is similar to gps_rw_by_char but tries to buffer strings of data.
 //! See example is gps_rw_by_char for usart settings and pin connections.
 
@@ -34,7 +34,7 @@ use nb::block;
 use stm32f1xx_hal::{prelude::*,   
                     pac::Peripherals, 
                     serial::{Config, Serial, StopBits, Tx, Rx},  
-		    device::{USART1, USART2}  }; 
+		    device::{USART1, USART3}  }; 
 
 #[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
 use stm32f3xx_hal::{prelude::*, 
@@ -69,7 +69,7 @@ fn main() -> ! {
     //hprintln!("{:?}",      "just checking to_str".as_bytes()).expect("hprintln error."); 
 
     #[cfg(feature = "stm32f1xx")]
-    fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>)  {
+    fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART3>, Rx<USART3>)  {
         let p = Peripherals::take().unwrap();
     	let mut rcc = p.RCC.constrain();  
 	let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr); 
@@ -79,25 +79,26 @@ fn main() -> ! {
     	// next consumes (moves) arguments other than clocks,  &mut rcc.apb2 and afio.
 	let (tx1, rx1) = Serial::usart1(
     	    p.USART1,
-    	    (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),     //tx pa9
-	     gpioa.pa10),					     //rx pa10
+    	    (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),     //tx pa9   for console
+	     gpioa.pa10),					     //rx pa10  for console
     	    &mut afio.mapr,
     	    Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1), //.parity_odd()
     	    clocks,
     	    &mut rcc.apb2,
     	    ).split();
 
-        let (tx2, rx2) = Serial::usart2(
-            p.USART2,
-            (gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),     //tx pa2 
-             gpioa.pa3), 					     //rx pa3
+    	let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
+        let (tx3, rx3) = Serial::usart3(
+            p.USART3,
+            (gpiob.pb10.into_alternate_push_pull(&mut gpiob.crh),    //tx pb10  for GPS
+             gpiob.pb11), 					     //rx pb11  for GPS
             &mut afio.mapr,
             Config::default() .baudrate(9_600.bps()), 
             clocks,
             &mut rcc.apb1,
         ).split();
 
-        (tx1, rx1,   tx2, rx2 )
+        (tx1, rx1,   tx3, rx3 )
 	}
 
 
@@ -111,8 +112,8 @@ fn main() -> ! {
         let mut gpioa = p.GPIOA.split(&mut rcc.ahb); 
         let (tx1, rx1)  = Serial::usart1(
             p.USART1,
-            (gpioa.pa9.into_af7( &mut gpioa.moder, &mut gpioa.afrh),   //tx pa9
-	     gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)),  //tx pb10
+            (gpioa.pa9.into_af7( &mut gpioa.moder, &mut gpioa.afrh),   //tx pa9   for console
+	     gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)),  //tx pb10  for console
             9600.bps(),
             clocks,
             &mut rcc.apb2,
@@ -120,8 +121,8 @@ fn main() -> ! {
 
         let (tx2, rx2) = Serial::usart2(
             p.USART2,
-            (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl),    //tx pa2
-             gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)),   //rx pa3
+            (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl),    //tx pa2  for GPS
+             gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)),   //rx pa3  for GPS
             9600.bps(),    // 115_200.bps(),
             clocks,
             &mut rcc.apb1,
@@ -139,8 +140,8 @@ fn main() -> ! {
         let gpioa = p.GPIOA.split();
         let (tx1, rx1) =  Serial::usart1(
            p.USART1,
-    	   (gpioa.pa9.into_alternate_af7(),            //tx pa9
-	    gpioa.pa10.into_alternate_af7()),          //rx pa10
+    	   (gpioa.pa9.into_alternate_af7(),            //tx pa9   for console
+	    gpioa.pa10.into_alternate_af7()),          //rx pa10  for console
     	   Config::default() .baudrate(9600.bps()),
     	   clocks
            ).unwrap().split(); 
@@ -149,8 +150,8 @@ fn main() -> ! {
 	//p.USART2.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
         let (tx2, rx2) = Serial::usart2(
            p.USART2,
-           (gpioa.pa2.into_alternate_af7(),            //tx pa2
-	    gpioa.pa3.into_alternate_af7()),           //rx pa3
+           (gpioa.pa2.into_alternate_af7(),            //tx pa2  for GPS
+	    gpioa.pa3.into_alternate_af7()),           //rx pa3  for GPS
            Config::default() .baudrate(9600.bps()), 
            clocks,
            ).unwrap().split();
@@ -168,16 +169,16 @@ fn main() -> ! {
         let gpioa = p.GPIOA.split();
         let (tx1, rx1) =  Serial::usart1(
            p.USART1,
-           (gpioa.pa9.into_alternate_af7(),            //tx pa9
-	    gpioa.pa10.into_alternate_af7()),          //rx pa10
+           (gpioa.pa9.into_alternate_af7(),            //tx pa9   for console
+	    gpioa.pa10.into_alternate_af7()),          //rx pa10  for console
     	   Config::default() .baudrate(9600.bps()),
     	   clocks
            ).unwrap().split(); 
 
         let (tx2, rx2) = Serial::usart2(
             p.USART2,
-            (gpioa.pa2.into_alternate_af7(),           //tx pa2
-	     gpioa.pa3.into_alternate_af7()),          //rx pa3
+            (gpioa.pa2.into_alternate_af7(),           //tx pa2  for GPS
+	     gpioa.pa3.into_alternate_af7()),          //rx pa3  for GPS
             Config::default() .baudrate(9600.bps()), 
             clocks,
             ).unwrap().split();
@@ -188,10 +189,10 @@ fn main() -> ! {
 
     // End of hal/MCU specific setup. Following should be generic code.
 
-    let (mut tx1, mut _rx1, mut _tx2, mut rx2) = setup();  // 1 is console, 2 is GPS
+    let (mut tx_con, mut _rx_con,   mut _tx_gps, mut rx_gps) = setup();  // console, GPS
 
-    //writeln!(tx1, "\r\nconsole connect check.\r\n").unwrap();
-    for byte in b"\r\nconsole connect check.\r\n" { block!(tx1.write(*byte)).ok(); }
+    //writeln!(tx_con, "\r\nconsole connect check.\r\n").unwrap();
+    for byte in b"\r\nconsole connect check.\r\n" { block!(tx_con.write(*byte)).ok(); }
 
     // read gps on usart2
     hprintln!("about to read GPS").unwrap();
@@ -206,19 +207,19 @@ fn main() -> ! {
     let e: u8 = 9;
     let mut good = false;
     loop {
-        let byte = match block!(rx2.read()) {
+        let byte = match block!(rx_gps.read()) {
 	    Ok(byt)	  => byt,
 	    Err(_error) => e,
 	    };
-        block!(tx1.write(byte)).ok();
+        block!(tx_con.write(byte)).ok();
         if   byte == 36  {  //  $ is 36. start of a line
 	   buffer.clear();
 	   good = true;     //start capturing line
 	   };
 	if good {
 	   if buffer.push(byte).is_err() ||  byte == 13  {  //  \r is 13, \n is 10
-              //writeln!(tx1, "{}", to_str(&buffer)).unwrap();
-              for byte in &buffer { block!(tx1.write(*byte)).ok(); }
+              //writeln!(tx_con, "{}", to_str(&buffer)).unwrap();
+              for byte in &buffer { block!(tx_con.write(*byte)).ok(); }
               //hprintln!("buffer at {} of {}", buffer.len(), buffer.capacity()).unwrap();
               buffer.clear();
 	      good = false;
@@ -226,29 +227,4 @@ fn main() -> ! {
 	      };
 	   };
 	}
-
-    //asm::bkpt();
-
-
-    // (buf, rx)  tuple for RxDma VS read() a single u8
-    //let mut br = (singleton!(: [u8; 100] = [0; 100]).unwrap(), rx2);
-    //br = br.1.read(br.0).wait();                
-    //hprintln!("buf is  {:?}", br.0).unwrap(); 
-    //hprintln!("to_str(buf2) is {:?}", to_str(bbr.0)).unwrap();  
-
-    //hprintln!("about to write  buf2 to console").unwrap();
-    //hprintln!("sending console {:?}", buf2).unwrap(); //would not need :? if these were not [u8; 8]
-
-    //let bufx = buftx1.1.write(bufrx2.0); 
-    //let bufx = buftx1.1.TxDma(bufrx2.0);  // wait(); //TxDma VS read  !!!!!!!!!!!!!
-    //hprintln!("sent console {:?}", bufx).unwrap(); //would not need :? if these were not [u8; 8]
-
-    // NB: bt uses br's buffer. And br use bt's buffer, but not sure why.
-    //   whereas in the first read above br used it's own buffer.
-    //loop {
-    //   bt = bt.1.write(br.0).wait(); 
-    //   br = br.1.read(bt.0).wait();
-    //   }
-
-    // PUT A TEST HERE THAT WILL SHOW FAILURE. ASSERT SEEMS TO PANIC HALT SO ...
 }
