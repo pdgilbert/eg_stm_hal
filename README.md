@@ -149,8 +149,27 @@ See [Running Examples](#running-examples) for more details.
       completely eliminating the development board. 
       (If the dongle power is used. 5v if preferred on mine.)
 
-Following is the status of examples as of June 2020. Examples are run on a 'bluepill' (stm32f1xx),
-'Discovery kit STM32F303' (stm32f3xx), and 'Nucleo-64 STM32F411' (stm32f4xx).
+Following is the status of examples as of July 2020. Examples are run with 'stm32f1xx_hal' on a 'bluepill',
+'stm32f3xx_hal' on a 'Discovery kit STM32F303', stm32l1xx_hal' on a 'STM32L100C Discovery', and 'stm32f4xx_hal' on a 'Nucleo-64 STM32F411', a blackpill with MCU stm32f401, and a blackpill with MCU stm32f411. Abreviations in the table headings are:
+echo_1 is 'echo_console_by_char',
+echo_2 is 'echo_console_string',
+ser_1  is 'serial_char',
+ser_2  is 'serial_string', and
+gps_1  is 'gps_rw_by_char'.
+In the table cells: 
+'runs' means builds and runs correctly, or as noted; 'builds' means builds but run not tested; 'no' means does not build, or builds but fails badly as noted. 
+
+|    hal    |         board        | blink | blink3 | echo_1 | echo_2 | ser_1  | ser_2  | gps_1  | gps_rw |
+|:---------:|:--------------------:|:-----:|:------:|:------:|:------:|:------:|:------:|:------:|:------:|
+| stm32f1xx | bluepill             | runs  | runs   | runs-5 | runs-5 | runs-1 |  no-2  |  runs  |  runs  |	     
+| stm32f3xx | discovery-stm32f303  | runs  | runs   | runs-5 | no-8,9 | runs-1 |  no-9  |  runs  | runs-10|
+| stm32f4xx | nucleo-64 	   | runs  | runs   | runs-5 |  no-9  |  no-2  |  no-9  |  no-6  |  no-6  |
+| stm32f4xx | blackpill-stm32f401  | runs  | runs   | runs-5 |  no-9  |  runs  |  no-9  | runs-10| runs-10|
+| stm32f4xx | blackpill-stm32f411  | runs  | runs   | no-12  |  no-9  |  runs  |  no-9  |  runs  |  runs  |
+| stm32l1xx | discovery-stm32l100  | runs  | runs   |   no   |   no   |   no   |   no   |   no   |   no   |
+
+
+IN PROCESS OF RECONSIDERING FORMAT
 
 | ------------------------------- | - stm32f1xx - | - stm32f3xx - | - stm32f4xx - | - stm32l1xx - |
 |:-------------------------------:|:-----------:|:-----------:|:-----------:|:-----------:|
@@ -170,12 +189,14 @@ Following is the status of examples as of June 2020. Examples are run on a 'blue
 2.  Stalls waiting to receive. Possibly need thread to receive started before send?
 3.  Usart2 with Usart3 connection works both ways but jibberish written on console.
 4.  Gibberish written on console.
-5.  Works as long a typing is slow.
+5.  Works as long as typing is slow.
 6.  Fails reading gps (does not return). 
 7.  Works once, repeat problems.
 8.  Writeln! macro missing from stm32f3xx ?
 9.  Uses dma buffering in stm32f1xx. Have not figured out how to do that with other HALs.
-10. Some lines miss begining.
+10. Some lines miss begining or truncated.
+11. Overrun error.
+12. no echo.
 
 ## Building Examples
 
@@ -195,9 +216,9 @@ Board directories use one of
   export HAL=stm32f1xx MCU=stm32f100   TARGET=thumbv7m-none-eabi     # none-stm32f100      Cortex-M3
   export HAL=stm32f1xx MCU=stm32f101   TARGET=thumbv7m-none-eabi     # none-stm32f101      Cortex-M3
   export HAL=stm32f3xx MCU=stm32f303xc TARGET=thumbv7em-none-eabihf  # discovery-stm32f303 Cortex-M3
-  export HAL=stm32f4xx MCU=stm32f411   TARGET=thumbv7em-none-eabihf  # nucleo-64           Cortex-M4
-  export HAL=stm32f4xx MCU=stm32f411   TARGET=thumbv7em-none-eabihf  # blackpill-stm32f401 Cortex-M4
+  export HAL=stm32f4xx MCU=stm32f401   TARGET=thumbv7em-none-eabihf  # blackpill-stm32f401 Cortex-M4
   export HAL=stm32f4xx MCU=stm32f411   TARGET=thumbv7em-none-eabihf  # blackpill-stm32f411 Cortex-M4
+  export HAL=stm32f4xx MCU=stm32f411   TARGET=thumbv7em-none-eabihf  # nucleo-64           Cortex-M4
   export HAL=stm32l1xx MCU=stm32l100   TARGET=thumbv7m-none-eabi     # discovery-stm32l100 Cortex-M3
   export HAL=stm32l1xx MCU=stm32l151   TARGET=thumbv7m-none-eabi     # heltec-lora-node151 Cortex-M3
 ```
@@ -382,7 +403,9 @@ To use cargo to build and also start gdb and run the compiled code, in `.cargo/c
 ```
   runner = "gdb-multiarch -q -x openocd.gdb"
 ```
-This is already done in the `.cargo/config` in this package.
+This is already done in the `.cargo/config` in this package. The error message when something is wrong 
+with `.cargo` may be something not very helpful, like `Syntax error: word unexpected (expecting ")")`.
+The board directories on this package have soft links for `.cargo` to a common file in the root directory.
 
 ##  Links
 

@@ -1,9 +1,9 @@
 //! Blink  onboard LED if one is available, or PC13 otherwise.
 //! compare  blink3 example and stm32f1xx_hal example blinky.rs.
 //! 
-//! stm32f1xx below uses PC13  which is onboard green LED on Bluepill.
+//! stm32f1xx below uses PC13  which is onboard green LED on (many?) bluepill boards.
 //! stm32f3xx below uses PE15  which is onboard green LD6 (West) LED on STM32F303 Discovery kit.
-//! stm32f4xx below uses PC13  which is onboard green C13  LED on my STM32F411CEU6 blackpill board,
+//! stm32f4xx below uses PC13  which is onboard blue C13  LED on some STM32F411CEU6 blackpill boards,
 //!  another option would be PA5  which is onboard green LD2 LED on STM32F411RET6 Nucleo-64 board.
 //! stm32l1xx below uses PB6   On some STM32L1.. Discovery boards there are onboard LD3 and LD4 LEDs on PB7 
 //!                            and PB6 but mine are defective and so tested with off board LED on PB6.
@@ -85,8 +85,8 @@ fn main() -> ! {
     // 4.
     // The version of bluepill tested is active-low, cathode connected to the pin and anode to Vcc, 
     // so pin low is a sink and allows current flow. Other boards are wired for the GPIO pin to source.
-    // Thus set_high turns the bluepill LED off and Discovery & Nucleo-64 boards LEDs on while
-    //      set_low  turns the bluepill LED  on, Discovery & Nucleo-64 LEDs off.
+    // Thus set_high turns the bluepill and blackpill LEDs off and Discovery & Nucleo-64 boards LEDs on while
+    //      set_low  turns the bluepill and blackpill LEDs  on and Discovery & Nucleo-64 boards LEDs off.
     // To achieve generic code an LED trait is defined, with different boards having different use
     // of high and low for on and off in their implemantations.
 
@@ -132,9 +132,11 @@ fn main() -> ! {
        let dp    = Peripherals::take().unwrap();
        let gpioc = dp.GPIOC.split();
        
+       // Note that blackpill with stm32f411 and nucleo-64 with stm32f411 have onboard led wired
+       // differently, so this is reversed (in addition to PA5 vs PC13).
        impl LED for PC13<Output<PushPull>> {
-           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
-           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           fn   on(&mut self)  -> () { self.set_low().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_high().unwrap() }
            };
 
        // return tuple  (led, delay)
