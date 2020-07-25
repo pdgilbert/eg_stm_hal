@@ -220,10 +220,6 @@ fn main() -> !{
 
     let mut lora =  setup();
 
-    //    let mut lora = sx127x_lora::LoRa::new(
-    //        spi, cs, reset,  FREQUENCY, Delay)
-    //        .expect("Failed to communicate with radio module!");
-
     lora.set_tx_power(17,1).unwrap(); //Using PA_BOOST. See your board for correct pin.
 
     let message = "Hello, world!";

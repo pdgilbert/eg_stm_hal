@@ -135,11 +135,11 @@ See [Running Examples](#running-examples) for more details.
 | gps_rw               |   3   | Read a line  from GPS with echo to console + semihost output   |
 
 
-0.  Using the git versions of HALs (in June 2020 much is changing and release in crates.io is old). 
+0.  Using the git versions of HALs (in July 2020 much is changing and release in crates.io is old). 
 1.  blink3 does not blink when stepping in gdb, use continue.
 2.  With local echo on in console the characters are doubled, `<cr>` adds a single `<lf>`.
      Without local echo there is no `<lf>`. There is trouble if you type too fast.
-4.  Ublox GPS by default uses 9600bps, odd Parity, 1 stop bit (minicom 8-N-1). 
+3.  Ublox GPS by default uses 9600bps, odd Parity, 1 stop bit (minicom 8-N-1). 
       This can be checked by directly connecting a computer through usb-ttl dongle to the GPS, 
       completely eliminating the development board. 
       (If the dongle power is used. 5v if preferred on mine.)
@@ -186,7 +186,7 @@ cargo build  --target $TARGET  --features $HAL,$MCU --example xxx
 ```
 where `xxx` is one of the examples from the table above, and `TARGET`, `HAL`  and `MCU` are
 environment variables for your processor (and corresponding to the board directory). 
-Variables `HAL`  and `MCU` overlap, it should be possible to determine  `HAL`  based on `MCU`.
+Variables `HAL`  and `MCU` overlap. It should be possible to determine  `HAL`  based on `MCU`.
 The variable `HAL` is used in the example code whereas some of the underlying HAL packages
 actually need the specific `MCU`.
 Board directories use one of 
@@ -255,7 +255,7 @@ to start running the example code.
 
 If you have not yet bought a development board and are just looking to start then consider 
 a 'blue pill' with a cheap ST-Link dongle. It is not only the cheapest by far (I think I got
-5 for $10 with a dongle) but it also seems to be the best supported by HAL at the moment (Nov 2019). 
+5 for $10 with a dongle) but it also seems to be the best supported by HAL at the moment (July 2020). 
 No doubt the support is because all the developers have a few lying around.
 You could well want a more expensive development board when you get further along.
 
