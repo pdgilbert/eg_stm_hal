@@ -12,9 +12,27 @@
 //REST is reset.
 
 
+//https://www.rfwireless-world.com/Tutorials/LoRa-channels-list.html
+//channels = {
+//   'CH_00_900': 903.08, 'CH_01_900': 905.24, 'CH_02_900': 907.40,
+//   'CH_03_900': 909.56, 'CH_04_900': 911.72, 'CH_05_900': 913.88,
+//   'CH_06_900': 916.04, 'CH_07_900': 918.20, 'CH_08_900': 920.36,
+//   'CH_09_900': 922.52, 'CH_10_900': 924.68, 'CH_11_900': 926.84, 'CH_12_900': 915,
+//
+//   'CH_10_868': 865.20, 'CH_11_868': 865.50, 'CH_12_868': 865.80,
+//   'CH_13_868': 866.10, 'CH_14_868': 866.40, 'CH_15_868': 866.70,
+//   'CH_16_868': 867   , 'CH_17_868': 868   ,   
+//   }
+//
+//CodingRates = {"4_5": CODING_RATE.CR4_5,  "4_6": CODING_RATE.CR4_6,
+//               "4_7": CODING_RATE.CR4_7,  "4_8": CODING_RATE.CR4_8 }
+
+
 #![deny(unsafe_code)]
 #![no_main]
 #![no_std]
+
+const FREQUENCY: i64 = 915;
 
 #[cfg(debug_assertions)]
 extern crate panic_semihosting;
@@ -35,7 +53,7 @@ use cortex_m_semihosting::hprintln;
 //use core::ascii;
 use nb::block;
 
-use eg_stm_hal::to_str;
+//use eg_stm_hal::to_str;
 
 use sx127x_lora;
 
@@ -43,7 +61,7 @@ use sx127x_lora;
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
 use stm32f1xx_hal::{prelude::*,   
                     pac::Peripherals, 
-                    serial::{Config, Serial, StopBits, Tx, Rx},  
+                    serial::{Config, Serial, Tx, Rx},  //, StopBits
 		    device::{USART3},  
                     spi::{Spi, Spi1NoRemap},
                     delay::Delay,
@@ -91,7 +109,6 @@ use stm32l1xx_hal::{prelude::*,
 		    };
 
 
-const FREQUENCY: i64 = 915;
 
 #[entry]
 
