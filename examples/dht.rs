@@ -89,8 +89,8 @@ fn main() -> ! {
 
        let mut rcc   = p.RCC.constrain();
        let clocks    = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
-       let mut gpioa   = p.GPIOA.split(&mut rcc.ahb);
-       let mut pin_a8  = gpioa.pa8.into_open_drain_output(&mut gpioa.moder, &mut gpioa.otyper);
+       let mut gpioa = p.GPIOA.split(&mut rcc.ahb);
+       let pin_a8    = gpioa.pa8.into_open_drain_output(&mut gpioa.moder, &mut gpioa.otyper);
        
        // delay is used by `dht-sensor` to wait for signals
        let mut delay = Delay::new(cp.SYST, clocks);   //SysTick: System Timer

@@ -2,6 +2,8 @@
 // see https://github.com/plorefice/dht11-rs/
 // and https://github.com/plorefice/dht11-rs/blob/master/examples/stm32f407-dwt.rs
 // see (Data Watchpoint and Trace)
+// DHT11   digital temperature and humidity sensor needs xxx?k pull-up resistor on data pin.
+
 #![deny(unsafe_code)]
 #![no_main]
 #![no_std]
@@ -71,8 +73,8 @@ fn main() -> ! {
 
        let mut rcc   = p.RCC.constrain();
        let clocks    = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
-       let mut gpioa   = p.GPIOA.split(&mut rcc.ahb);
-       let mut pin_a8  = gpioa.pa8.into_open_drain_output(&mut gpioa.moder, &mut gpioa.otyper);
+       let mut gpioa = p.GPIOA.split(&mut rcc.ahb);
+       let pin_a8    = gpioa.pa8.into_open_drain_output(&mut gpioa.moder, &mut gpioa.otyper);
        
        (Dht11::new(pin_a8),                   //DHT11 data on A8
         Delay::new(cp.SYST, clocks))
