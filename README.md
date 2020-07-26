@@ -7,7 +7,7 @@ so will usually indicate `failing` even if most examples work on most boards.
 The [status for individual boards described below can be 
 seen at Travis CI.](https://travis-ci.org/pdgilbert/eg_stm_hal). 
 That, or the [Status of Examples](#status-of-examples) section below give a better 
-indication of actual status of the project.
+indication of the actual status of the project.
 
 ## Preamble
 These are newbie notes. I really am new to embedded programming and to Rust. 
@@ -57,7 +57,7 @@ the main crates associated with `embedded-hal`. The second group uses additional
 - [This Package Setup](#this-package-setup)
 - [Summary of Examples](#summary-of-examples)
 - [Status of Examples](#status-of-examples)
-- [Additional Examples](#additiona-examples)
+- [Additional Examples](#additional-examples)
 - [Building Examples](#building-examples)
 - [Running Examples](#running-examples)
 - [Hardware Notes](#hardware-notes)
@@ -159,8 +159,9 @@ See [Running Examples](#running-examples) for more details.
 ## Status of Examples
 
 Following is the status of examples as of July 2020. Examples are run with `stm32f1xx_hal` on a `bluepill`,
-`stm32f3xx_hal` on a `Discovery kit STM32F303`, stm32l1xx_hal` on a `STM32L100C Discovery`, 
-and `stm32f4xx_hal` on a `Nucleo-64 STM32F411`, a blackpill with MCU stm32f401, and a blackpill with MCU stm32f411.
+`stm32f3xx_hal` on a `Discovery kit STM32F303`, `stm32l1xx_hal` on a `STM32L100C Discovery`, 
+and `stm32f4xx_hal` on a `Nucleo-64 STM32F411`, a `blackpill` with MCU `stm32f401`, 
+and a `blackpill` with MCU `stm32f411`.
 In the table cells: 
 `runs` means builds and runs correctly, or as noted; `builds` means builds but run not tested; 
 `no` means does not build, or builds but fails badly as noted. 
@@ -193,11 +194,13 @@ In the table cells:
 These are examples which use an additional device crate as follows: dht uses `dht`. dht11 uses `dht11`,
 and lora_send, lora_receive, lora_gps use `sx127x_lora`.
 
-| xxx                  | notes |   Description                                                  |
-| -------------------- |:-----:|:-------------------------------------------------------------- |
-| blink                |   1   | Blink on-board LED                                             |
-| blink3               |   1   | Blink off-board LEDs attached to  pb 13,14,15                  |
-| echo_console_by_char |   2   | Echo console input, char by char,  + semihost output           |
+| xxx          | notes |   Description                                              |
+| ------------ |:-----:|:---------------------------------------------------------- |
+| dht          |       | read a dht11 sensor and write to semihost                  |
+| dht11        |       | read a dht11 sensor and write to semihost                  |
+| lora_send    |       | transmit a character string over LoRa,  + semihost output  |
+| lora_receive |       | receive  a character string over LoRa,  + semihost output  |
+| lora_gps     |       | read gps and transmit over LoRa,  + semihost output        |
 
 The status of these examples is
 
