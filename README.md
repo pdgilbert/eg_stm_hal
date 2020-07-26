@@ -14,7 +14,7 @@ These are newbie notes. I really am new to embedded programming and to Rust.
 However, I do have experience identifying bugs in other languages, and setting
 up examples and tests to help eliminate them.
 This is my attempt to organize notes made while trying to figure out Rust/embedded,
-and to use Travis CI to monitor what is working or not.
+and use CI to help keep track of what is working or not.
 I have put the examples and notes here so they  can be useful to others. 
 There is a lot of confusing out-of-date information
 on the web, so my hope is that the CI links here will warn readers when this project 
@@ -43,11 +43,21 @@ Also please enter an issue if you think there is something that really needs to 
 in many places. However, the examples should work in other development 
 environments. Just the setup may change.)
 
+The coded in the examples is organized so that the setup for different HALs and hardware is in the 
+first section and the generic application code follows. The hope is that this will make clear how
+to best take advantage of the generic aspect of `embedded-hal`. (The setup in many examples, 
+including these, tends to dominate the application code, so the advantage of the HAL is not
+always so obvious.) 
+These examples are divided into two groups. The first group uses only the MCU specific HAL crate and
+the main crates associated with `embedded-hal`. The second group uses additional device driver crates.
+
+
 ##  Contents
 - [Status Summary](#status-summary)
 - [This Package Setup](#this-package-setup)
 - [Summary of Examples](#summary-of-examples)
 - [Status of Examples](#status-of-examples)
+- [Additional Examples](#additiona-examples)
 - [Building Examples](#building-examples)
 - [Running Examples](#running-examples)
 - [Hardware Notes](#hardware-notes)
@@ -133,6 +143,7 @@ See [Running Examples](#running-examples) for more details.
 | serial_string        |       | String writes between usarts 2 and 3, console and semihost output|
 | gps_rw_by_char       |       | Read by char from GPS with echo to console + semihost output   |
 | gps_rw               |   3   | Read a line  from GPS with echo to console + semihost output   |
+| temperature          |       | Read temperature of MCU and external TMP35 * semihost output   |
 
 
 0.  Using the git versions of HALs (in July 2020 much is changing and release in crates.io is old). 
@@ -154,14 +165,14 @@ In the table cells:
 `runs` means builds and runs correctly, or as noted; `builds` means builds but run not tested; 
 `no` means does not build, or builds but fails badly as noted. 
 
-|    hal    |         board        | blink | blink3 | echo_by_char | echo_string | serial_char | serial_string | gps_rw_by_char | gps_rw |
-|:---------:|:--------------------:|:-----:|:------:|:------------:|:-----------:|:-----------:|:-------------:|:--------------:|:------:|
-| stm32f1xx | bluepill             | runs  | runs   |    runs-5    |   runs-5    |    runs-1   |     no-2      |     runs       |  runs  |      
-| stm32f3xx | discovery-stm32f303  | runs  | runs   |    runs-5    |   no-8,9    |    runs-1   |     no-9      |     runs       | runs-10|
-| stm32f4xx | nucleo-64 	   | runs  | runs   |    runs-5    |    no-9     |     no-2    |     no-9      |     no-6       |  no-6  |
-| stm32f4xx | blackpill-stm32f401  | runs  | runs   |    runs-5    |    no-9     |     runs    |     no-9      |    runs-10     | runs-10|
-| stm32f4xx | blackpill-stm32f411  | runs  | runs   |    no-12     |    no-9     |     runs    |     no-9      |     runs       |  runs  |
-| stm32l1xx | discovery-stm32l100  | runs  | runs   |      no      |     no      |      no     |      no       |      no        |   no   |
+|    hal    |         board        | blink | blink3 | echo_by_char | echo_string | serial_char | serial_string | gps_rw_by_char | gps_rw |   temperature  |
+|:---------:|:--------------------:|:-----:|:------:|:------------:|:-----------:|:-----------:|:-------------:|:--------------:|:------:|:--------------:|
+| stm32f1xx | bluepill             | runs  | runs   |    runs-5    |   runs-5    |    runs-1   |     no-2      |     runs       |  runs  |     runs       |      
+| stm32f3xx | discovery-stm32f303  | runs  | runs   |    runs-5    |   no-8,9    |    runs-1   |     no-9      |     runs       | runs-10|                |
+| stm32f4xx | nucleo-64 	   | runs  | runs   |    runs-5    |    no-9     |     no-2    |     no-9      |     no-6       |  no-6  |                |
+| stm32f4xx | blackpill-stm32f401  | runs  | runs   |    runs-5    |    no-9     |     runs    |     no-9      |    runs-10     | runs-10|                |
+| stm32f4xx | blackpill-stm32f411  | runs  | runs   |    no-12     |    no-9     |     runs    |     no-9      |     runs       |  runs  |                |
+| stm32l1xx | discovery-stm32l100  | runs  | runs   |      no      |     no      |      no     |      no       |      no        |   no   |                |
 
 
 1.  tx2 to rx3 works. tx3 to rx2 works sometimes but sometimes fails unwrapping err value Overrun on receive.
@@ -173,9 +184,32 @@ In the table cells:
 7.  Works once, repeat problems.
 8.  Writeln! macro missing from stm32f3xx ?
 9.  Uses dma buffering in stm32f1xx. Have not figured out how to do that with other HALs.
-10. Some lines miss begining or truncated.
+10. Some lines miss beginning or truncated.
 11. Overrun error.
 12. no echo.
+
+## Additional Examples
+
+These are examples which use an additional device crate as follows: dht uses `dht`. dht11 uses `dht11`,
+and lora_send, lora_receive, lora_gps use `sx127x_lora`.
+
+| xxx                  | notes |   Description                                                  |
+| -------------------- |:-----:|:-------------------------------------------------------------- |
+| blink                |   1   | Blink on-board LED                                             |
+| blink3               |   1   | Blink off-board LEDs attached to  pb 13,14,15                  |
+| echo_console_by_char |   2   | Echo console input, char by char,  + semihost output           |
+
+The status of these examples is
+
+|    hal    |         board        |  dht  | dht11 | lora_send | lora_receive | lora_gps |
+|:---------:|:--------------------:|:-----:|:-----:|:---------:|:------------:|:--------:|
+| stm32f1xx | bluepill             | runs  | runs  |  build    |   build      |  build   |
+| stm32f3xx | discovery-stm32f303  | build | build |  build    |   build      |  build   |
+| stm32f4xx | nucleo-64 	   | build | build |  build    |   build      |  build   |
+| stm32f4xx | blackpill-stm32f401  |       |       |           |              |          |
+| stm32f4xx | blackpill-stm32f411  |       |       |           |              |          |
+| stm32l1xx | discovery-stm32l100  |       |       |           |              |          |
+
 
 ## Building Examples
 

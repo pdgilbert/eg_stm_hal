@@ -621,7 +621,7 @@ dependencies = [
 [[package]]
 name = "stm32f3xx-hal"
 version = "0.5.0"
-source = "git+https://github.com/stm32-rs/stm32f3xx-hal#cd706042af555b947db24aed6b2481f6208b07a2"
+source = "git+https://github.com/stm32-rs/stm32f3xx-hal#15aa2cd74280dc056787c9ccc03eaae90fcf6e8b"
 dependencies = [
  "bare-metal",
  "cast",
@@ -650,7 +650,7 @@ dependencies = [
 [[package]]
 name = "stm32f4xx-hal"
 version = "0.8.3"
-source = "git+https://github.com/stm32-rs/stm32f4xx-hal#97377f87dbc72116604552c4bec9a804ea118145"
+source = "git+https://github.com/stm32-rs/stm32f4xx-hal#f21927264a8f974c657ecbf65d067a9f61c07acf"
 dependencies = [
  "bare-metal",
  "cast",
