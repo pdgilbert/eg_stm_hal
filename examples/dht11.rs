@@ -2,7 +2,7 @@
 // see https://github.com/plorefice/dht11-rs/
 // and https://github.com/plorefice/dht11-rs/blob/master/examples/stm32f407-dwt.rs
 // see (Data Watchpoint and Trace)
-// DHT11   digital temperature and humidity sensor needs xxx?k pull-up resistor on data pin.
+// DHT11   digital temperature and humidity sensor needs 10k pull-up resistor on data pin.
 
 #![deny(unsafe_code)]
 #![no_main]

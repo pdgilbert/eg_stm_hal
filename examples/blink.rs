@@ -8,6 +8,12 @@
 //! stm32l1xx below uses PB6   On some STM32L1.. Discovery boards there are onboard LD3 and LD4 LEDs on PB7 
 //!                            and PB6 but mine are defective and so tested with off board LED on PB6.
 //! 
+//! Note of Interest:  board wiring can have the LED cathode connected to the GPIO pin and anode to Vcc,
+//! so pin low is a sink and allows current flow. Alternate wiring has the GPIO pin as source.
+//! Thus set_high() for the pin turns the LED off in one case (eg. bluepill and blackpill boards) 
+//! and on in the other (eg. Discovery & Nucleo-64 boards) with set_low() doing the opposite in each case.
+//! To achieve generic code for turning the LED on and off an LED trait is defined, with different boards
+//! having different use of set_high() and set_low() in their implemantations of set_on() and set_off().
 
 #![deny(unsafe_code)]
 #![no_std]
@@ -81,14 +87,7 @@ fn main() -> ! {
     // 1. Get device specific peripherals
     // 2. Take ownership of the raw rcc (Reset and Clock Control) device and convert to  HAL structs
     // 3. Configure gpio pin as a push-pull output. 
-
-    // 4.
-    // The version of bluepill tested is active-low, cathode connected to the pin and anode to Vcc, 
-    // so pin low is a sink and allows current flow. Other boards are wired for the GPIO pin to source.
-    // Thus set_high turns the bluepill and blackpill LEDs off and Discovery & Nucleo-64 boards LEDs on while
-    //      set_low  turns the bluepill and blackpill LEDs  on and Discovery & Nucleo-64 boards LEDs off.
-    // To achieve generic code an LED trait is defined, with different boards having different use
-    // of high and low for on and off in their implemantations.
+    // 4. See Note of Interest above.
 
     #[cfg(feature = "stm32f1xx")]
     fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
