@@ -70,7 +70,7 @@ use stm32f4xx_hal::{prelude::*,
 //const LORA_CS_PIN: u64 = 8;
 //const LORA_RESET_PIN: u64 = 21;
 
-const FREQUENCY: i64 = 915;
+const FREQUENCY: i64 = 915,00;
 
 #[entry]
 fn main() -> !{
@@ -235,5 +235,18 @@ fn main() -> !{
     	Err(_error) => hprintln!("Error").unwrap(),
     };
 
-    loop { };
+    let mut j : u8  = 0;
+    loop { 
+       j += 1;
+       let message = "message " ;
+       for (i,c) in message.chars().enumerate() { buffer[i] = c as u8; }
+       buffer[1 + message.len()] = j ;
+       
+       let transmit = lora.transmit_payload(buffer, message.len());
+       match transmit {
+           Ok(_size)   => hprintln!("Sent packet: {} {}", message, j).unwrap(),
+           //Ok(size) => hprintln!("Sent packet with size: {}", size).unwrap(),
+           Err(_error) => hprintln!("Error").unwrap(),
+       };
+          };
 }

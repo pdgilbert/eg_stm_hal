@@ -206,13 +206,15 @@ The status of these examples is
 
 |    hal    |         board        |  dht  | dht11 | lora_send | lora_receive | lora_gps |
 |:---------:|:--------------------:|:-----:|:-----:|:---------:|:------------:|:--------:|
-| stm32f1xx | bluepill             | runs  | runs  |  build    |   build      |  build   |
-| stm32f3xx | discovery-stm32f303  | build | build |  build    |   build      |  build   |
-| stm32f4xx | nucleo-64 	   | build | build |  build    |   build      |  build   |
-| stm32f4xx | blackpill-stm32f401  |       |       |           |              |          |
-| stm32f4xx | blackpill-stm32f411  |       |       |           |              |          |
+| stm32f1xx | bluepill             | no-1  | no-1  |  builds   |   builds     |  builds  |
+| stm32f3xx | discovery-stm32f303  | builds| builds|  builds   |   builds     |  builds  |
+| stm32f4xx | nucleo-64 	   | builds| builds|  builds   |   builds     |  builds  |
+| stm32f4xx | blackpill-stm32f401  | no-0  | no-0  |           |              |          |
+| stm32f4xx | blackpill-stm32f411  | no-0  | no-0  |           |              |          |
 | stm32l1xx | discovery-stm32l100  |       |       |           |              |          |
 
+0. panic. Timer not set right yet.
+1. stall/timeout reading sensor
 
 ## Building Examples
 

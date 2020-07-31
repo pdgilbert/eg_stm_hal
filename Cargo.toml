@@ -81,6 +81,10 @@ path = "examples/lora_send.rs"
 name = "lora_receive"
 path = "examples/lora_receive.rs"
 
+[[example]]
+name = "lora_gps"
+path = "examples/lora_gps.rs"
+
 
 [dependencies]
 cortex-m = "0.6.0"
@@ -107,9 +111,9 @@ stm32f4 = "0.11"
 stm32l1 = "0.5.0"
 
 [dependencies.sx127x_lora]
-#git = "https://github.com/mvniekerk/sx127x_lora"
+git = "https://github.com/mvniekerk/sx127x_lora"
 #features = ["version_0x12"]
-version = "0.3.1"
+#version = "0.3.1"
 #optional = true
 
 #[dependencies.dht11]
@@ -152,6 +156,7 @@ stm32f101 = ["stm32f1xx-hal/stm32f101", "stm32f1xx-hal/rt"]
 stm32f103 = ["stm32f1xx-hal/stm32f103", "stm32f1xx-hal/rt"]
 stm32f303xc = ["stm32f3xx-hal/stm32f303xc", "stm32f3xx-hal/rt"] 
 stm32f401 = ["stm32f4xx-hal/stm32f401", "stm32f4xx-hal/rt"] 
+stm32f405 = ["stm32f4xx-hal/stm32f405", "stm32f4xx-hal/rt"] 
 stm32f411 = ["stm32f4xx-hal/stm32f411", "stm32f4xx-hal/rt"] 
 stm32l100 = ["stm32l1xx-hal/stm32l100", "stm32l1xx-hal/rt"]
 stm32l151 = ["stm32l1xx-hal/stm32l151", "stm32l1xx-hal/rt"]

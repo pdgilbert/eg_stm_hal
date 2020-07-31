@@ -179,7 +179,7 @@ fn main() -> !{
     let mut lora =  setup();
     
     loop {
-        let poll = lora.poll_irq(Some(30)); //30 Second timeout
+        let poll = lora.poll_irq(Some(60)); //60 30 Second timeout
         match poll {
             Ok(size) =>{
                 hprintln!("New Packet with size {} and RSSI: {}", size, lora.get_packet_rssi().unwrap()).unwrap();
