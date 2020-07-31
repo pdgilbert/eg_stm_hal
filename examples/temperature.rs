@@ -4,6 +4,11 @@
 //     https://docs.rs/stm32f4xx-hal/0.8.3/stm32f4xx_hal/adc/struct.Adc.html
 // http://ctms.engin.umich.edu/CTMS/Content/Activities/TMP35_36_37.pdf
 // TMP36   analog temperature sensor
+//!
+//! Notes of Interest:  
+//!  -I don't understand the details of setting  ADC or ADC clocks. If you know what you are
+//!    doing you can probably do better than what is done below. Please let me know of important
+//!    improvements by entering an issue at https://github.com/pdgilbert/eg_stm_hal
 
 // For digital temperature sensor exanples see  ds1820.rs, dht.rs and dht11.rs.
 
@@ -35,9 +40,9 @@ use stm32f3xx_hal::{prelude::*,
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
 use stm32f4xx_hal::{prelude::*, 
                     pac::Peripherals, 
-                    adc::{Adc, config::{AdcConfig, SampleTime}},
+                    adc::{Adc, Temperature, config::{AdcConfig, SampleTime}},
 		    gpio::{gpiob::{PB1}, Analog},
-		    stm32::{ADC1, ADC2},
+		    stm32::{ADC1}, //ADC2},          // 405 has ADC2 but 401 and 411 have only one adc
                     };
 
 //use stm32f4xx_hal::{ gpio::gpioa, adc::{ Adc, config::AdcConfig, config::{SampleTime,
@@ -52,43 +57,74 @@ use stm32l1xx_hal::{prelude::*,
 		    pac::{ADC1, ADC2},
                     };
 
+pub struct AdcCh <T, U> {          // combined ADC and  channel
+   adc : T,  //Adc<ADC1>,
+   ch  : U,  //PB1<Analog>,
+   }
+
+pub trait ReadTempC {                 // generics for reading AdcCh temp
+   #![allow(non_snake_case)]
+   fn read_tempC(&mut self) -> i32;        // temperature in degrees Celsius   
+   }
+
+pub trait ReadMV {                 // generics for reading AdcCh
+   fn read_mv(&mut self)    -> u32;    // millivolts
+   }
+
 
 #[entry]
 fn main() -> ! {
 
     #[cfg(feature = "stm32f1xx")]
-    fn setup() ->  (Adc<ADC1>, Adc<ADC2>, PB1<Analog>)  {
-    
+    fn setup() ->  (AdcCh<Adc<ADC1>, ()>, AdcCh<Adc<ADC2>, PB1<Analog>>) {
+  
        let p = Peripherals::take().unwrap();
        let mut flash = p.FLASH.constrain();
        let mut rcc = p.RCC.constrain();
 
-       // Configure ADC clocks
-       // ADC clock is configurable, so its frequency can be changed.
-       // User specified value approximated using supported  prescaler values 2/4/6/8  ?
-       // PCLK2 / 8  is the slowest possible ADC clock ?
+       // Configure ADC clocks. See Notes of Interest above.
 
        let clocks = rcc.cfgr.adcclk(2.mhz()).freeze(&mut flash.acr);
     
        // with above on bluepill  clocks.sysclk() is  8 Mhz and  clocks.adcclk() is  2 Mhz
        // with below on bluepill  clocks.sysclk() is 56 Mhz and  clocks.adcclk() is 14 Mhz
        // The mcu temp does not seem to be affected by this difference
-       // but the external analog temperature (adc_temp) is high by 6-7deg C with clock below.
-    
+       // but the external analog temperature (tmp36) is high by 6-7deg C with clock below.    
        //let clocks = rcc.cfgr.use_hse(8.mhz()).sysclk(56.mhz())
        //    .pclk1(28.mhz()).adcclk(14.mhz()).freeze(&mut flash.acr);
 
        hprintln!("sysclk freq: {}", clocks.sysclk().0).unwrap();  
        hprintln!("adc freq: {}", clocks.adcclk().0).unwrap();    
 
-       let mcuadc = Adc::adc1(p.ADC1, &mut rcc.apb2, clocks);         //MCU temperature using ADC1 
+       //The MCU temperature sensor is internally connected to the ADC12_IN16 input channel
+       // so no channel needs to be specified here.
+              
+       let mcutemp = AdcCh{
+                        adc: Adc::adc1(p.ADC1, &mut rcc.apb2, clocks),  // MCU temperature using ADC1
+			ch: () ,                                        // no channel
+			};
+    
+        impl ReadTempC for AdcCh<Adc<ADC1>, ()> {
+           fn read_tempC(&mut self) -> i32 {
+	      self.adc.read_temp()
+	      }
+          };
+
 
        let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
+        
+       let tmp36 = AdcCh{
+                         adc: Adc::adc2(p.ADC2, &mut rcc.apb2, clocks), // TMP36 on PB1 using ADC2
+			 ch:  gpiob.pb1.into_analog(&mut gpiob.crl),    //  using channel pb1
+			 };
+      
+       impl ReadMV for AdcCh<Adc<ADC2>, PB1<Analog>> {
+          fn read_mv(&mut self) -> u32 {
+	     self.adc.read(&mut self.ch).unwrap()
+	     }
+          };
 
-       let adc2 = Adc::adc2(p.ADC2, &mut rcc.apb2, clocks);
-       let ch1 = gpiob.pb1.into_analog(&mut gpiob.crl);               // TMP36 on PB1 using ADC2 and ch1
-       
-       (mcuadc, adc2, ch1)
+       (mcutemp, tmp36)
        };
 
 
@@ -99,24 +135,10 @@ fn main() -> ! {
        let mut flash = p.FLASH.constrain();
        let mut rcc = p.RCC.constrain();
 
-       // Configure ADC clocks
-       // ADC clock is configurable, so its frequency can be changed.
-       // User specified value approximated using supported  prescaler values 2/4/6/8  ?
-       // PCLK2 / 8  is the slowest possible ADC clock ?
+       // Configure ADC clocks. See Notes of Interest above.
 
        let clocks = rcc.cfgr.adcclk(2.mhz()).freeze(&mut flash.acr);
    
-       // with above on bluepill  clocks.sysclk() is  8 Mhz and  clocks.adcclk() is  2 Mhz
-       // with below on bluepill  clocks.sysclk() is 56 Mhz and  clocks.adcclk() is 14 Mhz
-       // The mcu temp does not seem to be affected by this difference
-       // but the external analog temperature (adc_temp) is high by 6-7deg C with clock below.
-    
-       //let clocks = rcc.cfgr.use_hse(8.mhz()).sysclk(56.mhz())
-       //    .pclk1(28.mhz()).adcclk(14.mhz()).freeze(&mut flash.acr);
-
-       hprintln!("sysclk freq: {}", clocks.sysclk().0).unwrap();  
-       hprintln!("adc freq: {}", clocks.adcclk().0).unwrap();    
-
        let mcuadc = Adc::adc1(p.ADC1, &mut rcc.apb2, clocks);         //MCU temperature using ADC1 
 
        let mut gpiob = p.GPIOB.split(&mut rcc.ahb);
@@ -129,40 +151,67 @@ fn main() -> ! {
 
 
     #[cfg(feature = "stm32f4xx")]
-    fn setup() ->  (Adc<ADC1>, Adc<ADC2>, PB1<Analog>) {
-       
+    fn setup() ->  (AdcCh<Adc<ADC1>, Temperature>, AdcCh<Adc<ADC1>, PB1<Analog>>) {
+    //fn setup() ->  AdcCh<Adc<ADC1>, Temperature> {
+    //fn setup() ->  AdcCh<Adc<ADC1>, PB1<Analog>> {
+
        // see https://docs.rs/stm32f4xx-hal/0.8.3/stm32f4xx_hal/adc/struct.Adc.html
        // and https://docs.rs/stm32f4xx-hal/0.8.3/stm32f4xx_hal/adc/struct.Adc.html#method.adc2
        
        let p = Peripherals::take().unwrap();
-       let mut rcc = p.RCC.constrain();
+       let rcc = p.RCC.constrain();
 
-       let clocks = rcc.cfgr.adcclk(2.mhz()).freeze();
-        
-       //let clocks = rcc.cfgr.use_hse(8.mhz()).sysclk(56.mhz())
-       //    .pclk1(28.mhz()).adcclk(14.mhz()).freeze();
+       //from datasheet:To synchronize A/D conversion and timers, the ADCs could be triggered by 
+       //any of TIM1,TIM2, TIM3, TIM4 or TIM5 timer.
+       
+       let clocks = rcc.cfgr.hclk(48.mhz()).sysclk(48.mhz()).pclk1(24.mhz()).pclk2(24.mhz()).freeze();
 
        hprintln!("sysclk freq: {}", clocks.sysclk().0).unwrap();  
-       hprintln!("adc freq: {}", clocks.adcclk().0).unwrap();    
       
-       let mut mcuadc = Adc::adc1(p.ADC1, true, AdcConfig::default());    //MCU temperature using ADC1 
+       // stm32f411: The temperature sensor is internally connected to the ADC_IN18 input channel 
+        
+       // one-shot conversion       
+       let mcutemp = AdcCh{
+                        adc: Adc::adc1(p.ADC1, true, AdcConfig::default()),  // MCU temperature using ADC1
+                         ch: Temperature,                                    // channel internally 18
+                     };
+      
+       impl ReadTempC for AdcCh<Adc<ADC1>, Temperature> {
+           fn read_tempC(&mut self) -> i32 {
+              let adc_value = self.adc.read(&mut self.ch).unwrap() as u32; //READS ONCE OK, THEN 0.
+              //let adc_temp:  i32 = (adc_value as f32 / 12.412122 ) as i32 - 50 ; // NOT RIGHT
+              adc_value as i32 
+              }
+           };
 
-       let mut gpiob = p.GPIOB.split();
 
-       //pub fn adc2(adc: ADC2, reset: bool, config: AdcConfig) -> Adc<ADC2>
+       let gpiob = p.GPIOB.split();
 
        // one-shot conversion
-       let mut adc2 = Adc::adc2(p.ADC2, true, AdcConfig::default());       // TMP36 on PB1 using ADC2 and ch1
-       let mut ch1 = gpiob.pb1.into_analog();
        
-       (mcuadc, adc2, ch1)        
+       let tmp36 = AdcCh{
+        		 adc: Adc::adc1(p.ADC1, true, AdcConfig::default()),  // TMP36 on PB1 using ADC1 
+       	                  ch:  gpiob.pb1.into_analog(),	                      //  using channel on pb1
+       	       };
+       
+       impl ReadMV for AdcCh<Adc<ADC1>, PB1<Analog>> {
+          fn read_mv(&mut self) -> u32 {
+	     self.adc.read(&mut self.ch).unwrap() as u32
+	     }
+          };
+
+       //mcutemp
+       //tmp36
+       (mcutemp, tmp36)
        };
 
 
     // End of hal/MCU specific setup. Following should be generic code.
 
 
-    let (mut mcuadc,   mut adc2,   mut ch1) = setup();  
+    //let mut mcutemp = setup();  
+    //let mut tmp36   = setup();  
+    let (mut mcutemp,   mut tmp36) = setup();  
 
     // TMP35 has linear output with scale calculation as follows.
     // Vin = 3.3v * ADCvalue / 4096     (12 bit adc has  2**12 = 4096 steps)
@@ -181,11 +230,11 @@ fn main() -> ! {
     //   let adc_temp:  i16 = (adc_value / 12 ) as i16 - 50  ;
 
     loop {
-        let mcutemp = mcuadc.read_temp();
-        hprintln!("MCU temp: {}", mcutemp).unwrap();
+        let mcu_value = mcutemp.read_tempC();
+        hprintln!("MCU temp: {}", mcu_value).unwrap();
 
-	let adc_value: u16 = adc2.read(&mut ch1).unwrap();
-	let adc_temp:  i16 = (adc_value as f32 / 12.412122 ) as i16 - 50  ;
-        hprintln!("adc2: {}", adc_temp).unwrap();
+	let tmp36_value: u32 = tmp36.read_mv();
+	let tmp36_temp:  i32 = (tmp36_value as f32 / 12.412122 ) as i32 - 50  ;
+	hprintln!("external TMP36: {}", tmp36_temp).unwrap();
         }
 }
