@@ -138,15 +138,33 @@ fn main() -> ! {
        // Configure ADC clocks. See Notes of Interest above.
 
        let clocks = rcc.cfgr.adcclk(2.mhz()).freeze(&mut flash.acr);
-   
-       let mcuadc = Adc::adc1(p.ADC1, &mut rcc.apb2, clocks);         //MCU temperature using ADC1 
 
-       let mut gpiob = p.GPIOB.split(&mut rcc.ahb);
+       let mcutemp = AdcCh{
+                        adc: Adc::adc1(p.ADC1, &mut rcc.apb2, clocks),  // MCU temperature using ADC1
+			ch: () ,                                        // no channel
+			};
+    
+        impl ReadTempC for AdcCh<Adc<ADC1>, ()> {
+           fn read_tempC(&mut self) -> i32 {
+	      self.adc.read_temp()
+	      }
+          };
 
-       let adc2 = Adc::adc2(p.ADC2, &mut rcc.apb2, clocks);
-       let ch1 = gpiob.pb1.into_analog(&mut gpiob.crl);              // TMP36 on PB1 using ADC2 and ch1
-       
-       (mcuadc, adc2, ch1)
+
+       let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
+        
+       let tmp36 = AdcCh{
+                         adc: Adc::adc2(p.ADC2, &mut rcc.apb2, clocks), // TMP36 on PB1 using ADC2
+			 ch:  gpiob.pb1.into_analog(&mut gpiob.crl),    //  using channel pb1
+			 };
+      
+       impl ReadMV for AdcCh<Adc<ADC2>, PB1<Analog>> {
+          fn read_mv(&mut self) -> u32 {
+	     self.adc.read(&mut self.ch).unwrap()
+	     }
+          };
+
+       (mcutemp, tmp36)
        };
 
 
