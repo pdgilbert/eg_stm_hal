@@ -1,7 +1,8 @@
-//! Using crate ssd1306 to print on a generic ssd1306 based OLED display.
+//! Using crate ssd1306 to print with i2c on a generic ssd1306 based OLED display.
 //!
 //! Print "Hello world!" then "Hello rust!". Uses the `embedded_graphics` crate to draw.
 //! Wiring pin connections for scl and sda to display as in the setup sections below.
+//! Tested on generic (cheap) ssd1306 OLED 0.91" 128x32 and 0.96" 128c64 displays.
 //!
 //! This example based on 
 //!    https://github.com/jamwaffles/ssd1306/blob/master/examples/text_i2c.rs
@@ -40,13 +41,21 @@ use stm32f3xx_hal::{prelude::*,
 		    pac::I2C1,
 		    };
 
-#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
+#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f401 stm32f411
 use stm32f4xx_hal::{prelude::*,  
                     pac::Peripherals, 
                     i2c::{I2c, },  
 		    gpio::{gpiob::{PB8, PB9}, AlternateOD, AF4, },
                     pac::I2C1,
 		    }; 
+
+
+#[cfg(feature = "stm32l1xx") ] // eg  Discovery STM32L100 and Heltec lora_node STM32L151CCU6
+use stm32l1xx_hal::{prelude::*, 
+                    stm32::Peripherals,
+		    gpio::{gpiob::{PB8, PB9}, AlternateOD, AF4, },
+                    stm32::I2C1,
+                    };
 
 #[entry]
 fn main() -> ! {
@@ -103,6 +112,24 @@ fn main() -> ! {
   
        let  p  = Peripherals::take().unwrap();
        let rcc = p.RCC.constrain();
+       let clocks = rcc.cfgr.freeze();
+       let gpiob  = p.GPIOB.split();
+       
+       // could also have scl on PB6, sda on PB7
+       //BlockingI2c::i2c1(
+       let scl = gpiob.pb8.into_alternate_af4().set_open_drain();   // scl on PB8
+       let sda = gpiob.pb9.into_alternate_af4().set_open_drain();   // sda on PB9
+       
+       // return i2c
+       I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks)
+       };
+
+
+    #[cfg(feature = "stm32l1xx")]
+    fn setup() -> I2c<I2C1, (PB8<AlternateOD<AF4>>, PB9<AlternateOD<AF4>>)> {
+  
+       let  p  = Peripherals::take().unwrap();
+       //let rcc = p.RCC.constrain();
        let clocks = rcc.cfgr.freeze();
        let gpiob  = p.GPIOB.split();
        

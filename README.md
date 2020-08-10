@@ -191,27 +191,27 @@ In the table cells:
 
 ## Additional Examples
 
-These are examples which use an additional device crate as follows: dht uses `dht`. dht11 uses `dht11`,
-and lora_send, lora_receive, lora_gps use `sx127x_lora`.
+These are examples which use an additional device crate .
 
-| xxx          | notes |   Description                                              |
-| ------------ |:-----:|:---------------------------------------------------------- |
-| dht          |       | read a dht11 sensor and write to semihost                  |
-| dht11        |       | read a dht11 sensor and write to semihost                  |
-| lora_send    |       | transmit a character string over LoRa,  + semihost output  |
-| lora_receive |       | receive  a character string over LoRa,  + semihost output  |
-| lora_gps     |       | read gps and transmit over LoRa,  + semihost output        |
+| xxx          |    crate    | notes |   Description                                              |
+| ------------ |:-----------:|:-----:|:---------------------------------------------------------- |
+| dht          | dht         |       | read a dht11 sensor and write to semihost                  |
+| dht11        | dht11       |       | read a dht11 sensor and write to semihost                  |
+| text_i2c     | ssd1306     |       | write 2 text lines on ssd1306 OLED                         |
+| lora_send    | sx127x_lora |       | transmit a character string over LoRa,  + semihost output  |
+| lora_receive | sx127x_lora |       | receive  a character string over LoRa,  + semihost output  |
+| lora_gps     | sx127x_lora |       | read gps and transmit over LoRa,  + semihost output        |
 
 The status of these examples is
 
-|    hal    |         board        |  dht  | dht11 | lora_send | lora_receive | lora_gps |
-|:---------:|:--------------------:|:-----:|:-----:|:---------:|:------------:|:--------:|
-| stm32f1xx | bluepill             | no-1  | no-1  |  builds   |   builds     |  builds  |
-| stm32f3xx | discovery-stm32f303  | builds| builds|  builds   |   builds     |  builds  |
-| stm32f4xx | nucleo-64 	   | builds| builds|  builds   |   builds     |  builds  |
-| stm32f4xx | blackpill-stm32f401  | no-0  | no-0  |           |              |          |
-| stm32f4xx | blackpill-stm32f411  | no-0  | no-0  |           |              |          |
-| stm32l1xx | discovery-stm32l100  |       |       |           |              |          |
+|    hal    |         board        |  dht  | dht11 | text_i2c | lora_send | lora_receive | lora_gps |
+|:---------:|:--------------------:|:-----:|:-----:|:--------:|:---------:|:------------:|:--------:|
+| stm32f1xx | bluepill             | no-1  | no-1  |   runs   |  builds   |   builds     |  builds  |
+| stm32f3xx | discovery-stm32f303  | builds| builds|   runs   |  builds   |   builds     |  builds  |
+| stm32f4xx | nucleo-64 	   | builds| builds|   runs   |  builds   |   builds     |  builds  |
+| stm32f4xx | blackpill-stm32f401  | no-0  | no-0  |   runs   |           |              |          |
+| stm32f4xx | blackpill-stm32f411  | no-0  | no-0  |   runs   |           |              |          |
+| stm32l1xx | discovery-stm32l100  |       |       |   no     |           |              |          |
 
 0. panic. Timer not set right yet.
 1. stall/timeout reading sensor
@@ -345,8 +345,9 @@ Development boards I have tried:
 ```
   export INTERFACE=stlink-v2-1  PROC=stm32f3x  #discovery-stm32f303
   export INTERFACE=stlink-v2-1  PROC=stm32f4x  #nucleo-64
+  export INTERFACE=stlink-v2    PROC=stm32l1x  #discovery-stm32l100 
 ```
-The discovery-stm32f303 and nucleo-64 pop up a a window with Mbed.htm which I dismiss and then run `openocd`.
+These may pop up a a window with Mbed.htm which I dismiss and then run `openocd`.
 
 It is possible to use the built in STlink on some development boards to program another board. 
 To do this it is necessary to  removing 2 connectors on the 'ST-LINK' header and connect the 
