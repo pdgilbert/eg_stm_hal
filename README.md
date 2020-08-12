@@ -198,23 +198,26 @@ These are examples which use an additional device crate .
 | dht          | dht         |       | read a dht11 sensor and write to semihost                  |
 | dht11        | dht11       |       | read a dht11 sensor and write to semihost                  |
 | text_i2c     | ssd1306     |       | write 2 text lines on ssd1306 OLED                         |
+| oled_gps     | ssd1306     |       | read gps and write coordinates on ssd1306 OLED             |
 | lora_send    | sx127x_lora |       | transmit a character string over LoRa,  + semihost output  |
 | lora_receive | sx127x_lora |       | receive  a character string over LoRa,  + semihost output  |
 | lora_gps     | sx127x_lora |       | read gps and transmit over LoRa,  + semihost output        |
 
 The status of these examples is
 
-|    hal    |         board        |  dht  | dht11 | text_i2c | lora_send | lora_receive | lora_gps |
-|:---------:|:--------------------:|:-----:|:-----:|:--------:|:---------:|:------------:|:--------:|
-| stm32f1xx | bluepill             | no-1  | no-1  |   runs   |  builds   |   builds     |  builds  |
-| stm32f3xx | discovery-stm32f303  | builds| builds|   runs   |  builds   |   builds     |  builds  |
-| stm32f4xx | nucleo-64 	   | builds| builds|   runs   |  builds   |   builds     |  builds  |
-| stm32f4xx | blackpill-stm32f401  | no-0  | no-0  |   runs   |           |              |          |
-| stm32f4xx | blackpill-stm32f411  | no-0  | no-0  |   runs   |           |              |          |
-| stm32l1xx | discovery-stm32l100  |       |       |   no     |           |              |          |
+|    hal    |         board        |  dht  | dht11 | text_i2c | oled_gps | lora_send | lora_receive | lora_gps |
+|:---------:|:--------------------:|:-----:|:-----:|:--------:|:--------:|:---------:|:------------:|:--------:|
+| stm32f1xx | bluepill             | no-1  | no-1  |   runs   |   no-2   |  builds   |   builds     |  builds  |
+| stm32f3xx | discovery-stm32f303  | builds| builds|   runs   |          |  builds   |   builds     |  builds  |
+| stm32f4xx | nucleo-64 	   | builds| builds|   runs   |          |  builds   |   builds     |  builds  |
+| stm32f4xx | blackpill-stm32f401  | no-0  | no-0  |   runs   |          |           |              |          |
+| stm32f4xx | blackpill-stm32f411  | no-0  | no-0  |   runs   |  runs-3  |           |              |          |
+| stm32l1xx | discovery-stm32l100  |       |       |   no     |          |           |              |          |
 
 0. panic. Timer not set right yet.
-1. stall/timeout reading sensor
+1. stall/timeout reading sensor.
+2. too large for flash.
+3. with 128x64 display.
 
 ## Building Examples
 
