@@ -2,7 +2,7 @@
 //!
 //! Print "Hello world!" then "Hello rust!". Uses the `embedded_graphics` crate to draw.
 //! Wiring pin connections for scl and sda to display as in the setup sections below.
-//! Tested on generic (cheap) ssd1306 OLED 0.91" 128x32 and 0.96" 128c64 displays.
+//! Tested on generic (cheap) ssd1306 OLED 0.91" 128x32 and 0.96" 128x64 displays.
 //!
 //! This example based on 
 //!    https://github.com/jamwaffles/ssd1306/blob/master/examples/text_i2c.rs
