@@ -48,6 +48,9 @@ use stm32l1xx_hal::{prelude::*,
 		    gpio::{gpioa::PA8, OpenDrain,  Output, },
 		   };
 
+use embedded_hal::blocking::delay::{DelayMs, DelayUs};
+use embedded_hal::digital::v2::{InputPin, OutputPin};
+
 
 #[entry]
 fn main() -> ! {
@@ -66,16 +69,17 @@ fn main() -> ! {
 
        let mut rcc = p.RCC.constrain();
        let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
-
-       let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
-       let pin_a8    = gpioa.pa8.into_open_drain_output(&mut gpioa.crh); 
        
        // delay is used by `dht-sensor` to wait for signals
        let mut delay = Delay::new(cp.SYST, clocks);   //SysTick: System Timer
 
+       let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
+       let pin_a8    = gpioa.pa8.into_open_drain_output(&mut gpioa.crh); 
+       //let mut pin_a8 = cortex_m::interrupt::free(|cs| pin_a8.into_open_drain_output(cs));
+ 
        //  1 second delay (for DHT11 setup?) Wait on  sensor initialization?
        delay.delay_ms(1000_u16);
-       
+      
        (pin_a8,                   //DHT data will be on A8
         delay)
        };
@@ -151,8 +155,10 @@ fn main() -> ! {
     let (mut pin_a8, mut delay) = setup();
     
     hprintln!("Reading sensor...").unwrap();
+    
+    let r = dht11::Reading::read(&mut delay, &mut pin_a8);
 
-    match dht11::Reading::read(&mut delay, &mut pin_a8) {
+    match r {
         Ok(dht11::Reading {
             temperature,
             relative_humidity,
@@ -160,7 +166,6 @@ fn main() -> ! {
         Err(e) => hprintln!("Error {:?}", e).unwrap(),
     }
     hprintln!("empty looping").unwrap();
-    hprintln!("entering sensor reading loop...").unwrap();
 
     loop {}
 }

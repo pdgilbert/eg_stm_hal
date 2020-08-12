@@ -19,7 +19,7 @@ use embedded_graphics::{
     pixelcolor::BinaryColor,
     prelude::*,
     style::TextStyleBuilder,
-};
+   };
 use panic_halt as _;
 
 use ssd1306::{prelude::*, Builder, I2CDIBuilder};
@@ -35,13 +35,12 @@ use stm32f1xx_hal::{prelude::*,
 #[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
 use stm32f3xx_hal::{prelude::*, 
                     pac::Peripherals,
-                    //i2c::{I2c, BlockingI2c, DutyCycle, Mode},  
                     i2c::{I2c, },  
 		    gpio::{gpiob::{PB8, PB9}, AF4, },
 		    pac::I2C1,
 		    };
 
-#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f401 stm32f411
+#[cfg(feature = "stm32f4xx")] // eg Nucleo-64, blackpills stm32f401 and stm32f411
 use stm32f4xx_hal::{prelude::*,  
                     pac::Peripherals, 
                     i2c::{I2c, },  

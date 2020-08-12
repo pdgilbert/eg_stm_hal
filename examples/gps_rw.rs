@@ -90,8 +90,8 @@ fn main() -> ! {
     	let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
         let (tx3, rx3) = Serial::usart3(
             p.USART3,
-            (gpiob.pb10.into_alternate_push_pull(&mut gpiob.crh),    //tx pb10  for GPS
-             gpiob.pb11), 					     //rx pb11  for GPS
+            (gpiob.pb10.into_alternate_push_pull(&mut gpiob.crh),    //tx pb10  for GPS rx
+             gpiob.pb11), 					     //rx pb11  for GPS tx
             &mut afio.mapr,
             Config::default() .baudrate(9_600.bps()), 
             clocks,
@@ -199,7 +199,7 @@ fn main() -> ! {
     
     // byte buffer length 80
     let mut buffer: Vec<u8, consts::U80> = Vec::new();
-    hprintln!("buffer at {} of {}", buffer.len(), buffer.capacity()).unwrap();  //0 of 100
+    hprintln!("buffer at {} of {}", buffer.len(), buffer.capacity()).unwrap();  //0 of 80
     buffer.clear();
 
 //    while (i < r.len()) && !buffer.push(r[i]).is_err() {
