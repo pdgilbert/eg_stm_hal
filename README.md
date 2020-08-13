@@ -210,14 +210,14 @@ The status of these examples is
 | stm32f1xx | bluepill             | no-1  | no-1  |   runs   |   no-2   |  builds   |   builds     |  builds  |
 | stm32f3xx | discovery-stm32f303  | builds| builds|   runs   |          |  builds   |   builds     |  builds  |
 | stm32f4xx | nucleo-64 	   | builds| builds|   runs   |          |  builds   |   builds     |  builds  |
-| stm32f4xx | blackpill-stm32f401  | no-0  | no-0  |   runs   |          |           |              |          |
-| stm32f4xx | blackpill-stm32f411  | no-0  | no-0  |   runs   |  runs-3  |           |              |          |
+| stm32f4xx | blackpill-stm32f401  | no-0  | no-0  |   runs   |   runs   |           |              |          |
+| stm32f4xx | blackpill-stm32f411  | no-0  | no-0  |   runs   |   runs   |           |              |          |
 | stm32l1xx | discovery-stm32l100  |       |       |   no     |          |           |              |          |
 
 0. panic. Timer not set right yet.
 1. stall/timeout reading sensor.
 2. too large for flash.
-3. with 128x64 display.
+
 
 ## Building Examples
 

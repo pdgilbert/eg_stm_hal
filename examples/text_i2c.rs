@@ -151,7 +151,8 @@ fn main() -> ! {
     let mut disp: GraphicsMode<_> = Builder::new().connect(interface).into();
     disp.init().unwrap();
 
-    let text_style = TextStyleBuilder::new(Font8x16)
+    //builtin include Font6x6, Font6x8, Font6x12, Font8x16, Font12x16, Font24x32
+    let text_style = TextStyleBuilder::new(Font8x16) 
         .text_color(BinaryColor::On)
         .build();
 

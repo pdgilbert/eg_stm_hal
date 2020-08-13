@@ -25,8 +25,10 @@ use nb::block;
 
 use eg_stm_hal::to_str;
 
+//builtin include Font6x6, Font6x8, Font6x12, Font8x16, Font12x16, Font24x32
 use embedded_graphics::{
-    fonts::{Font8x16, Text},   // Font6x8, Font12x16, Font6x12, Font8x16
+    //fonts::{Font6x6, Font6x8, Font6x12, Font8x16, Font12x16, Font24x32, Text,}, 
+    fonts::{Font6x12,  Text,}, 
     pixelcolor::BinaryColor,
     prelude::*,
     style::TextStyleBuilder,
@@ -235,17 +237,45 @@ fn main() -> ! {
     let mut disp: GraphicsMode<_> = Builder::new().connect(interface).into();
     disp.init().unwrap();
 
-    let text_style = TextStyleBuilder::new(Font8x16)
+    //builtin include Font6x6, Font6x8, Font6x12, Font8x16, Font12x16, Font24x32
+    // printing 14 characters, font width must be less than 9  (128/14)
+    // but I don't undestand height. 
+    
+    // 0.91" advertised as 128x32, seems to be 128x64 but very compressed in 64 direction.
+    // Unsure if this is a driver problem.
+    
+    // Font6x6   extremely small. Unreadable on  0.91" 128x32. Clear on 0.96" 128x64.
+    // Font6x8   very small. Unreadable on  0.91" 128x32. Clear on 0.96" 128x64.
+    // Font6x12  clear but small. Works both  0.91" 128x32 and 0.96" 128x64 displays.
+    // Font8x16  works on 0.96" 128x64 display, not good (clipped top edge) on 0.91" 128x32.
+    // Font12x16 too wide on both.
+    // Font24x32 too wide and too high for two lines on both. Causes panic.
+    let text_style = TextStyleBuilder::new(Font6x12)
         .text_color(BinaryColor::On)
         .background_color(BinaryColor::Off)
         .build();
 
-    //Text::new("----", Point::zero())
-    //	.into_styled(text_style)
-    //	.draw(&mut disp)
-    //	.unwrap();
-    //
-    //delay.delay_ms(4000_u16);
+    //let top = Text::new("----", Point::zero())
+    //  .into_styled(text_style)
+    //  .draw(&mut disp)
+    //  .unwrap();
+    let mut line1 = Text::new("YYYYYYYYYYYYYYYY", Point::zero());
+    let mut line2 = Text::new("XXXXXXXXXXXXXXXX", Point::new(0, 32));
+    
+    line1.into_styled(text_style).draw(&mut disp).unwrap();
+    line2.into_styled(text_style).draw(&mut disp).unwrap();
+    disp.flush().unwrap();
+   
+    delay.delay_ms(3000_u16);
+    
+    // Would this approach in loop give smaller code? or faster? 
+    // Need to avoid  mutable/immutable borrow.
+    line1.text = "xxxx";
+    line1.into_styled(text_style).draw(&mut disp).unwrap();
+    line2.text = "zzzz";
+    line2.into_styled(text_style).draw(&mut disp).unwrap();
+    disp.flush().unwrap();
+    delay.delay_ms(2000_u16);
 
 
     //disp.flush().unwrap();
@@ -269,7 +299,7 @@ fn main() -> ! {
 	   good = true;     //start capturing line
 	   };
 	if good {
-	   if buffer.push(byte).is_err() ||  byte == 13  { //print if end of line. \r is 13, \n is 10
+	   if buffer.push(byte).is_err() ||  byte == 13 { //end of line. \r is 13, \n is 10
               
               //hprintln!("buffer at {} of {}", buffer.len(), buffer.capacity()).unwrap();
               //hprintln!("read buffer {:?}", to_str(&buffer)).unwrap();
@@ -293,7 +323,7 @@ fn main() -> ! {
                       .into_styled(text_style)
                       .draw(&mut disp)
                       .unwrap();
-	          Text::new(east, Point::new(0, 20))
+	          Text::new(east, Point::new(0, 32))
                       .into_styled(text_style)
                       .draw(&mut disp)
                       .unwrap();
