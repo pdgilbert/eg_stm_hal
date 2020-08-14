@@ -3,19 +3,24 @@
 //! Print "Hello world!" then "Hello rust!". Uses the `embedded_graphics` crate to draw.
 //! Wiring pin connections for scl and sda to display as in the setup sections below.
 //! Tested on generic (cheap) ssd1306 OLED 0.91" 128x32 and 0.96" 128x64 displays.
+//! Note that the DisplaySize setting needs to be adjusted for 128x64 or 128x32 display
 //!
 //! This example based on 
 //!    https://github.com/jamwaffles/ssd1306/blob/master/examples/text_i2c.rs
 //! with stm32f4xx_hal setup following 
 //!    https://github.com/stm32-rs/stm32f4xx-hal/blob/master/examples/ssd1306-image.rs
+//!
+//! Compare this example with oled_gps.
 
 
 #![no_std]
 #![no_main]
 
 use cortex_m_rt::{entry, exception, ExceptionFrame};
+
+//builtin include Font6x6, Font6x8, Font6x12, Font8x16, Font12x16, Font24x32
 use embedded_graphics::{
-    fonts::{Font8x16, Text},   // Font6x8, Font12x16, Font6x12, Font8x16
+    fonts::{Font8x16, Text}, 
     pixelcolor::BinaryColor,
     prelude::*,
     style::TextStyleBuilder,
@@ -148,7 +153,10 @@ fn main() -> ! {
     let i2c = setup();
     
     let interface = I2CDIBuilder::new().init(i2c);
-    let mut disp: GraphicsMode<_> = Builder::new().connect(interface).into();
+    let mut disp: GraphicsMode<_, _> = Builder::new()
+                    .size(DisplaySize128x64)        // set display size 128x32, 128x64
+		    .connect(interface)
+		    .into();
     disp.init().unwrap();
 
     //builtin include Font6x6, Font6x8, Font6x12, Font8x16, Font12x16, Font24x32
