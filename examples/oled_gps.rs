@@ -1,4 +1,7 @@
 //! Read GPS on usart serial interface and display on OLED with i2c.
+//! GPS longitude and latitude in 100ths of a degree (taken as characters
+//! from GPS messages without any conversion).
+//! Note that the DisplaySize setting needs to be adjusted for 128x64 or 128x32 display
 //! Compare this example with gps_rw, lora_gps and text_i2c.
 
 #![deny(unsafe_code)]
@@ -28,7 +31,7 @@ use eg_stm_hal::to_str;
 //builtin include Font6x6, Font6x8, Font6x12, Font8x16, Font12x16, Font24x32
 use embedded_graphics::{
     //fonts::{Font6x6, Font6x8, Font6x12, Font8x16, Font12x16, Font24x32, Text,}, 
-    fonts::{Font6x12,  Text,}, 
+    fonts::{Font8x16,  Text,}, 
     pixelcolor::BinaryColor,
     prelude::*,
     style::TextStyleBuilder,
@@ -233,40 +236,37 @@ fn main() -> ! {
 
     let (mut _tx_gps, mut rx_gps,   i2c,  mut delay) = setup();  //  GPS, i2c, delay
 
-    let interface = I2CDIBuilder::new().init(i2c);
-    let mut disp: GraphicsMode<_> = Builder::new().connect(interface).into();
+    let interface = I2CDIBuilder::new().init(i2c);    
+    let mut disp: GraphicsMode<_, _> = Builder::new()
+                    .size(DisplaySize128x64)        // set display size 128x32, 128x64
+		    .connect(interface)
+		    .into();
     disp.init().unwrap();
+    
+    // A symptom of improper DisplaySize setting can be clipping font on top and/or bottom.
 
     //builtin include Font6x6, Font6x8, Font6x12, Font8x16, Font12x16, Font24x32
-    // printing 14 characters, font width must be less than 9  (128/14)
-    // but I don't undestand height. 
-    
-    // 0.91" advertised as 128x32, seems to be 128x64 but very compressed in 64 direction.
-    // Unsure if this is a driver problem.
-    
-    // Font6x6   extremely small. Unreadable on  0.91" 128x32. Clear on 0.96" 128x64.
-    // Font6x8   very small. Unreadable on  0.91" 128x32. Clear on 0.96" 128x64.
-    // Font6x12  clear but small. Works both  0.91" 128x32 and 0.96" 128x64 displays.
-    // Font8x16  works on 0.96" 128x64 display, not good (clipped top edge) on 0.91" 128x32.
-    // Font12x16 too wide on both.
-    // Font24x32 too wide and too high for two lines on both. Causes panic.
-    let text_style = TextStyleBuilder::new(Font6x12)
+    // printing 14 characters, font width must be less than 9  (128/14)        
+    // Font6x6   extremely small.
+    // Font6x8   very small. 
+    // Font6x12  clear but small. 
+    // Font8x16  good.
+    // Font12x16 too wide for 128x displays.
+    // Font24x32 too wide and too high for two lines. Causes panic.
+
+    let text_style = TextStyleBuilder::new(Font8x16)
         .text_color(BinaryColor::On)
         .background_color(BinaryColor::Off)
         .build();
 
-    //let top = Text::new("----", Point::zero())
-    //  .into_styled(text_style)
-    //  .draw(&mut disp)
-    //  .unwrap();
-    let mut line1 = Text::new("YYYYYYYYYYYYYYYY", Point::zero());
-    let mut line2 = Text::new("XXXXXXXXXXXXXXXX", Point::new(0, 32));
+    let mut line1 = Text::new("----", Point::zero());
+    let mut line2 = Text::new("----", Point::new(0, 20));
     
     line1.into_styled(text_style).draw(&mut disp).unwrap();
     line2.into_styled(text_style).draw(&mut disp).unwrap();
     disp.flush().unwrap();
    
-    delay.delay_ms(3000_u16);
+    delay.delay_ms(2000_u16);
     
     // Would this approach in loop give smaller code? or faster? 
     // Need to avoid  mutable/immutable borrow.
@@ -275,10 +275,8 @@ fn main() -> ! {
     line2.text = "zzzz";
     line2.into_styled(text_style).draw(&mut disp).unwrap();
     disp.flush().unwrap();
-    delay.delay_ms(2000_u16);
+    delay.delay_ms(1000_u16);
 
-
-    //disp.flush().unwrap();
 
     // byte buffer length 80
     let mut buffer: Vec<u8, consts::U80> = Vec::new();
@@ -303,19 +301,15 @@ fn main() -> ! {
               
               //hprintln!("buffer at {} of {}", buffer.len(), buffer.capacity()).unwrap();
               //hprintln!("read buffer {:?}", to_str(&buffer)).unwrap();
-              
-	      //hprintln!("buffer[0..6] {:?}", &buffer[0..6]).unwrap();
-	      //hprintln!("buffer[0..6] {}", to_str(&buffer)).unwrap();  // message id
-	      // hprintln!("buffer[0..6] {}", to_str(&buffer[0..6])).unwrap();  // message
- 
-              
-	      //if buffer[0..6] == [36, 71, 80, 84, 88, 84] {  // "$GPTXT"
+                            
+	      //if buffer[0..6] == [36, 71, 80, 84, 88, 84] {  //$GPTXT
 	      //if buffer[0..6] == [36, 71, 80, 82, 77, 67] {  //$GPRMC
 	      
-	      //$GPGLL north ~ to_str(&buffer[7..19]) east ~ to_str(&buffer[19..33])
+	      //$GPGLL north ~ to_str(&buffer[7..19])  east ~ to_str(&buffer[19..33])
 	      //$GPRMC north = to_str(&buffer[19..31]) east = to_str(&buffer[32..45])
 	      
-	      if to_str(&buffer[0..6]) == "$GPRMC" {   // message id
+	      //if to_str(&buffer[0..6]) == "$GPRMC" {           // message id
+	      if &buffer[0..6] == [36, 71, 80, 82, 77, 67] {   // message id
 	          let north = to_str(&buffer[19..31]);
 	          hprintln!("north {}", north).unwrap();
 	          let east  = to_str(&buffer[32..45]);
@@ -323,7 +317,7 @@ fn main() -> ! {
                       .into_styled(text_style)
                       .draw(&mut disp)
                       .unwrap();
-	          Text::new(east, Point::new(0, 32))
+	          Text::new(east, Point::new(0, 20))
                       .into_styled(text_style)
                       .draw(&mut disp)
                       .unwrap();
