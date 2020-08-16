@@ -77,7 +77,9 @@ script:
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  dht
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  dht11
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  text_i2c
+  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  oled_gps
   #- cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  ads1015-display
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  lora_send
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  lora_receive
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  lora_gps
+  - touch testBadge.png

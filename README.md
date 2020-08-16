@@ -147,7 +147,7 @@ See [Running Examples](#running-examples) for more details.
 
 
 0.  Using the git versions of HALs (in July 2020 much is changing and release in crates.io is old). 
-1.  blink3 does not blink when stepping in gdb, use continue.
+1.  Does not blink when stepping in gdb, use continue.
 2.  With local echo on in console the characters are doubled, `<cr>` adds a single `<lf>`.
      Without local echo there is no `<lf>`. There is trouble if you type too fast.
 3.  Ublox GPS by default uses 9600bps, odd Parity, 1 stop bit (minicom 8-N-1). 
@@ -191,7 +191,7 @@ In the table cells:
 
 ## Additional Examples
 
-These are examples which use an additional device crate .
+These are examples which use an additional device crate.
 
 | xxx          |    crate    | notes |   Description                                              |
 | ------------ |:-----------:|:-----:|:---------------------------------------------------------- |
