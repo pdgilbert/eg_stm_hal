@@ -48,8 +48,8 @@ use stm32l1xx_hal::{prelude::*,
 		    gpio::{gpioa::PA8, OpenDrain,  Output, },
 		   };
 
-use embedded_hal::blocking::delay::{DelayMs, DelayUs};
-use embedded_hal::digital::v2::{InputPin, OutputPin};
+use embedded_hal::blocking::delay::{DelayMs,};
+//use embedded_hal::digital::v2::{InputPin, OutputPin};
 
 
 #[entry]
