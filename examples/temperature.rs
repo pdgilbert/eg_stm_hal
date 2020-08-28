@@ -213,12 +213,13 @@ fn main() -> ! {
                      };
       
        impl ReadTempC for AdcCh<&'static Adc<ADC1>, Temperature> {
-           fn read_tempC(&mut self) -> i32 {
-              let adc_value = (self.adc).read(&mut self.ch).unwrap() as u32; //READS ONCE OK, THEN 0.
-              //let adc_temp:  i32 = (adc_value as f32 / 12.412122 ) as i32 - 50 ; // NOT RIGHT
-              adc_value as i32 
-              }
-           };
+          fn read_tempC(&mut self) -> i32 {
+	     let ch  = &mut self.ch;
+	     let adc = &self.adc;
+             let v:  u32 = adc.read(ch).unwrap() as u32; 
+             (v as f32 / 12.412122 ) as i32 - 50  as i32 // NOT RIGHT
+             }
+          };
 
 
        let gpiob = p.GPIOB.split();
@@ -232,7 +233,18 @@ fn main() -> ! {
        
        impl ReadMV for AdcCh<&'static Adc<ADC1>, PB1<Analog>> {
           fn read_mv(&mut self) -> u32 {
-	     (self.adc).read(&mut self.ch).unwrap() as u32
+	     let ch  = &mut self.ch;
+	     let adc = &self.adc;
+	     adc.read(ch).unwrap() as u32
+	     }
+          };
+
+       impl ReadTempC for AdcCh<&'static Adc<ADC1>, PB1<Analog>> {
+          fn read_tempC(&mut self) -> i32 {
+	     let ch = &mut self.ch;
+	     let adc = &self.adc;
+	     let v:  u32 = adc.read(ch).unwrap() as u32;
+	     (v as f32 / 12.412122 ) as i32 - 50 as i32
 	     }
           };
 

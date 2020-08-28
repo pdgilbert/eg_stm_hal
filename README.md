@@ -137,8 +137,8 @@ See [Running Examples](#running-examples) for more details.
 | -------------------- |:-----:|:-------------------------------------------------------------- |
 | blink                |   1   | Blink on-board LED                                             |
 | blink3               |   1   | Blink off-board LEDs attached to  pb 13,14,15                  |
-| echo_console_by_char |   2   | Echo console input, char by char,  + semihost output           |
-| echo_console_string  |       | Read 15 chars input from console, output to semihost, repeat   |
+| echo_by_char |   2   | Echo console input, char by char,  + semihost output           |
+| echo_string  |       | Read 15 chars input from console, output to semihost, repeat   |
 | serial_char          |       | Single char between usarts 2 and 3, console and semihost output|
 | serial_string        |       | String writes between usarts 2 and 3, console and semihost output|
 | gps_rw_by_char       |       | Read by char from GPS with echo to console + semihost output   |
