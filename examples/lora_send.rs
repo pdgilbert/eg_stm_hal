@@ -70,7 +70,7 @@ use stm32f4xx_hal::{prelude::*,
 //const LORA_CS_PIN: u64 = 8;
 //const LORA_RESET_PIN: u64 = 21;
 
-const FREQUENCY: i64 = 915,00;
+const FREQUENCY: i64 = 915;  // needs decimal not hz not Mhz
 
 #[entry]
 fn main() -> !{
@@ -91,9 +91,9 @@ fn main() -> !{
     //    reset.set_direction(Direction::Out).unwrap();
 
     #[cfg(feature = "stm32f1xx")]
-    fn setup() ->  sx127x_lora::LoRa< Spi<SPI1,  Spi1NoRemap,
+    fn setup() ->  (sx127x_lora::LoRa< Spi<SPI1,  Spi1NoRemap,
                          (PA5<Alternate<PushPull>>, PA6<Input<Floating>>, PA7<Alternate<PushPull>>)>,
-                      PA1<Output<PushPull>>,  PA0<Output<PushPull>>, Delay> {
+                      PA1<Output<PushPull>>,  PA0<Output<PushPull>>>, Delay) {
 
        let cp = cortex_m::Peripherals::take().unwrap();
        let p  = Peripherals::take().unwrap();
@@ -119,11 +119,13 @@ fn main() -> !{
            );
 
      
+       let mut delay = Delay::new(cp.SYST, clocks);
+
        let lora = sx127x_lora::LoRa::new(spi, 
                               gpioa.pa1.into_push_pull_output(&mut gpioa.crl),     //  cs   on PA1
                               gpioa.pa0.into_push_pull_output(&mut gpioa.crl),     // reset on PA0
                               FREQUENCY, 
-                              Delay::new(cp.SYST, clocks) );                       // delay
+                              &mut delay );                                                // delay
 			      // .expect("Failed to communicate with radio module!")
        
        let lora =  lora.unwrap();
@@ -136,16 +138,15 @@ fn main() -> !{
 	//                 }
         //  };
 
-       // return LoRa object
-       lora
+       (lora, delay )                                                               // delay again
        };
 
 
     #[cfg(feature = "stm32f3xx")]
-    fn setup() ->  sx127x_lora::LoRa<Spi<SPI1, (PA5<AF5>, PA6<AF5>, PA7<AF5>)>,
+    fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, (PA5<AF5>, PA6<AF5>, PA7<AF5>)>,
                                      PA1<Output<PushPull>>, 
-                                     PA0<Output<PushPull>>, 
-                                     Delay> {
+                                     PA0<Output<PushPull>>>, 
+                                     Delay) {
        
        let cp = cortex_m::Peripherals::take().unwrap();
        let p  = Peripherals::take().unwrap();
@@ -168,20 +169,23 @@ fn main() -> !{
            &mut rcc.apb2,
            );
        
-       // return LoRa object
-       sx127x_lora::LoRa::new(spi, 
+       let mut delay = Delay::new(cp.SYST, clocks);
+       
+       let lora = sx127x_lora::LoRa::new(spi, 
                           gpioa.pa1.into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper), //  cs  on PA1
                           gpioa.pa0.into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper), //reset on PA0
                           FREQUENCY, 
-                          Delay::new(cp.SYST, clocks) ).unwrap()                                 // delay
+                          &mut delay ).unwrap();                            // delay
+       
+       (lora, delay )                                                       // delay again
        };
 
 
     #[cfg(feature = "stm32f4xx")]
-    fn setup() ->  sx127x_lora::LoRa<Spi<SPI1, (PA5<Alternate<AF5>>, PA6<Alternate<AF5>>, PA7<Alternate<AF5>>)>,
+    fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, (PA5<Alternate<AF5>>, PA6<Alternate<AF5>>, PA7<Alternate<AF5>>)>,
                                      PA1<Output<PushPull>>, 
-                                     PA0<Output<PushPull>>, 
-                                     Delay> {
+                                     PA0<Output<PushPull>>>, 
+                                     Delay) {
 
        let cp = cortex_m::Peripherals::take().unwrap();
        let p  = Peripherals::take().unwrap();
@@ -206,21 +210,38 @@ fn main() -> !{
        //let reset = gpiof.pf13.into_push_pull_output(&mut gpiof.moder, &mut gpiof.otyper);
        //let cs    = gpiod.pd14.into_push_pull_output(&mut gpiod.moder, &mut gpiod.otyper);
        
-       // return LoRa object
-       sx127x_lora::LoRa::new(spi, 
+       let mut delay = Delay::new(cp.SYST, clocks);
+       
+       let lora = sx127x_lora::LoRa::new(spi, 
                               gpioa.pa1.into_push_pull_output(),     //  cs   on PA1
                               gpioa.pa0.into_push_pull_output(),     // reset on PA0
                               FREQUENCY, 
-                              Delay::new(cp.SYST, clocks) ).unwrap()  // delay
+                              &mut delay ).unwrap();                 // delay
+       
+       (lora, delay )                                                // delay again
        };
 
 
     // End of hal/MCU specific setup. Following should be generic code.
 
 
-    let mut lora =  setup();
+    let (mut lora, _delay) =  setup();
 
-    lora.set_tx_power(17,1).unwrap(); //Using PA_BOOST. See your board for correct pin.
+    lora.set_mode(sx127x_lora::RadioMode::Stdby).unwrap();
+    lora.set_signal_bandwidth(125_000).unwrap();
+    lora.set_coding_rate_4(5).unwrap();
+    lora.set_spreading_factor(7).unwrap();
+    lora.set_invert_iq(false).unwrap();
+    lora.set_tx_power(17,1).unwrap();    //Using PA_BOOST. See your board for correct pin.
+
+    //hprintln!("mode             {}", lora.get_mode()).unwrap();
+    //hprintln!("mode             {}", lora.read_register(Register::RegOpMode.addr())).unwrap();
+    hprintln!("bandwidth        {:?}", lora.get_signal_bandwidth()).unwrap();
+    //hprintln!("coding_rate      {:?}",  lora.get_coding_rate_4()).unwrap();
+    hprintln!("spreading_factor {:?}",  lora.get_spreading_factor()).unwrap();
+    //hprintln!("invert_iq        {:?}",  lora.get_invert_iq()).unwrap();
+    //hprintln!("tx_power         {:?}",  lora.get_tx_power()).unwrap();
+
 
     let message = "Hello, world!";
     let mut buffer = [0;255];

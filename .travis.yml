@@ -65,8 +65,8 @@ script:
   - echo BOARD= ${BOARD} TARGET= ${TARGET}  HAL= ${HAL} MCU= ${MCU}
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  blink
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  blink3
-  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  echo_console_by_char
-  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  echo_console_string
+  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  echo_by_char
+  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  echo_string
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  serial_char
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  serial_string
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  gps_rw_by_char
