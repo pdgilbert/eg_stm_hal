@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# $1 is name of example to run
+
+usage='Usage:\n  checkExample xxx \n   e.g.  checkExample blink'
+
+case $# in
+    0)echo "${usage}"; exit 1 ;;
+    1) ;;
+    *) echo "${usage}"; exit 1 ;;
+  esac
+
+echo BOARD= ${BOARD} TARGET= ${TARGET}  HAL= ${HAL} MCU= ${MCU}
+
+mkdir -p examplesNewStatus
+
+echo "fail" >examplesNewStatus/$1
+
+eval  cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  $1  ; RC=$?
+
+echo "success" >examplesNewStatus/$1
+
+exit ${RC} 

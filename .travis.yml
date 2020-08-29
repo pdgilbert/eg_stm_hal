@@ -58,13 +58,15 @@ install:
   - cd  boards/${BOARD}
   - cargo update
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}
+  - export PATH="${PWD}/utils:$PATH"
 
 script:
   # verify this is already in boards/${BOARD} from install
   - echo  PWD= ${PWD}
+  - echo  PWD= ${PATH}
   - echo BOARD= ${BOARD} TARGET= ${TARGET}  HAL= ${HAL} MCU= ${MCU}
-  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  blink
-  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  blink3
+  - checkExample blink
+  - checkExample blink3
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  echo_by_char
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  echo_string
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  serial_char
@@ -83,3 +85,8 @@ script:
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  lora_receive
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  lora_gps
   - touch testBadge.png
+
+after:
+  - echo  PWD= ${PWD}
+  - ls
+  - ls examplesNewStatus
