@@ -66,25 +66,25 @@ script:
   - echo  PWD= ${PATH}
   - echo BOARD= ${BOARD} TARGET= ${TARGET}  HAL= ${HAL} MCU= ${MCU}
   #- cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  blink
-  - checkExample blink
-  - checkExample blink3
-  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  echo_by_char
-  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  echo_string
-  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  serial_char
-  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  serial_string
-  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  gps_rw_by_char
-  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  gps_rw
+  - checkExample  blink
+  - checkExample  blink3
+  - checkExample  echo_by_char
+  - checkExample  echo_string
+  - checkExample  serial_char
+  - checkExample  serial_string
+  - checkExample  gps_rw_by_char
+  - checkExample  gps_rw
 
-  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  temperature
+  - checkExample  temperature
 
-  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  dht
-  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  dht11
-  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  text_i2c
-  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  oled_gps
-  #- cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  ads1015-display
-  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  lora_send
-  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  lora_receive
-  - cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  lora_gps
+  - checkExample  dht
+  - checkExample  dht11
+  - checkExample  text_i2c
+  - checkExample  oled_gps
+  #- checkExample  ads1015-display
+  - checkExample  lora_send
+  - checkExample  lora_receive
+  - checkExample  lora_gps
   - touch testBadge.png
 
   - echo  PWD= ${PWD}
