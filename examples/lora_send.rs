@@ -57,6 +57,18 @@ use stm32f4xx_hal::{prelude::*,
 		    }; 
 
 
+#[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
+use stm32l1xx_hal::{prelude::*, 
+                    stm32::Peripherals, 
+                    spi::{Spi},
+                    delay::Delay,
+		    gpio::{gpioa::{PA5, PA6, PA7},   
+                           gpioa::{PA0, PA1}, Output, PushPull},
+                    stm32::SPI1,
+                    rcc::Config,
+		    };
+
+
 
 //#![feature(extern_crate_item_prelude)]
 //extern crate sx127x_lora;
@@ -213,6 +225,56 @@ fn main() -> !{
        
        let mut delay = Delay::new(cp.SYST, clocks);
        
+       let lora = sx127x_lora::LoRa::new(spi, 
+                              gpioa.pa1.into_push_pull_output(),     //  cs   on PA1
+                              gpioa.pa0.into_push_pull_output(),     // reset on PA0
+                              FREQUENCY, 
+                              &mut delay ).unwrap();                 // delay
+       
+       (lora, delay )                                                // delay again
+       };
+
+
+    #[cfg(feature = "stm32l1xx")]
+    fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, (PA5<Output<PushPull>>, PA6<Output<PushPull>>, PA7<Output<PushPull>>)>,
+                                      PA1<Output<PushPull>>, 
+                                      PA0<Output<PushPull>>>, 
+                    Delay) {
+       let cp = cortex_m::Peripherals::take().unwrap();
+       let p  = Peripherals::take().unwrap();
+
+       //let rcc   = p.RCC.constrain(); 
+       //let clocks = rcc.cfgr.sysclk(64.mhz()).pclk1(32.mhz()).freeze();
+       let mut rcc = p.RCC.freeze(Config::hsi());
+
+       let gpioa = p.GPIOA.split();
+
+       //let spi = Spi::spi1(
+       //    p.SPI1,
+       //    (gpioa.pa5.into_push_pull_output(),  // sck   on PA5
+       //     gpioa.pa6.into_push_pull_output(),  // miso  on PA6
+       //     gpioa.pa7.into_push_pull_output()   // mosi  on PA7
+       //     ),
+       //    sx127x_lora::MODE,
+       //    8.mhz(),
+       //    clocks,
+       //    );
+       let mut spi = p
+                     .SPI1
+                     .spi(
+                          (gpioa.pa5.into_push_pull_output(),  // sck   on PA5 
+                           gpioa.pa6.into_push_pull_output(),  // miso  on PA6 
+                           gpioa.pa7.into_push_pull_output()   // mosi  on PA7
+                           ), 
+                          sx127x_lora::MODE, 
+                          8.mhz(), 
+                          &mut rcc
+                          );
+        
+                     
+       let mut delay = Delay::new(cp.SYST, clocks);
+       
+ //CHECK THE PINS ON THIS
        let lora = sx127x_lora::LoRa::new(spi, 
                               gpioa.pa1.into_push_pull_output(),     //  cs   on PA1
                               gpioa.pa0.into_push_pull_output(),     // reset on PA0

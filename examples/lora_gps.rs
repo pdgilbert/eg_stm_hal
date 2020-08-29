@@ -102,10 +102,9 @@ use stm32l1xx_hal::{prelude::*,
 		    stm32::{USART2},
                     spi::{Spi},
                     delay::Delay,
-		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5,  
+		    gpio::{gpioa::{PA5, PA6, PA7},   
                            gpioa::{PA0, PA1}, Output, PushPull},
-                    time::MegaHertz,
-		    pac::SPI1,
+                    pac::SPI1,
 		    };
 
 
@@ -279,8 +278,8 @@ fn main() -> ! {
 
         let (tx2, rx2) = Serial::usart2(
             p.USART2,
-            (gpioa.pa2.into_alternate_af7(),           //tx pa2  for GPS
-	     gpioa.pa3.into_alternate_af7()),          //rx pa3  for GPS
+            (gpioa.pa2.into_push_pull_output(),           //tx pa2  for GPS
+	     gpioa.pa3.into_push_pull_output()),          //rx pa3  for GPS
             Config::default() .baudrate(9600.bps()), 
             clocks,
             ).unwrap().split();
@@ -288,17 +287,18 @@ fn main() -> ! {
 
        let spi = Spi::spi1(
            p.SPI1,
-           (gpioa.pa5.into_alternate_af5(),  // sck   on PA5
-            gpioa.pa6.into_alternate_af5(),  // miso  on PA6
-            gpioa.pa7.into_alternate_af5()   // mosi  on PA7
+           (gpioa.pa5.into_push_pull_output(),  // sck   on PA5
+            gpioa.pa6.into_push_pull_output(),  // miso  on PA6
+            gpioa.pa7.into_push_pull_output()   // mosi  on PA7
             ),
            sx127x_lora::MODE,
-           MegaHertz(8).into(),
+           8.mhz(),
            clocks,
            );
 
        let mut delay = Delay::new(cp.SYST, clocks);
 
+ //CHECK THE PINS ON THIS
        let lora = sx127x_lora::LoRa::new(spi, 
                               gpioa.pa1.into_push_pull_output(),      //  cs   on PA1
                               gpioa.pa0.into_push_pull_output(),      // reset on PA0

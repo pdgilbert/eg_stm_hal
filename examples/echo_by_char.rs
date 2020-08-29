@@ -127,8 +127,8 @@ fn main() -> ! {
     	p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
     	Serial::usart1(
     	    p.USART1,
-    	    (gpioa.pa9.into_alternate_af7(),			      //tx pa9
-	     gpioa.pa10.into_alternate_af7()),  		      //rx pa10
+    	    (gpioa.pa9.into_push_pull_output(),			      //tx pa9
+	     gpioa.pa10.into_push_pull_output()),  		      //rx pa10
     	    Config::default() .baudrate(9600.bps()),
     	    clocks,
     	    ).unwrap().split()

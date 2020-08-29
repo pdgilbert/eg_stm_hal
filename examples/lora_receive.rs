@@ -56,6 +56,17 @@ use stm32f4xx_hal::{prelude::*,
 		    }; 
 
 
+#[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
+use stm32l1xx_hal::{prelude::*, 
+                    stm32::Peripherals, 
+                    spi::{Spi},
+                    delay::Delay,
+		    gpio::{gpioa::{PA5, PA6, PA7},   
+                           gpioa::{PA0, PA1}, Output, PushPull},
+                    stm32::SPI1,
+		    };
+
+
 
 const FREQUENCY: i64 = 915;
 
@@ -186,6 +197,43 @@ fn main() -> !{
         delay )                                                       // delay again
        };
 
+
+
+    #[cfg(feature = "stm32l1xx")]
+    fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, (PA5<Output<PushPull>>, PA6<Output<PushPull>>, PA7<Output<PushPull>>)>,
+                                     PB14<Output<PushPull>>, 
+                                     PB13<Output<PushPull>> >, Delay) {
+
+       let cp = cortex_m::Peripherals::take().unwrap();
+       let p  = Peripherals::take().unwrap();
+
+       let rcc   = p.RCC.constrain();
+       let clocks = rcc.cfgr.sysclk(64.mhz()).pclk1(32.mhz()).freeze();
+       
+       let gpioa = p.GPIOA.split();
+       let gpiob = p.GPIOB.split();
+
+       let spi = Spi::spi1(
+           p.SPI1,
+           (gpioa.pa5.into_push_pull_output(),  // sck   on PA5
+            gpioa.pa6.into_push_pull_output(),  // miso  on PA6
+            gpioa.pa7.into_push_pull_output()   // mosi  on PA7
+            ),
+           sx127x_lora::MODE,
+           8.mhz(),
+           clocks,
+           );
+              
+       let mut delay = Delay::new(cp.SYST, clocks);
+       
+       // return tuple ( LoRa object,  delay)
+       (sx127x_lora::LoRa::new(spi, 
+                              gpiob.pb14.into_push_pull_output(),     //  cs   on PB14
+                              gpiob.pb13.into_push_pull_output(),     // reset on PB13
+                              FREQUENCY, 
+                              &mut delay).unwrap(),                   // delay
+        delay )                                                       // delay again
+       };
 
 
     // End of hal/MCU specific setup. Following should be generic code.
