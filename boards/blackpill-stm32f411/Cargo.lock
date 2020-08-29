@@ -18,9 +18,9 @@ checksum = "d39da9b88ae1a81c03c9c082b8db83f1d0e93914126041962af61034ab44c4a5"
 
 [[package]]
 name = "aligned"
-version = "0.3.2"
+version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eb1ce8b3382016136ab1d31a1b5ce807144f8b7eb2d5f16b2108f0f07edceb94"
+checksum = "c19796bd8d477f1a9d4ac2465b464a8b1359474f06a96bb3cda650b4fca309bf"
 dependencies = [
  "as-slice",
 ]
@@ -58,9 +58,9 @@ dependencies = [
 
 [[package]]
 name = "bit_field"
-version = "0.10.0"
+version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a165d606cf084741d4ac3a28fb6e9b1eb0bd31f6cd999098cfddb0b2ab381dc0"
+checksum = "dcb6dd1c2376d2e096796e234a70e17e94cc2d5d54ff8ce42b28cef1d0d359a4"
 
 [[package]]
 name = "bitfield"
@@ -119,7 +119,7 @@ version = "0.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2be99930c99669a74d986f7fd2162085498b322e6daae8ef63a97cc9ac1dc73c"
 dependencies = [
- "aligned 0.3.2",
+ "aligned 0.3.4",
  "bare-metal",
  "bitfield",
  "volatile-register",
@@ -143,7 +143,7 @@ checksum = "4717562afbba06e760d34451919f5c3bf3ac15c7bb897e8b04862a7428378647"
 dependencies = [
  "proc-macro2 1.0.19",
  "quote 1.0.7",
- "syn 1.0.35",
+ "syn 1.0.39",
 ]
 
 [[package]]
@@ -275,9 +275,9 @@ dependencies = [
 
 [[package]]
 name = "either"
-version = "1.5.3"
+version = "1.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bb1f6b1ce1c140482ea30ddd3335fc0024ac7ee112895426e0a629a6c20adfe3"
+checksum = "cd56b59865bce947ac5958779cfa508f6c3b9497cc762b7e24a12d11ccde2c4f"
 
 [[package]]
 name = "embedded-graphics"
@@ -542,19 +542,19 @@ checksum = "388a1df253eca08550bef6c72392cfe7c30914bf41df5269b68cbd6ff8f570a3"
 
 [[package]]
 name = "serde"
-version = "1.0.114"
+version = "1.0.115"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5317f7588f0a5078ee60ef675ef96735a1442132dc645eb1d12c018620ed8cd3"
+checksum = "e54c9a88f2da7238af84b5101443f0c0d0a3bbdc455e34a5c9497b1903ed55d5"
 
 [[package]]
 name = "serde_derive"
-version = "1.0.114"
+version = "1.0.115"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2a0be94b04690fbaed37cddffc5c134bf537c8e3329d53e982fe04c374978f8e"
+checksum = "609feed1d0a73cc36a0182a840a9b37b4a82f0b1150369f0536a9e3f2a31dc48"
 dependencies = [
  "proc-macro2 1.0.19",
  "quote 1.0.7",
- "syn 1.0.35",
+ "syn 1.0.39",
 ]
 
 [[package]]
@@ -612,7 +612,7 @@ dependencies = [
 [[package]]
 name = "stm32f1xx-hal"
 version = "0.6.1"
-source = "git+https://github.com/stm32-rs/stm32f1xx-hal#0f23be54b42f91497648d1c334b7b3af41b4e522"
+source = "git+https://github.com/stm32-rs/stm32f1xx-hal#d976ba2312fae2f1b15707573bc5d82ea00ba73f"
 dependencies = [
  "as-slice",
  "cast",
@@ -639,7 +639,7 @@ dependencies = [
 [[package]]
 name = "stm32f3xx-hal"
 version = "0.5.0"
-source = "git+https://github.com/stm32-rs/stm32f3xx-hal#15aa2cd74280dc056787c9ccc03eaae90fcf6e8b"
+source = "git+https://github.com/stm32-rs/stm32f3xx-hal#5a1c06ebb41951dfb1a7e5b416c4cbc4222fe483"
 dependencies = [
  "bare-metal",
  "cast",
@@ -668,7 +668,7 @@ dependencies = [
 [[package]]
 name = "stm32f4xx-hal"
 version = "0.8.3"
-source = "git+https://github.com/stm32-rs/stm32f4xx-hal#f21927264a8f974c657ecbf65d067a9f61c07acf"
+source = "git+https://github.com/stm32-rs/stm32f4xx-hal#23c6ec990653d2e4a08fa9b46e43a66b0cf28798"
 dependencies = [
  "bare-metal",
  "cast",
@@ -677,6 +677,7 @@ dependencies = [
  "embedded-hal",
  "nb 0.1.3",
  "rand_core 0.5.1",
+ "stable_deref_trait",
  "stm32f4",
  "void",
 ]
@@ -696,7 +697,7 @@ dependencies = [
 [[package]]
 name = "stm32l1xx-hal"
 version = "0.1.0"
-source = "git+https://github.com/stm32-rs/stm32l1xx-hal#a228bac202e3fa82b6a57ff7f501bb0e0907d488"
+source = "git+https://github.com/stm32-rs/stm32l1xx-hal#17fa193ba68b74ca7e3253e6e1e7857691aa63b4"
 dependencies = [
  "bare-metal",
  "cast",
@@ -729,9 +730,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "1.0.35"
+version = "1.0.39"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fb7f4c519df8c117855e19dd8cc851e89eb746fe7a73f0157e0d95fdec5369b0"
+checksum = "891d8d6567fe7c7f8835a3a98af4208f3846fba258c1bc3c31d6e506239f11f9"
 dependencies = [
  "proc-macro2 1.0.19",
  "quote 1.0.7",

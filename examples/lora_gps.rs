@@ -120,8 +120,9 @@ fn main() -> ! {
                                           (PA5<Alternate<PushPull>>, 
 		                           PA6<Input<Floating>>, 
 			                   PA7<Alternate<PushPull>>)>,
-                                  PA1<Output<PushPull>>,  PA0<Output<PushPull>>, 
-		                  Delay> )  {
+                                      PA1<Output<PushPull>>,  
+                                      PA0<Output<PushPull>>>, 
+		    Delay )  {
         let cp = cortex_m::Peripherals::take().unwrap();
         let p = Peripherals::take().unwrap();
     	let mut rcc = p.RCC.constrain();  
@@ -129,7 +130,7 @@ fn main() -> ! {
         let mut afio = p.AFIO.constrain(&mut rcc.apb2);
 
     	let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
-        let (tx3, rx3) = Serial::usart3(
+        let (tx, rx) = Serial::usart3(
             p.USART3,
             (gpiob.pb10.into_alternate_push_pull(&mut gpiob.crh),    //tx pb10  for GPS
              gpiob.pb11), 					     //rx pb11  for GPS
@@ -154,15 +155,17 @@ fn main() -> ! {
            &mut rcc.apb2,
            );
 
-     
+       let mut delay = Delay::new(cp.SYST, clocks);
+
        let lora = sx127x_lora::LoRa::new(spi, 
                               gpioa.pa1.into_push_pull_output(&mut gpioa.crl), //  cs   on PA1
                               gpioa.pa0.into_push_pull_output(&mut gpioa.crl), // reset on PA0
                               FREQUENCY, 
-                              Delay::new(cp.SYST, clocks) ).unwrap();          // delay
+                              &mut delay ).unwrap();                           // delay
+			      // .expect("Failed to communicate with radio module!")
 
 
-        (tx3, rx3,   lora)
+        (tx, rx,  lora,  delay)
 	}
 
 
@@ -171,8 +174,8 @@ fn main() -> ! {
     fn setup() ->  (Tx<USART2>, Rx<USART2>, 
                    sx127x_lora::LoRa<Spi<SPI1, (PA5<AF5>, PA6<AF5>, PA7<AF5>)>,
                                      PA1<Output<PushPull>>, 
-                                     PA0<Output<PushPull>>, 
-                                     Delay> ) {
+                                     PA0<Output<PushPull>>> , 
+                                     Delay) {
 
         let cp = cortex_m::Peripherals::take().unwrap();
         let p = Peripherals::take().unwrap();
@@ -180,7 +183,7 @@ fn main() -> ! {
 	let clocks  = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr); 
         let mut gpioa = p.GPIOA.split(&mut rcc.ahb); 
 
-        let (tx2, rx2) = Serial::usart2(
+        let (tx, rx) = Serial::usart2(
             p.USART2,
             (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl),    //tx pa2  for GPS
              gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)),   //rx pa3  for GPS
@@ -201,15 +204,17 @@ fn main() -> ! {
            clocks,
            &mut rcc.apb2,
            );
-       
+
+       let mut delay = Delay::new(cp.SYST, clocks);
+     
        let lora = sx127x_lora::LoRa::new(spi, 
                           gpioa.pa1.into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper), //  cs  on PA1
                           gpioa.pa0.into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper), //reset on PA0
                           FREQUENCY, 
-                          Delay::new(cp.SYST, clocks) ).unwrap();                               // delay
- 
+                          &mut delay ).unwrap();                                               // delay
+			  // .expect("Failed to communicate with radio module!")
 
-        (tx2, rx2,   lora)
+        (tx, rx,  lora,  delay)
 	}
 
 
@@ -221,15 +226,15 @@ fn main() -> ! {
 		                                 PA6<Alternate<AF5>>, 
 						 PA7<Alternate<AF5>>)>,
                                      PA1<Output<PushPull>>, 
-                                     PA0<Output<PushPull>>, 
-                                     Delay> ) {
+                                     PA0<Output<PushPull>>>, 
+                                     Delay ) {
 
         let cp = cortex_m::Peripherals::take().unwrap();
         let p = Peripherals::take().unwrap();
         let clocks    =  p.RCC.constrain().cfgr.freeze();
         let gpioa = p.GPIOA.split();
 
-        let (tx2, rx2) = Serial::usart2(
+        let (tx, rx) = Serial::usart2(
            p.USART2,
            (gpioa.pa2.into_alternate_af7(),            //tx pa2  for GPS
 	    gpioa.pa3.into_alternate_af7()),           //rx pa3  for GPS
@@ -248,14 +253,16 @@ fn main() -> ! {
            clocks,
            );
 
+       let mut delay = Delay::new(cp.SYST, clocks);
+
        let lora = sx127x_lora::LoRa::new(spi, 
                               gpioa.pa1.into_push_pull_output(),      //  cs   on PA1
                               gpioa.pa0.into_push_pull_output(),      // reset on PA0
                               FREQUENCY, 
-                              Delay::new(cp.SYST, clocks) ).unwrap(); // delay
+                              &mut delay).unwrap();                        // delay
 
 
-        (tx2, rx2,   lora)
+        (tx, rx,  lora,  delay)
 	}
 
 
@@ -278,15 +285,34 @@ fn main() -> ! {
             clocks,
             ).unwrap().split();
 
-        let lora = ();
- 
-        (tx2, rx2,   lora)
+
+       let spi = Spi::spi1(
+           p.SPI1,
+           (gpioa.pa5.into_alternate_af5(),  // sck   on PA5
+            gpioa.pa6.into_alternate_af5(),  // miso  on PA6
+            gpioa.pa7.into_alternate_af5()   // mosi  on PA7
+            ),
+           sx127x_lora::MODE,
+           MegaHertz(8).into(),
+           clocks,
+           );
+
+       let mut delay = Delay::new(cp.SYST, clocks);
+
+       let lora = sx127x_lora::LoRa::new(spi, 
+                              gpioa.pa1.into_push_pull_output(),      //  cs   on PA1
+                              gpioa.pa0.into_push_pull_output(),      // reset on PA0
+                              FREQUENCY, 
+                              delay).unwrap();                        // delay
+
+
+        (tx3, rx3,  lora,  delay)
 	}
 
 
     // End of hal/MCU specific setup. Following should be generic code.
 
-    let (mut _tx_gps, mut rx_gps,   mut lora) = setup();  //  GPS, lora
+    let (mut _tx_gps, mut rx_gps,   mut lora,   _delay) = setup();  //  GPS, lora, delay
 
     lora.set_tx_power(17,1).unwrap(); //Using PA_BOOST. See your board for correct pin.
     
@@ -301,7 +327,7 @@ fn main() -> ! {
 
     let e: u8 = 9;
     let mut good = false;
-    let mut size: usize = 0;
+    let mut size: usize;
     
     loop {
         let byte = match block!(rx_gps.read()) {

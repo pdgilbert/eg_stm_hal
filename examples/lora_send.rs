@@ -91,9 +91,10 @@ fn main() -> !{
     //    reset.set_direction(Direction::Out).unwrap();
 
     #[cfg(feature = "stm32f1xx")]
-    fn setup() ->  (sx127x_lora::LoRa< Spi<SPI1,  Spi1NoRemap,
-                         (PA5<Alternate<PushPull>>, PA6<Input<Floating>>, PA7<Alternate<PushPull>>)>,
-                      PA1<Output<PushPull>>,  PA0<Output<PushPull>>>, Delay) {
+    fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1,  Spi1NoRemap, (PA5<Alternate<PushPull>>, 
+                                          PA6<Input<Floating>>, PA7<Alternate<PushPull>>)>,
+                                      PA1<Output<PushPull>>, PA0<Output<PushPull>>>, 
+                    Delay) {
 
        let cp = cortex_m::Peripherals::take().unwrap();
        let p  = Peripherals::take().unwrap();
@@ -144,9 +145,9 @@ fn main() -> !{
 
     #[cfg(feature = "stm32f3xx")]
     fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, (PA5<AF5>, PA6<AF5>, PA7<AF5>)>,
-                                     PA1<Output<PushPull>>, 
-                                     PA0<Output<PushPull>>>, 
-                                     Delay) {
+                                      PA1<Output<PushPull>>, 
+                                      PA0<Output<PushPull>>>, 
+                    Delay) {
        
        let cp = cortex_m::Peripherals::take().unwrap();
        let p  = Peripherals::take().unwrap();
@@ -183,9 +184,9 @@ fn main() -> !{
 
     #[cfg(feature = "stm32f4xx")]
     fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, (PA5<Alternate<AF5>>, PA6<Alternate<AF5>>, PA7<Alternate<AF5>>)>,
-                                     PA1<Output<PushPull>>, 
-                                     PA0<Output<PushPull>>>, 
-                                     Delay) {
+                                      PA1<Output<PushPull>>, 
+                                      PA0<Output<PushPull>>>, 
+                    Delay) {
 
        let cp = cortex_m::Peripherals::take().unwrap();
        let p  = Peripherals::take().unwrap();
