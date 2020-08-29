@@ -90,6 +90,8 @@ script:
   - echo  PWD= ${PWD}
   - ls
   - ls examplesNewStatus
+  - ls examplesNewStatus/*
+  - ls examplesNewStatus/*/*
   - git checkout gh-pages
   - git status
   - cp -r ../examplesNewStatus/*  examplesStatus
