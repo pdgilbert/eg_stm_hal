@@ -12,10 +12,10 @@ case $# in
 
 mkdir -p examplesNewStatus
 
-echo "fail" >examplesNewStatus/$1
+echo "x" >examplesNewStatus/$1
 
 eval  cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  $1  ; RC=$?
 
-echo "success" >examplesNewStatus/$1
+echo "y" >examplesNewStatus/$1
 
 exit ${RC} 

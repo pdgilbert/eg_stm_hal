@@ -98,7 +98,8 @@ script:
 
   # The travis start up only cloned master, now gh-pages is needed. 
   # Note this is a separate clone, not a branch of the original clone.
-  # worry about conflict with other boards CI?
+  # Travis must enable token use for master since this build is started by a master commit,
+  # even though the token is only needed to allow the gh-pages push.
  
   - git clone --depth=50 --branch=gh-pages https://${GITHUB_TOKEN}@github.com/pdgilbert/eg_stm_hal.git
   - cd eg_stm_hal
