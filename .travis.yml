@@ -90,11 +90,20 @@ script:
   - echo  PWD= ${PWD}
   - ls
   - ls examplesNewStatus
-  - ls examplesNewStatus/*
-  - ls examplesNewStatus/*/*
+
+  # the travis start up only cloned master, now gh-pages is needed. 
+  # Note this is a separate clone in a subdir, not a branch in the master clone.
+PASSWD
+  - git clone --depth=50 --branch=gh-pages https://${GITHUB_TOKEN}@github.com/pdgilbert/eg_stm_hal.git
+  - cd eg_stm_hal
+  - ls 
+  - ls examplesStatus
+  - ls ../examplesNewStatus
+  
   - git checkout gh-pages
+  - ls 
   - git status
-  - cp -r ../examplesNewStatus/*  examplesStatus
+  - cp ../examplesNewStatus/*  examplesStatus
   - echo $PWD
   - ls examplesStatus
   - ls examplesStatus/*
