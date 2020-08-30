@@ -85,10 +85,8 @@ script:
   - checkExample  lora_send
   - checkExample  lora_receive
   - checkExample  lora_gps
-  - touch testBadge.png
 
   - echo  PWD= ${PWD}
-  - ls
   - ls examplesNewStatus
 
   # the travis start up only cloned master, now gh-pages is needed. 
@@ -96,16 +94,16 @@ script:
 
   - git clone --depth=50 --branch=gh-pages https://${GITHUB_TOKEN}@github.com/pdgilbert/eg_stm_hal.git
   - cd eg_stm_hal
-  - ls 
-  - ls examplesStatus
-  - ls ../examplesNewStatus
-  
-  - git checkout gh-pages
-  - ls 
   - git status
+  - mkdir -p examplesStatus
   - cp ../examplesNewStatus/*  examplesStatus
-  - echo $PWD
   - ls examplesStatus
   - ls examplesStatus/*
-  - ls examplesStatus/*/*
+
+  - git add examplesStatus 
   - git status 
+  - git commit -am "commiting examplesStatus."
+  - git status 
+  - git push  
+  - git status
+  - echo  pushed examplesStatus on gh-pages branch
