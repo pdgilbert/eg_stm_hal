@@ -98,11 +98,9 @@ script:
   - mkdir -p examplesStatus
   - cp ../examplesNewStatus/*  examplesStatus
   - ls examplesStatus
-  - ls examplesStatus/*
 
   - git add examplesStatus 
-  - git status 
-  - git commit -am "commiting examplesStatus."
+  - git commit -m "commiting new examplesStatus."
   - git status 
   - git push  
   - git status
