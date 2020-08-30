@@ -86,25 +86,31 @@ script:
   - checkExample  lora_gps
 
   - echo  PWD= ${PWD}
+  - echo  HOME= ${HOME}
   - ls examplesNewStatus
-  - mv examplesNewStatus  ../
-  - cd ..
+  - cd  ../../../
+  - echo  PWD= ${PWD}
+  - mkdir -p examplesNewStatus/${BOARD}
+  - mv eg_stm_hal/boards/${BOARD}/examplesNewStatus/*  examplesNewStatus/${BOARD}
   - ls
+  - ls examplesNewStatus/${BOARD}
   - mv eg_stm_hal eg_stm_hal_master
 
   # The travis start up only cloned master, now gh-pages is needed. 
   # Note this is a separate clone, not a branch of the original clone.
+  # worry about conflict with other boards CI?
  
   - git clone --depth=50 --branch=gh-pages https://${GITHUB_TOKEN}@github.com/pdgilbert/eg_stm_hal.git
   - cd eg_stm_hal
   - git status
   - mkdir -p examplesStatus
-  - cp ../examplesNewStatus/*  examplesStatus
+  - mv ../examplesNewStatus/${BOARD}  examplesStatus
   - ls examplesStatus
+  - ls examplesStatus/${BOARD}
 
-  - git add examplesStatus 
-  - git commit -m "commiting new examplesStatus."
+  - git add examplesStatus/${BOARD} 
+  - git commit -m "commiting new examplesStatus/${BOARD}."
   - git status 
   - git push  
   - git status
-  - echo  pushed examplesStatus on gh-pages branch
+  - echo  pushed examplesStatus/${BOARD} on gh-pages branch
