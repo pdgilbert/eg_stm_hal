@@ -63,7 +63,6 @@ install:
 script:
   # verify this is already in boards/${BOARD} from install
   - echo  PWD= ${PWD}
-  - echo  PWD= ${PATH}
   - echo BOARD= ${BOARD} TARGET= ${TARGET}  HAL= ${HAL} MCU= ${MCU}
   #- cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  blink
   - checkExample  blink
@@ -90,10 +89,11 @@ script:
   - ls examplesNewStatus
   - mv examplesNewStatus  ../
   - cd ..
+  - ls
   - mv eg_stm_hal eg_stm_hal_master
 
-  # the travis start up only cloned master, now gh-pages is needed. 
-  # Note this is a separate clone in a subdir, not a branch of the original clone.
+  # The travis start up only cloned master, now gh-pages is needed. 
+  # Note this is a separate clone, not a branch of the original clone.
  
   - git clone --depth=50 --branch=gh-pages https://${GITHUB_TOKEN}@github.com/pdgilbert/eg_stm_hal.git
   - cd eg_stm_hal
