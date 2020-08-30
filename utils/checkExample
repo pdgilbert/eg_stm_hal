@@ -10,8 +10,6 @@ case $# in
     *) echo "${usage}"; exit 1 ;;
   esac
 
-echo BOARD= ${BOARD} TARGET= ${TARGET}  HAL= ${HAL} MCU= ${MCU}
-
 mkdir -p examplesNewStatus
 
 echo "fail" >examplesNewStatus/$1
