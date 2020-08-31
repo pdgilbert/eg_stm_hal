@@ -16,6 +16,12 @@ In the table cells:
 
 Commit <embed src="examplesStatus/bluepill/COMMIT"> on <embed src="examplesStatus/bluepill/DATE.STAMP"> 
 
+[Commit](examplesStatus/bluepill/COMMIT)
+
+[http link to Commit](https://github.com/pdgilbert/eg_stm_hal/tree/gh-pages/examplesStatus/bluepill/COMMIT)
+
+[markup link to blink](examplesStatus/bluepill/blink)
+
 |    hal    |         board        | blink | blink3 | echo_by_char | echo_string | serial_char | serial_string | gps_rw_by_char | gps_rw |   temperature  |
 |:---------:|:--------------------:|:-----:|:------:|:------------:|:-----------:|:-----------:|:-------------:|:--------------:|:------:|:--------------:|
 | stm32f1xx | bluepill             |<embed src="examplesStatus/bluepill/blink"> runs | runs   |    runs-5    |   runs-5    |    runs-1   |     no-2      |     runs       |  runs  |     runs       |      
