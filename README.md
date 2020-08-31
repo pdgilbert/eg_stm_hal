@@ -6,29 +6,25 @@
 
 ## Status of Examples
 
-Following is the status of examples as of July 2020. Examples are run with `stm32f1xx_hal` on a `bluepill`,
+Following is the status of examples. Examples are run with `stm32f1xx_hal` on a `bluepill`,
 `stm32f3xx_hal` on a `Discovery kit STM32F303`, `stm32l1xx_hal` on a `STM32L100C Discovery`, 
 and `stm32f4xx_hal` on a `Nucleo-64 STM32F411`, a `blackpill` with MCU `stm32f401`, 
 and a `blackpill` with MCU `stm32f411`.
 In the table cells: 
-`runs` means builds and runs correctly, or as noted; `builds` means builds but run not tested; 
-`no` means does not build, or builds but fails badly as noted. 
+Green check marks and red X marks indicate that the CI example check builds or fails.
+`runs` is an indication that a manual test on actual hardware has been done and it works correctly, or as noted and 
+`no` means the manual test fails badly as noted. The CI testing is automatic and corresponds to the most recent
+example code, and also recent git versions of packages. The manual tests are not automatic, and less current.
 
 Commit <embed src=examplesStatus/bluepill/COMMIT> on <embed src=examplesStatus/bluepill/DATE.STAMP> 
 
 [Commit gets file ](examplesStatus/bluepill/COMMIT)
 
 
-![alt text](examplesStatus/bluepill/blink.png)
 
-![alt text](checkMark.png)
-
-![?](examplesStatus/bluepill/blink.png)
-
-
-|    hal    |         board        | blink | blink3 | echo_by_char | echo_string | serial_char | serial_string | gps_rw_by_char | gps_rw |   temperature  |
+|    hal    |         board        |             blink                           | blink3 | echo_by_char | echo_string | serial_char | serial_string | gps_rw_by_char | gps_rw |   temperature  |
 |:---------:|:--------------------:|:-----:|:------:|:------------:|:-----------:|:-----------:|:-------------:|:--------------:|:------:|:--------------:|
-| stm32f1xx | bluepill             |![?](examplesStatus/bluepill/blink.png) runs | runs   |    runs-5    |   runs-5    |    runs-1   |     no-2      |     runs       |  runs  |     runs       |      
+| stm32f1xx | bluepill             |![?](examplesStatus/bluepill/blink.png) runs |![?](examplesStatus/bluepill/blink3.png) runs   |    runs-5    |   runs-5    |    runs-1   |     no-2      |     runs       |  runs  |     runs       |      
 | stm32f3xx | discovery-stm32f303  |![?](checkMark.png) runs  | runs   |    runs-5    |   no-8,9    |    runs-1   |     no-9      |     runs       | runs-10|                |
 | stm32f4xx | nucleo-64 	   | runs  | runs   |    runs-5    |    no-9     |     no-2    |     no-9      |     no-6       |  no-6  |                |
 | stm32f4xx | blackpill-stm32f401  | runs  | runs   |    runs-5    |    no-9     |     runs    |     no-9      |    runs-10     | runs-10|                |
