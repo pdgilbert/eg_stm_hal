@@ -14,9 +14,11 @@ In the table cells:
 `runs` means builds and runs correctly, or as noted; `builds` means builds but run not tested; 
 `no` means does not build, or builds but fails badly as noted. 
 
+Commit <embed src="examplesStatus/bluepill/COMMIT"> on <embed src="examplesStatus/bluepill/DATE.STAMP"> 
+
 |    hal    |         board        | blink | blink3 | echo_by_char | echo_string | serial_char | serial_string | gps_rw_by_char | gps_rw |   temperature  |
 |:---------:|:--------------------:|:-----:|:------:|:------------:|:-----------:|:-----------:|:-------------:|:--------------:|:------:|:--------------:|
-| stm32f1xx | bluepill             | <link rel="import" href="examplesStatus/bluepill/blink"> runs  | runs   |    runs-5    |   runs-5    |    runs-1   |     no-2      |     runs       |  runs  |     runs       |      
+| stm32f1xx | bluepill             |<embed src="examplesStatus/bluepill/blink"> runs | runs   |    runs-5    |   runs-5    |    runs-1   |     no-2      |     runs       |  runs  |     runs       |      
 | stm32f3xx | discovery-stm32f303  | runs  | runs   |    runs-5    |   no-8,9    |    runs-1   |     no-9      |     runs       | runs-10|                |
 | stm32f4xx | nucleo-64 	   | runs  | runs   |    runs-5    |    no-9     |     no-2    |     no-9      |     no-6       |  no-6  |                |
 | stm32f4xx | blackpill-stm32f401  | runs  | runs   |    runs-5    |    no-9     |     runs    |     no-9      |    runs-10     | runs-10|                |
