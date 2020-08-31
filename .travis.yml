@@ -56,7 +56,7 @@ before_install:
 
 install:
   - export PATH="${PWD}/utils:$PATH"  # for checkExample script
-  - export UTILS="${PWD}/utils        # for png files copied in checkExample script
+  - export UTILS="${PWD}/utils"       # for png files copied in checkExample script
   - cd  boards/${BOARD}
   - cargo update
   - cargo build  --target ${TARGET}  --features ${HAL},${MCU}
