@@ -16,6 +16,8 @@ echo "x" >examplesNewStatus/$1
 
 eval  cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  $1  ; RC=$?
 
-echo "y" >examplesNewStatus/$1
+if [ ${RC} -eq  0 ]; then 
+   echo "y" >examplesNewStatus/$1
+fi
 
 exit ${RC} 
