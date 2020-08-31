@@ -86,14 +86,13 @@ script:
   - checkExample  lora_gps
 
   - echo  PWD= ${PWD}
-  - echo  HOME= ${HOME}
+  # next also ensure there is something new to commit, so commit does not fail
+  - date >examplesNewStatus/DATE.STAMP
+  - echo ${TRAVIS_COMMIT} > examplesNewStatus/COMMIT
+
   - ls examplesNewStatus
   - cd  ../../../
   - echo  PWD= ${PWD}
-  - mkdir -p examplesNewStatus/${BOARD}
-  - mv eg_stm_hal/boards/${BOARD}/examplesNewStatus/*  examplesNewStatus/${BOARD}
-  - ls
-  - ls examplesNewStatus/${BOARD}
   - mv eg_stm_hal eg_stm_hal_master
 
   # The travis start up only cloned master, now gh-pages is needed. 
@@ -102,16 +101,15 @@ script:
   # even though the token is only needed to allow the gh-pages push.
  
   - git clone --depth=50 --branch=gh-pages https://${GITHUB_TOKEN}@github.com/pdgilbert/eg_stm_hal.git
+
+  - mkdir -p eg_stm_hal/examplesStatus/${BOARD}
+  - mv eg_stm_hal_master/boards/${BOARD}/examplesNewStatus/*  eg_stm_hal/examplesStatus/${BOARD}
   - cd eg_stm_hal
   - git status
-  - mkdir -p examplesStatus
-  - mv ../examplesNewStatus/${BOARD}  examplesStatus
-  - ls examplesStatus
   - ls examplesStatus/${BOARD}
 
   - git add examplesStatus/${BOARD} 
   - git commit -m "commiting new examplesStatus/${BOARD}."
   - git status 
   - git push  
-  - git status
   - echo  pushed examplesStatus/${BOARD} on gh-pages branch
