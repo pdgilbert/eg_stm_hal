@@ -18,6 +18,12 @@ Commit <embed src=examplesStatus/bluepill/COMMIT> on <embed src=examplesStatus/b
 
 [Commit gets file ](examplesStatus/bluepill/COMMIT)
 
+![alt text](examplesStatus/bluepill/blink)
+
+![alt text](examplesStatus/bluepill/blink.png)
+
+![?](examplesStatus/bluepill/blink)
+
 [http link to Commitgoes to git repo ](https://github.com/pdgilbert/eg_stm_hal/tree/gh-pages/examplesStatus/bluepill/COMMIT)
 
 [markup link to blink gets file](examplesStatus/bluepill/blink)
