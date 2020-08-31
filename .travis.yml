@@ -111,6 +111,6 @@ script:
 
   - git add examplesStatus/${BOARD} 
   - git commit -m "commiting new examplesStatus/${BOARD}."
-  - git status 
+  - git pull     # narrow chance of conflict (expected head) with parallel jobs 
   - git push  
   - echo  pushed examplesStatus/${BOARD} on gh-pages branch
