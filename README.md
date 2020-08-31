@@ -18,20 +18,18 @@ Commit <embed src=examplesStatus/bluepill/COMMIT> on <embed src=examplesStatus/b
 
 [Commit gets file ](examplesStatus/bluepill/COMMIT)
 
-![alt text](examplesStatus/bluepill/blink)
 
 ![alt text](examplesStatus/bluepill/blink.png)
 
-![?](examplesStatus/bluepill/blink)
+![alt text](checkMark.png)
 
-[http link to Commitgoes to git repo ](https://github.com/pdgilbert/eg_stm_hal/tree/gh-pages/examplesStatus/bluepill/COMMIT)
+![?](examplesStatus/bluepill/blink.png)
 
-[markup link to blink gets file](examplesStatus/bluepill/blink)
 
 |    hal    |         board        | blink | blink3 | echo_by_char | echo_string | serial_char | serial_string | gps_rw_by_char | gps_rw |   temperature  |
 |:---------:|:--------------------:|:-----:|:------:|:------------:|:-----------:|:-----------:|:-------------:|:--------------:|:------:|:--------------:|
-| stm32f1xx | bluepill             |<embed src=examplesStatus/bluepill/blink> runs | runs   |    runs-5    |   runs-5    |    runs-1   |     no-2      |     runs       |  runs  |     runs       |      
-| stm32f3xx | discovery-stm32f303  |<embed src=https://pdgilbert.github.io/eg_stm_hal/examplesStatus/bluepill/blink3> runs  | runs   |    runs-5    |   no-8,9    |    runs-1   |     no-9      |     runs       | runs-10|                |
+| stm32f1xx | bluepill             |![?](examplesStatus/bluepill/blink.png) runs | runs   |    runs-5    |   runs-5    |    runs-1   |     no-2      |     runs       |  runs  |     runs       |      
+| stm32f3xx | discovery-stm32f303  |![?](checkMark.png) runs  | runs   |    runs-5    |   no-8,9    |    runs-1   |     no-9      |     runs       | runs-10|                |
 | stm32f4xx | nucleo-64 	   | runs  | runs   |    runs-5    |    no-9     |     no-2    |     no-9      |     no-6       |  no-6  |                |
 | stm32f4xx | blackpill-stm32f401  | runs  | runs   |    runs-5    |    no-9     |     runs    |     no-9      |    runs-10     | runs-10|                |
 | stm32f4xx | blackpill-stm32f411  | runs  | runs   |    no-12     |    no-9     |     runs    |     no-9      |     runs       |  runs  |                |
