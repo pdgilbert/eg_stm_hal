@@ -91,9 +91,7 @@ script:
   - date >examplesNewStatus/DATE.STAMP
   - echo ${TRAVIS_COMMIT} > examplesNewStatus/COMMIT
 
-  - ls examplesNewStatus
   - cd  ../../../
-  - echo  PWD= ${PWD}
   - mv eg_stm_hal eg_stm_hal_master
 
   # The travis start up only cloned master, now gh-pages is needed. 
@@ -106,9 +104,6 @@ script:
   - mkdir -p eg_stm_hal/examplesStatus/${BOARD}
   - mv eg_stm_hal_master/boards/${BOARD}/examplesNewStatus/*  eg_stm_hal/examplesStatus/${BOARD}
   - cd eg_stm_hal
-  - git status
-  - ls examplesStatus/${BOARD}
-
   - git add examplesStatus/${BOARD} 
   - git commit -m "commiting new examplesStatus/${BOARD}."
   - git pull     # narrow chance of conflict (expected head) with parallel jobs 

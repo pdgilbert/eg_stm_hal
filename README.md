@@ -1,23 +1,14 @@
 # Examples Using embedded Rust
 
-This project's overall Travis CI build status is 
-[![Build Status](https://api.travis-ci.org/pdgilbert/eg_stm_hal.svg?branch=master)](https://travis-ci.org/pdgilbert/eg_stm_hal).
-This will indicate `failing` if any examples fail on any boards, 
-so will usually indicate `failing` even if most examples work on most boards.
-The [status for individual boards described below can be 
-seen at Travis CI.](https://travis-ci.org/pdgilbert/eg_stm_hal). 
-That, or the [Status of Examples](#status-of-examples) section below give a better 
-indication of the actual status of the project.
+See the [status of examples](https://pdgilbert.github.io/eg_stm_hal/) for a summary.
 
 ## Preamble
-These are newbie notes. I really am new to embedded programming and to Rust. 
-However, I do have experience identifying bugs in other languages, and setting
-up examples and tests to help eliminate them.
-This is my attempt to organize notes made while trying to figure out Rust/embedded,
-and use CI to help keep track of what is working or not.
-I have put the examples and notes here so they  can be useful to others. 
+These are newbie notes. 
+This is my attempt to organize notes made while trying to figure out Rust/embedded.
+CI is used to help keep track of what is working or not.
+The examples and notes are here in case they may be useful to others. 
 There is a lot of confusing out-of-date information
-on the web, so my hope is that the CI links here will warn readers when this project 
+on the web, so my hope is that the CI links will warn readers when this project 
 becomes old and broken.
 
 Rust seems to have many attractive features compared to more mature languages.
@@ -27,10 +18,6 @@ This is frustrating while learning the language but will be a substantial time s
 compared to run time debugging. The downside is that Rust is newer than many alternatives,
 embedded Rust is even newer, and the hardware abstraction library (HAL) project is in 
 active development.
-
-So, this is not yet easy territory for faint of heart newbies, or anyone on a strict timeline.
-For me, having spent many years dealing with cross platform desktop problems, 
-HAL just makes a lot of sense.
 
 After awhile things that were a time consuming stumbling block become so obvious that
 it no longer seems necessary to mention them. That is why it is so hard to write beginner
@@ -53,11 +40,10 @@ the main crates associated with `embedded-hal`. The second group uses additional
 
 
 ##  Contents
-- [Status Summary](#status-summary)
-- [This Package Setup](#this-package-setup)
+- [Overall Status](#overall-status)
 - [Summary of Examples](#summary-of-examples)
-- [Status of Examples](#status-of-examples)
 - [Additional Examples](#additional-examples)
+- [This Package Setup](#this-package-setup)
 - [Building Examples](#building-examples)
 - [Running Examples](#running-examples)
 - [Hardware Notes](#hardware-notes)
@@ -68,15 +54,21 @@ the main crates associated with `embedded-hal`. The second group uses additional
 - [Contribution](#Contribution)
 
 
-##  Status Summary
- (July 2020) work in progress ...
+##  Overall Status
+ (Sept 2020) work in progress ...
 
-The overall Travis CI build status and the link for individual boards is given above.
+This project's overall Travis CI build status is 
+[![Build Status](https://api.travis-ci.org/pdgilbert/eg_stm_hal.svg?branch=master)](https://travis-ci.org/pdgilbert/eg_stm_hal).
+This will indicate `failing` if any examples fail on any boards, 
+so will usually indicate `failing` even if most examples work on most boards.
+
+For the individual boards described below 
+[details of the build and failures](https://travis-ci.org/pdgilbert/eg_stm_hal) can be
+seen at Travis CI.
+
 Testing if the code runs and does something resembling what it is supposed to do 
 requires hardware and is not as automatic as CI. 
-My summary as of July 2020 is given below in section [Summary of Examples](#summary-of-examples). 
-If you check the examples using other MCUs 
-then please provide details 
+If you check the examples using MCUs other than those listed below then please provide details 
 using [issues](https://github.com/pdgilbert/eg_stm_hal/issues) for this git project.
 
 This project's examples depend on [embedded_hal](https://docs.rs/embedded-hal/) and several stm32 HALs. 
@@ -97,38 +89,14 @@ See [stm32 HALs on Github](https://github.com/stm32-rs) and on [Travis CI.](http
 | [stm32l4xx-hal](https://github.com/stm32-rs/stm32l4xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32l4xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32l4xx-hal) |
 
 
-##  This Package Setup
-
-I am trying to have a common code base of examples that run on different boards.
-(This may be wishful thinking.) I have still not decided the best way to 
-organize this for Cargo. Workspaces do not seem to be intended for this.
-My current setup is to have common files `src/`, `examples/`, ..., at the top level.
-Then in the `boards/` directories use soft links to the common files. 
-That leaves only `memory.x` and and build files `target/` and `Cargo.lock` in
-the `boards/` directories.
-
-You can get this package from Github with 
-```
-git clone https://github.com/pdgilbert/eg_stm_hal.git
-```
-The package is mostly examples in directory `examples/`, but the
-build fails unless there are targets so there needs to be something in `src/`. 
-That could be `main.rs` or `lib.rs`, which are defaults, or could be something else but then
-that needs to be specified in Cargo.toml. 
-This package has a `src/lib.rs` file with a small utility function used in several examples.
-
-It is unlikely that you would ever want to call functions in this package from another package,
-so I do not expect to ever set it up as a crate for importing.
-
-
 ## Summary of Examples
 
 These examples are derived after working through many other examples, in particular the examples
 in [stm32f1xx-hal.](https://github.com/stm32-rs/stm32f1xx-hal)
 
-There is more detail about examples in comments in the source files, see the 
+There is more detail in comments in the example source files, see the 
 [example directory](https://github.com/pdgilbert/eg_stm_hal/tree/master/examples).
-Here is a brief summary. 'Console' means a terminal session 
+Here is a brief summary table. 'Console' means a terminal session 
 (eg. minicom) on a computer connected via usb-to-ttl to the MPU USART1 (pins pa9, pa10 on bluepill).
 See [Running Examples](#running-examples) for more details.
 
@@ -137,8 +105,8 @@ See [Running Examples](#running-examples) for more details.
 | -------------------- |:-----:|:-------------------------------------------------------------- |
 | blink                |   1   | Blink on-board LED                                             |
 | blink3               |   1   | Blink off-board LEDs attached to  pb 13,14,15                  |
-| echo_by_char |   2   | Echo console input, char by char,  + semihost output           |
-| echo_string  |       | Read 15 chars input from console, output to semihost, repeat   |
+| echo_by_char         |   2   | Echo console input, char by char,  + semihost output           |
+| echo_string          |       | Read 15 chars input from console, output to semihost, repeat   |
 | serial_char          |       | Single char between usarts 2 and 3, console and semihost output|
 | serial_string        |       | String writes between usarts 2 and 3, console and semihost output|
 | gps_rw_by_char       |       | Read by char from GPS with echo to console + semihost output   |
@@ -155,39 +123,7 @@ See [Running Examples](#running-examples) for more details.
       completely eliminating the development board. 
       (If the dongle power is used. 5v if preferred on mine.)
 
-
-## Status of Examples
-
-Following is the status of examples as of July 2020. Examples are run with `stm32f1xx_hal` on a `bluepill`,
-`stm32f3xx_hal` on a `Discovery kit STM32F303`, `stm32l1xx_hal` on a `STM32L100C Discovery`, 
-and `stm32f4xx_hal` on a `Nucleo-64 STM32F411`, a `blackpill` with MCU `stm32f401`, 
-and a `blackpill` with MCU `stm32f411`.
-In the table cells: 
-`runs` means builds and runs correctly, or as noted; `builds` means builds but run not tested; 
-`no` means does not build, or builds but fails badly as noted. 
-
-|    hal    |         board        | blink | blink3 | echo_by_char | echo_string | serial_char | serial_string | gps_rw_by_char | gps_rw |   temperature  |
-|:---------:|:--------------------:|:-----:|:------:|:------------:|:-----------:|:-----------:|:-------------:|:--------------:|:------:|:--------------:|
-| stm32f1xx | bluepill             | runs  | runs   |    runs-5    |   runs-5    |    runs-1   |     no-2      |     runs       |  runs  |     runs       |      
-| stm32f3xx | discovery-stm32f303  | runs  | runs   |    runs-5    |   no-8,9    |    runs-1   |     no-9      |     runs       | runs-10|                |
-| stm32f4xx | nucleo-64 	   | runs  | runs   |    runs-5    |    no-9     |     no-2    |     no-9      |     no-6       |  no-6  |                |
-| stm32f4xx | blackpill-stm32f401  | runs  | runs   |    runs-5    |    no-9     |     runs    |     no-9      |    runs-10     | runs-10|                |
-| stm32f4xx | blackpill-stm32f411  | runs  | runs   |    no-12     |    no-9     |     runs    |     no-9      |     runs       |  runs  |                |
-| stm32l1xx | discovery-stm32l100  | runs  | runs   |      no      |     no      |      no     |      no       |      no        |   no   |                |
-
-
-1.  tx2 to rx3 works. tx3 to rx2 works sometimes but sometimes fails unwrapping err value Overrun on receive.
-2.  Stalls waiting to receive. Possibly need thread to receive started before send?
-3.  Usart2 with Usart3 connection works both ways but jibberish written on console.
-4.  Gibberish written on console.
-5.  Works as long as typing is slow.
-6.  Fails reading gps (does not return). 
-7.  Works once, repeat problems.
-8.  Writeln! macro missing from stm32f3xx ?
-9.  Uses dma buffering in stm32f1xx. Have not figured out how to do that with other HALs.
-10. Some lines miss beginning or truncated.
-11. Overrun error.
-12. no echo.
+The current status of examples is [summarized automatically by the CI.](https://pdgilbert.github.io/eg_stm_hal/#status-of-examples)
 
 ## Additional Examples
 
@@ -203,27 +139,36 @@ These are examples which use an additional device crate.
 | lora_receive | sx127x_lora |       | receive  a character string over LoRa,  + semihost output  |
 | lora_gps     | sx127x_lora |       | read gps and transmit over LoRa,  + semihost output        |
 
-The status of these examples is
+The current status of these examples is [here.](https://pdgilbert.github.io/eg_stm_hal/#additional-examples)
 
-|    hal    |         board        |  dht  | dht11 | text_i2c | oled_gps | lora_send | lora_receive | lora_gps |
-|:---------:|:--------------------:|:-----:|:-----:|:--------:|:--------:|:---------:|:------------:|:--------:|
-| stm32f1xx | bluepill             | no-1  | no-1  |   runs   |   no-2   |  builds   |   builds     |  builds  |
-| stm32f3xx | discovery-stm32f303  | builds| builds|   runs   |          |  builds   |   builds     |  builds  |
-| stm32f4xx | nucleo-64 	   | builds| builds|   runs   |          |  builds   |   builds     |  builds  |
-| stm32f4xx | blackpill-stm32f401  | no-0  | no-0  |   runs   |   runs   |  builds   |   builds     |  builds  |
-| stm32f4xx | blackpill-stm32f411  | no-0  | no-0  |   runs   |   runs   |  builds   |   builds     |  builds  |
-| stm32l1xx | discovery-stm32l100  |       |       |   no     |          |           |              |          |
 
-0. panic. Timer not set right yet.
-1. stall/timeout reading sensor.
-2. too large for flash.
+##  This Package Setup
+
+I am trying to have a common code base for examples that run on different boards.
+The setup is to have common files `src/`, `examples/`, ..., at the top level.
+Then in the `boards/` directories use soft links to the common files. 
+That leaves only `memory.x` and build files `target/` and `Cargo.lock` in
+the `boards/` directories.
+
+You can get this package from Github with 
+```
+git clone https://github.com/pdgilbert/eg_stm_hal.git
+```
+The package is mostly examples in directory `examples/`, but the
+build fails unless there are targets so there needs to be something in `src/`. 
+That could be `main.rs` or `lib.rs`, which are defaults, or could be something else but then
+that needs to be specified in Cargo.toml. 
+This package has a `src/lib.rs` file with a small utility function used in several examples.
+
+It is unlikely that you would ever want to call functions in this package from another package,
+so I do not expect to ever set it up as a crate for importing.
 
 
 ## Building Examples
 
 To build the examples cd into one of the board directories, eg `cd boards/bluepill` 
 and use
-```rust
+```
 cargo build  --target $TARGET  --features $HAL,$MCU --example xxx
 ```
 where `xxx` is one of the examples from the table above, and `TARGET`, `HAL`  and `MCU` are
