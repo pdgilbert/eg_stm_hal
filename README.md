@@ -1,26 +1,34 @@
 
-##  Contents
-- [Status of Examples](#status-of-examples)
-- [Additional Examples](#additional-examples)
+# Status of Examples
+
+##  Links
+- [code repository](https://github.com/pdgilbert/eg_stm_hal) 
+- [main documentation](https://github.com/pdgilbert/eg_stm_hal#examples-using-embedded-rust)
+- [Travis CI](https://travis-ci.org/pdgilbert/eg_stm_hal)
+- [Table of Core Examples Status](#table-of-core-examples-status)
+- [Table of Additional Examples Status](#table-of-additional-examples-status)
 
 
-## Status of Examples
-
-Following is the status of examples. Thes examples use only the indicated hal and the main embedded crates.
+Following is the status of examples. 
 The examples are run with `stm32f1xx_hal` on a `bluepill`,
 `stm32f3xx_hal` on a `Discovery kit STM32F303`, `stm32l1xx_hal` on a `STM32L100C Discovery`, 
 and `stm32f4xx_hal` on a `Nucleo-64 STM32F411`, a `blackpill` with MCU `stm32f401`, 
 and a `blackpill` with MCU `stm32f411`.
 In the table cells: 
-Green check marks and red X marks indicate that the CI example builds or fails.
+Green check marks and red X marks indicate that the CI of the example builds or fails.
 `runs` is an indication that a manual test on actual hardware has been done and it works correctly or as noted, and 
 `no` means the manual test fails badly as noted. The CI testing is automatic and corresponds to the most recent
 example code, and using recent git versions of packages. The manual tests are not automatic, and less current.
 
-Commit <embed src="examplesStatus/bluepill/COMMIT"> on <embed src="examplesStatus/bluepill/DATE.STAMP"> 
 
+##  Table of Core Examples Status
+
+These examples use only the indicated hal and the main embedded crates.
 The names in the board column are also the names of the build directories. 
-The those names link to a filea recording the commit that was used for the example tests.
+Those names link to a file recording the commit that was used for the example tests.
+
+tmp link testing [bluepill](examplesStatus/bluepill/COMMIT)
+<a href="https://github.com/pdgilbert/eg_stm_hal/tree/543a6d12100c2856cbf37d978626cee47c462111" title="link to commit">Commit</a>
 
 |    hal    |                        board                                      |                     blink                                                         |                            blink3                                                  |                                  echo_by_char                                              |                  echo_string                                                               |                           serial_char                                                     |                           serial_string                                                   |                              gps_rw_by_char                                                   |                       gps_rw                                                          |                      temperature                                                        |
 |:---------:|:--------------------:|:-----:|:------:|:------:|:------:|:-----------:|:-------------:|:--------------:|:------:|:--------------:|
@@ -45,7 +53,7 @@ The those names link to a filea recording the commit that was used for the examp
 11. Overrun error.
 12. no echo.
 
-## Additional Examples
+## Table of Additional Examples Status
 
 The status of the additional examples is
 
