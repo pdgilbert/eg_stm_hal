@@ -23,7 +23,7 @@ The names in the board column are also the names of the build directories.
 The those names link to a filea recording the commit that was used for the example tests.
 
 |    hal    |                        board                                      |                     blink                                                         |                            blink3                                                  |                                  echo_by_char                                              |                  echo_string                                                               |                           serial_char                                                     |                           serial_string                                                   |                              gps_rw_by_char                                                   |                       gps_rw                                                          |                      temperature                                                        |
-|:---------:|:--------------------:|:-----:|:------:|:------------:|:-----------:|:-----------:|:-------------:|:--------------:|:------:|:--------------:|
+|:---------:|:--------------------:|:-----:|:------:|:------:|:------:|:-----------:|:-------------:|:--------------:|:------:|:--------------:|
 | stm32f1xx | [bluepill](examplesStatus/bluepill/COMMIT)                        |<img src="examplesStatus/bluepill/blink.png"            width="20" alt="?" /> runs  |<img src="examplesStatus/bluepill/blink3.png"            width="20" alt="?" /> runs |<img src="examplesStatus/bluepill/echo_by_char.png"           width="20" alt="?" /> runs-5 |<img src="examplesStatus/bluepill/echo_string.png"            width="20" alt="?" /> runs-5 |<img src="examplesStatus/bluepill/serial_char.png"            width="20" alt="?" /> runs-1 |<img src="examplesStatus/bluepill/serial_string.png"            width="20" alt="?" /> no-2 |<img src="examplesStatus/bluepill/gps_rw_by_char.png"            width="20" alt="?" /> runs    |<img src="examplesStatus/bluepill/gps_rw.png"            width="20" alt="?" /> runs    |<img src="examplesStatus/bluepill/temperature.png"            width="20" alt="?" /> runs |      
 | stm32f3xx | [discovery-stm32f303](examplesStatus/discovery-stm32f303/COMMIT)  |<img src="examplesStatus/discovery-stm32f303/blink.png" width="20" alt="?" /> runs  |<img src="examplesStatus/discovery-stm32f303/blink3.png" width="20" alt="?" /> runs |<img src="examplesStatus/discovery-stm32f303/echo_by_char.png" width="20" alt="?" /> runs-5 |<img src="examplesStatus/discovery-stm32f303/echo_string.png" width="20" alt="?" /> no-8,9 |<img src="examplesStatus/discovery-stm32f303/serial_char.png" width="20" alt="?" /> runs-1 |<img src="examplesStatus/discovery-stm32f303/serial_string.png" width="20" alt="?" /> no-9 |<img src="examplesStatus/discovery-stm32f303/gps_rw_by_char.png" width="20" alt="?" /> runs    |<img src="examplesStatus/discovery-stm32f303/gps_rw.png" width="20" alt="?" /> runs-10 |<img src="examplesStatus/discovery-stm32f303/temperature.png" width="20" alt="?" />      |
 | stm32f4xx | [nucleo-64](examplesStatus/nucleo-64/COMMIT) 	                |<img src="examplesStatus/nucleo-64/blink.png"           width="20" alt="?" /> runs  |<img src="examplesStatus/nucleo-64/blink3.png"           width="20" alt="?" /> runs |<img src="examplesStatus/nucleo-64/echo_by_char.png"           width="20" alt="?" /> runs-5 |<img src="examplesStatus/nucleo-64/echo_string.png"           width="20" alt="?" /> no-9   |<img src="examplesStatus/nucleo-64/serial_char.png"           width="20" alt="?" /> no-2   |<img src="examplesStatus/nucleo-64/serial_string.png"           width="20" alt="?" /> no-9 |<img src="examplesStatus/nucleo-64/gps_rw_by_char.png"           width="20" alt="?" /> no-6    |<img src="examplesStatus/nucleo-64/gps_rw.png"           width="20" alt="?" /> no-6    |<img src="examplesStatus/nucleo-64/temperature.png"           width="20" alt="?" />      |
@@ -47,19 +47,7 @@ The those names link to a filea recording the commit that was used for the examp
 
 ## Additional Examples
 
-These are examples which use an additional device crate.
-
-| xxx          |    crate    | notes |   Description                                              |
-| ------------ |:-----------:|:-----:|:---------------------------------------------------------- |
-| dht          | dht         |       | read a dht11 sensor and write to semihost                  |
-| dht11        | dht11       |       | read a dht11 sensor and write to semihost                  |
-| text_i2c     | ssd1306     |       | write 2 text lines on ssd1306 OLED                         |
-| oled_gps     | ssd1306     |       | read gps and write coordinates on ssd1306 OLED             |
-| lora_send    | sx127x_lora |       | transmit a character string over LoRa,  + semihost output  |
-| lora_receive | sx127x_lora |       | receive  a character string over LoRa,  + semihost output  |
-| lora_gps     | sx127x_lora |       | read gps and transmit over LoRa,  + semihost output        |
-
-The status of these examples is
+The status of the additional examples is
 
 |    hal    |         board        |                                 dht                                              |                       dht11                                                        |                              text_i2c                                                  |                                 oled_gps                                              |                                 lora_send                                        |                           lora_receive                                             |                                   lora_gps                                       |
 |:---------:|:--------------------:|:-----:|:-----:|:--------:|:--------:|:---------:|:------------:|:--------:|
