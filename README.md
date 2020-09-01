@@ -35,8 +35,8 @@ first section and the generic application code follows. The hope is that this wi
 to best take advantage of the generic aspect of `embedded-hal`. (The setup in many examples, 
 including these, tends to dominate the application code, so the advantage of the HAL is not
 always so obvious.) 
-These examples are divided into two groups. The first group uses only the MCU specific HAL crate and
-the main crates associated with `embedded-hal`. The second group uses additional device driver crates.
+These examples are divided into two groups. The first group if core examples uses only the MCU specific HAL crate and
+the main crates associated with `embedded-hal`. The second group of additional examples uses additional device driver crates.
 
 
 ##  Contents
@@ -61,6 +61,10 @@ This project's overall Travis CI build status is
 [![Build Status](https://api.travis-ci.org/pdgilbert/eg_stm_hal.svg?branch=master)](https://travis-ci.org/pdgilbert/eg_stm_hal).
 This will indicate `failing` if any examples fail on any boards, 
 so will usually indicate `failing` even if most examples work on most boards.
+The CI is set up to use recent git versions of dependencies, so this project CI failing can be a result of updates
+in dependencies. The upside of this is that if the examples are not failing then they are working with
+recent versions of dependencies, 
+unlike many examples from the web that I have worked through in my own learnimg process.
 
 For the individual boards described below 
 [details of the build and failures](https://travis-ci.org/pdgilbert/eg_stm_hal) can be

@@ -104,7 +104,7 @@ fn main() -> !{
 
     #[cfg(feature = "stm32f1xx")]
     fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1,  Spi1NoRemap, (PA5<Alternate<PushPull>>, 
-                                          PA6<Input<Floating>>, PA7<Alternate<PushPull>>)>,
+                                          PA6<Input<Floating>>, PA7<Alternate<PushPull>>), u8>,
                                       PA1<Output<PushPull>>, PA0<Output<PushPull>>>, 
                     Delay) {
 

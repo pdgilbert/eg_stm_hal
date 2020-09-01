@@ -75,7 +75,7 @@ fn main() -> !{
 
     #[cfg(feature = "stm32f1xx")]
     fn setup() ->  (sx127x_lora::LoRa< Spi<SPI1,  Spi1NoRemap,
-                         (PA5<Alternate<PushPull>>, PA6<Input<Floating>>, PA7<Alternate<PushPull>>)>,
+                         (PA5<Alternate<PushPull>>, PA6<Input<Floating>>, PA7<Alternate<PushPull>>), u8>,
                       PB14<Output<PushPull>>,  PB13<Output<PushPull>> >, Delay) {  //
 
        let cp = cortex_m::Peripherals::take().unwrap();
