@@ -15,10 +15,14 @@ The examples are run with `stm32f1xx_hal` on a `bluepill`,
 and `stm32f4xx_hal` on a `Nucleo-64 STM32F411`, a `blackpill` with MCU `stm32f401`, 
 and a `blackpill` with MCU `stm32f411`.
 In the table cells: 
-Green check marks and red X marks indicate that the CI of the example builds or fails.
+green check marks and red X marks indicate that the CI of the example builds or fails.
 `runs` is an indication that a manual test on actual hardware has been done and it works correctly or as noted, and 
 `no` means the manual test fails badly as noted. The CI testing is automatic and corresponds to the most recent
 example code, and using recent git versions of crates. The manual tests are not automatic, and less current.
+When I remember to record it, 
+clicking on `runs` will go to the code repository history for the commit when a manual test was done.
+In addition to the example code at the time, the `Cargo.lock` file in the board directories gives an
+indication of the versions of dependencies.
 
 
 ##  Table of Core Examples Status
@@ -38,7 +42,7 @@ Those names link to a file recording the commit that was used for the example te
 {% assign db02 = "examplesStatus/discovery-stm32f303/" %}
 {% assign db03 = "examplesStatus/nucleo-64/" %}
 {% assign db04 = "examplesStatus/blackpill-stm32f401/" %}
-{% assign db05 = "examplesStatus/blakpill-stm32f411/" %}
+{% assign db05 = "examplesStatus/blackpill-stm32f411/" %}
 {% assign db06 = "examplesStatus/discovery-stm32l100/" %}
 
 {% capture p %}width="20" alt="?" {% endcapture %}
