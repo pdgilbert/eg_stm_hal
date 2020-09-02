@@ -79,6 +79,9 @@ use stm32h7xx_hal::{prelude::*,
                     gpio::{gpioc::PC13, Output, PushPull,}, 
                     };
 
+#[cfg(feature = "stm32h7xx")] 
+use embedded_hal::digital::v2::OutputPin;
+
 
 #[cfg(feature = "stm32l0xx")] 
 use stm32l0xx_hal::{prelude::*,   
@@ -194,8 +197,13 @@ fn main() -> ! {
     #[cfg(feature = "stm32h7xx")]
     fn setup() -> (PC13<Output<PushPull>>, AsmDelay) { 
 
-       let dp    = Peripherals::take().unwrap();
-       let gpioc = dp.GPIOC.split();
+       // see https://github.com/stm32-rs/stm32h7xx-hal/blob/master/examples/blinky.rs
+       let dp        = Peripherals::take().unwrap();
+       let pwr = dp.PWR.constrain();
+       let vos = pwr.freeze();
+       let rcc   = dp.RCC.constrain(); 
+       let ccdr      = rcc.sys_ck(100.mhz()).freeze(vos, &dp.SYSCFG);
+       let gpioc = dp.GPIOC.split(ccdr.peripheral.GPIOC);
        
        impl LED for PC13<Output<PushPull>> {
            fn   on(&mut self)  -> () { self.set_low().unwrap()  }   
@@ -246,8 +254,9 @@ fn main() -> ! {
     #[cfg(feature = "stm32l4xx")]
     fn setup() -> (PC13<Output<PushPull>>, AsmDelay) { 
 
-       let dp    = Peripherals::take().unwrap();
-       let gpioc = dp.GPIOC.split();
+       let dp        = Peripherals::take().unwrap();
+       let mut rcc   = dp.RCC.constrain(); 
+       let mut gpioc = dp.GPIOC.split(&mut rcc.ahb2);
        
        impl LED for PC13<Output<PushPull>> {
            fn   on(&mut self)  -> () { self.set_low().unwrap()  }   
@@ -255,8 +264,8 @@ fn main() -> ! {
            };
 
        // return tuple  (led, delay)
-       (gpioc.pc13.into_push_pull_output(),                        // led on pc13 with on/off
-        AsmDelay::new(bitrate::U32BitrateExt::mhz(32)) )           // delay
+       (gpioc.pc13.into_push_pull_output(&mut gpioc.moder, &mut gpioc.otyper),  // led on pc13 with on/off
+        AsmDelay::new(bitrate::U32BitrateExt::mhz(32)) )                        // delay
        };
 
     // End of hal/MCU specific setup. Following should be generic code.

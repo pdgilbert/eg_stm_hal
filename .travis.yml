@@ -28,13 +28,13 @@ matrix:
           env: HAL="stm32f1xx"  MCU="stm32f103"  TARGET="thumbv7m-none-eabi"     BOARD="bluepill"
 
         #- name: "none-stm32f100"
-        #  env: HAL="stm32f1xx"  MCU="stm32f100"  TARGET="thumbv7m-none-eabi"     BOARD="none-stm32f100"
+        #  env: HAL="stm32f1xx"  MCU="stm32f100"  TARGET="thumbv7m-none-eabi"    BOARD="none-stm32f100"
 
         #- name: "none-stm32f101"
-        #  env: HAL="stm32f1xx"  MCU="stm32f101"  TARGET="thumbv7m-none-eabi"     BOARD="none-stm32f101"
+        #  env: HAL="stm32f1xx"  MCU="stm32f101"  TARGET="thumbv7m-none-eabi"    BOARD="none-stm32f101"
 
         - name: "discovery-stm32f303"
-          env: HAL="stm32f3xx"  MCU="stm32f303xc" TARGET="thumbv7em-none-eabihf"  BOARD="discovery-stm32f303"
+          env: HAL="stm32f3xx"  MCU="stm32f303xc" TARGET="thumbv7em-none-eabihf" BOARD="discovery-stm32f303"
 
         - name: "nucleo-64"
           env: HAL="stm32f4xx"  MCU="stm32f411"  TARGET="thumbv7em-none-eabihf"  BOARD="nucleo-64"
@@ -52,7 +52,7 @@ matrix:
           env: HAL="stm32h7xx"  MCU="stm32h742"  TARGET="thumbv7em-none-eabihf"  BOARD="none-stm32h74"
 
         - name: "none-stm32l0x2"
-          env: HAL="stm32l0xx"  MCU="stm32l0x2"  TARGET="thumbv7em-none-eabihf"  BOARD="none-stm32l0x2"
+          env: HAL="stm32l0xx"  MCU="stm32l0x2"  TARGET="thumbv6m-none-eabi"     BOARD="none-stm32l0x2"
 
         - name: "discovery-stm32l100"
           env: HAL="stm32l1xx"  MCU="stm32l100"  TARGET="thumbv7m-none-eabi"     BOARD="discovery-stm32l100"
@@ -61,7 +61,7 @@ matrix:
           env: HAL="stm32l1xx"  MCU="stm32l151"  TARGET="thumbv7m-none-eabi"     BOARD="heltec-lora-node151"
 
         - name: "none-stm32l4x1"
-          env: HAL="stm32l4xx"  MCU="stm32l4x1"  TARGET="thumbv7em-none-eabihf"  BOARD="none-stm32l4x1"
+          env: HAL="stm32l4xx"  MCU="stm32l4x1"  TARGET="thumbv7em-none-eabi"    BOARD="none-stm32l4x1"
 
 before_install:
   - rustup target add ${TARGET}
