@@ -40,7 +40,7 @@ Those names link to a file recording the commit that was used for the example te
 {% assign b07 = "[none-stm32h742](examplesStatus/none-stm32h742/COMMIT)" %}
 {% assign b08 = "[none-stm32l0x2](examplesStatus/none-stm32l0x2/COMMIT)" %}
 {% assign b09 = "[discovery-stm32l100](examplesStatus/discovery-stm32l100/COMMIT)" %}
-{% assign b10 = "[heltec-stm32l151](examplesStatus/heltec-stm32l151/COMMIT)" %}
+{% assign b10 = "[heltec-lora-node151](examplesStatus/heltec-lora-node151/COMMIT)" %}
 {% assign b11 = "[none-stm32l4x1](examplesStatus/none-stm32l4x1/COMMIT)" %}
 
 {% assign db01 = "examplesStatus/bluepill/" %}
@@ -52,7 +52,7 @@ Those names link to a file recording the commit that was used for the example te
 {% assign db07 = "examplesStatus/none-stm32h742/" %}
 {% assign db08 = "examplesStatus/none-stm32l0x2/" %}
 {% assign db09 = "examplesStatus/discovery-stm32l100/" %}
-{% assign db10 = "examplesStatus/heltec-stm32l151/" %}
+{% assign db10 = "examplesStatus/heltec-lora-node151/" %}
 {% assign db11 = "examplesStatus/none-stm32l4x1/" %}
 
 {% capture p %}width="20" alt="?" {% endcapture %}
