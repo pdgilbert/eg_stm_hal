@@ -95,6 +95,45 @@ use stm32f4xx_hal::{prelude::*,
 		    pac::SPI1,
 		    };
 
+#[cfg(feature = "stm32f7xx")] 
+use stm32f7xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::{USART2}, 
+                    spi::{Spi},
+                    delay::Delay,
+		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5,  
+                           gpioa::{PA0, PA1}, Output, PushPull},
+                    time::MegaHertz,
+		    pac::SPI1,
+		    };
+
+#[cfg(feature = "stm32h7xx")] 
+use stm32h7xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::{USART2}, 
+                    spi::{Spi},
+                    delay::Delay,
+		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5,  
+                           gpioa::{PA0, PA1}, Output, PushPull},
+                    time::MegaHertz,
+		    pac::SPI1,
+		    };
+
+#[cfg(feature = "stm32l0xx")] 
+use stm32l0xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::{USART2}, 
+                    spi::{Spi},
+                    delay::Delay,
+		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5,  
+                           gpioa::{PA0, PA1}, Output, PushPull},
+                    time::MegaHertz,
+		    pac::SPI1,
+		    };
+
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{prelude::*, 
 		    stm32::Peripherals, 
@@ -105,6 +144,19 @@ use stm32l1xx_hal::{prelude::*,
 		    gpio::{gpioa::{PA5, PA6, PA7},   
                            gpioa::{PA0, PA1}, Output, PushPull},
                     pac::SPI1,
+		    };
+
+#[cfg(feature = "stm32l4xx")] 
+use stm32l4xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::{USART2}, 
+                    spi::{Spi},
+                    delay::Delay,
+		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5,  
+                           gpioa::{PA0, PA1}, Output, PushPull},
+                    time::MegaHertz,
+		    pac::SPI1,
 		    };
 
 
@@ -217,9 +269,145 @@ fn main() -> ! {
 	}
 
 
-
-
     #[cfg(feature = "stm32f4xx")]
+    fn setup() ->  (Tx<USART2>, Rx<USART2>,
+                    sx127x_lora::LoRa<Spi<SPI1, (PA5<Alternate<AF5>>, 
+		                                 PA6<Alternate<AF5>>, 
+						 PA7<Alternate<AF5>>)>,
+                                     PA1<Output<PushPull>>, 
+                                     PA0<Output<PushPull>>>, 
+                                     Delay ) {
+
+        let cp = cortex_m::Peripherals::take().unwrap();
+        let p = Peripherals::take().unwrap();
+        let clocks    =  p.RCC.constrain().cfgr.freeze();
+        let gpioa = p.GPIOA.split();
+
+        let (tx, rx) = Serial::usart2(
+           p.USART2,
+           (gpioa.pa2.into_alternate_af7(),            //tx pa2  for GPS
+	    gpioa.pa3.into_alternate_af7()),           //rx pa3  for GPS
+           Config::default() .baudrate(9600.bps()), 
+           clocks,
+           ).unwrap().split();
+
+       let spi = Spi::spi1(
+           p.SPI1,
+           (gpioa.pa5.into_alternate_af5(),  // sck   on PA5
+            gpioa.pa6.into_alternate_af5(),  // miso  on PA6
+            gpioa.pa7.into_alternate_af5()   // mosi  on PA7
+            ),
+           sx127x_lora::MODE,
+           MegaHertz(8).into(),
+           clocks,
+           );
+
+       let mut delay = Delay::new(cp.SYST, clocks);
+
+       let lora = sx127x_lora::LoRa::new(spi, 
+                              gpioa.pa1.into_push_pull_output(),      //  cs   on PA1
+                              gpioa.pa0.into_push_pull_output(),      // reset on PA0
+                              FREQUENCY, 
+                              &mut delay).unwrap();                        // delay
+
+
+        (tx, rx,  lora,  delay)
+	}
+
+
+    #[cfg(feature = "stm32f7xx")]
+    fn setup() ->  (Tx<USART2>, Rx<USART2>,
+                    sx127x_lora::LoRa<Spi<SPI1, (PA5<Alternate<AF5>>, 
+		                                 PA6<Alternate<AF5>>, 
+						 PA7<Alternate<AF5>>), u8>,
+                                     PA1<Output<PushPull>>, 
+                                     PA0<Output<PushPull>>>, 
+                                     Delay ) {
+
+        let cp = cortex_m::Peripherals::take().unwrap();
+        let p = Peripherals::take().unwrap();
+        let clocks    =  p.RCC.constrain().cfgr.freeze();
+        let gpioa = p.GPIOA.split();
+
+        let (tx, rx) = Serial::usart2(
+           p.USART2,
+           (gpioa.pa2.into_alternate_af7(),            //tx pa2  for GPS
+	    gpioa.pa3.into_alternate_af7()),           //rx pa3  for GPS
+           Config::default() .baudrate(9600.bps()), 
+           clocks,
+           ).unwrap().split();
+
+       let spi = Spi::spi1(
+           p.SPI1,
+           (gpioa.pa5.into_alternate_af5(),  // sck   on PA5
+            gpioa.pa6.into_alternate_af5(),  // miso  on PA6
+            gpioa.pa7.into_alternate_af5()   // mosi  on PA7
+            ),
+           sx127x_lora::MODE,
+           MegaHertz(8).into(),
+           clocks,
+           );
+
+       let mut delay = Delay::new(cp.SYST, clocks);
+
+       let lora = sx127x_lora::LoRa::new(spi, 
+                              gpioa.pa1.into_push_pull_output(),      //  cs   on PA1
+                              gpioa.pa0.into_push_pull_output(),      // reset on PA0
+                              FREQUENCY, 
+                              &mut delay).unwrap();                        // delay
+
+
+        (tx, rx,  lora,  delay)
+	}
+
+
+    #[cfg(feature = "stm32h7xx")]
+    fn setup() ->  (Tx<USART2>, Rx<USART2>,
+                    sx127x_lora::LoRa<Spi<SPI1, (PA5<Alternate<AF5>>, 
+		                                 PA6<Alternate<AF5>>, 
+						 PA7<Alternate<AF5>>)>,
+                                     PA1<Output<PushPull>>, 
+                                     PA0<Output<PushPull>>>, 
+                                     Delay ) {
+
+        let cp = cortex_m::Peripherals::take().unwrap();
+        let p = Peripherals::take().unwrap();
+        let clocks    =  p.RCC.constrain().cfgr.freeze();
+        let gpioa = p.GPIOA.split();
+
+        let (tx, rx) = Serial::usart2(
+           p.USART2,
+           (gpioa.pa2.into_alternate_af7(),            //tx pa2  for GPS
+	    gpioa.pa3.into_alternate_af7()),           //rx pa3  for GPS
+           Config::default() .baudrate(9600.bps()), 
+           clocks,
+           ).unwrap().split();
+
+       let spi = Spi::spi1(
+           p.SPI1,
+           (gpioa.pa5.into_alternate_af5(),  // sck   on PA5
+            gpioa.pa6.into_alternate_af5(),  // miso  on PA6
+            gpioa.pa7.into_alternate_af5()   // mosi  on PA7
+            ),
+           sx127x_lora::MODE,
+           MegaHertz(8).into(),
+           clocks,
+           );
+
+       let mut delay = Delay::new(cp.SYST, clocks);
+
+       let lora = sx127x_lora::LoRa::new(spi, 
+                              gpioa.pa1.into_push_pull_output(),      //  cs   on PA1
+                              gpioa.pa0.into_push_pull_output(),      // reset on PA0
+                              FREQUENCY, 
+                              &mut delay).unwrap();                        // delay
+
+
+        (tx, rx,  lora,  delay)
+	}
+
+
+    #[cfg(feature = "stm32l0xx")]
     fn setup() ->  (Tx<USART2>, Rx<USART2>,
                     sx127x_lora::LoRa<Spi<SPI1, (PA5<Alternate<AF5>>, 
 		                                 PA6<Alternate<AF5>>, 
@@ -307,6 +495,52 @@ fn main() -> ! {
 
 
         (tx3, rx3,  lora,  delay)
+	}
+
+
+    #[cfg(feature = "stm32l4xx")]
+    fn setup() ->  (Tx<USART2>, Rx<USART2>,
+                    sx127x_lora::LoRa<Spi<SPI1, (PA5<Alternate<AF5>>, 
+		                                 PA6<Alternate<AF5>>, 
+						 PA7<Alternate<AF5>>)>,
+                                     PA1<Output<PushPull>>, 
+                                     PA0<Output<PushPull>>>, 
+                                     Delay ) {
+
+        let cp = cortex_m::Peripherals::take().unwrap();
+        let p = Peripherals::take().unwrap();
+        let clocks    =  p.RCC.constrain().cfgr.freeze();
+        let gpioa = p.GPIOA.split();
+
+        let (tx, rx) = Serial::usart2(
+           p.USART2,
+           (gpioa.pa2.into_alternate_af7(),            //tx pa2  for GPS
+	    gpioa.pa3.into_alternate_af7()),           //rx pa3  for GPS
+           Config::default() .baudrate(9600.bps()), 
+           clocks,
+           ).unwrap().split();
+
+       let spi = Spi::spi1(
+           p.SPI1,
+           (gpioa.pa5.into_alternate_af5(),  // sck   on PA5
+            gpioa.pa6.into_alternate_af5(),  // miso  on PA6
+            gpioa.pa7.into_alternate_af5()   // mosi  on PA7
+            ),
+           sx127x_lora::MODE,
+           MegaHertz(8).into(),
+           clocks,
+           );
+
+       let mut delay = Delay::new(cp.SYST, clocks);
+
+       let lora = sx127x_lora::LoRa::new(spi, 
+                              gpioa.pa1.into_push_pull_output(),      //  cs   on PA1
+                              gpioa.pa0.into_push_pull_output(),      // reset on PA0
+                              FREQUENCY, 
+                              &mut delay).unwrap();                        // delay
+
+
+        (tx, rx,  lora,  delay)
 	}
 
 

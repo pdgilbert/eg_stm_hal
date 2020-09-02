@@ -55,6 +55,39 @@ use stm32f4xx_hal::{prelude::*,
 		    pac::SPI1,
 		    }; 
 
+#[cfg(feature = "stm32f7xx")] 
+use stm32f7xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    spi::{Spi},
+                    delay::Delay,
+		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5,  
+                           gpiob::{PB13, PB14}, Output, PushPull},
+                    time::MegaHertz,
+		    pac::SPI1,
+		    }; 
+
+#[cfg(feature = "stm32h7xx")] 
+use stm32h7xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    spi::{Spi},
+                    delay::Delay,
+		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5,  
+                           gpiob::{PB13, PB14}, Output, PushPull},
+                    time::MegaHertz,
+		    pac::SPI1,
+		    }; 
+
+#[cfg(feature = "stm32l0xx")] 
+use stm32l0xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    spi::{Spi},
+                    delay::Delay,
+		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5,  
+                           gpiob::{PB13, PB14}, Output, PushPull},
+                    time::MegaHertz,
+		    pac::SPI1,
+		    }; 
+
 
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{prelude::*, 
@@ -65,6 +98,17 @@ use stm32l1xx_hal::{prelude::*,
                            gpioa::{PA0, PA1}, Output, PushPull},
                     stm32::SPI1,
 		    };
+
+#[cfg(feature = "stm32l4xx")] 
+use stm32l4xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    spi::{Spi},
+                    delay::Delay,
+		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5,  
+                           gpiob::{PB13, PB14}, Output, PushPull},
+                    time::MegaHertz,
+		    pac::SPI1,
+		    }; 
 
 
 
@@ -197,6 +241,114 @@ fn main() -> !{
         delay )                                                       // delay again
        };
 
+    #[cfg(feature = "stm32f7xx")]
+    fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, (PA5<Alternate<AF5>>, PA6<Alternate<AF5>>, PA7<Alternate<AF5>>), u8>,
+                                     PB14<Output<PushPull>>, 
+                                     PB13<Output<PushPull>> >, Delay) {
+
+       let cp = cortex_m::Peripherals::take().unwrap();
+       let p  = Peripherals::take().unwrap();
+
+       let rcc   = p.RCC.constrain();
+       let clocks = rcc.cfgr.sysclk(64.mhz()).pclk1(32.mhz()).freeze();
+       
+       let gpioa = p.GPIOA.split();
+       let gpiob = p.GPIOB.split();
+
+       let spi = Spi::spi1(
+           p.SPI1,
+           (gpioa.pa5.into_alternate_af5(),  // sck   on PA5
+            gpioa.pa6.into_alternate_af5(),  // miso  on PA6
+            gpioa.pa7.into_alternate_af5()   // mosi  on PA7
+            ),
+           sx127x_lora::MODE,
+           MegaHertz(8).into(),
+           clocks,
+           );
+              
+       let mut delay = Delay::new(cp.SYST, clocks);
+       
+       // return tuple ( LoRa object,  delay)
+       (sx127x_lora::LoRa::new(spi, 
+                              gpiob.pb14.into_push_pull_output(),     //  cs   on PB14
+                              gpiob.pb13.into_push_pull_output(),     // reset on PB13
+                              FREQUENCY, 
+                              &mut delay).unwrap(),                   // delay
+        delay )                                                       // delay again
+       };
+
+    #[cfg(feature = "stm32h7xx")]
+    fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, (PA5<Alternate<AF5>>, PA6<Alternate<AF5>>, PA7<Alternate<AF5>>)>,
+                                     PB14<Output<PushPull>>, 
+                                     PB13<Output<PushPull>> >, Delay) {
+
+       let cp = cortex_m::Peripherals::take().unwrap();
+       let p  = Peripherals::take().unwrap();
+
+       let rcc   = p.RCC.constrain();
+       let clocks = rcc.cfgr.sysclk(64.mhz()).pclk1(32.mhz()).freeze();
+       
+       let gpioa = p.GPIOA.split();
+       let gpiob = p.GPIOB.split();
+
+       let spi = Spi::spi1(
+           p.SPI1,
+           (gpioa.pa5.into_alternate_af5(),  // sck   on PA5
+            gpioa.pa6.into_alternate_af5(),  // miso  on PA6
+            gpioa.pa7.into_alternate_af5()   // mosi  on PA7
+            ),
+           sx127x_lora::MODE,
+           MegaHertz(8).into(),
+           clocks,
+           );
+              
+       let mut delay = Delay::new(cp.SYST, clocks);
+       
+       // return tuple ( LoRa object,  delay)
+       (sx127x_lora::LoRa::new(spi, 
+                              gpiob.pb14.into_push_pull_output(),     //  cs   on PB14
+                              gpiob.pb13.into_push_pull_output(),     // reset on PB13
+                              FREQUENCY, 
+                              &mut delay).unwrap(),                   // delay
+        delay )                                                       // delay again
+       };
+
+    #[cfg(feature = "stm32l0xx")]
+    fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, (PA5<Alternate<AF5>>, PA6<Alternate<AF5>>, PA7<Alternate<AF5>>)>,
+                                     PB14<Output<PushPull>>, 
+                                     PB13<Output<PushPull>> >, Delay) {
+
+       let cp = cortex_m::Peripherals::take().unwrap();
+       let p  = Peripherals::take().unwrap();
+
+       let rcc   = p.RCC.constrain();
+       let clocks = rcc.cfgr.sysclk(64.mhz()).pclk1(32.mhz()).freeze();
+       
+       let gpioa = p.GPIOA.split();
+       let gpiob = p.GPIOB.split();
+
+       let spi = Spi::spi1(
+           p.SPI1,
+           (gpioa.pa5.into_alternate_af5(),  // sck   on PA5
+            gpioa.pa6.into_alternate_af5(),  // miso  on PA6
+            gpioa.pa7.into_alternate_af5()   // mosi  on PA7
+            ),
+           sx127x_lora::MODE,
+           MegaHertz(8).into(),
+           clocks,
+           );
+              
+       let mut delay = Delay::new(cp.SYST, clocks);
+       
+       // return tuple ( LoRa object,  delay)
+       (sx127x_lora::LoRa::new(spi, 
+                              gpiob.pb14.into_push_pull_output(),     //  cs   on PB14
+                              gpiob.pb13.into_push_pull_output(),     // reset on PB13
+                              FREQUENCY, 
+                              &mut delay).unwrap(),                   // delay
+        delay )                                                       // delay again
+       };
+
 
 
     #[cfg(feature = "stm32l1xx")]
@@ -221,6 +373,42 @@ fn main() -> !{
             ),
            sx127x_lora::MODE,
            8.mhz(),
+           clocks,
+           );
+              
+       let mut delay = Delay::new(cp.SYST, clocks);
+       
+       // return tuple ( LoRa object,  delay)
+       (sx127x_lora::LoRa::new(spi, 
+                              gpiob.pb14.into_push_pull_output(),     //  cs   on PB14
+                              gpiob.pb13.into_push_pull_output(),     // reset on PB13
+                              FREQUENCY, 
+                              &mut delay).unwrap(),                   // delay
+        delay )                                                       // delay again
+       };
+
+    #[cfg(feature = "stm32l4xx")]
+    fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, (PA5<Alternate<AF5>>, PA6<Alternate<AF5>>, PA7<Alternate<AF5>>)>,
+                                     PB14<Output<PushPull>>, 
+                                     PB13<Output<PushPull>> >, Delay) {
+
+       let cp = cortex_m::Peripherals::take().unwrap();
+       let p  = Peripherals::take().unwrap();
+
+       let rcc   = p.RCC.constrain();
+       let clocks = rcc.cfgr.sysclk(64.mhz()).pclk1(32.mhz()).freeze();
+       
+       let gpioa = p.GPIOA.split();
+       let gpiob = p.GPIOB.split();
+
+       let spi = Spi::spi1(
+           p.SPI1,
+           (gpioa.pa5.into_alternate_af5(),  // sck   on PA5
+            gpioa.pa6.into_alternate_af5(),  // miso  on PA6
+            gpioa.pa7.into_alternate_af5()   // mosi  on PA7
+            ),
+           sx127x_lora::MODE,
+           MegaHertz(8).into(),
            clocks,
            );
               

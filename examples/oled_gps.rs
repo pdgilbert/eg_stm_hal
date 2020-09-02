@@ -73,6 +73,39 @@ use stm32f4xx_hal::{prelude::*,
                     pac::I2C1,
 		    };
 
+#[cfg(feature = "stm32f7x")] 
+use stm32f7xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::{USART2}, 
+                    delay::Delay,
+		    i2c::{I2c, PinScl, PinSda, },  
+		    gpio::{gpiob::{PB8, PB9}, Alternate, AF4, },
+                    pac::I2C1,
+		    };
+
+#[cfg(feature = "stm32h7xx")] 
+use stm32h7xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::{USART2}, 
+                    delay::Delay,
+		    i2c::{I2c, },  
+		    gpio::{gpiob::{PB8, PB9}, AlternateOD, AF4, },
+                    pac::I2C1,
+		    };
+
+#[cfg(feature = "stm32l0xx")] 
+use stm32l0xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::{USART2}, 
+                    delay::Delay,
+		    i2c::{I2c, },  
+		    gpio::{gpiob::{PB8, PB9}, AlternateOD, AF4, },
+                    pac::I2C1,
+		    };
+
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{prelude::*, 
 		    stm32::Peripherals, 
@@ -83,6 +116,17 @@ use stm32l1xx_hal::{prelude::*,
                     stm32::I2C1,
 		    };
 
+
+#[cfg(feature = "stm32l4xx")] 
+use stm32l4xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::{USART2}, 
+                    delay::Delay,
+		    i2c::{I2c, },  
+		    gpio::{gpiob::{PB8, PB9}, AlternateOD, AF4, },
+                    pac::I2C1,
+		    };
 
 
 #[entry]
@@ -172,20 +216,20 @@ fn main() -> ! {
                     I2c<I2C1, (PB8<AlternateOD<AF4>>, PB9<AlternateOD<AF4>>)>, 
                     Delay ) {
 
-        let cp = cortex_m::Peripherals::take().unwrap();
-        let p = Peripherals::take().unwrap();
-        let clocks    =  p.RCC.constrain().cfgr.freeze();
-        let gpioa = p.GPIOA.split();
+       let cp = cortex_m::Peripherals::take().unwrap();
+       let p = Peripherals::take().unwrap();
+       let clocks    =  p.RCC.constrain().cfgr.freeze();
+       let gpioa = p.GPIOA.split();
 
-        let (tx2, rx2) = Serial::usart2(
-           p.USART2,
-           (gpioa.pa2.into_alternate_af7(),            //tx pa2  for GPS rx
-	    gpioa.pa3.into_alternate_af7()),           //rx pa3  for GPS tx
-           Config::default() .baudrate(9600.bps()), 
-           clocks,
-           ).unwrap().split();
+       let (tx2, rx2) = Serial::usart2(
+          p.USART2,
+          (gpioa.pa2.into_alternate_af7(),            //tx pa2  for GPS rx
+           gpioa.pa3.into_alternate_af7()),           //rx pa3  for GPS tx
+          Config::default() .baudrate(9600.bps()), 
+          clocks,
+          ).unwrap().split();
 
-        let gpiob  = p.GPIOB.split();
+       let gpiob  = p.GPIOB.split();
        
        // could also have scl on PB6, sda on PB7
        //BlockingI2c::i2c1(
@@ -197,6 +241,103 @@ fn main() -> ! {
         Delay::new(cp.SYST, clocks))
        };
 
+
+
+
+
+    #[cfg(feature = "stm32f7xx")]
+    fn setup() ->  (Tx<USART2>, Rx<USART2>,
+                    I2c<I2C1, PB8<AlternateOD<AF4>>, PB9<AlternateOD<AF4>>>, 
+                    Delay ) {
+
+       let cp = cortex_m::Peripherals::take().unwrap();
+       let p = Peripherals::take().unwrap();
+       let clocks    =  p.RCC.constrain().cfgr.freeze();
+       let gpioa = p.GPIOA.split();
+
+       let (tx2, rx2) = Serial::usart2(
+          p.USART2,
+          (gpioa.pa2.into_alternate_af7(),            //tx pa2  for GPS rx
+           gpioa.pa3.into_alternate_af7()),           //rx pa3  for GPS tx
+          Config::default() .baudrate(9600.bps()), 
+          clocks,
+          ).unwrap().split();
+
+       let gpiob  = p.GPIOB.split();
+       
+       let scl = gpiob.pb8.into_alternate_af4().set_open_drain();   // scl on PB8
+       let sda = gpiob.pb9.into_alternate_af4().set_open_drain();   // sda on PB9
+       
+       (tx2, rx2,   
+	I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks), // i2c
+        Delay::new(cp.SYST, clocks))
+       };
+
+
+
+
+
+    #[cfg(feature = "stm32h7xx")]
+    fn setup() ->  (Tx<USART2>, Rx<USART2>,
+                    I2c<I2C1, (PB8<AlternateOD<AF4>>, PB9<AlternateOD<AF4>>)>, 
+                    Delay ) {
+
+       let cp = cortex_m::Peripherals::take().unwrap();
+       let p = Peripherals::take().unwrap();
+       let pwr    = p.PWR.constrain();
+       let vos    = pwr.freeze();
+       let rcc    = p.RCC.constrain();
+       let clocks = rcc.cfgr.freeze();
+       let ccdr   = rcc.sys_ck(100.mhz()).freeze(vos, &p.SYSCFG);
+       let gpioa  = p.GPIOA.split(ccdr.peripheral.GPIOA);
+
+       let (tx2, rx2) = Serial::usart2(
+          p.USART2,
+          (gpioa.pa2.into_alternate_af7(),            //tx pa2  for GPS rx
+           gpioa.pa3.into_alternate_af7()),           //rx pa3  for GPS tx
+          Config::default() .baudrate(9600.bps()), 
+          clocks,
+          ).unwrap().split();
+
+       let gpiob  = p.GPIOB.split();
+       
+       let scl = gpiob.pb8.into_alternate_af4().set_open_drain();   // scl on PB8
+       let sda = gpiob.pb9.into_alternate_af4().set_open_drain();   // sda on PB9
+       
+       (tx2, rx2,   
+	I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks), // i2c
+        Delay::new(cp.SYST, clocks))
+       };
+
+
+
+    #[cfg(feature = "stm32l0xx")]
+    fn setup() ->  (Tx<USART2>, Rx<USART2>,
+                    I2c<I2C1, (PB8<AlternateOD<AF4>>, PB9<AlternateOD<AF4>>)>, 
+                    Delay ) {
+
+       let cp = cortex_m::Peripherals::take().unwrap();
+       let p = Peripherals::take().unwrap();
+       let clocks    =  p.RCC.constrain().cfgr.freeze();
+       let gpioa = p.GPIOA.split();
+
+       let (tx2, rx2) = Serial::usart2(
+           p.USART2,
+           (gpioa.pa2.into_alternate_af7(),            //tx pa2  for GPS rx
+	    gpioa.pa3.into_alternate_af7()),           //rx pa3  for GPS tx
+           Config::default() .baudrate(9600.bps()), 
+           clocks,
+           ).unwrap().split();
+
+       let gpiob  = p.GPIOB.split();
+       
+       let scl = gpiob.pb8.into_alternate_af4().set_open_drain();   // scl on PB8
+       let sda = gpiob.pb9.into_alternate_af4().set_open_drain();   // sda on PB9
+       
+       (tx2, rx2,   
+	I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks), // i2c
+        Delay::new(cp.SYST, clocks))
+       };
 
 
 
@@ -230,6 +371,39 @@ fn main() -> ! {
         I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks), // i2c
         Delay::new(cp.SYST, clocks))
        };
+
+
+
+    #[cfg(feature = "stm32l4xx")]
+    fn setup() ->  (Tx<USART2>, Rx<USART2>,
+                    I2c<I2C1, (PB8<AlternateOD<AF4>>, PB9<AlternateOD<AF4>>)>, 
+                    Delay ) {
+
+        let cp     = cortex_m::Peripherals::take().unwrap();
+        let p      = Peripherals::take().unwrap();
+        let rcc    = p.RCC.constrain();
+        let clocks = rcc.cfgr.freeze();
+        let gpioa  = p.GPIOA.split(&mut rcc.ahb2);
+
+        let (tx2, rx2) = Serial::usart2(
+           p.USART2,
+           (gpioa.pa2.into_alternate_af7(),            //tx pa2  for GPS rx
+	    gpioa.pa3.into_alternate_af7()),           //rx pa3  for GPS tx
+           Config::default() .baudrate(9600.bps()), 
+           clocks,
+           ).unwrap().split();
+
+        let gpiob  = p.GPIOB.split();
+       
+       let scl = gpiob.pb8.into_alternate_af4().set_open_drain();   // scl on PB8
+       let sda = gpiob.pb9.into_alternate_af4().set_open_drain();   // sda on PB9
+       
+       (tx2, rx2,   
+	I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks), // i2c
+        Delay::new(cp.SYST, clocks))
+       };
+
+
 
 
     // End of hal/MCU specific setup. Following should be generic code.
