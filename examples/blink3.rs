@@ -51,6 +51,32 @@ use  stm32f4xx_hal::{prelude::*,
 use embedded_hal::digital::v2::OutputPin;
 
 
+#[cfg(feature = "stm32f7xx")] 
+use stm32f7xx_hal::{prelude::*,   
+                    pac::Peripherals, 
+                    gpio::{gpiob::{PB13, PB14, PB15}, Output, PushPull,}, 
+                    };
+
+
+
+#[cfg(feature = "stm32h7xx")] 
+use stm32h7xx_hal::{prelude::*,   
+                    pac::Peripherals, 
+                    gpio::{gpiob::{PB13, PB14, PB15}, Output, PushPull,}, 
+                    };
+
+#[cfg(feature = "stm32h7xx")] 
+use embedded_hal::digital::v2::OutputPin;
+
+
+#[cfg(feature = "stm32l0xx")] 
+use stm32l0xx_hal::{prelude::*,   
+                    pac::Peripherals, 
+                    gpio::{gpiob::{PB13, PB14, PB15}, Output, PushPull,}, 
+                    };
+
+
+
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{prelude::*, 
                      stm32::Peripherals,
@@ -59,6 +85,12 @@ use stm32l1xx_hal::{prelude::*,
 
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use embedded_hal::digital::v2::OutputPin;
+
+#[cfg(feature = "stm32l4xx")] 
+use stm32l4xx_hal::{prelude::*,   
+                    pac::Peripherals, 
+                    gpio::{gpiob::{PB13, PB14, PB15}, Output, PushPull,}, 
+                    };
 
 pub trait LED {
    fn  on(&mut self)  -> () ;
@@ -168,6 +200,107 @@ fn main() -> ! {
         AsmDelay::new(bitrate::U32BitrateExt::mhz(32)) )             // delay
        };
 
+
+    #[cfg(feature = "stm32f7xx")]
+    fn setup() -> (PB13<Output<PushPull>>, PB14<Output<PushPull>>, PB15<Output<PushPull>>, AsmDelay) { 
+
+       let dp    = Peripherals::take().unwrap();
+       let gpiob = dp.GPIOB.split();
+       
+       // all leds wire with pin as source, cathode connect to ground though a resistor.
+       impl LED for PB13<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           };
+
+       impl LED for PB14<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           };
+
+       impl LED for PB15<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           };
+
+
+       // return (led1, led2, led3, delay)
+       (gpiob.pb13.into_push_pull_output(),  // led on pb13
+        gpiob.pb14.into_push_pull_output(),  // led on pb14
+        gpiob.pb15.into_push_pull_output(),  // led on pb15
+        AsmDelay::new(bitrate::U32BitrateExt::mhz(32)) )             // delay
+       };
+
+
+    #[cfg(feature = "stm32h7xx")]
+    fn setup() -> (PB13<Output<PushPull>>, PB14<Output<PushPull>>, PB15<Output<PushPull>>, AsmDelay) { 
+
+       // see https://github.com/stm32-rs/stm32h7xx-hal/blob/master/examples/blinky.rs
+       let dp    = Peripherals::take().unwrap();
+       let pwr   = dp.PWR.constrain();
+       let vos   = pwr.freeze();
+       let rcc   = dp.RCC.constrain(); 
+       let ccdr  = rcc.sys_ck(100.mhz()).freeze(vos, &dp.SYSCFG);
+       let gpiob = dp.GPIOB.split(ccdr.peripheral.GPIOB);
+       
+       // all leds wire with pin as source, cathode connect to ground though a resistor.
+       impl LED for PB13<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           };
+
+       impl LED for PB14<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           };
+
+       impl LED for PB15<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           };
+
+
+       // return (led1, led2, led3, delay)
+       (gpiob.pb13.into_push_pull_output(),  // led on pb13
+        gpiob.pb14.into_push_pull_output(),  // led on pb14
+        gpiob.pb15.into_push_pull_output(),  // led on pb15
+        AsmDelay::new(bitrate::U32BitrateExt::mhz(32)) )             // delay
+       };
+
+
+    #[cfg(feature = "stm32l0xx")]
+    fn setup() -> (PB13<Output<PushPull>>, PB14<Output<PushPull>>, PB15<Output<PushPull>>, AsmDelay) { 
+
+       let dp    = Peripherals::take().unwrap();
+       let gpiob = dp.GPIOB.split();
+       
+       // all leds wire with pin as source, cathode connect to ground though a resistor.
+       impl LED for PB13<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           };
+
+       impl LED for PB14<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           };
+
+       impl LED for PB15<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           };
+
+
+       // return (led1, led2, led3, delay)
+       (gpiob.pb13.into_push_pull_output(),  // led on pb13
+        gpiob.pb14.into_push_pull_output(),  // led on pb14
+        gpiob.pb15.into_push_pull_output(),  // led on pb15
+        AsmDelay::new(bitrate::U32BitrateExt::mhz(32)) )             // delay
+       };
+
+
+
+
     #[cfg(feature = "stm32l1xx")]
     fn setup() -> (PB13<Output<PushPull>>, PB14<Output<PushPull>>, PB15<Output<PushPull>>, AsmDelay) {
 
@@ -196,6 +329,38 @@ fn main() -> ! {
         gpiob.pb14.into_push_pull_output(),  // led on pb14
         gpiob.pb15.into_push_pull_output(),  // led on pb15
         AsmDelay::new(bitrate::U32BitrateExt::mhz(4)) )             // delay
+       };
+
+
+    #[cfg(feature = "stm32l4xx")]
+    fn setup() -> (PB13<Output<PushPull>>, PB14<Output<PushPull>>, PB15<Output<PushPull>>, AsmDelay) { 
+
+       let dp        = Peripherals::take().unwrap();
+       let mut rcc   = dp.RCC.constrain(); 
+       let mut gpiob = dp.GPIOB.split(&mut rcc.ahb2);
+       
+       // all leds wire with pin as source, cathode connect to ground though a resistor.
+       impl LED for PB13<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           };
+
+       impl LED for PB14<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           };
+
+       impl LED for PB15<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           };
+
+
+       // return (led1, led2, led3, delay)
+       (gpiob.pb13.into_push_pull_output(),  // led on pb13
+        gpiob.pb14.into_push_pull_output(),  // led on pb14
+        gpiob.pb15.into_push_pull_output(),  // led on pb15
+        AsmDelay::new(bitrate::U32BitrateExt::mhz(32)) )             // delay
        };
 
 

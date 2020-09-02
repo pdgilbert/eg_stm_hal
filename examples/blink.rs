@@ -198,11 +198,11 @@ fn main() -> ! {
     fn setup() -> (PC13<Output<PushPull>>, AsmDelay) { 
 
        // see https://github.com/stm32-rs/stm32h7xx-hal/blob/master/examples/blinky.rs
-       let dp        = Peripherals::take().unwrap();
-       let pwr = dp.PWR.constrain();
-       let vos = pwr.freeze();
+       let dp    = Peripherals::take().unwrap();
+       let pwr   = dp.PWR.constrain();
+       let vos   = pwr.freeze();
        let rcc   = dp.RCC.constrain(); 
-       let ccdr      = rcc.sys_ck(100.mhz()).freeze(vos, &dp.SYSCFG);
+       let ccdr  = rcc.sys_ck(100.mhz()).freeze(vos, &dp.SYSCFG);
        let gpioc = dp.GPIOC.split(ccdr.peripheral.GPIOC);
        
        impl LED for PC13<Output<PushPull>> {
