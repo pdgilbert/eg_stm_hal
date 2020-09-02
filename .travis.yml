@@ -49,7 +49,7 @@ matrix:
           env: HAL="stm32f7xx"  MCU="stm32f722"  TARGET="thumbv7em-none-eabihf"  BOARD="none-stm32f722"
 
         - name: "none-stm32h742"
-          env: HAL="stm32h7xx"  MCU="stm32h742"  TARGET="thumbv7em-none-eabihf"  BOARD="none-stm32h74"
+          env: HAL="stm32h7xx"  MCU="stm32h742"  TARGET="thumbv7em-none-eabihf"  BOARD="none-stm32h742"
 
         - name: "none-stm32l0x2"
           env: HAL="stm32l0xx"  MCU="stm32l0x2"  TARGET="thumbv6m-none-eabi"     BOARD="none-stm32l0x2"
