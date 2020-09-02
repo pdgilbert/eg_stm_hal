@@ -155,6 +155,18 @@ git = "https://github.com/stm32-rs/stm32f4xx-hal"
 #version = "0.6.0"
 optional = true
 
+[dependencies.stm32f7xx-hal]
+git = "https://github.com/stm32-rs/stm32f7xx-hal"
+optional = true
+
+[dependencies.stm32h7xx-hal]
+git = "https://github.com/stm32-rs/stm32h7xx-hal"
+optional = true
+
+[dependencies.stm32l0xx-hal]
+git = "https://github.com/stm32-rs/stm32l0xx-hal"
+optional = true
+
 [dependencies.stm32l1xx-hal]
 git = "https://github.com/stm32-rs/stm32l1xx-hal"
 default-features = false
@@ -162,14 +174,21 @@ default-features = false
 #version = "0.1.0"
 optional = true
 
+[dependencies.stm32l4xx-hal]
+git = "https://github.com/stm32-rs/stm32l4xx-hal"
+optional = true
+
 [features]
 stm32f1xx = []
 stm32f3xx = []
 stm32f4xx = []
+stm32f7xx = []
+stm32h7xx = []
+stm32l0xx = []
 stm32l1xx = []
+stm32l4xx = []
 #device-selected = []
 #doc = []
-#rt = ["stm32f1xx-hal/rt"]
 stm32f100 = ["stm32f1xx-hal/stm32f100", "stm32f1xx-hal/rt"]
 stm32f101 = ["stm32f1xx-hal/stm32f101", "stm32f1xx-hal/rt"]
 stm32f103 = ["stm32f1xx-hal/stm32f103", "stm32f1xx-hal/rt"]
@@ -177,8 +196,12 @@ stm32f303xc = ["stm32f3xx-hal/stm32f303xc", "stm32f3xx-hal/rt"]
 stm32f401 = ["stm32f4xx-hal/stm32f401", "stm32f4xx-hal/rt"] 
 stm32f405 = ["stm32f4xx-hal/stm32f405", "stm32f4xx-hal/rt"] 
 stm32f411 = ["stm32f4xx-hal/stm32f411", "stm32f4xx-hal/rt"] 
+stm32f722 = ["stm32f7xx-hal/stm32f722", "stm32f7xx-hal/rt"] 
+stm32h742 = ["stm32h7xx-hal/stm32h742", "stm32h7xx-hal/rt"] 
+stm32l0x2 = ["stm32l0xx-hal/stm32l0x2", "stm32l0xx-hal/rt"]
 stm32l100 = ["stm32l1xx-hal/stm32l100", "stm32l1xx-hal/rt"]
 stm32l151 = ["stm32l1xx-hal/stm32l151", "stm32l1xx-hal/rt"]
+stm32l4x1 = ["stm32l4xx-hal/stm32l4x1", "stm32l4xx-hal/rt"]
 
 [dependencies.void]
 default-features = false
