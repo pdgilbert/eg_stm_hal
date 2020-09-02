@@ -59,11 +59,35 @@ use stm32f4xx_hal::{prelude::*,
                     serial::{config::Config, Serial, Tx, Rx},
 		    pac::{USART1, USART2, USART6} };
 
+#[cfg(feature = "stm32f7xx")] 
+use stm32f7xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::{USART1, USART2, USART6} };
+
+#[cfg(feature = "stm32h7xx")] 
+use stm32h7xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::{USART1, USART2, USART6} };
+
+#[cfg(feature = "stm32l0xx")] 
+use stm32l0xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::{USART1, USART2, USART6} };
+
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{prelude::*, 
 		    stm32::Peripherals, 
 		    serial::{Config, Serial, Tx, Rx},
 		    stm32::{USART1, USART2, USART3} };
+
+#[cfg(feature = "stm32l4xx")] 
+use stm32l4xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::{USART1, USART2, USART6} };
 
 
 #[entry]
@@ -190,7 +214,119 @@ fn main() -> ! {
     // AF7 on PA2  is usart2_Tx, on PA3  is usart2_Rx,
     // AF8 on PA11 is usart6_Tx, on PA12 is usart6_Rx
 
+
     #[cfg(feature = "stm32f4xx")]
+    fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>, Tx<USART6>, Rx<USART6>, )  {
+        let p = Peripherals::take().unwrap();
+    	let rcc = p.RCC.constrain();  
+	let clocks = rcc.cfgr.freeze();
+        let gpioa = p.GPIOA.split();
+        p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+        let (tx1, rx1) =  Serial::usart1(
+           p.USART1,
+    	   (gpioa.pa9.into_alternate_af7(),            //tx pa9
+	    gpioa.pa10.into_alternate_af7()),          //rx pa10
+    	   Config::default() .baudrate(9600.bps()),
+    	   clocks
+           ).unwrap().split(); 
+
+        p.USART2.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+        let (tx2, rx2) = Serial::usart2(
+           p.USART2,
+           (gpioa.pa2.into_alternate_af7(),            //tx pa2
+	    gpioa.pa3.into_alternate_af7()),           //rx pa3
+           Config::default() .baudrate(115_200.bps()),  //.parity_odd() .stopbits(StopBits::STOP1)
+           clocks,
+           ).unwrap().split();
+
+        p.USART6.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+        let (tx3, rx3) = Serial::usart6(      //  NOTE PINS and USART6 !!!
+           p.USART6,
+           (gpioa.pa11.into_alternate_af8(),           //tx pa11
+	    gpioa.pa12.into_alternate_af8()),          //rx pa12
+           Config::default() .baudrate(115_200.bps()) ,
+           clocks,
+           ).unwrap().split();
+
+        (tx1, rx1,   tx2, rx2,   tx3, rx3 )
+	}
+
+
+    #[cfg(feature = "stm32f7xx")]
+    fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>, Tx<USART6>, Rx<USART6>, )  {
+        let p = Peripherals::take().unwrap();
+    	let rcc = p.RCC.constrain();  
+	let clocks = rcc.cfgr.freeze();
+        let gpioa = p.GPIOA.split();
+        p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+        let (tx1, rx1) =  Serial::usart1(
+           p.USART1,
+    	   (gpioa.pa9.into_alternate_af7(),            //tx pa9
+	    gpioa.pa10.into_alternate_af7()),          //rx pa10
+    	   Config::default() .baudrate(9600.bps()),
+    	   clocks
+           ).unwrap().split(); 
+
+        p.USART2.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+        let (tx2, rx2) = Serial::usart2(
+           p.USART2,
+           (gpioa.pa2.into_alternate_af7(),            //tx pa2
+	    gpioa.pa3.into_alternate_af7()),           //rx pa3
+           Config::default() .baudrate(115_200.bps()),  //.parity_odd() .stopbits(StopBits::STOP1)
+           clocks,
+           ).unwrap().split();
+
+        p.USART6.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+        let (tx3, rx3) = Serial::usart6(      //  NOTE PINS and USART6 !!!
+           p.USART6,
+           (gpioa.pa11.into_alternate_af8(),           //tx pa11
+	    gpioa.pa12.into_alternate_af8()),          //rx pa12
+           Config::default() .baudrate(115_200.bps()) ,
+           clocks,
+           ).unwrap().split();
+
+        (tx1, rx1,   tx2, rx2,   tx3, rx3 )
+	}
+
+
+    #[cfg(feature = "stm32h7xx")]
+    fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>, Tx<USART6>, Rx<USART6>, )  {
+        let p = Peripherals::take().unwrap();
+    	let rcc = p.RCC.constrain();  
+	let clocks = rcc.cfgr.freeze();
+        let gpioa = p.GPIOA.split();
+        p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+        let (tx1, rx1) =  Serial::usart1(
+           p.USART1,
+    	   (gpioa.pa9.into_alternate_af7(),            //tx pa9
+	    gpioa.pa10.into_alternate_af7()),          //rx pa10
+    	   Config::default() .baudrate(9600.bps()),
+    	   clocks
+           ).unwrap().split(); 
+
+        p.USART2.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+        let (tx2, rx2) = Serial::usart2(
+           p.USART2,
+           (gpioa.pa2.into_alternate_af7(),            //tx pa2
+	    gpioa.pa3.into_alternate_af7()),           //rx pa3
+           Config::default() .baudrate(115_200.bps()),  //.parity_odd() .stopbits(StopBits::STOP1)
+           clocks,
+           ).unwrap().split();
+
+        p.USART6.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+        let (tx3, rx3) = Serial::usart6(      //  NOTE PINS and USART6 !!!
+           p.USART6,
+           (gpioa.pa11.into_alternate_af8(),           //tx pa11
+	    gpioa.pa12.into_alternate_af8()),          //rx pa12
+           Config::default() .baudrate(115_200.bps()) ,
+           clocks,
+           ).unwrap().split();
+
+        (tx1, rx1,   tx2, rx2,   tx3, rx3 )
+	}
+
+
+    #[cfg(feature = "stm32l0xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>, Tx<USART6>, Rx<USART6>, )  {
         let p = Peripherals::take().unwrap();
     	let rcc = p.RCC.constrain();  
@@ -260,6 +396,43 @@ fn main() -> ! {
             Config::default() .baudrate(115_200.bps()) ,
             clocks,
             ).unwrap().split();
+
+        (tx1, rx1,   tx2, rx2,   tx3, rx3 )
+	}
+
+
+    #[cfg(feature = "stm32l4xx")]
+    fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>, Tx<USART6>, Rx<USART6>, )  {
+        let p = Peripherals::take().unwrap();
+    	let rcc = p.RCC.constrain();  
+	let clocks = rcc.cfgr.freeze();
+        let gpioa = p.GPIOA.split();
+        p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+        let (tx1, rx1) =  Serial::usart1(
+           p.USART1,
+    	   (gpioa.pa9.into_alternate_af7(),            //tx pa9
+	    gpioa.pa10.into_alternate_af7()),          //rx pa10
+    	   Config::default() .baudrate(9600.bps()),
+    	   clocks
+           ).unwrap().split(); 
+
+        p.USART2.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+        let (tx2, rx2) = Serial::usart2(
+           p.USART2,
+           (gpioa.pa2.into_alternate_af7(),            //tx pa2
+	    gpioa.pa3.into_alternate_af7()),           //rx pa3
+           Config::default() .baudrate(115_200.bps()),  //.parity_odd() .stopbits(StopBits::STOP1)
+           clocks,
+           ).unwrap().split();
+
+        p.USART6.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+        let (tx3, rx3) = Serial::usart6(      //  NOTE PINS and USART6 !!!
+           p.USART6,
+           (gpioa.pa11.into_alternate_af8(),           //tx pa11
+	    gpioa.pa12.into_alternate_af8()),          //rx pa12
+           Config::default() .baudrate(115_200.bps()) ,
+           clocks,
+           ).unwrap().split();
 
         (tx1, rx1,   tx2, rx2,   tx3, rx3 )
 	}

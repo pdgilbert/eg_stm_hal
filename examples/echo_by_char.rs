@@ -46,11 +46,39 @@ use stm32f4xx_hal::{prelude::*,
 		    pac::USART1 
 		    };
 
+#[cfg(feature = "stm32f7xx")]
+use stm32f7xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::USART1 
+		    };
+
+#[cfg(feature = "stm32h7xx")] 
+use stm32h7xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::USART1 
+		    };
+
+#[cfg(feature = "stm32l0xx")]
+use stm32l0xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::USART1 
+		    };
+
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{prelude::*, 
 		    stm32::Peripherals, 
 		    serial::{Config, Serial, Tx, Rx},
 		    stm32::USART1 
+		    };
+
+#[cfg(feature = "stm32l4xx")] 
+use stm32l4xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::USART1 
 		    };
 
 
@@ -117,6 +145,71 @@ fn main() -> ! {
 
 
 
+    #[cfg(feature = "stm32f7xx")]
+    fn setup() -> (Tx<USART1>, Rx<USART1>) {
+
+        let p = Peripherals::take().unwrap();
+    	let rcc = p.RCC.constrain();
+    	let clocks = rcc.cfgr.freeze();
+    	let gpioa = p.GPIOA.split();
+
+    	p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+
+    	Serial::usart1(
+    	    p.USART1,
+    	    (gpioa.pa9.into_alternate_af7(),			      //tx pa9
+	     gpioa.pa10.into_alternate_af7()),  		      //rx pa10
+    	    Config::default() .baudrate(9600.bps()),
+    	    clocks,
+    	    ).unwrap().split()
+	}
+
+
+
+    #[cfg(feature = "stm32h7xx")]
+    fn setup() -> (Tx<USART1>, Rx<USART1>) {
+
+       let p      = Peripherals::take().unwrap();
+       let pwr    = p.PWR.constrain();
+       let vos    = pwr.freeze();
+       let rcc    = p.RCC.constrain();
+       let clocks = rcc.cfgr.freeze();
+       let gpioa  = p.GPIOA.split(ccdr.peripheral.GPIOA);
+
+       p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+
+       Serial::usart1(
+           p.USART1,
+           (gpioa.pa9.into_alternate_af7(),                          //tx pa9
+            gpioa.pa10.into_alternate_af7()),                        //rx pa10
+           Config::default() .baudrate(9600.bps()),
+           clocks,
+           ).unwrap().split()
+       }
+
+
+
+    #[cfg(feature = "stm32l0x")]
+    fn setup() -> (Tx<USART1>, Rx<USART1>) {
+
+        let p = Peripherals::take().unwrap();
+    	let rcc = p.RCC.constrain();
+    	let clocks = rcc.cfgr.freeze();
+    	let gpioa = p.GPIOA.split();
+
+    	p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+
+    	Serial::usart1(
+    	    p.USART1,
+    	    (gpioa.pa9.into_alternate_af7(),			      //tx pa9
+	     gpioa.pa10.into_alternate_af7()),  		      //rx pa10
+    	    Config::default() .baudrate(9600.bps()),
+    	    clocks,
+    	    ).unwrap().split()
+	}
+
+
+
     #[cfg(feature = "stm32l1xx")]
     fn setup() -> (Tx<USART1>, Rx<USART1>) {
         let p = Peripherals::take().unwrap();
@@ -133,6 +226,24 @@ fn main() -> ! {
     	    clocks,
     	    ).unwrap().split()
     	}
+
+
+
+    #[cfg(feature = "stm32l4xx")]
+    fn setup() -> (Tx<USART1>, Rx<USART1>) {
+        let p = Peripherals::take().unwrap();
+    	let rcc = p.RCC.constrain();
+    	let clocks = rcc.cfgr.freeze();
+    	let gpioa = p.GPIOA.split();
+    	p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+    	Serial::usart1(
+    	    p.USART1,
+    	    (gpioa.pa9.into_alternate_af7(),			      //tx pa9
+	     gpioa.pa10.into_alternate_af7()),  		      //rx pa10
+    	    Config::default() .baudrate(9600.bps()),
+    	    clocks,
+    	    ).unwrap().split()
+	}
 
     // End of hal/MCU specific setup. Following should be generic code.
 
