@@ -75,6 +75,9 @@ use stm32l4xx_hal::{prelude::*,
 		    gpio::{gpioa::PA8, OpenDrain,  Output, },
 		    };
 
+//#[cfg(feature = "stm32l4xx")]
+//use embedded_hal::digital::v2::{InputPin, OutputPin};
+
 #[entry]
 fn main() -> ! {
 
@@ -196,10 +199,15 @@ fn main() -> ! {
        
        let cp = CorePeripherals::take().unwrap();
        let  p = Peripherals::take().unwrap();
+       let mut flash = p.FLASH.constrain();
+       let mut rcc = p.RCC.constrain();
+       let mut pwr = p.PWR.constrain(&mut rcc.apb1r1);
+       let clocks = rcc.cfgr .sysclk(80.mhz()) .pclk1(80.mhz()) 
+                             .pclk2(80.mhz()) .freeze(&mut flash.acr, &mut pwr);
 
-       let clocks = p.RCC.constrain().cfgr.use_hse(8.mhz()).sysclk(168.mhz()).freeze();
-       let pin_a8 = p.GPIOA.split().pa8.into_open_drain_output();  
-       
+       let gpioa   = p.GPIOA.split(&mut rcc.ahb2);
+       let pin_a8  = gpioa.pa8.into_open_drain_output(&mut gpioa.moder, &mut gpioa.otyper);
+  
        (Dht11::new(pin_a8),                  //DHT11 data on A8
         Delay::new(cp.SYST, clocks))
        };

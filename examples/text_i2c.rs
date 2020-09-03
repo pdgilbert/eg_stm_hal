@@ -89,7 +89,7 @@ use stm32l1xx_hal::{prelude::*,
 use stm32l4xx_hal::{prelude::*,  
                     pac::Peripherals, 
                     i2c::{I2c, },  
-		    gpio::{gpiob::{PB8, PB9}, AlternateOD, AF4, },
+		    gpio::{gpiob::{PB8, PB9}, Alternate, AF4, Output, OpenDrain, },
                     pac::I2C1,
 		    }; 
 
@@ -239,20 +239,29 @@ fn main() -> ! {
 
 
     #[cfg(feature = "stm32l4xx")]
-    fn setup() ->  I2c<I2C1, (PB8<AlternateOD<AF4>>, PB9<AlternateOD<AF4>>)> {
+    fn setup() ->  I2c<I2C1, (PB8<Alternate<AF4, Output<OpenDrain>>>, PB9<Alternate<AF4, Output<OpenDrain>>>)> {
   
        let  p     = Peripherals::take().unwrap();
-       let rcc    = p.RCC.constrain();
-       let clocks = rcc.cfgr.freeze();
-       let gpiob  = p.GPIOB.split(&mut rcc.ahb2);
+       let mut flash = p.FLASH.constrain();
+       let mut rcc = p.RCC.constrain();
+       let mut pwr = p.PWR.constrain(&mut rcc.apb1r1);
+       let clocks = rcc.cfgr .sysclk(80.mhz()) .pclk1(80.mhz()) 
+                             .pclk2(80.mhz()) .freeze(&mut flash.acr, &mut pwr);
+
+       let mut gpiob  = p.GPIOB.split(&mut rcc.ahb2);
        
-       // could also have scl on PB6, sda on PB7
-       //BlockingI2c::i2c1(
-       let scl = gpiob.pb8.into_alternate_af4().set_open_drain();   // scl on PB8
-       let sda = gpiob.pb9.into_alternate_af4().set_open_drain();   // sda on PB9
        
+       // following ttps://github.com/stm32-rs/stm32l4xx-hal/blob/master/examples/i2c_write.rs
+       let mut scl = gpiob.pb8.into_open_drain_output(&mut gpiob.moder, &mut gpiob.otyper);  // scl on PB8
+       scl.internal_pull_up(&mut gpiob.pupdr, true);
+       let scl = scl.into_af4(&mut gpiob.moder, &mut gpiob.afrh);
+
+       let mut sda = gpiob.pb9.into_open_drain_output(&mut gpiob.moder, &mut gpiob.otyper);  // sda on PB9
+       sda.internal_pull_up(&mut gpiob.pupdr, true);
+       let sda = sda.into_af4(&mut gpiob.moder, &mut gpiob.afrh);
+    
        // return i2c
-       I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks)
+       I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks, &mut rcc.apb1r1)
        };
 
 

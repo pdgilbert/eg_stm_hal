@@ -86,8 +86,8 @@ use stm32l1xx_hal::{prelude::*,
 #[cfg(feature = "stm32l4xx")] 
 use stm32l4xx_hal::{prelude::*,  
                     pac::Peripherals, 
-                    serial::{config::Config, Serial, Tx, Rx},
-		    pac::{USART1, USART2, USART6} };
+                    serial::{Config, Serial, Tx, Rx},
+		    pac::{USART1, USART2, USART3} };
 
 
 #[entry]
@@ -402,17 +402,17 @@ fn main() -> ! {
 
 
     #[cfg(feature = "stm32l4xx")]
-    fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>, Tx<USART6>, Rx<USART6>, )  {
+    fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>, Tx<USART3>, Rx<USART3>, )  {
 
-       let p = Peripherals::take().unwrap();
+       let p         = Peripherals::take().unwrap();
        let mut flash = p.FLASH.constrain();
-       let rcc = p.RCC.constrain();  
-       let mut rcc = p.RCC.constrain();
-       let mut pwr = p.PWR.constrain(&mut rcc.apb1r1);
-       let clocks = rcc.cfgr .sysclk(80.mhz()) .pclk1(80.mhz()) 
+       let rcc       = p.RCC.constrain();  
+       let mut rcc   = p.RCC.constrain();
+       let mut pwr   = p.PWR.constrain(&mut rcc.apb1r1);
+       let clocks    = rcc.cfgr .sysclk(80.mhz()) .pclk1(80.mhz()) 
                              .pclk2(80.mhz()) .freeze(&mut flash.acr, &mut pwr);
 
-       let gpioa = p.GPIOA.split(&mut rcc.ahb2);
+       let mut gpioa = p.GPIOA.split(&mut rcc.ahb2);
 
        let (tx1, rx1) =  Serial::usart1(
           p.USART1,
@@ -425,17 +425,19 @@ fn main() -> ! {
 
        let (tx2, rx2) = Serial::usart2(
           p.USART2,
-          (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrh),            //tx pa2
-           gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrh)),           //rx pa3
+          (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl),            //tx pa2
+           gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)),           //rx pa3
           Config::default() .baudrate(115_200.bps()),  
           clocks,
-          &mut rcc.apb2,
+          &mut rcc.apb1r1,
           ).split();
 
-       let (tx3, rx3) = Serial::usart6(      
-          p.USART6,
-          (gpioa.pa11.into_af8(&mut gpioa.moder, &mut gpioa.afrh),           //tx pa11   CHECK af8 ?
-           gpioa.pa12.into_af8(&mut gpioa.moder, &mut gpioa.afrh)),          //rx pa12   CHECK af8 ?
+       let mut gpiob = p.GPIOB.split(&mut rcc.ahb2);
+
+       let (tx3, rx3) = Serial::usart3(      
+          p.USART3,
+          (gpiob.pb10.into_af7(&mut gpiob.moder, &mut gpiob.afrh),           //tx pb10
+           gpiob.pb11.into_af7(&mut gpiob.moder, &mut gpiob.afrh)),          //rx pb11 
           Config::default() .baudrate(115_200.bps()) ,
           clocks,
           &mut rcc.apb2,

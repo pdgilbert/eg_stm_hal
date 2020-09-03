@@ -789,7 +789,7 @@ dependencies = [
 [[package]]
 name = "stm32l0xx-hal"
 version = "0.6.2"
-source = "git+https://github.com/stm32-rs/stm32l0xx-hal#9d7f50a4f123b259ebd26650ca5ff3936f998e5a"
+source = "git+https://github.com/stm32-rs/stm32l0xx-hal#6c33eb909228d4fcb1a5395c941bfaa179191e4f"
 dependencies = [
  "as-slice",
  "cast",

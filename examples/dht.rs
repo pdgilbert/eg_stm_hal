@@ -242,8 +242,7 @@ fn main() -> ! {
        //  1 second delay (for DHT11 setup?) Wait on  sensor initialization?
        delay.delay_ms(1000_u16);
    
-       (pin_a8,                   //DHT data will be on A8
-        delay)
+       (pin_a8,  delay)                  //DHT data will be on A8
        };
 
 
@@ -252,21 +251,22 @@ fn main() -> ! {
        
        let cp = CorePeripherals::take().unwrap();
        let  p = Peripherals::take().unwrap();
+       let mut flash = p.FLASH.constrain();
+       let mut rcc = p.RCC.constrain();
+       let mut pwr = p.PWR.constrain(&mut rcc.apb1r1);
+       let clocks = rcc.cfgr .sysclk(80.mhz()) .pclk1(80.mhz()) 
+                             .pclk2(80.mhz()) .freeze(&mut flash.acr, &mut pwr);
 
-       //let clocks =  p.RCC.constrain().cfgr.freeze();
-       // next gives panicked at 'assertion failed: !sysclk_on_pll || 
-       //                  sysclk <= sysclk_max && sysclk >= sysclk_min'
-       let clocks = p.RCC.constrain().cfgr.use_hse(8.mhz()).sysclk(168.mhz()).freeze();
-       let pin_a8 = p.GPIOA.split().pa8.into_open_drain_output();  
-              
+       let gpioa   = p.GPIOA.split(&mut rcc.ahb2);
+       let pin_a8  = gpioa.pa8.into_open_drain_output(&mut gpioa.moder, &mut gpioa.otyper);
+       
        // delay is used by `dht-sensor` to wait for signals
        let mut delay = Delay::new(cp.SYST, clocks);   //SysTick: System Timer
 
        //  1 second delay (for DHT11 setup?) Wait on  sensor initialization?
        delay.delay_ms(1000_u16);
 
-       (pin_a8,                   //DHT data will be on A8
-        delay)
+       (pin_a8, delay)                   //DHT data will be on A8
        };
 
 

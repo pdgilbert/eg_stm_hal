@@ -149,13 +149,12 @@ use stm32l1xx_hal::{prelude::*,
 #[cfg(feature = "stm32l4xx")] 
 use stm32l4xx_hal::{prelude::*,  
                     pac::Peripherals, 
-                    serial::{config::Config, Serial, Tx, Rx},
+                    serial::{Config, Serial, Tx, Rx},
 		    pac::{USART2}, 
                     spi::{Spi},
                     delay::Delay,
-		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5,  
+		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5, Input, Floating,  
                            gpioa::{PA0, PA1}, Output, PushPull},
-                    time::MegaHertz,
 		    pac::SPI1,
 		    };
 
@@ -500,48 +499,55 @@ fn main() -> ! {
 
     #[cfg(feature = "stm32l4xx")]
     fn setup() ->  (Tx<USART2>, Rx<USART2>,
-                    sx127x_lora::LoRa<Spi<SPI1, (PA5<Alternate<AF5>>, 
-		                                 PA6<Alternate<AF5>>, 
-						 PA7<Alternate<AF5>>)>,
+                    sx127x_lora::LoRa<Spi<SPI1, (PA5<Alternate<AF5, Input<Floating>>>, 
+		                                 PA6<Alternate<AF5, Input<Floating>>>, 
+						 PA7<Alternate<AF5, Input<Floating>>>)>,
                                      PA1<Output<PushPull>>, 
                                      PA0<Output<PushPull>>>, 
                                      Delay ) {
 
-        let cp = cortex_m::Peripherals::take().unwrap();
-        let p = Peripherals::take().unwrap();
-        let clocks    =  p.RCC.constrain().cfgr.freeze();
-        let gpioa = p.GPIOA.split();
+       let cp = cortex_m::Peripherals::take().unwrap();
+       let p = Peripherals::take().unwrap();
+       let mut flash = p.FLASH.constrain();
+       let mut rcc   = p.RCC.constrain();
+       let mut pwr   = p.PWR.constrain(&mut rcc.apb1r1);
+       let clocks    = rcc.cfgr .sysclk(80.mhz()) .pclk1(80.mhz()) 
+                                .pclk2(80.mhz()) .freeze(&mut flash.acr, &mut pwr);
+      
+       let mut gpioa = p.GPIOA.split(&mut rcc.ahb2);
 
-        let (tx, rx) = Serial::usart2(
-           p.USART2,
-           (gpioa.pa2.into_alternate_af7(),            //tx pa2  for GPS
-	    gpioa.pa3.into_alternate_af7()),           //rx pa3  for GPS
-           Config::default() .baudrate(9600.bps()), 
-           clocks,
-           ).unwrap().split();
+       let (tx, rx) = Serial::usart2(
+          p.USART2,
+          (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl),            //tx pa2  for GPS
+           gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)),           //rx pa3  for GPS
+          Config::default() .baudrate(9600.bps()), 
+          clocks,
+          &mut rcc.apb1r1,
+          ).split();
 
        let spi = Spi::spi1(
-           p.SPI1,
-           (gpioa.pa5.into_alternate_af5(),  // sck   on PA5
-            gpioa.pa6.into_alternate_af5(),  // miso  on PA6
-            gpioa.pa7.into_alternate_af5()   // mosi  on PA7
-            ),
-           sx127x_lora::MODE,
-           MegaHertz(8).into(),
-           clocks,
-           );
+          p.SPI1,
+          (gpioa.pa5.into_af5(&mut gpioa.moder, &mut gpioa.afrl),  // sck   on PA5
+           gpioa.pa6.into_af5(&mut gpioa.moder, &mut gpioa.afrl),  // miso  on PA6
+           gpioa.pa7.into_af5(&mut gpioa.moder, &mut gpioa.afrl)   // mosi  on PA7
+           ),
+          sx127x_lora::MODE,
+          8.mhz(),
+          clocks,
+          &mut rcc.apb2,
+          );
 
        let mut delay = Delay::new(cp.SYST, clocks);
 
        let lora = sx127x_lora::LoRa::new(spi, 
-                              gpioa.pa1.into_push_pull_output(),      //  cs   on PA1
-                              gpioa.pa0.into_push_pull_output(),      // reset on PA0
-                              FREQUENCY, 
-                              &mut delay).unwrap();                        // delay
+                             gpioa.pa1.into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper),      //  cs   on PA1
+                             gpioa.pa0.into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper),      // reset on PA0
+                             FREQUENCY, 
+                             &mut delay).unwrap();                        // delay
 
 
-        (tx, rx,  lora,  delay)
-	}
+       (tx, rx,  lora,  delay)
+       }
 
 
     // End of hal/MCU specific setup. Following should be generic code.

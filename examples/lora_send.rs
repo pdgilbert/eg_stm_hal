@@ -107,9 +107,8 @@ use stm32l4xx_hal::{prelude::*,
                     pac::Peripherals, 
                     spi::{Spi},
                     delay::Delay,
-		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5,  
+		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5, Input, Floating, 
                            gpioa::{PA0, PA1}, Output, PushPull},
-                    time::MegaHertz,
 		    pac::SPI1,
 		    }; 
 
@@ -443,37 +442,43 @@ fn main() -> !{
        };
 
 
+
     #[cfg(feature = "stm32l4xx")]
-    fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, (PA5<Alternate<AF5>>, PA6<Alternate<AF5>>, PA7<Alternate<AF5>>)>,
+    fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, (PA5<Alternate<AF5, Input<Floating>>>, 
+                                                 PA6<Alternate<AF5, Input<Floating>>>, 
+                                                 PA7<Alternate<AF5, Input<Floating>>>
+                                                 )>,
                                       PA1<Output<PushPull>>, 
                                       PA0<Output<PushPull>>>, 
                     Delay) {
 
-       let cp = cortex_m::Peripherals::take().unwrap();
-       let p  = Peripherals::take().unwrap();
-
-       let rcc   = p.RCC.constrain();
-       let clocks = rcc.cfgr.sysclk(64.mhz()).pclk1(32.mhz()).freeze();
-       
-       let gpioa = p.GPIOA.split();
-       //let gpiob = p.GPIOB.split();
+       let cp        = cortex_m::Peripherals::take().unwrap();
+       let p         = Peripherals::take().unwrap();
+       let mut flash = p.FLASH.constrain();
+       let mut rcc   = p.RCC.constrain();
+       let mut pwr   = p.PWR.constrain(&mut rcc.apb1r1);
+       let clocks    = rcc.cfgr .sysclk(80.mhz()) .pclk1(80.mhz()) 
+                                .pclk2(80.mhz()) .freeze(&mut flash.acr, &mut pwr);
+      
+       let mut gpioa = p.GPIOA.split(&mut rcc.ahb2);
 
        let spi = Spi::spi1(
            p.SPI1,
-           (gpioa.pa5.into_alternate_af5(),  // sck   on PA5
-            gpioa.pa6.into_alternate_af5(),  // miso  on PA6
-            gpioa.pa7.into_alternate_af5()   // mosi  on PA7
+           (gpioa.pa5.into_af5(&mut gpioa.moder, &mut gpioa.afrl),  // sck   on PA5
+            gpioa.pa6.into_af5(&mut gpioa.moder, &mut gpioa.afrl),  // miso  on PA6
+            gpioa.pa7.into_af5(&mut gpioa.moder, &mut gpioa.afrl)   // mosi  on PA7
             ),
            sx127x_lora::MODE,
-           MegaHertz(8).into(),
+           8.mhz(),
            clocks,
+           &mut rcc.apb2,
            );
-       
+
        let mut delay = Delay::new(cp.SYST, clocks);
        
        let lora = sx127x_lora::LoRa::new(spi, 
-                              gpioa.pa1.into_push_pull_output(),     //  cs   on PA1
-                              gpioa.pa0.into_push_pull_output(),     // reset on PA0
+                              gpioa.pa1.into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper),  //  cs   on PA1
+                              gpioa.pa0.into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper),  // reset on PA0
                               FREQUENCY, 
                               &mut delay ).unwrap();                 // delay
        

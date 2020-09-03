@@ -120,11 +120,11 @@ use stm32l1xx_hal::{prelude::*,
 #[cfg(feature = "stm32l4xx")] 
 use stm32l4xx_hal::{prelude::*,  
                     pac::Peripherals, 
-                    serial::{config::Config, Serial, Tx, Rx},
+                    serial::{Config, Serial, Tx, Rx},
 		    pac::{USART2}, 
                     delay::Delay,
 		    i2c::{I2c, },  
-		    gpio::{gpiob::{PB8, PB9}, AlternateOD, AF4, },
+		    gpio::{gpiob::{PB8, PB9}, Alternate, AF4, Output, OpenDrain},
                     pac::I2C1,
 		    };
 
@@ -376,36 +376,41 @@ fn main() -> ! {
 
     #[cfg(feature = "stm32l4xx")]
     fn setup() ->  (Tx<USART2>, Rx<USART2>,
-                    I2c<I2C1, (PB8<AlternateOD<AF4>>, PB9<AlternateOD<AF4>>)>, 
+                    I2c<I2C1, (PB8<Alternate<AF4, Output<OpenDrain>>>, PB9<Alternate<AF4, Output<OpenDrain>>>)>, 
                     Delay ) {
 
        let cp     = cortex_m::Peripherals::take().unwrap();
        let p      = Peripherals::take().unwrap();
        let mut flash = p.FLASH.constrain();
-       let rcc = p.RCC.constrain();  
        let mut rcc = p.RCC.constrain();
        let mut pwr = p.PWR.constrain(&mut rcc.apb1r1);
        let clocks = rcc.cfgr .sysclk(80.mhz()) .pclk1(80.mhz()) 
                              .pclk2(80.mhz()) .freeze(&mut flash.acr, &mut pwr);
 
-       let gpioa = p.GPIOA.split(&mut rcc.ahb2);
+       let mut gpioa = p.GPIOA.split(&mut rcc.ahb2);
 
        let (tx2, rx2) = Serial::usart2(
           p.USART2,
-          (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrh),   //tx pa2  for GPS rx
-           gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrh)),  //rx pa3  for GPS tx
+          (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl),   //tx pa2  for GPS rx
+           gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)),  //rx pa3  for GPS tx
           Config::default() .baudrate(9600.bps()), 
           clocks,
-          &mut rcc.apb2,
+          &mut rcc.apb1r1,
           ).split();
 
-       let gpiob  = p.GPIOB.split();
+       let mut gpiob  = p.GPIOB.split(&mut rcc.ahb2);
        
-       let scl = gpiob.pb8.into_af4().set_open_drain();   // scl on PB8
-       let sda = gpiob.pb9.into_af4().set_open_drain();   // sda on PB9
-       
+       // following github.com/stm32-rs/stm32l4xx-hal/blob/master/examples/i2c_write.rs
+       let mut scl = gpiob.pb8.into_open_drain_output(&mut gpiob.moder, &mut gpiob.otyper);  // scl on PB8
+       scl.internal_pull_up(&mut gpiob.pupdr, true);
+       let scl = scl.into_af4(&mut gpiob.moder, &mut gpiob.afrh);
+
+       let mut sda = gpiob.pb9.into_open_drain_output(&mut gpiob.moder, &mut gpiob.otyper);  // sda on PB9
+       sda.internal_pull_up(&mut gpiob.pupdr, true);
+       let sda = sda.into_af4(&mut gpiob.moder, &mut gpiob.afrh);
+
        (tx2, rx2,   
-	I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks), // i2c
+	I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks, &mut rcc.apb1r1 ), // i2c
         Delay::new(cp.SYST, clocks))
        };
 
