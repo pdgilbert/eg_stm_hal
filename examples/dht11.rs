@@ -40,12 +40,40 @@ use stm32f4xx_hal::{prelude::*,
 		    gpio::{gpioa::PA8, OpenDrain,  Output, },
 		    };
 
+#[cfg(feature = "stm32f7xx")]
+use stm32f7xx_hal::{prelude::*, 
+                    pac::{Peripherals, CorePeripherals}, 
+		    delay::Delay, 
+		    gpio::{gpioa::PA8, OpenDrain,  Output, },
+		    };
+
+#[cfg(feature = "stm32h7xx")]
+use stm32h7xx_hal::{prelude::*, 
+                    pac::{Peripherals, CorePeripherals}, 
+		    delay::Delay, 
+		    gpio::{gpioa::PA8, OpenDrain,  Output, },
+		    };
+
+#[cfg(feature = "stm32l0xx")]
+use stm32l0xx_hal::{prelude::*, 
+                    pac::{Peripherals, CorePeripherals}, 
+		    delay::Delay, 
+		    gpio::{gpioa::PA8, OpenDrain,  Output, },
+		    };
+
 #[cfg(feature = "stm32l1xx")]
 use stm32l1xx_hal::{prelude::*, 
                     stm32::{Peripherals, CorePeripherals}, 
 		    delay::Delay ,
 		    gpio::{gpioa::PA8, OpenDrain,  Output, },
 		   };
+
+#[cfg(feature = "stm32l4xx")]
+use stm32l4xx_hal::{prelude::*, 
+                    pac::{Peripherals, CorePeripherals}, 
+		    delay::Delay, 
+		    gpio::{gpioa::PA8, OpenDrain,  Output, },
+		    };
 
 #[entry]
 fn main() -> ! {
@@ -98,6 +126,57 @@ fn main() -> ! {
        };
 
 
+    #[cfg(feature = "stm32f7xx")]         
+    fn setup() -> (Dht11<PA8<Output<OpenDrain>>>,  Delay) {
+       
+       let cp = CorePeripherals::take().unwrap();
+       let  p = Peripherals::take().unwrap();
+
+       //let clocks =  p.RCC.constrain().cfgr.freeze();
+       // next gives panicked at 'assertion failed: !sysclk_on_pll || 
+       //                  sysclk <= sysclk_max && sysclk >= sysclk_min'
+       let clocks = p.RCC.constrain().cfgr.use_hse(8.mhz()).sysclk(168.mhz()).freeze();
+       let pin_a8 = p.GPIOA.split().pa8.into_open_drain_output();  
+       
+       (Dht11::new(pin_a8),                  //DHT11 data on A8
+        Delay::new(cp.SYST, clocks))
+       };
+
+
+    #[cfg(feature = "stm32h7xx")]         
+    fn setup() -> (Dht11<PA8<Output<OpenDrain>>>,  Delay) {
+       
+       let cp = CorePeripherals::take().unwrap();
+       let  p = Peripherals::take().unwrap();
+
+       //let clocks =  p.RCC.constrain().cfgr.freeze();
+       // next gives panicked at 'assertion failed: !sysclk_on_pll || 
+       //                  sysclk <= sysclk_max && sysclk >= sysclk_min'
+       let clocks = p.RCC.constrain().cfgr.use_hse(8.mhz()).sysclk(168.mhz()).freeze();
+       let pin_a8 = p.GPIOA.split().pa8.into_open_drain_output();  
+       
+       (Dht11::new(pin_a8),                  //DHT11 data on A8
+        Delay::new(cp.SYST, clocks))
+       };
+
+
+    #[cfg(feature = "stm32l0xx")]  
+    fn setup() -> (Dht11<PA8<Output<OpenDrain>>>,  Delay) {
+       
+       let cp = CorePeripherals::take().unwrap();
+       let  p = Peripherals::take().unwrap();
+
+       //let clocks =  p.RCC.constrain().cfgr.freeze();
+       // next gives panicked at 'assertion failed: !sysclk_on_pll || 
+       //                  sysclk <= sysclk_max && sysclk >= sysclk_min'
+       let clocks = p.RCC.constrain().cfgr.use_hse(8.mhz()).sysclk(168.mhz()).freeze();
+       let pin_a8 = p.GPIOA.split().pa8.into_open_drain_output();  
+       
+       (Dht11::new(pin_a8),                  //DHT11 data on A8
+        Delay::new(cp.SYST, clocks))
+       };
+
+
     #[cfg(feature = "stm32l1xx")]   
     fn setup() -> (Dht11<PA8<Output<OpenDrain>>>,  Delay) {
        
@@ -108,6 +187,20 @@ fn main() -> ! {
        let pin_a8 = p.GPIOA.split().pa8.into_open_drain_output();
        
        (Dht11::new(pin_a8),                 //DHT11 data on A8
+        Delay::new(cp.SYST, clocks))
+       };
+
+
+    #[cfg(feature = "stm32l4xx")]           // Use HSE oscillator
+    fn setup() -> (Dht11<PA8<Output<OpenDrain>>>,  Delay) {
+       
+       let cp = CorePeripherals::take().unwrap();
+       let  p = Peripherals::take().unwrap();
+
+       let clocks = p.RCC.constrain().cfgr.use_hse(8.mhz()).sysclk(168.mhz()).freeze();
+       let pin_a8 = p.GPIOA.split().pa8.into_open_drain_output();  
+       
+       (Dht11::new(pin_a8),                  //DHT11 data on A8
         Delay::new(cp.SYST, clocks))
        };
 

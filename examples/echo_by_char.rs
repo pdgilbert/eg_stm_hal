@@ -77,7 +77,7 @@ use stm32l1xx_hal::{prelude::*,
 #[cfg(feature = "stm32l4xx")] 
 use stm32l4xx_hal::{prelude::*,  
                     pac::Peripherals, 
-                    serial::{config::Config, Serial, Tx, Rx},
+                    serial::{Config, Serial, Tx, Rx},
 		    pac::USART1 
 		    };
 
@@ -231,19 +231,25 @@ fn main() -> ! {
 
     #[cfg(feature = "stm32l4xx")]
     fn setup() -> (Tx<USART1>, Rx<USART1>) {
-        let p = Peripherals::take().unwrap();
-    	let rcc = p.RCC.constrain();
-    	let clocks = rcc.cfgr.freeze();
-    	let gpioa = p.GPIOA.split();
-    	p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
-    	Serial::usart1(
-    	    p.USART1,
-    	    (gpioa.pa9.into_alternate_af7(),			      //tx pa9
-	     gpioa.pa10.into_alternate_af7()),  		      //rx pa10
-    	    Config::default() .baudrate(9600.bps()),
-    	    clocks,
-    	    ).unwrap().split()
-	}
+
+       let p         = Peripherals::take().unwrap();
+       let mut flash = p.FLASH.constrain();
+       let mut rcc   = p.RCC.constrain();
+       let mut pwr   = p.PWR.constrain(&mut rcc.apb1r1);
+       let clocks    = rcc.cfgr .sysclk(80.mhz()) .pclk1(80.mhz()) 
+                             .pclk2(80.mhz()) .freeze(&mut flash.acr, &mut pwr);
+
+       let mut gpioa = p.GPIOA.split(&mut rcc.ahb2);
+
+       Serial::usart1(
+           p.USART1,
+           (gpioa.pa9.into_af7(&mut gpioa.moder, &mut gpioa.afrh),    //tx pa9
+            gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)),  //rx pa10
+           Config::default() .baudrate(9600.bps()),
+           clocks,
+           &mut rcc.apb2,
+           ).split()
+       }
 
     // End of hal/MCU specific setup. Following should be generic code.
 

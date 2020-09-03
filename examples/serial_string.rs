@@ -27,17 +27,54 @@ use nb::block;
 use eg_stm_hal::to_str;
 
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
-use stm32f1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, StopBits, }, };
+use stm32f1xx_hal::{prelude::*,   
+                    pac::Peripherals, 
+                    serial::{Config, Serial, StopBits, }, 
+                    };
 
 #[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
-use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Serial}, };
+use stm32f3xx_hal::{prelude::*, 
+                    stm32::Peripherals, 
+                    serial::{Serial}, 
+                    };
+
 //use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{Config, Serial, StopBits}, };
 
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
-use stm32f4xx_hal::{prelude::*, pac::Peripherals, serial::{config::Config, Serial}};
+use stm32f4xx_hal::{prelude::*, 
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial}
+                    };
+
+#[cfg(feature = "stm32f7xx")] 
+use stm32f7xx_hal::{prelude::*, 
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial}
+                    };
+
+#[cfg(feature = "stm32h7xx")] 
+use stm32h7xx_hal::{prelude::*, 
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial}
+                    };
+
+#[cfg(feature = "stm32l0xx")] 
+use stm32l0xx_hal::{prelude::*, 
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial}
+                    };
 
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
-use stm32l1xx_hal::{prelude::*, stm32::Peripherals, serial::{Config, Serial}};
+use stm32l1xx_hal::{prelude::*, 
+                    stm32::Peripherals, 
+                    serial::{Config, Serial}
+                    };
+
+#[cfg(feature = "stm32l4xx")]
+use stm32l4xx_hal::{prelude::*, 
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial}
+                    };
 
 
 #[entry]

@@ -44,11 +44,39 @@ use stm32f4xx_hal::{prelude::*,
 		    pac::USART1 
 		    };
 
+#[cfg(feature = "stm32f7xx")] 
+use stm32f7xx_hal::{prelude::*, 
+                    pac::Peripherals, 
+		    serial::{config::Config, Serial, Tx, Rx},
+		    pac::USART1 
+		    };
+
+#[cfg(feature = "stm32h7xx")] 
+use stm32h7xx_hal::{prelude::*, 
+                    pac::Peripherals, 
+		    serial::{config::Config, Serial, Tx, Rx},
+		    pac::USART1 
+		    };
+
+#[cfg(feature = "stm32l0xx")] 
+use stm32l0xx_hal::{prelude::*, 
+                    pac::Peripherals, 
+		    serial::{config::Config, Serial, Tx, Rx},
+		    pac::USART1 
+		    };
+
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{prelude::*, 
                     stm32::Peripherals, 
 		    serial::{Config, Serial, Tx, Rx},
 		    stm32::USART1 
+		    };
+
+#[cfg(feature = "stm32l4xx")] 
+use stm32l4xx_hal::{prelude::*, 
+                    pac::Peripherals, 
+		    serial::{config::Config, Serial, Tx, Rx},
+		    pac::USART1 
 		    };
 
 
@@ -131,6 +159,72 @@ fn main() -> ! {
        };
 
 
+    #[cfg(feature = "stm32f7xx")]
+    fn setup() ->  (Tx<USART1>, Rx<USART1>)  {
+
+       let p = Peripherals::take().unwrap();
+       let mut rcc = p.RCC.constrain();  
+       let clocks = rcc.cfgr.freeze();
+       let gpioa = p.GPIOA.split();
+       p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+
+       let txrx1 =  Serial::usart1(
+          p.USART1,
+          (gpioa.pa9.into_alternate_af7(), 
+	   gpioa.pa10.into_alternate_af7()), 
+    	  Config::default() .baudrate(9600.bps()),
+    	  clocks,
+          ).unwrap();    
+
+       let (mut tx1, mut rx1)  = txrx1.split();
+       (tx1, rx1)
+       };
+
+
+    #[cfg(feature = "stm32h7xx")]
+    fn setup() ->  (Tx<USART1>, Rx<USART1>)  {
+
+       let p = Peripherals::take().unwrap();
+       let mut rcc = p.RCC.constrain();  
+       let clocks = rcc.cfgr.freeze();
+       let gpioa = p.GPIOA.split();
+       p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+
+       let txrx1 =  Serial::usart1(
+          p.USART1,
+          (gpioa.pa9.into_alternate_af7(), 
+	   gpioa.pa10.into_alternate_af7()), 
+    	  Config::default() .baudrate(9600.bps()),
+    	  clocks,
+          ).unwrap();    
+
+       let (mut tx1, mut rx1)  = txrx1.split();
+       (tx1, rx1)
+       };
+
+
+    #[cfg(feature = "stm32l0xx")]
+    fn setup() ->  (Tx<USART1>, Rx<USART1>)  {
+
+       let p = Peripherals::take().unwrap();
+       let mut rcc = p.RCC.constrain();  
+       let clocks = rcc.cfgr.freeze();
+       let gpioa = p.GPIOA.split();
+       p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+
+       let txrx1 =  Serial::usart1(
+          p.USART1,
+          (gpioa.pa9.into_alternate_af7(), 
+	   gpioa.pa10.into_alternate_af7()), 
+    	  Config::default() .baudrate(9600.bps()),
+    	  clocks,
+          ).unwrap();    
+
+       let (mut tx1, mut rx1)  = txrx1.split();
+       (tx1, rx1)
+       };
+
+
     #[cfg(feature = "stm32l1xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>)  {
 
@@ -149,6 +243,28 @@ fn main() -> ! {
  
        let (mut tx1, mut rx1)  = txrx1.split();
        (tx1, rx1)
+       };
+
+
+    #[cfg(feature = "stm32l4xx")]
+    fn setup() ->  (Tx<USART1>, Rx<USART1>)  {
+
+       let p = Peripherals::take().unwrap();
+       let mut flash = p.FLASH.constrain();
+       let mut rcc = p.RCC.constrain();  
+       let mut pwr = p.PWR.constrain(&mut rcc.apb1r1);
+       let clocks = rcc.cfgr .sysclk(80.mhz()) .pclk1(80.mhz()) 
+                             .pclk2(80.mhz()) .freeze(&mut flash.acr, &mut pwr);
+       let mut gpioa = p.GPIOA.split(&mut rcc.ahb2);
+
+       Serial::usart1(
+           p.USART1,
+           (gpioa.pa9.into_af7(&mut gpioa.moder, &mut gpioa.afrh),    //tx pa9
+            gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)),  //rx pa10
+           Config::default() .baudrate(9600.bps()),
+           clocks,
+           &mut rcc.apb2,
+           ).split()
        };
 
 

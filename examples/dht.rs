@@ -41,6 +41,27 @@ use stm32f4xx_hal::{prelude::*,
 		    gpio::{gpioa::PA8, OpenDrain,  Output, },
 		    };
 
+#[cfg(feature = "stm32f7xx")]
+use stm32f7xx_hal::{prelude::*, 
+                    pac::{Peripherals, CorePeripherals}, 
+		    delay::Delay, 
+		    gpio::{gpioa::PA8, OpenDrain,  Output, },
+		    };
+
+#[cfg(feature = "stm32h7xx")]
+use stm32h7xx_hal::{prelude::*, 
+                    pac::{Peripherals, CorePeripherals}, 
+		    delay::Delay, 
+		    gpio::{gpioa::PA8, OpenDrain,  Output, },
+		    };
+
+#[cfg(feature = "stm32l0xx")]
+use stm32l0xx_hal::{prelude::*, 
+                    pac::{Peripherals, CorePeripherals}, 
+		    delay::Delay, 
+		    gpio::{gpioa::PA8, OpenDrain,  Output, },
+		    };
+
 #[cfg(feature = "stm32l1xx")]
 use stm32l1xx_hal::{prelude::*, 
                     stm32::{Peripherals, CorePeripherals}, 
@@ -50,6 +71,13 @@ use stm32l1xx_hal::{prelude::*,
 
 use embedded_hal::blocking::delay::{DelayMs,};
 //use embedded_hal::digital::v2::{InputPin, OutputPin};
+
+#[cfg(feature = "stm32l4xx")]
+use stm32l4xx_hal::{prelude::*, 
+                    pac::{Peripherals, CorePeripherals}, 
+		    delay::Delay, 
+		    gpio::{gpioa::PA8, OpenDrain,  Output, },
+		    };
 
 
 #[entry]
@@ -130,6 +158,75 @@ fn main() -> ! {
        };
 
 
+    #[cfg(feature = "stm32f7xx")]           // Use HSE oscillator
+    fn setup() -> (PA8<Output<OpenDrain>>,  Delay) {
+       
+       let cp = CorePeripherals::take().unwrap();
+       let  p = Peripherals::take().unwrap();
+
+       //let clocks =  p.RCC.constrain().cfgr.freeze();
+       // next gives panicked at 'assertion failed: !sysclk_on_pll || 
+       //                  sysclk <= sysclk_max && sysclk >= sysclk_min'
+       let clocks = p.RCC.constrain().cfgr.use_hse(8.mhz()).sysclk(168.mhz()).freeze();
+       let pin_a8 = p.GPIOA.split().pa8.into_open_drain_output();  
+              
+       // delay is used by `dht-sensor` to wait for signals
+       let mut delay = Delay::new(cp.SYST, clocks);   //SysTick: System Timer
+
+       //  1 second delay (for DHT11 setup?) Wait on  sensor initialization?
+       delay.delay_ms(1000_u16);
+
+       (pin_a8,                   //DHT data will be on A8
+        delay)
+       };
+
+
+    #[cfg(feature = "stm32h7xx")]  
+    fn setup() -> (PA8<Output<OpenDrain>>,  Delay) {
+       
+       let cp = CorePeripherals::take().unwrap();
+       let  p = Peripherals::take().unwrap();
+
+       //let clocks =  p.RCC.constrain().cfgr.freeze();
+       // next gives panicked at 'assertion failed: !sysclk_on_pll || 
+       //                  sysclk <= sysclk_max && sysclk >= sysclk_min'
+       let clocks = p.RCC.constrain().cfgr.use_hse(8.mhz()).sysclk(168.mhz()).freeze();
+       let pin_a8 = p.GPIOA.split().pa8.into_open_drain_output();  
+              
+       // delay is used by `dht-sensor` to wait for signals
+       let mut delay = Delay::new(cp.SYST, clocks);   //SysTick: System Timer
+
+       //  1 second delay (for DHT11 setup?) Wait on  sensor initialization?
+       delay.delay_ms(1000_u16);
+
+       (pin_a8,                   //DHT data will be on A8
+        delay)
+       };
+
+
+    #[cfg(feature = "stm32l0xx")]      
+    fn setup() -> (PA8<Output<OpenDrain>>,  Delay) {
+       
+       let cp = CorePeripherals::take().unwrap();
+       let  p = Peripherals::take().unwrap();
+
+       //let clocks =  p.RCC.constrain().cfgr.freeze();
+       // next gives panicked at 'assertion failed: !sysclk_on_pll || 
+       //                  sysclk <= sysclk_max && sysclk >= sysclk_min'
+       let clocks = p.RCC.constrain().cfgr.use_hse(8.mhz()).sysclk(168.mhz()).freeze();
+       let pin_a8 = p.GPIOA.split().pa8.into_open_drain_output();  
+              
+       // delay is used by `dht-sensor` to wait for signals
+       let mut delay = Delay::new(cp.SYST, clocks);   //SysTick: System Timer
+
+       //  1 second delay (for DHT11 setup?) Wait on  sensor initialization?
+       delay.delay_ms(1000_u16);
+
+       (pin_a8,                   //DHT data will be on A8
+        delay)
+       };
+
+
     #[cfg(feature = "stm32l1xx")]   
     fn setup() -> (PA8<Output<OpenDrain>>,  Delay) {
        
@@ -145,6 +242,29 @@ fn main() -> ! {
        //  1 second delay (for DHT11 setup?) Wait on  sensor initialization?
        delay.delay_ms(1000_u16);
    
+       (pin_a8,                   //DHT data will be on A8
+        delay)
+       };
+
+
+    #[cfg(feature = "stm32l4xx")]        
+    fn setup() -> (PA8<Output<OpenDrain>>,  Delay) {
+       
+       let cp = CorePeripherals::take().unwrap();
+       let  p = Peripherals::take().unwrap();
+
+       //let clocks =  p.RCC.constrain().cfgr.freeze();
+       // next gives panicked at 'assertion failed: !sysclk_on_pll || 
+       //                  sysclk <= sysclk_max && sysclk >= sysclk_min'
+       let clocks = p.RCC.constrain().cfgr.use_hse(8.mhz()).sysclk(168.mhz()).freeze();
+       let pin_a8 = p.GPIOA.split().pa8.into_open_drain_output();  
+              
+       // delay is used by `dht-sensor` to wait for signals
+       let mut delay = Delay::new(cp.SYST, clocks);   //SysTick: System Timer
+
+       //  1 second delay (for DHT11 setup?) Wait on  sensor initialization?
+       delay.delay_ms(1000_u16);
+
        (pin_a8,                   //DHT data will be on A8
         delay)
        };

@@ -357,9 +357,9 @@ fn main() -> ! {
 
 
        // return (led1, led2, led3, delay)
-       (gpiob.pb13.into_push_pull_output(),  // led on pb13
-        gpiob.pb14.into_push_pull_output(),  // led on pb14
-        gpiob.pb15.into_push_pull_output(),  // led on pb15
+       (gpiob.pb13.into_push_pull_output(&mut gpiob.moder, &mut gpiob.otyper),  // led on pb13
+        gpiob.pb14.into_push_pull_output(&mut gpiob.moder, &mut gpiob.otyper),  // led on pb14
+        gpiob.pb15.into_push_pull_output(&mut gpiob.moder, &mut gpiob.otyper),  // led on pb15
         AsmDelay::new(bitrate::U32BitrateExt::mhz(32)) )             // delay
        };
 
