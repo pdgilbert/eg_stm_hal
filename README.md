@@ -59,11 +59,26 @@ Those names link to a file recording the commit that was used for the example te
 
 {% capture runA %}<a href="https://github.com/pdgilbert/eg_stm_hal/tree/543a6d12100c2856cbf37d978626cee47c462111" title="link to commit">runs</a>{% endcapture %}
 
-{% capture blink  %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/blink.rs"  title="link to example source code">blink</a> {% endcapture %}
-{% capture blink3 %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/blink3.rs" title="link to example source code">blink3</a>{% endcapture %}
+{% capture blink          %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/blink.rs"          title="link to example source code">blink</a>                   {% endcapture %}
+{% capture blink3         %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/blink3.rs"         title="link to example source code">blink3</a>                  {% endcapture %}
+{% capture echo_by_char   %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/echo_by_char.rs"   title="link to example source code">echo_by_char</a>            {% endcapture %}
+{% capture echo_string    %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/echo_string.rs"    title="link to example source code">echo_string</a>             {% endcapture %}
+{% capture serial_char    %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/serial_char.rs"    title="link to example source code">serial_char</a>             {% endcapture %}
+{% capture serial_string  %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/serial_string.rs"  title="link to example source code">serial_string</a>           {% endcapture %}
+{% capture gps_rw_by_char %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/gps_rw_by_char.rs" title="link to example source code">gps_rw_by_char</a>          {% endcapture %}
+{% capture gps_rw         %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/gps_rw.rs"         title="link to example source code">gps_rw</a>                  {% endcapture %}
+{% capture temperature    %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/temperature.rs"    title="link to example source code">temperature</a>             {% endcapture %}
+
+{% capture dht            %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/dht.rs"            title="link to example source code">dht</a>                     {% endcapture %}
+{% capture dht11          %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/dht11.rs"          title="link to example source code">dht11</a>                   {% endcapture %}
+{% capture text_i2c       %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/text_i2c.rs"       title="link to example source code">text_i2c</a>                {% endcapture %}
+{% capture oled_gps       %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/oled_gps.rs"       title="link to example source code">oled_gps</a>                {% endcapture %}
+{% capture lora_send      %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/lora_send.rs"      title="link to example source code">lora_send</a>               {% endcapture %}
+{% capture lora_receive   %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/lora_receive.rs"   title="link to example source code">lora_receive</a>            {% endcapture %}
+{% capture lora_gps       %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/lora_gps.rs"       title="link to example source code">lora_gps</a>                {% endcapture %}
 
 
-|    hal    |  board  |                {{blink}}                      |                {{blink3}}                  |                     echo_by_char                        |                  echo_string                       |                   serial_char                        |                  serial_string                      |                  gps_rw_by_char                         |                  gps_rw                         |                  temperature                                                        |
+|    hal    |  board  |                {{blink}}                      |                {{blink3}}               |                   {{echo_by_char}}                     |                 {{echo_string}}                      |                {{serial_char}}                      |                {{serial_string}}                    |                {{gps_rw_by_char}}                       |                {{gps_rw}}                       |                  {{temperature}}                  |
 |:---------:|:-------:|:-----:|:------:|:------:|:------:|:----------:|:-------------:|:--------------:|:------:|:--------------:|
 | stm32f1xx | {{b01}} |<img src="{{db01}}blink.png" {{p}} /> {{runA}} |<img src="{{db01}}blink3.png" {{p}} /> runs |<img src="{{db01}}echo_by_char.png" {{p}} />   runs-5 |<img src="{{db01}}echo_string.png" {{p}} />   runs-5 |<img src="{{db01}}serial_char.png" {{p}} />   runs-1 |<img src="{{db01}}serial_string.png" {{p}} />   no-2 |<img src="{{db01}}gps_rw_by_char.png" {{p}} />   runs    |<img src="{{db01}}gps_rw.png" {{p}} />   runs    |<img src="{{db01}}temperature.png" {{p}} />   runs |      
 | stm32f3xx | {{b02}} |<img src="{{db02}}blink.png" {{p}} />   runs   |<img src="{{db02}}blink3.png" {{p}} /> runs |<img src="{{db02}}echo_by_char.png" {{p}} />   runs-5 |<img src="{{db02}}echo_string.png" {{p}} />   no-8,9 |<img src="{{db02}}serial_char.png" {{p}} />   runs-1 |<img src="{{db02}}serial_string.png" {{p}} />   no-9 |<img src="{{db02}}gps_rw_by_char.png" {{p}} />   runs    |<img src="{{db02}}gps_rw.png" {{p}} />   runs-10 |<img src="{{db02}}temperature.png" {{p}} />        |
@@ -95,7 +110,7 @@ Those names link to a file recording the commit that was used for the example te
 
 The status of the additional examples is
 
-|    hal    | board   |                  dht                       |                  dht11                       |                  text_i2c                        |                 oled_gps                        |                  lora_send                |                   lora_receive                 |                  lora_gps                 |
+|    hal    | board   |                {{dht}}                     |                {{dht11}}                    |                 {{text_i2c}}                      |                {{oled_gps}}                     |                {{lora_send}}               |                {{lora_receive}}               |                {{lora_gps}}               |
 |:---------:|:--------------------:|:-----:|:-----:|:--------:|:--------:|:---------:|:------------:|:--------:|
 | stm32f1xx | {{b01}} |<img src="{{db01}}dht.png" {{p}} />   no-1  |<img src="{{db01}}dht11.png" {{p}} />   no-1  |<img src="{{db01}}text_i2c.png" {{p}} />   runs   |<img src="{{db01}}oled_gps.png" {{p}} />   no-2  |<img src="{{db01}}lora_send.png" {{p}} />   |<img src="{{db01}}lora_receive.png" {{p}} />   |<img src="{{db01}}lora_gps.png" {{p}} />   |
 | stm32f3xx | {{b02}} |<img src="{{db02}}dht.png" {{p}} />         |<img src="{{db02}}dht11.png" {{p}} />         |<img src="{{db02}}text_i2c.png" {{p}} />   runs   |<img src="{{db02}}oled_gps.png" {{p}} />         |<img src="{{db02}}lora_send.png" {{p}} />   |<img src="{{db02}}lora_receive.png" {{p}} />   |<img src="{{db02}}lora_gps.png" {{p}} />   |
