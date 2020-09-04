@@ -58,7 +58,7 @@ use stm32f7xx_hal::{prelude::*,
 #[cfg(feature = "stm32h7xx")]
 use stm32h7xx_hal::{prelude::*,  
                     pac::Peripherals, 
-                    serial::{config::Config, Serial, Tx, Rx},
+                    serial::{Tx, Rx},
 		    pac::{USART1, USART2} };
 
 #[cfg(feature = "stm32l0xx")]
@@ -205,26 +205,28 @@ fn main() -> ! {
 
     #[cfg(feature = "stm32h7xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2> )  {
-        let p = Peripherals::take().unwrap();
-        let clocks    =  p.RCC.constrain().cfgr.freeze();
-        let gpioa = p.GPIOA.split();
-        let (tx1, rx1) =  Serial::usart1(
-           p.USART1,
-    	   (gpioa.pa9.into_alternate_af7(),            //tx pa9  for console
-	    gpioa.pa10.into_alternate_af7()),          //rx pa10 for console
-    	   Config::default() .baudrate(9600.bps()),
-    	   clocks
-           ).unwrap().split(); 
 
-    	// this probably needs fix here. rx2.read() stalls and does not return.
-	//p.USART2.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
-        let (tx2, rx2) = Serial::usart2(
-           p.USART2,
-           (gpioa.pa2.into_alternate_af7(),            //tx pa2  for GPS
-	    gpioa.pa3.into_alternate_af7()),           //rx pa3  for GPS
-           Config::default() .baudrate(9600.bps()), 
-           clocks,
-           ).unwrap().split();
+       let p      = Peripherals::take().unwrap();
+       let pwr    = p.PWR.constrain();
+       let vos    = pwr.freeze();
+       let rcc    = p.RCC.constrain();
+       let ccdr   = rcc.sys_ck(160.mhz()).freeze(vos, &p.SYSCFG);
+       let clocks = ccdr.clocks;
+       let gpioa  = p.GPIOA.split(ccdr.peripheral.GPIOA);
+
+
+       let (tx1, rx1) = p.USART1.serial((gpioa.pa9.into_alternate_af7(),     //tx pa9
+                                         gpioa.pa10.into_alternate_af7()),   //rx pa10
+                                        9600.bps(), 
+                                        ccdr.peripheral.USART1, 
+                                        &clocks).unwrap().split();
+
+       
+       let (tx2, rx2) = p.USART2.serial((gpioa.pa2.into_alternate_af7(),     //tx pa2
+                                         gpioa.pa3.into_alternate_af7()),    //rx pa3
+                                        9600.bps(), 
+                                        ccdr.peripheral.USART2, 
+                                        &clocks).unwrap().split();
 
         (tx1, rx1,   tx2, rx2 )
 	}

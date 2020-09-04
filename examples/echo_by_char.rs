@@ -56,7 +56,7 @@ use stm32f7xx_hal::{prelude::*,
 #[cfg(feature = "stm32h7xx")] 
 use stm32h7xx_hal::{prelude::*,  
                     pac::Peripherals, 
-                    serial::{config::Config, Serial, Tx, Rx},
+                    serial::{Tx, Rx},   //Serial, 
 		    pac::USART1 
 		    };
 
@@ -173,20 +173,24 @@ fn main() -> ! {
        let pwr    = p.PWR.constrain();
        let vos    = pwr.freeze();
        let rcc    = p.RCC.constrain();
-       let clocks = rcc.cfgr.freeze();
+       let ccdr   = rcc.sys_ck(160.mhz()).freeze(vos, &p.SYSCFG);
+       let clocks = ccdr.clocks;
        let gpioa  = p.GPIOA.split(ccdr.peripheral.GPIOA);
 
-       p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
-
-       Serial::usart1(
-           p.USART1,
-           (gpioa.pa9.into_alternate_af7(),                          //tx pa9
-            gpioa.pa10.into_alternate_af7()),                        //rx pa10
-           Config::default() .baudrate(9600.bps()),
-           clocks,
-           ).unwrap().split()
+       //let txrx =Serial::usart1(
+       //    p.USART1,
+       //    (gpioa.pa9.into_alternate_af7(),                          //tx pa9
+       //     gpioa.pa10.into_alternate_af7()),                        //rx pa10
+       //    9600.bps(),
+       //    &clocks,
+       //    ).unwrap().split()
+       
+       p.USART1.serial((gpioa.pa9.into_alternate_af7(),                //tx pa9
+                        gpioa.pa10.into_alternate_af7()),              //rx pa10
+                       9600.bps(), 
+                       ccdr.peripheral.USART1, 
+                       &clocks).unwrap().split()
        }
-
 
 
     #[cfg(feature = "stm32l0x")]

@@ -54,7 +54,7 @@ use stm32f7xx_hal::{prelude::*,
 #[cfg(feature = "stm32h7xx")] 
 use stm32h7xx_hal::{prelude::*, 
                     pac::Peripherals, 
-		    serial::{config::Config, Serial, Tx, Rx},
+		    serial::{Tx, Rx},
 		    pac::USART1 
 		    };
 
@@ -184,23 +184,28 @@ fn main() -> ! {
     #[cfg(feature = "stm32h7xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>)  {
 
-       let p = Peripherals::take().unwrap();
-       let mut rcc = p.RCC.constrain();  
-       let clocks = rcc.cfgr.freeze();
-       let gpioa = p.GPIOA.split();
-       p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+       let p      = Peripherals::take().unwrap();
+       let pwr    = p.PWR.constrain();
+       let vos    = pwr.freeze();
+       let rcc    = p.RCC.constrain();
+       let ccdr   = rcc.sys_ck(160.mhz()).freeze(vos, &p.SYSCFG);
+       let clocks = ccdr.clocks;
+       let gpioa  = p.GPIOA.split(ccdr.peripheral.GPIOA);
 
-       let txrx1 =  Serial::usart1(
-          p.USART1,
-          (gpioa.pa9.into_alternate_af7(), 
-	   gpioa.pa10.into_alternate_af7()), 
-    	  Config::default() .baudrate(9600.bps()),
-    	  clocks,
-          ).unwrap();    
-
-       let (mut tx1, mut rx1)  = txrx1.split();
-       (tx1, rx1)
-       };
+       //let txrx =Serial::usart1(
+       //    p.USART1,
+       //    (gpioa.pa9.into_alternate_af7(),                          //tx pa9
+       //     gpioa.pa10.into_alternate_af7()),                        //rx pa10
+       //    9600.bps(),
+       //    &clocks,
+       //    ).unwrap().split()
+       
+       p.USART1.serial((gpioa.pa9.into_alternate_af7(),                //tx pa9
+                        gpioa.pa10.into_alternate_af7()),              //rx pa10
+                       9600.bps(), 
+                       ccdr.peripheral.USART1, 
+                       &clocks).unwrap().split()
+       }
 
 
     #[cfg(feature = "stm32l0xx")]
