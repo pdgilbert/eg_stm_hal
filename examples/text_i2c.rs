@@ -64,8 +64,8 @@ use stm32f7xx_hal::{prelude::*,
 #[cfg(feature = "stm32h7xx")] 
 use stm32h7xx_hal::{prelude::*,  
                     pac::Peripherals, 
-                    i2c::{I2c, },  
-		    gpio::{gpiob::{PB8, PB9}, Alternate, AF4, },
+                    i2c::{I2c,},  
+		    //gpio::{gpiob::{PB8, PB9}, Alternate, AF4, }, really! builds without this
                     pac::I2C1,
 		    }; 
 
@@ -182,23 +182,23 @@ fn main() -> ! {
 
 
     #[cfg(feature = "stm32h7xx")]
-    fn setup() ->  I2c<I2C1, (PB8<Alternate<AF4>>, PB9<Alternate<AF4>>)> {
+    fn setup() ->  I2c<I2C1> {
   
        let p      = Peripherals::take().unwrap();
        let pwr    = p.PWR.constrain();
        let vos    = pwr.freeze();
        let rcc    = p.RCC.constrain();
-       let clocks = rcc.cfgr.freeze();
-       let ccdr   = rcc.sys_ck(100.mhz()).freeze(vos, &p.SYSCFG);
-       let gpiob  = p.GPIOB.split(ccdr.peripheral.GPIOB);
+       let ccdr   = rcc.sys_ck(160.mhz()).freeze(vos, &p.SYSCFG);
+       let clocks = ccdr.clocks;
        
-       // could also have scl on PB6, sda on PB7
-       //BlockingI2c::i2c1(
+       let gpiob  = p.GPIOB.split(ccdr.peripheral.GPIOB);
+ 
        let scl = gpiob.pb8.into_alternate_af4().set_open_drain();   // scl on PB8
        let sda = gpiob.pb9.into_alternate_af4().set_open_drain();   // sda on PB9
        
        // return i2c
-       I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks)
+       // I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks)
+       p.I2C1 .i2c((scl, sda), 400.khz(), ccdr.peripheral.I2C1, &clocks)
        };
 
 

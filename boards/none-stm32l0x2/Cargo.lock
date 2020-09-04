@@ -141,7 +141,7 @@ version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4717562afbba06e760d34451919f5c3bf3ac15c7bb897e8b04862a7428378647"
 dependencies = [
- "proc-macro2 1.0.19",
+ "proc-macro2 1.0.20",
  "quote 1.0.7",
  "syn 1.0.39",
 ]
@@ -490,9 +490,9 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.19"
+version = "1.0.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "04f5f085b5d71e2188cb8271e5da0161ad52c3f227a661a3c135fdf28e258b12"
+checksum = "175c513d55719db99da20232b06cda8bab6b83ec2d04e3283edf0213c37c1a29"
 dependencies = [
  "unicode-xid 0.2.1",
 ]
@@ -512,7 +512,7 @@ version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "aa563d17ecb180e500da1cfd2b028310ac758de548efdd203e18f283af693f37"
 dependencies = [
- "proc-macro2 1.0.19",
+ "proc-macro2 1.0.20",
 ]
 
 [[package]]
@@ -587,7 +587,7 @@ version = "1.0.115"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "609feed1d0a73cc36a0182a840a9b37b4a82f0b1150369f0536a9e3f2a31dc48"
 dependencies = [
- "proc-macro2 1.0.19",
+ "proc-macro2 1.0.20",
  "quote 1.0.7",
  "syn 1.0.39",
 ]
@@ -760,8 +760,8 @@ dependencies = [
 
 [[package]]
 name = "stm32h7xx-hal"
-version = "0.6.0"
-source = "git+https://github.com/stm32-rs/stm32h7xx-hal#74ab7e0495e4a2b641a91ee0b308203bc12607f4"
+version = "0.7.0"
+source = "git+https://github.com/stm32-rs/stm32h7xx-hal#cad583d9ed51055906e0faaeb018cdd5f32a6a7e"
 dependencies = [
  "bare-metal",
  "cast",
@@ -789,7 +789,7 @@ dependencies = [
 [[package]]
 name = "stm32l0xx-hal"
 version = "0.6.2"
-source = "git+https://github.com/stm32-rs/stm32l0xx-hal#9d7f50a4f123b259ebd26650ca5ff3936f998e5a"
+source = "git+https://github.com/stm32-rs/stm32l0xx-hal#6c33eb909228d4fcb1a5395c941bfaa179191e4f"
 dependencies = [
  "as-slice",
  "cast",
@@ -882,7 +882,7 @@ version = "1.0.39"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "891d8d6567fe7c7f8835a3a98af4208f3846fba258c1bc3c31d6e506239f11f9"
 dependencies = [
- "proc-macro2 1.0.19",
+ "proc-macro2 1.0.20",
  "quote 1.0.7",
  "unicode-xid 0.2.1",
 ]

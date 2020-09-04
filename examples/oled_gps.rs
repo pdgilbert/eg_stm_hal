@@ -87,11 +87,11 @@ use stm32f7xx_hal::{prelude::*,
 #[cfg(feature = "stm32h7xx")] 
 use stm32h7xx_hal::{prelude::*,  
                     pac::Peripherals, 
-                    serial::{config::Config, Serial, Tx, Rx},
+                    serial::{Tx, Rx},
 		    pac::{USART2}, 
                     delay::Delay,
 		    i2c::{I2c, },  
-		    gpio::{gpiob::{PB8, PB9}, AlternateOD, AF4, },
+		    //gpio::{gpiob::{PB8, PB9}, Alternate, AF4, },
                     pac::I2C1,
 		    };
 
@@ -279,7 +279,7 @@ fn main() -> ! {
 
     #[cfg(feature = "stm32h7xx")]
     fn setup() ->  (Tx<USART2>, Rx<USART2>,
-                    I2c<I2C1, (PB8<AlternateOD<AF4>>, PB9<AlternateOD<AF4>>)>, 
+                    I2c<I2C1>, 
                     Delay ) {
 
        let cp = cortex_m::Peripherals::take().unwrap();
@@ -287,25 +287,24 @@ fn main() -> ! {
        let pwr    = p.PWR.constrain();
        let vos    = pwr.freeze();
        let rcc    = p.RCC.constrain();
-       let clocks = rcc.cfgr.freeze();
        let ccdr   = rcc.sys_ck(100.mhz()).freeze(vos, &p.SYSCFG);
+       let clocks = ccdr.clocks;
+       
        let gpioa  = p.GPIOA.split(ccdr.peripheral.GPIOA);
 
-       let (tx2, rx2) = Serial::usart2(
-          p.USART2,
-          (gpioa.pa2.into_alternate_af7(),            //tx pa2  for GPS rx
-           gpioa.pa3.into_alternate_af7()),           //rx pa3  for GPS tx
-          Config::default() .baudrate(9600.bps()), 
-          clocks,
-          ).unwrap().split();
-
-       let gpiob  = p.GPIOB.split();
+       let (tx2, rx2) = p.USART2.serial((gpioa.pa2.into_alternate_af7(),  //tx pa2 for GPS rx
+                                         gpioa.pa3.into_alternate_af7()), //rx pa3 for GPS tx
+                                        9600.bps(), 
+                                        ccdr.peripheral.USART2, 
+                                        &clocks).unwrap().split();
+       
+       let gpiob  = p.GPIOB.split(ccdr.peripheral.GPIOB);
        
        let scl = gpiob.pb8.into_alternate_af4().set_open_drain();   // scl on PB8
        let sda = gpiob.pb9.into_alternate_af4().set_open_drain();   // sda on PB9
        
        (tx2, rx2,   
-	I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks), // i2c
+	p.I2C1 .i2c((scl, sda), 400.khz(), ccdr.peripheral.I2C1, &clocks), // i2c
         Delay::new(cp.SYST, clocks))
        };
 

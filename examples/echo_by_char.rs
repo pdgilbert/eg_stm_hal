@@ -48,8 +48,8 @@ use stm32f4xx_hal::{prelude::*,
 
 #[cfg(feature = "stm32f7xx")]
 use stm32f7xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    serial::{config::Config, Serial, Tx, Rx},
+                    pac::Peripherals,
+                    serial::{Config, Serial, Tx, Rx, Oversampling, },
 		    pac::USART1 
 		    };
 
@@ -150,18 +150,20 @@ fn main() -> ! {
 
         let p = Peripherals::take().unwrap();
     	let rcc = p.RCC.constrain();
-    	let clocks = rcc.cfgr.freeze();
-    	let gpioa = p.GPIOA.split();
+    	let clocks = rcc.cfgr.sysclk(216.mhz()).freeze();
+        
+        let gpioa = p.GPIOA.split();
 
-    	p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
-
-    	Serial::usart1(
+    	Serial::new(
     	    p.USART1,
     	    (gpioa.pa9.into_alternate_af7(),			      //tx pa9
 	     gpioa.pa10.into_alternate_af7()),  		      //rx pa10
-    	    Config::default() .baudrate(9600.bps()),
     	    clocks,
-    	    ).unwrap().split()
+    	    Config {
+                    baud_rate: 9600.bps(),
+                    oversampling: Oversampling::By16,
+                    },
+    	    ).split()
 	}
 
 
