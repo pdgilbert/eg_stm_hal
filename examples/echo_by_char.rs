@@ -70,8 +70,9 @@ use stm32l0xx_hal::{prelude::*,
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{prelude::*, 
 		    stm32::Peripherals, 
-		    serial::{Config, Serial, Tx, Rx},
-		    stm32::USART1 
+		    rcc,   // for ::Config but note name conflict with next
+                    serial::{Config, SerialExt, Tx, Rx},
+		    stm32::USART1,
 		    };
 
 #[cfg(feature = "stm32l4xx")] 
@@ -195,7 +196,7 @@ fn main() -> ! {
        }
 
 
-    #[cfg(feature = "stm32l0x")]
+    #[cfg(feature = "stm32l0xx")]
     fn setup() -> (Tx<USART1>, Rx<USART1>) {
 
         let p = Peripherals::take().unwrap();
@@ -218,19 +219,25 @@ fn main() -> ! {
 
     #[cfg(feature = "stm32l1xx")]
     fn setup() -> (Tx<USART1>, Rx<USART1>) {
-        let p = Peripherals::take().unwrap();
-    	let rcc = p.RCC.constrain();
-    	let clocks = rcc.cfgr.freeze();
-    	let gpioa = p.GPIOA.split();
-    	let cnfg = Config::default() .baudrate(9600.bps());
-    	p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
-    	Serial::usart1(
-    	    p.USART1,
-    	    (gpioa.pa9.into_push_pull_output(),			      //tx pa9
-	     gpioa.pa10.into_push_pull_output()),  		      //rx pa10
-    	    Config::default() .baudrate(9600.bps()),
-    	    clocks,
-    	    ).unwrap().split()
+
+       let p       = Peripherals::take().unwrap();
+       let mut rcc = p.RCC.freeze(rcc::Config::hsi());
+       //let clocks  = rcc.cfgr.freeze();
+       let gpioa   = p.GPIOA.split();
+
+       //Serial::usart1(
+       //    p.USART1,
+       //    (gpioa.pa9.into_push_pull_output(),	 //tx pa9
+       //     gpioa.pa10.into_push_pull_output()),  	 //rx pa10
+       //    Config::default() .baudrate(9600.bps()),
+       //    clocks,
+       //    ).unwrap().split()
+       
+       // following github.com/stm32-rs/stm32l0xx-hal/blob/master/examples/serial.rs
+       p.USART1.usart((gpioa.pa9,     //tx pa9 
+                       gpioa.pa10),   //rx pa10 
+                      Config::default() .baudrate(9600.bps()), 
+                      &mut rcc).unwrap().split()
     	}
 
 

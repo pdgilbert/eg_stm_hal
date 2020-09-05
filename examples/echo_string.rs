@@ -68,7 +68,8 @@ use stm32l0xx_hal::{prelude::*,
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{prelude::*, 
                     stm32::Peripherals, 
-		    serial::{Config, Serial, Tx, Rx},
+		    rcc,   // for ::Config but note name conflict with next
+                    serial::{Config, SerialExt, Tx, Rx},
 		    stm32::USART1 
 		    };
 
