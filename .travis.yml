@@ -100,8 +100,9 @@ script:
 
   - echo  PWD= ${PWD}
   # next also ensure there is something new to commit, so commit does not fail
-  - date >examplesNewStatus/DATE.STAMP
-  - echo ${TRAVIS_COMMIT} > examplesNewStatus/COMMIT
+  # but causes more push rejects because of updates caused by other threads.
+  #- date >examplesNewStatus/DATE.STAMP
+  #- echo ${TRAVIS_COMMIT} > examplesNewStatus/COMMIT
 
   - cd  ../../../
   - mv eg_stm_hal eg_stm_hal_master
@@ -118,6 +119,5 @@ script:
   - cd eg_stm_hal
   - git add examplesStatus/${BOARD} 
   - git commit -m "commiting new examplesStatus/${BOARD}."
-  - git pull     # narrow chance of conflict (expected head) with parallel jobs 
-  - git push  
+  - git pull  ;  git push    # narrow chance of conflict (expected head) with parallel jobs 
   - echo  pushed examplesStatus/${BOARD} on gh-pages branch
