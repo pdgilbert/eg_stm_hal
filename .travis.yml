@@ -118,6 +118,4 @@ script:
   - mv eg_stm_hal_master/boards/${BOARD}/examplesNewStatus/*  eg_stm_hal/examplesStatus/${BOARD}
   - cd eg_stm_hal
   - git add examplesStatus/${BOARD} 
-  - git commit -m "commiting new examplesStatus/${BOARD}."
-  - git pull  ;  git push    # narrow chance of conflict (expected head) with parallel jobs 
-  - echo  pushed examplesStatus/${BOARD} on gh-pages branch
+  - pushIfNeeded
