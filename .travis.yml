@@ -118,5 +118,7 @@ script:
   - mv eg_stm_hal_master/boards/${BOARD}/examplesNewStatus/*  eg_stm_hal/examplesStatus/${BOARD}
   - cd eg_stm_hal
   - git add examplesStatus/${BOARD} 
-  - export PATH="${PWD}/utils:$PATH"  # for pushIfNeedede script
+  - ls  ../
+  - ls  ../eg_stm_hal_master/utils
+  - export PATH="../eg_stm_hal_master/utils:$PATH"  # for pushIfNeeded script
   - pushIfNeeded
