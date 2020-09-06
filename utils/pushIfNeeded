@@ -18,7 +18,7 @@ if [ ${RC} -eq  0 ]; then
    echo  pushed examplesStatus/${BOARD} on gh-pages branch.
 else
    RC=0
-   echo  nithing to push.
+   echo  nothing to push.
 fi
 
 exit ${RC} 

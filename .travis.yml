@@ -118,4 +118,4 @@ script:
   - mv eg_stm_hal_master/boards/${BOARD}/examplesNewStatus/*  eg_stm_hal/examplesStatus/${BOARD}
   - cd eg_stm_hal
   - git add examplesStatus/${BOARD} 
-  - pushIfNeeded
+  - ../eg_stm_hal_master/utils/pushIfNeeded
