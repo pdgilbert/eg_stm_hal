@@ -12,7 +12,7 @@ case $# in
 
 echo ${PWD}
 
-git commit -m "commiting new examplesStatus/${BOARD}."  ; RC=$?
+eval  git commit -m "commiting new examplesStatus/${BOARD}."  ; RC=$?
 # commit has non-zero return code if there is nothing to commit.
 
 if [ ${RC} -eq  0 ]; then 

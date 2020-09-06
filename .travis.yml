@@ -120,5 +120,10 @@ script:
   - git add examplesStatus/${BOARD} 
   - ls  ../
   - ls  ../eg_stm_hal_master/utils
-  - export PATH="../eg_stm_hal_master/utils:$PATH"  # for pushIfNeeded script
-  - pushIfNeeded
+  # tried to do this with script pushIfNeeded but git does not seem to like it.
+  #- export PATH="../eg_stm_hal_master/utils:$PATH"  # for pushIfNeeded script
+  #- pushIfNeeded
+  # last command in next is to get 0 return code for travis
+  - git commit -m "commiting new examplesStatus/${BOARD}."  ; RC=$? ; echo x >/dev/null
+  # in next try to narrow chance of conflict (expected head...) with parallel jobs 
+  - if [ ${RC} -eq  0 ]; then git  pull  ;  git push  ; fi

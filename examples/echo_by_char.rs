@@ -27,7 +27,6 @@ use nb::block;
 
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
 use stm32f1xx_hal::{prelude::*,   
-                    Break this to tests pushIfNeeded buils script
                     pac::Peripherals, 
                     serial::{Config, Serial, Tx, Rx},  
 		    device::USART1 
