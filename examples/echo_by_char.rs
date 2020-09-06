@@ -27,6 +27,7 @@ use nb::block;
 
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
 use stm32f1xx_hal::{prelude::*,   
+                    Break this to tests pushIfNeeded buils script
                     pac::Peripherals, 
                     serial::{Config, Serial, Tx, Rx},  
 		    device::USART1 
@@ -234,7 +235,7 @@ fn main() -> ! {
        //    clocks,
        //    ).unwrap().split()
        
-       // following github.com/stm32-rs/stm32l0xx-hal/blob/master/examples/serial.rs
+       // following github.com/stm32-rs/stm32l1xx-hal/blob/master/examples/serial.rs
        p.USART1.usart((gpioa.pa9,     //tx pa9 
                        gpioa.pa10),   //rx pa10 
                       Config::default() .baudrate(9600.bps()), 
