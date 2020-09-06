@@ -36,32 +36,32 @@ matrix:
         - name: "discovery-stm32f303"
           env: HAL="stm32f3xx"  MCU="stm32f303xc" TARGET="thumbv7em-none-eabihf" BOARD="discovery-stm32f303"
 
-#        - name: "nucleo-64"
-#          env: HAL="stm32f4xx"  MCU="stm32f411"  TARGET="thumbv7em-none-eabihf"  BOARD="nucleo-64"
-#
-#        - name: "blackpill-stm32f411"
-#          env: HAL="stm32f4xx"  MCU="stm32f411"  TARGET="thumbv7em-none-eabihf"  BOARD="blackpill-stm32f411"
-#
-#        - name: "blackpill-stm32f401"
-#          env: HAL="stm32f4xx"  MCU="stm32f401"  TARGET="thumbv7em-none-eabihf"  BOARD="blackpill-stm32f401"
-#
-#        - name: "none-stm32f722"
-#          env: HAL="stm32f7xx"  MCU="stm32f722"  TARGET="thumbv7em-none-eabihf"  BOARD="none-stm32f722"
-#
-#        - name: "none-stm32h742"
-#          env: HAL="stm32h7xx"  MCU="stm32h742"  TARGET="thumbv7em-none-eabihf"  BOARD="none-stm32h742"
-#
-#        - name: "none-stm32l0x2"
-#          env: HAL="stm32l0xx"  MCU="stm32l0x2"  TARGET="thumbv6m-none-eabi"     BOARD="none-stm32l0x2"
-#
-#        - name: "discovery-stm32l100"
-#          env: HAL="stm32l1xx"  MCU="stm32l100"  TARGET="thumbv7m-none-eabi"     BOARD="discovery-stm32l100"
-#
-#        - name: "heltec-lora-node151"
-#          env: HAL="stm32l1xx"  MCU="stm32l151"  TARGET="thumbv7m-none-eabi"     BOARD="heltec-lora-node151"
-#
-#        - name: "none-stm32l4x1"
-#          env: HAL="stm32l4xx"  MCU="stm32l4x1"  TARGET="thumbv7em-none-eabi"    BOARD="none-stm32l4x1"
+        - name: "nucleo-64"
+          env: HAL="stm32f4xx"  MCU="stm32f411"  TARGET="thumbv7em-none-eabihf"  BOARD="nucleo-64"
+
+        - name: "blackpill-stm32f411"
+          env: HAL="stm32f4xx"  MCU="stm32f411"  TARGET="thumbv7em-none-eabihf"  BOARD="blackpill-stm32f411"
+
+        - name: "blackpill-stm32f401"
+          env: HAL="stm32f4xx"  MCU="stm32f401"  TARGET="thumbv7em-none-eabihf"  BOARD="blackpill-stm32f401"
+
+        - name: "none-stm32f722"
+          env: HAL="stm32f7xx"  MCU="stm32f722"  TARGET="thumbv7em-none-eabihf"  BOARD="none-stm32f722"
+
+        - name: "none-stm32h742"
+          env: HAL="stm32h7xx"  MCU="stm32h742"  TARGET="thumbv7em-none-eabihf"  BOARD="none-stm32h742"
+
+        - name: "none-stm32l0x2"
+          env: HAL="stm32l0xx"  MCU="stm32l0x2"  TARGET="thumbv6m-none-eabi"     BOARD="none-stm32l0x2"
+
+        - name: "discovery-stm32l100"
+          env: HAL="stm32l1xx"  MCU="stm32l100"  TARGET="thumbv7m-none-eabi"     BOARD="discovery-stm32l100"
+
+        - name: "heltec-lora-node151"
+          env: HAL="stm32l1xx"  MCU="stm32l151"  TARGET="thumbv7m-none-eabi"     BOARD="heltec-lora-node151"
+
+        - name: "none-stm32l4x1"
+          env: HAL="stm32l4xx"  MCU="stm32l4x1"  TARGET="thumbv7em-none-eabi"    BOARD="none-stm32l4x1"
 
 before_install:
   - rustup target add ${TARGET}
@@ -82,21 +82,21 @@ script:
   - checkExample  blink3
   - checkExample  echo_by_char
   - checkExample  echo_string
-#  - checkExample  serial_char
-#  - checkExample  serial_string
-#  - checkExample  gps_rw_by_char
-#  - checkExample  gps_rw
-#
-#  - checkExample  temperature
-#
-#  - checkExample  dht
-#  - checkExample  dht11
-#  - checkExample  text_i2c
-#  - checkExample  oled_gps
-#  #- checkExample  ads1015-display
-#  - checkExample  lora_send
-#  - checkExample  lora_receive
-#  - checkExample  lora_gps
+  - checkExample  serial_char
+  - checkExample  serial_string
+  - checkExample  gps_rw_by_char
+  - checkExample  gps_rw
+
+  - checkExample  temperature
+
+  - checkExample  dht
+  - checkExample  dht11
+  - checkExample  text_i2c
+  - checkExample  oled_gps
+  #- checkExample  ads1015-display
+  - checkExample  lora_send
+  - checkExample  lora_receive
+  - checkExample  lora_gps
 
   - echo  PWD= ${PWD}
   # next also ensure there is something new to commit, so commit does not fail
@@ -120,9 +120,6 @@ script:
   - git add examplesStatus/${BOARD} 
   - ls  ../
   - ls  ../eg_stm_hal_master/utils
-  # tried to do this with script pushIfNeeded but git does not seem to like it.
-  #- export PATH="../eg_stm_hal_master/utils:$PATH"  # for pushIfNeeded script
-  #- pushIfNeeded
   # last command in next is to get 0 return code for travis
   - git commit -m "commiting new examplesStatus/${BOARD}."  ; RC=$? ; echo x >/dev/null
   # in next try to narrow chance of conflict (expected head...) with parallel jobs 
