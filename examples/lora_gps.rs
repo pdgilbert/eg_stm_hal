@@ -98,9 +98,9 @@ use stm32f4xx_hal::{prelude::*,
 #[cfg(feature = "stm32f7xx")] 
 use stm32f7xx_hal::{prelude::*,  
                     pac::Peripherals, 
-                    serial::{config::Config, Serial, Tx, Rx},
+                    serial::{Config, Serial, Tx, Rx, Oversampling, },
 		    pac::{USART2}, 
-                    spi::{Spi},
+                    spi::{Spi, ClockDivider},
                     delay::Delay,
 		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5,  
                            gpioa::{PA0, PA1}, Output, PushPull},
@@ -321,28 +321,50 @@ fn main() -> ! {
                                      PA0<Output<PushPull>>>, 
                                      Delay ) {
 
-        let cp = cortex_m::Peripherals::take().unwrap();
-        let p = Peripherals::take().unwrap();
-        let clocks    =  p.RCC.constrain().cfgr.freeze();
-        let gpioa = p.GPIOA.split();
+       let cp = cortex_m::Peripherals::take().unwrap();
+       let p      = Peripherals::take().unwrap();
+       let rcc    = p.RCC.constrain();
+       let clocks = rcc.cfgr.sysclk(216.mhz()).freeze();
+        
+       let gpioa = p.GPIOA.split();
 
-        let (tx, rx) = Serial::usart2(
+       let (tx, rx) = Serial::new(
            p.USART2,
            (gpioa.pa2.into_alternate_af7(),            //tx pa2  for GPS
 	    gpioa.pa3.into_alternate_af7()),           //rx pa3  for GPS
-           Config::default() .baudrate(9600.bps()), 
            clocks,
-           ).unwrap().split();
+           Config {
+                baud_rate: 9600.bps(),
+                oversampling: Oversampling::By16,
+                character_match: None,
+                },
+           ).split();
 
-       let spi = Spi::spi1(
-           p.SPI1,
-           (gpioa.pa5.into_alternate_af5(),  // sck   on PA5
-            gpioa.pa6.into_alternate_af5(),  // miso  on PA6
-            gpioa.pa7.into_alternate_af5()   // mosi  on PA7
-            ),
+       //let spi = Spi::spi1(
+       //    p.SPI1,                           // nss could be on PA4
+       //    (gpioa.pa5.into_alternate_af5(),  // sck   on PA5
+       //     gpioa.pa6.into_alternate_af5(),  // miso  on PA6
+       //     gpioa.pa7.into_alternate_af5()   // mosi  on PA7
+       //     ),
+       //    sx127x_lora::MODE,
+       //    MegaHertz(8).into(),
+       //    clocks,
+       //    );
+       
+       //let mut ncs = gpioc.pa4.into_push_pull_output();
+       let sck  = gpioa.pa5.into_alternate_af5();    // sck   on PA5
+       let miso = gpioa.pa6.into_alternate_af5();    // miso  on PA6
+       let mosi = gpioa.pa7.into_alternate_af5();   // mosi  on PA7
+       //    spi::Mode {
+       //        polarity: spi::Polarity::IdleHigh,
+       //        phase: spi::Phase::CaptureOnSecondTransition,
+       //        }
+       let mut spi = Spi::new(p.SPI1, (sck, miso, mosi));
+       
+       spi.enable::<u8>(
+           &mut rcc,
+           ClockDivider::DIV32,
            sx127x_lora::MODE,
-           MegaHertz(8).into(),
-           clocks,
            );
 
        let mut delay = Delay::new(cp.SYST, clocks);
@@ -555,7 +577,7 @@ fn main() -> ! {
 
     let (mut _tx_gps, mut rx_gps,   mut lora,   _delay) = setup();  //  GPS, lora, delay
 
-    lora.set_tx_power(17,1).unwrap(); //Using PA_BOOST. See your board for correct pin.
+// stm32f7xx_hal problem   lora.set_tx_power(17,1).unwrap(); //Using PA_BOOST. See your board for correct pin.
     
     // byte buffer length 80
     let mut buffer: Vec<u8, consts::U80> = Vec::new();

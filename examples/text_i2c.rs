@@ -167,17 +167,15 @@ fn main() -> ! {
     fn setup() ->  I2c<I2C1, impl PinScl<AF4>, impl PinSda<AF4>> {
 
        let  p  = Peripherals::take().unwrap();
-       let rcc = p.RCC.constrain();
+       let mut rcc = p.RCC.constrain();
        let clocks = rcc.cfgr.freeze();
        let gpiob  = p.GPIOB.split();
        
-       // could also have scl on PB6, sda on PB7
-       //BlockingI2c::i2c1(
        let scl = gpiob.pb8.into_alternate_af4().set_open_drain();   // scl on PB8
        let sda = gpiob.pb9.into_alternate_af4().set_open_drain();   // sda on PB9
        
        // return i2c
-       I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks, rcc.apb)
+       I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks, &mut rcc.apb1)
        };
 
 

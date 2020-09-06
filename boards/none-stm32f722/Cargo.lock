@@ -284,6 +284,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cd56b59865bce947ac5958779cfa508f6c3b9497cc762b7e24a12d11ccde2c4f"
 
 [[package]]
+name = "embedded-dma"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ce25093adf4f2a76d429644c1f6f0abc10b79d00784a13e5d0cfabcd52b55b76"
+dependencies = [
+ "stable_deref_trait",
+]
+
+[[package]]
 name = "embedded-graphics"
 version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -647,7 +656,7 @@ dependencies = [
 [[package]]
 name = "stm32f1xx-hal"
 version = "0.6.1"
-source = "git+https://github.com/stm32-rs/stm32f1xx-hal#3859f52f131a5ebdd429455aa0666f8ea27ef4f2"
+source = "git+https://github.com/stm32-rs/stm32f1xx-hal#2f9f5da3d0f6221cc8d2b21f5c794e77d9b8761d"
 dependencies = [
  "as-slice",
  "cast",
@@ -703,16 +712,16 @@ dependencies = [
 [[package]]
 name = "stm32f4xx-hal"
 version = "0.8.3"
-source = "git+https://github.com/stm32-rs/stm32f4xx-hal#23c6ec990653d2e4a08fa9b46e43a66b0cf28798"
+source = "git+https://github.com/stm32-rs/stm32f4xx-hal#4a1a019f8e6e81a69c726bcab1f7caadefdbd32e"
 dependencies = [
  "bare-metal",
  "cast",
  "cortex-m 0.6.3",
  "cortex-m-rt",
+ "embedded-dma",
  "embedded-hal",
  "nb 0.1.3",
  "rand_core 0.5.1",
- "stable_deref_trait",
  "stm32f4",
  "void",
 ]
@@ -760,8 +769,8 @@ dependencies = [
 
 [[package]]
 name = "stm32h7xx-hal"
-version = "0.7.0"
-source = "git+https://github.com/stm32-rs/stm32h7xx-hal#cad583d9ed51055906e0faaeb018cdd5f32a6a7e"
+version = "0.7.1"
+source = "git+https://github.com/stm32-rs/stm32h7xx-hal#469107d88fc3b63003355452af466cde66376ca6"
 dependencies = [
  "bare-metal",
  "cast",

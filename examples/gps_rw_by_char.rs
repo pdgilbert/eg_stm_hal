@@ -52,7 +52,7 @@ use stm32f4xx_hal::{prelude::*,
 #[cfg(feature = "stm32f7xx")]
 use stm32f7xx_hal::{prelude::*,  
                     pac::Peripherals, 
-                    serial::{config::Config, Serial, Tx, Rx},
+                    serial::{Config, Serial, Tx, Rx, Oversampling, },
 		    pac::{USART1, USART2} };
 
 #[cfg(feature = "stm32h7xx")]
@@ -179,26 +179,35 @@ fn main() -> ! {
 
     #[cfg(feature = "stm32f7xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2> )  {
+
         let p = Peripherals::take().unwrap();
-        let clocks    =  p.RCC.constrain().cfgr.freeze();
+    	let clocks = p.RCC.constrain().cfgr.sysclk(216.mhz()).freeze();
+        
         let gpioa = p.GPIOA.split();
-        let (tx1, rx1) =  Serial::usart1(
+        
+        let (tx1, rx1) =  Serial::new(
            p.USART1,
     	   (gpioa.pa9.into_alternate_af7(),            //tx pa9  for console
 	    gpioa.pa10.into_alternate_af7()),          //rx pa10 for console
-    	   Config::default() .baudrate(9600.bps()),
-    	   clocks
-           ).unwrap().split(); 
+    	   clocks,
+           Config {
+                baud_rate: 9600.bps(),
+                oversampling: Oversampling::By16,
+                character_match: None,
+                },
+           ).split(); 
 
-    	// this probably needs fix here. rx2.read() stalls and does not return.
-	//p.USART2.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
-        let (tx2, rx2) = Serial::usart2(
+        let (tx2, rx2) = Serial::new(
            p.USART2,
            (gpioa.pa2.into_alternate_af7(),            //tx pa2  for GPS
 	    gpioa.pa3.into_alternate_af7()),           //rx pa3  for GPS
-           Config::default() .baudrate(9600.bps()), 
            clocks,
-           ).unwrap().split();
+           Config {
+                baud_rate: 9600.bps(),
+                oversampling: Oversampling::By16,
+                character_match: None,
+                },
+           ).split();
 
         (tx1, rx1,   tx2, rx2 )
 	}

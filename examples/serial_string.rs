@@ -49,7 +49,7 @@ use stm32f4xx_hal::{prelude::*,
 #[cfg(feature = "stm32f7xx")] 
 use stm32f7xx_hal::{prelude::*, 
                     pac::Peripherals, 
-                    serial::{config::Config, Serial}
+                    serial::{Config, Serial, Tx, Rx, Oversampling, },
                     };
 
 #[cfg(feature = "stm32h7xx")] 

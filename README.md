@@ -64,7 +64,7 @@ so will usually indicate `failing` even if most examples work on most boards.
 The CI is set up to use recent git versions of dependencies, so this project CI failing can be a result of updates
 in dependencies. The upside of this is that if the examples are not failing then they are working with
 recent versions of dependencies, 
-unlike many examples from the web that I have worked through in my own learnimg process.
+unlike many examples from the web that I have worked through in my own learning process.
 
 For the individual boards described below 
 [details of the build and failures](https://travis-ci.org/pdgilbert/eg_stm_hal) can be

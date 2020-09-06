@@ -62,8 +62,8 @@ use stm32f4xx_hal::{prelude::*,
 #[cfg(feature = "stm32f7xx")] 
 use stm32f7xx_hal::{prelude::*,  
                     pac::Peripherals, 
-                    serial::{config::Config, Serial, Tx, Rx},
-		    pac::{USART1, USART2, USART6} };
+                    serial::{Config, Serial, Tx, Rx, Oversampling, },
+		    pac::{USART1, USART2, USART3} };
 
 #[cfg(feature = "stm32h7xx")] 
 use stm32h7xx_hal::{prelude::*,  
@@ -254,37 +254,50 @@ fn main() -> ! {
 
 
     #[cfg(feature = "stm32f7xx")]
-    fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>, Tx<USART6>, Rx<USART6>, )  {
+    fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>, Tx<USART3>, Rx<USART3>, )  {
+
         let p = Peripherals::take().unwrap();
-    	let rcc = p.RCC.constrain();  
-	let clocks = rcc.cfgr.freeze();
+    	let clocks = p.RCC.constrain().cfgr.sysclk(216.mhz()).freeze();
+
         let gpioa = p.GPIOA.split();
-        p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
-        let (tx1, rx1) =  Serial::usart1(
+        
+        let (tx1, rx1) =  Serial::new(
            p.USART1,
     	   (gpioa.pa9.into_alternate_af7(),            //tx pa9
 	    gpioa.pa10.into_alternate_af7()),          //rx pa10
-    	   Config::default() .baudrate(9600.bps()),
-    	   clocks
-           ).unwrap().split(); 
+    	   clocks,
+           Config {
+                baud_rate: 9600.bps(),
+                oversampling: Oversampling::By16,
+                character_match: None,
+                },
+           ).split(); 
 
-        p.USART2.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
-        let (tx2, rx2) = Serial::usart2(
+        let (tx2, rx2) = Serial::new(
            p.USART2,
            (gpioa.pa2.into_alternate_af7(),            //tx pa2
 	    gpioa.pa3.into_alternate_af7()),           //rx pa3
-           Config::default() .baudrate(115_200.bps()),  //.parity_odd() .stopbits(StopBits::STOP1)
            clocks,
-           ).unwrap().split();
+            Config {
+                baud_rate: 115_200.bps(),
+                oversampling: Oversampling::By16,
+                character_match: None,
+                },
+           ).split();
 
-        p.USART6.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
-        let (tx3, rx3) = Serial::usart6(      //  NOTE PINS and USART6 !!!
-           p.USART6,
-           (gpioa.pa11.into_alternate_af8(),           //tx pa11
-	    gpioa.pa12.into_alternate_af8()),          //rx pa12
-           Config::default() .baudrate(115_200.bps()) ,
+        let gpiob = p.GPIOB.split();
+
+        let (tx3, rx3) = Serial::new(  
+           p.USART3,
+           (gpiob.pb10.into_alternate_af7(),           //tx pb10
+	    gpiob.pb11.into_alternate_af7()),          //rx pb11
            clocks,
-           ).unwrap().split();
+            Config {
+                baud_rate: 115_200.bps(),
+                oversampling: Oversampling::By16,
+                character_match: None,
+                },
+           ).split();
 
         (tx1, rx1,   tx2, rx2,   tx3, rx3 )
 	}

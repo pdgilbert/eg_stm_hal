@@ -73,13 +73,13 @@ use stm32f4xx_hal::{prelude::*,
                     pac::I2C1,
 		    };
 
-#[cfg(feature = "stm32f7x")] 
+#[cfg(feature = "stm32f7xx")] 
 use stm32f7xx_hal::{prelude::*,  
                     pac::Peripherals, 
-                    serial::{config::Config, Serial, Tx, Rx},
+                    serial::{Config, Serial, Tx, Rx, Oversampling, },
 		    pac::{USART2}, 
                     delay::Delay,
-		    i2c::{I2c, PinScl, PinSda, },  
+		    i2c::{I2c, PinScl, PinSda, Mode, },  
 		    gpio::{gpiob::{PB8, PB9}, Alternate, AF4, },
                     pac::I2C1,
 		    };
@@ -247,21 +247,27 @@ fn main() -> ! {
 
     #[cfg(feature = "stm32f7xx")]
     fn setup() ->  (Tx<USART2>, Rx<USART2>,
-                    I2c<I2C1, PB8<AlternateOD<AF4>>, PB9<AlternateOD<AF4>>>, 
+                    I2c<I2C1, PB8<Alternate<AF4>>, PB9<Alternate<AF4>>>, 
                     Delay ) {
 
        let cp = cortex_m::Peripherals::take().unwrap();
        let p = Peripherals::take().unwrap();
-       let clocks    =  p.RCC.constrain().cfgr.freeze();
+       let mut rcc = p.RCC.constrain();
+       let clocks = rcc.cfgr.sysclk(216.mhz()).freeze();
+        
        let gpioa = p.GPIOA.split();
 
-       let (tx2, rx2) = Serial::usart2(
+       let (tx2, rx2) = Serial::new(
           p.USART2,
           (gpioa.pa2.into_alternate_af7(),            //tx pa2  for GPS rx
            gpioa.pa3.into_alternate_af7()),           //rx pa3  for GPS tx
-          Config::default() .baudrate(9600.bps()), 
           clocks,
-          ).unwrap().split();
+          Config {
+                baud_rate: 9600.bps(),
+                oversampling: Oversampling::By16,
+                character_match: None,
+                },
+          ).split();
 
        let gpiob  = p.GPIOB.split();
        
@@ -269,7 +275,7 @@ fn main() -> ! {
        let sda = gpiob.pb9.into_alternate_af4().set_open_drain();   // sda on PB9
        
        (tx2, rx2,   
-	I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks), // i2c
+	I2c::i2c1(p.I2C1, (scl, sda), Mode::standard(400_000.hz()), clocks, &mut rcc.apb1), // i2c
         Delay::new(cp.SYST, clocks))
        };
 

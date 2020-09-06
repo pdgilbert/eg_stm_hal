@@ -150,21 +150,22 @@ fn main() -> ! {
     fn setup() -> (Tx<USART1>, Rx<USART1>) {
 
         let p = Peripherals::take().unwrap();
-    	let rcc = p.RCC.constrain();
-    	let clocks = rcc.cfgr.sysclk(216.mhz()).freeze();
+    	let clocks = p.RCC.constrain().cfgr.sysclk(216.mhz()).freeze();
         
         let gpioa = p.GPIOA.split();
 
-    	Serial::new(
+    	let serial1 = Serial::new(
     	    p.USART1,
-    	    (gpioa.pa9.into_alternate_af7(),			      //tx pa9
-	     gpioa.pa10.into_alternate_af7()),  		      //rx pa10
+    	    (gpioa.pa9.into_alternate_af7(),	   //tx pa9
+	     gpioa.pa10.into_alternate_af7()),     //rx pa10
     	    clocks,
-    	    Config {
-                    baud_rate: 9600.bps(),
-                    oversampling: Oversampling::By16,
-                    },
-    	    ).split()
+            Config {
+                baud_rate: 115_200.bps(),
+                oversampling: Oversampling::By16,
+                character_match: None,
+                },
+    	    );
+        serial1.split()
 	}
 
 

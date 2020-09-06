@@ -243,7 +243,7 @@ dependencies = [
  "stm32f4 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "stm32f4xx-hal 0.8.3 (git+https://github.com/stm32-rs/stm32f4xx-hal)",
  "stm32f7xx-hal 0.2.0 (git+https://github.com/stm32-rs/stm32f7xx-hal)",
- "stm32h7xx-hal 0.7.0 (git+https://github.com/stm32-rs/stm32h7xx-hal)",
+ "stm32h7xx-hal 0.7.1 (git+https://github.com/stm32-rs/stm32h7xx-hal)",
  "stm32l0xx-hal 0.6.2 (git+https://github.com/stm32-rs/stm32l0xx-hal)",
  "stm32l1 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "stm32l1xx-hal 0.1.0 (git+https://github.com/stm32-rs/stm32l1xx-hal)",
@@ -589,7 +589,7 @@ dependencies = [
 [[package]]
 name = "stm32f1xx-hal"
 version = "0.6.1"
-source = "git+https://github.com/stm32-rs/stm32f1xx-hal#3859f52f131a5ebdd429455aa0666f8ea27ef4f2"
+source = "git+https://github.com/stm32-rs/stm32f1xx-hal#2f9f5da3d0f6221cc8d2b21f5c794e77d9b8761d"
 dependencies = [
  "as-slice 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "cast 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -698,8 +698,8 @@ dependencies = [
 
 [[package]]
 name = "stm32h7xx-hal"
-version = "0.7.0"
-source = "git+https://github.com/stm32-rs/stm32h7xx-hal#cad583d9ed51055906e0faaeb018cdd5f32a6a7e"
+version = "0.7.1"
+source = "git+https://github.com/stm32-rs/stm32h7xx-hal#469107d88fc3b63003355452af466cde66376ca6"
 dependencies = [
  "bare-metal 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "cast 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -941,7 +941,7 @@ dependencies = [
 "checksum stm32f7 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)" = "e8e6dbd8bf0965421c0c76c09e05683e71243216bf4d87984c7f95ed53caa28c"
 "checksum stm32f7xx-hal 0.2.0 (git+https://github.com/stm32-rs/stm32f7xx-hal)" = "<none>"
 "checksum stm32h7 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)" = "e9beb5e2a223c82f263c3051bba4614aebc6e98bd40217df3cd8817c83ac7bd8"
-"checksum stm32h7xx-hal 0.7.0 (git+https://github.com/stm32-rs/stm32h7xx-hal)" = "<none>"
+"checksum stm32h7xx-hal 0.7.1 (git+https://github.com/stm32-rs/stm32h7xx-hal)" = "<none>"
 "checksum stm32l0 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)" = "8386ff55bd099b3c6c7ea16bb68296cbe6025981f96ed69b222b6e6633ca6148"
 "checksum stm32l0xx-hal 0.6.2 (git+https://github.com/stm32-rs/stm32l0xx-hal)" = "<none>"
 "checksum stm32l1 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)" = "edda4346740d0f01082c353dca33b320e84f9fb51765fdcac7a624017c5a8ff4"
