@@ -10,6 +10,8 @@ case $# in
     *) echo "${usage}"; exit 1 ;;
   esac
 
+echo ${PWD}
+
 eval  git commit -m "commiting new examplesStatus/${BOARD}."  ; RC=$?
 # commit has non-zero return code if there is nothing to commit.
 
