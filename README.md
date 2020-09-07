@@ -11,8 +11,8 @@
 
 Following is the status of examples. 
 The examples are run with `stm32f1xx_hal` on a `bluepill`,
-`stm32f3xx_hal` on a `Discovery kit STM32F303`, `stm32l1xx_hal` on a `STM32L100C Discovery`, 
-and `stm32f4xx_hal` on a `Nucleo-64 STM32F411`, a `blackpill` with MCU `stm32f401`, 
+`stm32f3xx_hal` on a `Discovery kit STM32F303`, `stm32l1xx_hal` on a `STM32L100C Discovery` 
+and  a `heltec-lora-node151`, `stm32f4xx_hal` on a `Nucleo-64 STM32F411`, a `blackpill` with MCU `stm32f401`, 
 and a `blackpill` with MCU `stm32f411`.
 In the table cells: 
 green check marks and red X marks indicate that the CI of the example builds or fails.
