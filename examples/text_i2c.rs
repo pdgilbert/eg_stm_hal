@@ -81,7 +81,9 @@ use stm32l0xx_hal::{prelude::*,
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery STM32L100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{prelude::*, 
                     stm32::Peripherals,
-		    gpio::{gpiob::{PB8, PB9}, AlternateOD, AF4, },
+		    rcc,   // for ::Config but avoid name conflict with serial
+                    i2c::{I2c, Pins, },  
+		    //gpio::{gpiob::{PB8, PB9}, Output, OpenDrain, },
                     stm32::I2C1,
                     };
 
@@ -218,21 +220,25 @@ fn main() -> ! {
        };
 
 
+    //fn setup() -> I2c<I2C1, (PB8<Output<OpenDrain>>, PB9<Output<OpenDrain>>)> {
+    // also requires     gpio::{gpiob::{PB8, PB9}, Output, OpenDrain, },
+   
     #[cfg(feature = "stm32l1xx")]
-    fn setup() -> I2c<I2C1, (PB8<AlternateOD<AF4>>, PB9<AlternateOD<AF4>>)> {
-  
+    fn setup() -> I2c<I2C1, impl Pins<I2C1>> {
+
        let  p  = Peripherals::take().unwrap();
-       //let rcc = p.RCC.constrain();
-       let clocks = rcc.cfgr.freeze();
+       let mut rcc = p.RCC.freeze(rcc::Config::hsi());
+
        let gpiob  = p.GPIOB.split();
        
-       // could also have scl on PB6, sda on PB7
-       //BlockingI2c::i2c1(
-       let scl = gpiob.pb8.into_alternate_af4().set_open_drain();   // scl on PB8
-       let sda = gpiob.pb9.into_alternate_af4().set_open_drain();   // sda on PB9
+       // could also have scl,sda  on PB6,PB7 or on PB10,PB11
+       let scl = gpiob.pb8.into_open_drain_output();   // scl on PB8
+       let sda = gpiob.pb9.into_open_drain_output();   // sda on PB9
        
+       //BlockingI2c::i2c1( ??
+
        // return i2c
-       I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks)
+       p.I2C1.i2c((scl, sda), 400.khz(), &mut rcc) 
        };
 
 

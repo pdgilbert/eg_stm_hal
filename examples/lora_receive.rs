@@ -90,10 +90,10 @@ use stm32l0xx_hal::{prelude::*,
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{prelude::*, 
                     stm32::Peripherals, 
-                    spi::{Spi},
+		    rcc,   // for ::Config but note name conflict with next
+                    spi::{Spi, Pins},
                     delay::Delay,
-		    gpio::{gpioa::{PA5, PA6, PA7},   
-                           gpioa::{PA0, PA1}, Output, PushPull},
+		    gpio::{gpioa::{PA0, PA1}, Output, PushPull},
                     stm32::SPI1,
 		    };
 
@@ -352,39 +352,37 @@ fn main() -> !{
 
 
     #[cfg(feature = "stm32l1xx")]
-    fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, (PA5<Output<PushPull>>, PA6<Output<PushPull>>, PA7<Output<PushPull>>)>,
-                                     PB14<Output<PushPull>>, 
-                                     PB13<Output<PushPull>> >, Delay) {
+    fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, impl Pins<SPI1>>,
+                                     PA1<Output<PushPull>>, 
+                                     PA0<Output<PushPull>> >, 
+                    Delay) {
 
        let cp = cortex_m::Peripherals::take().unwrap();
        let p  = Peripherals::take().unwrap();
-
-       let rcc   = p.RCC.constrain();
-       let clocks = rcc.cfgr.sysclk(64.mhz()).pclk1(32.mhz()).freeze();
+       let mut rcc   = p.RCC.freeze(rcc::Config::hsi());
        
        let gpioa = p.GPIOA.split();
-       let gpiob = p.GPIOB.split();
 
-       let spi = Spi::spi1(
-           p.SPI1,
-           (gpioa.pa5.into_push_pull_output(),  // sck   on PA5
-            gpioa.pa6.into_push_pull_output(),  // miso  on PA6
-            gpioa.pa7.into_push_pull_output()   // mosi  on PA7
-            ),
-           sx127x_lora::MODE,
-           8.mhz(),
-           clocks,
-           );
-              
-       let mut delay = Delay::new(cp.SYST, clocks);
+       let spi = p.SPI1.spi(
+                          (gpioa.pa5,            // sck   on PA5 
+                           gpioa.pa6,            // miso  on PA6 
+                           gpioa.pa7             // mosi  on PA7
+                           ), 
+                          sx127x_lora::MODE, 
+                          8.mhz(), 
+                          &mut rcc
+                          );
+        
+                     
+       let mut delay = cp.SYST.delay(rcc.clocks);
        
-       // return tuple ( LoRa object,  delay)
-       (sx127x_lora::LoRa::new(spi, 
-                              gpiob.pb14.into_push_pull_output(),     //  cs   on PB14
-                              gpiob.pb13.into_push_pull_output(),     // reset on PB13
+       let lora = sx127x_lora::LoRa::new(spi, 
+                              gpioa.pa1.into_push_pull_output(),     //  cs   on PA1
+                              gpioa.pa0.into_push_pull_output(),     // reset on PA0
                               FREQUENCY, 
-                              &mut delay).unwrap(),                   // delay
-        delay )                                                       // delay again
+                              &mut delay ).unwrap();                 // delay
+       
+       (lora, delay )                                                // delay again
        };
 
     #[cfg(feature = "stm32l4xx")]

@@ -272,27 +272,27 @@ fn main() -> ! {
 
     #[cfg(feature = "stm32l1xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2> )  {
-        let p = Peripherals::take().unwrap();
-	let clocks    =  p.RCC.constrain().cfgr.freeze();
-        let gpioa = p.GPIOA.split();
-        let (tx1, rx1) =  Serial::usart1(
-           p.USART1,
-           (gpioa.pa9.into_alternate_af7(),            //tx pa9  for console
-	    gpioa.pa10.into_alternate_af7()),          //rx pa10 for console
-    	   Config::default() .baudrate(9600.bps()),
-    	   clocks
-           ).unwrap().split(); 
 
-        let (tx2, rx2) = Serial::usart2(
-            p.USART2,
-            (gpioa.pa2.into_alternate_af7(),           //tx pa2  for GPS
-	     gpioa.pa3.into_alternate_af7()),          //rx pa3  for GPS
-            Config::default() .baudrate(9600.bps()), 
-            clocks,
-            ).unwrap().split();
+       let p = Peripherals::take().unwrap();
+       let mut rcc = p.RCC.freeze(rcc::Config::hsi());
+       //let clocks  = rcc.cfgr.freeze();
 
-        (tx1, rx1,   tx2, rx2 )
-	}
+       let gpioa = p.GPIOA.split();
+
+       let (tx1, rx1) =  p.USART1.usart(
+                            (gpioa.pa9,                //tx pa9  for console
+                             gpioa.pa10),              //rx pa10 for console
+                            Config::default() .baudrate(9600.bps()), 
+                            &mut rcc).unwrap().split();
+
+       let (tx2, rx2) = p.USART2.usart(
+                           (gpioa.pa2,                 //tx pa2   for GPS
+                            gpioa.pa3),                //rx pa3   for GPS
+                           Config::default() .baudrate(115_200.bps()), 
+                           &mut rcc).unwrap().split();
+
+       (tx1, rx1,   tx2, rx2 )
+       }
 
 
     #[cfg(feature = "stm32l4xx")]

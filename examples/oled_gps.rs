@@ -109,10 +109,12 @@ use stm32l0xx_hal::{prelude::*,
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{prelude::*, 
 		    stm32::Peripherals, 
-		    serial::{Config, Serial, Tx, Rx},
+		    rcc,   // for ::Config but note name conflict with serial
+		    serial::{Config, SerialExt, Tx, Rx},
 		    stm32::{USART2},
                     delay::Delay,
-		    gpio::{gpiob::{PB8, PB9}, AlternateOD, AF4, },
+		    i2c::{I2c, Pins, },  
+		    //gpio::{gpiob::{PB8, PB9}, Output, OpenDrain, },
                     stm32::I2C1,
 		    };
 
@@ -345,36 +347,36 @@ fn main() -> ! {
        };
 
 
+    //fn setup() ->  (Tx<USART2>, Rx<USART2>,
+    //                I2c<I2C1, (PB8<Output<OpenDrain>>, PB9<Output<OpenDrain>>)>, 
+    //                Delay )  {
+    // also requires     gpio::{gpiob::{PB8, PB9}, Output, OpenDrain, },
 
     #[cfg(feature = "stm32l1xx")]
-    fn setup() ->  (Tx<USART2>, Rx<USART2>,I2c<I2C1, 
-                    (PB8<AlternateOD<AF4>>, PB9<AlternateOD<AF4>>)>, 
+    fn setup() ->  (Tx<USART2>, Rx<USART2>,
+                    I2c<I2C1, impl Pins<I2C1>>, 
 		    Delay )  {
 
        let cp = cortex_m::Peripherals::take().unwrap();
        let p = Peripherals::take().unwrap();
-       let clocks    =  p.RCC.constrain().cfgr.freeze();
+       let mut rcc = p.RCC.freeze(rcc::Config::hsi());
+
        let gpioa = p.GPIOA.split();
 
-       let (tx2, rx2) = Serial::usart2(
-           p.USART2,
-           (gpioa.pa2.into_alternate_af7(),	      //tx pa2  for GPS rx
-            gpioa.pa3.into_alternate_af7()),	      //rx pa3  for GPS tx
-           Config::default() .baudrate(9600.bps()), 
-           clocks,
-           ).unwrap().split();
+       let (tx2, rx2) = p.USART2.usart(
+                           (gpioa.pa2,                 //tx pa2   for GPS
+                            gpioa.pa3),                //rx pa3   for GPS
+                           Config::default() .baudrate(115_200.bps()), 
+                           &mut rcc).unwrap().split();
 
        let gpiob  = p.GPIOB.split();
        
-       let scl = gpiob.pb8.into_alternate_af4().set_open_drain();   // scl on PB8
-       let sda = gpiob.pb9.into_alternate_af4().set_open_drain();   // sda on PB9
+       let scl = gpiob.pb8.into_open_drain_output();   // scl on PB8
+       let sda = gpiob.pb9.into_open_drain_output();   // sda on PB9
        
-       // return i2c
-       I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks)
-
        (tx2, rx2,  
-        I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks), // i2c
-        Delay::new(cp.SYST, clocks))
+        p.I2C1.i2c((scl, sda), 400.khz(), &mut rcc),   // i2c
+        cp.SYST.delay(rcc.clocks))                     // delay
        };
 
 
@@ -513,6 +515,7 @@ fn main() -> ! {
 		  	      
               buffer.clear();
 	      good = false;
+              //delay.delay(4000.ms());
               delay.delay_ms(4000_u16);
 	      };
 	   };

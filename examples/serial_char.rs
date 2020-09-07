@@ -80,7 +80,7 @@ use stm32l0xx_hal::{prelude::*,
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{prelude::*, 
 		    stm32::Peripherals, 
-		    rcc,   // for ::Config but note name conflict with next
+		    rcc,   // for ::Config but note name conflict with serial
                     serial::{Config, SerialExt, Tx, Rx},
 		    stm32::{USART1, USART2, USART3} };
 
@@ -380,34 +380,35 @@ fn main() -> ! {
 
 
 
-    // stm32l1xx 
-
     #[cfg(feature = "stm32l1xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>, Tx<USART3>, Rx<USART3> )  {
 
        let p       = Peripherals::take().unwrap();
        let mut rcc = p.RCC.freeze(rcc::Config::hsi());
        //let clocks  = rcc.cfgr.freeze();
+
        let gpioa   = p.GPIOA.split();
 
 
+       // Note that setting the alternate function mode and push_pull input/output
+       // is not necessary. The hal code knows to do this for a usart.
        let (tx1, rx1) =  p.USART1.usart(
-                            (gpioa.pa9,         // .into_push_pull_output()     //tx pa9 
-                             gpioa.pa10),       // .into_push_pull_output(),    //rx pa10 
+                            (gpioa.pa9,                //tx pa9 
+                             gpioa.pa10),              //rx pa10 
                             Config::default() .baudrate(9600.bps()), 
                             &mut rcc).unwrap().split();
 
        let (tx2, rx2) = p.USART2.usart(
-                           (gpioa.pa2.into_push_pull_output(),                 //tx pa2 
-                            gpioa.pa3).into_push_pull_output(),                //rx pa3 
+                           (gpioa.pa2,                 //tx pa2 
+                            gpioa.pa3),                //rx pa3 
                            Config::default() .baudrate(115_200.bps()), 
                            &mut rcc).unwrap().split();
 
        let gpiob   = p.GPIOB.split();
 
        let (tx3, rx3) = p.USART3.usart(
-                           (gpiob.pb10.into_af7() ,                  //tx pb10 
-                            gpiob.pb11.into_af7()),                  //rx pb11 
+                           (gpiob.pb10,                                      //tx pb10 
+                            gpiob.pb11),                                     //rx pb11 
                            Config::default() .baudrate(115_200.bps()), 
                            &mut rcc).unwrap().split();
 

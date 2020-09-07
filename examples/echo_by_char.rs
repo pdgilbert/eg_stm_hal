@@ -225,18 +225,12 @@ fn main() -> ! {
        let mut rcc = p.RCC.freeze(rcc::Config::hsi());
        //let clocks  = rcc.cfgr.freeze();
        let gpioa   = p.GPIOA.split();
-
-       //Serial::usart1(
-       //    p.USART1,
-       //    (gpioa.pa9.into_push_pull_output(),	 //tx pa9
-       //     gpioa.pa10.into_push_pull_output()),  	 //rx pa10
-       //    Config::default() .baudrate(9600.bps()),
-       //    clocks,
-       //    ).unwrap().split()
        
        // following github.com/stm32-rs/stm32l1xx-hal/blob/master/examples/serial.rs
-       p.USART1.usart((gpioa.pa9,     //tx pa9 
-                       gpioa.pa10),   //rx pa10 
+       // Note that setting the alternate function mode  and push_pull input/output is
+       // not necessary. The hal code knows to do this for a usart.
+       p.USART1.usart((gpioa.pa9,                                  //tx pa9 
+                       gpioa.pa10),                                //rx pa10 
                       Config::default() .baudrate(9600.bps()), 
                       &mut rcc).unwrap().split()
     	}
