@@ -57,6 +57,7 @@ use stm32h7xx_hal::{prelude::*,
 #[cfg(feature = "stm32l0xx")]
 use stm32l0xx_hal::{prelude::*, 
                     pac::{Peripherals, CorePeripherals}, 
+		    rcc,   // for ::Config but note name conflict with serial
 		    delay::Delay, 
 		    gpio::{gpioa::PA8, OpenDrain,  Output, },
 		    };
@@ -64,6 +65,7 @@ use stm32l0xx_hal::{prelude::*,
 #[cfg(feature = "stm32l1xx")]
 use stm32l1xx_hal::{prelude::*, 
                     stm32::{Peripherals, CorePeripherals}, 
+		    rcc,   // for ::Config but note name conflict with next
 		    delay::Delay ,
 		    gpio::{gpioa::PA8, OpenDrain,  Output, },
 		   };
@@ -167,30 +169,39 @@ fn main() -> ! {
     fn setup() -> (Dht11<PA8<Output<OpenDrain>>>,  Delay) {
        
        let cp = CorePeripherals::take().unwrap();
-       let  p = Peripherals::take().unwrap();
+       let  p      = Peripherals::take().unwrap();
+       let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
 
        //let clocks =  p.RCC.constrain().cfgr.freeze();
        // next gives panicked at 'assertion failed: !sysclk_on_pll || 
        //                  sysclk <= sysclk_max && sysclk >= sysclk_min'
-       let clocks = p.RCC.constrain().cfgr.use_hse(8.mhz()).sysclk(168.mhz()).freeze();
-       let pin_a8 = p.GPIOA.split().pa8.into_open_drain_output();  
+       //let clocks = p.RCC.constrain().cfgr.use_hse(8.mhz()).sysclk(168.mhz()).freeze();
+       let pin_a8 = p.GPIOA.split(&mut rcc).pa8.into_open_drain_output();  
        
+       let mut delay = cp.SYST.delay(rcc.clocks);
+
+       //  1 second delay (for DHT11 setup?) Wait on  sensor initialization?
+       delay.delay_ms(1000_u16);
+
        (Dht11::new(pin_a8),                  //DHT11 data on A8
-        Delay::new(cp.SYST, clocks))
+        delay)
        };
 
 
     #[cfg(feature = "stm32l1xx")]   
     fn setup() -> (Dht11<PA8<Output<OpenDrain>>>,  Delay) {
        
-       let cp = CorePeripherals::take().unwrap();
-       let  p = Peripherals::take().unwrap();
-       
-       let clocks = p.RCC.constrain().cfgr.use_hse(8.mhz()).sysclk(168.mhz()).freeze();
+       let cp  = CorePeripherals::take().unwrap();
+       let  p  = Peripherals::take().unwrap();
+       let rcc = p.RCC.freeze(rcc::Config::hsi());
+
+       //let clocks = p.RCC.constrain().cfgr.use_hse(8.mhz()).sysclk(168.mhz()).freeze();
        let pin_a8 = p.GPIOA.split().pa8.into_open_drain_output();
-       
+          
+       let delay = cp.SYST.delay(rcc.clocks);
+   
        (Dht11::new(pin_a8),                 //DHT11 data on A8
-        Delay::new(cp.SYST, clocks))
+        delay)
        };
 
 

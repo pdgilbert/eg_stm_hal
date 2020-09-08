@@ -230,11 +230,9 @@ dependencies = [
  "mfrc522 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "nb 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "panic-halt 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "panic-itm 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "panic-semihosting 0.5.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.115 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.115 (registry+https://github.com/rust-lang/crates.io-index)",
- "shared-bus 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "ssd1306 0.4.0 (git+https://github.com/jamwaffles/ssd1306)",
  "stm32f1 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "stm32f1xx-hal 0.6.1 (git+https://github.com/stm32-rs/stm32f1xx-hal)",
@@ -401,14 +399,6 @@ version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
-name = "panic-itm"
-version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-dependencies = [
- "cortex-m 0.6.3 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
 name = "panic-semihosting"
 version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -536,15 +526,6 @@ dependencies = [
  "proc-macro2 1.0.20 (registry+https://github.com/rust-lang/crates.io-index)",
  "quote 1.0.7 (registry+https://github.com/rust-lang/crates.io-index)",
  "syn 1.0.40 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "shared-bus"
-version = "0.1.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-dependencies = [
- "cortex-m 0.5.10 (registry+https://github.com/rust-lang/crates.io-index)",
- "embedded-hal 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -909,7 +890,6 @@ dependencies = [
 "checksum owned-singleton 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "21aa378869c97c7db706a4c576cf0ce8258dc7e0e1ad25a97ee5aba1fd4eed83"
 "checksum owned-singleton-macros 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "8d5c2ac071b95017bf70a5b607037fb0ef4abfa663fdf6cac8fbf36af9756ee3"
 "checksum panic-halt 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "de96540e0ebde571dc55c73d60ef407c653844e6f9a1e2fdbd40c07b9252d812"
-"checksum panic-itm 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)" = "98830d17a95587207e41edaa3009b143d326ce134b0e3538ac98246a67d66cc3"
 "checksum panic-semihosting 0.5.3 (registry+https://github.com/rust-lang/crates.io-index)" = "c03864ac862876c16a308f5286f4aa217f1a69ac45df87ad3cd2847f818a642c"
 "checksum paste 0.1.18 (registry+https://github.com/rust-lang/crates.io-index)" = "45ca20c77d80be666aef2b45486da86238fabe33e38306bd3118fe4af33fa880"
 "checksum paste-impl 0.1.18 (registry+https://github.com/rust-lang/crates.io-index)" = "d95a7db200b97ef370c8e6de0088252f7e0dfff7d047a28528e47456c0fc98b6"
@@ -928,7 +908,6 @@ dependencies = [
 "checksum semver-parser 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)" = "388a1df253eca08550bef6c72392cfe7c30914bf41df5269b68cbd6ff8f570a3"
 "checksum serde 1.0.115 (registry+https://github.com/rust-lang/crates.io-index)" = "e54c9a88f2da7238af84b5101443f0c0d0a3bbdc455e34a5c9497b1903ed55d5"
 "checksum serde_derive 1.0.115 (registry+https://github.com/rust-lang/crates.io-index)" = "609feed1d0a73cc36a0182a840a9b37b4a82f0b1150369f0536a9e3f2a31dc48"
-"checksum shared-bus 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)" = "ed792a53f339088822c0cc9d6ebfb950752016a288dc96ed3e302e9592f18ab0"
 "checksum ssd1306 0.4.0 (git+https://github.com/jamwaffles/ssd1306)" = "<none>"
 "checksum stable_deref_trait 1.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3"
 "checksum stm32-usbd 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)" = "70d13eca735cae37df697f599777b000cc0ee924df8452f2b4bfaa6798ab0338"
