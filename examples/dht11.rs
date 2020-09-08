@@ -135,12 +135,9 @@ fn main() -> ! {
     fn setup() -> (Dht11<PA8<Output<OpenDrain>>>,  Delay) {
        
        let cp = CorePeripherals::take().unwrap();
-       let  p = Peripherals::take().unwrap();
+       let      p = Peripherals::take().unwrap();
+       let clocks = p.RCC.constrain().cfgr.sysclk(216.mhz()).freeze();
 
-       //let clocks =  p.RCC.constrain().cfgr.freeze();
-       // next gives panicked at 'assertion failed: !sysclk_on_pll || 
-       //                  sysclk <= sysclk_max && sysclk >= sysclk_min'
-       let clocks = p.RCC.constrain().cfgr.use_hse(8.mhz()).sysclk(168.mhz()).freeze();
        let pin_a8 = p.GPIOA.split().pa8.into_open_drain_output();  
        
        (Dht11::new(pin_a8),                  //DHT11 data on A8
@@ -152,13 +149,14 @@ fn main() -> ! {
     fn setup() -> (Dht11<PA8<Output<OpenDrain>>>,  Delay) {
        
        let cp = CorePeripherals::take().unwrap();
-       let  p = Peripherals::take().unwrap();
+       let  p     = Peripherals::take().unwrap();
+       let pwr    = p.PWR.constrain();
+       let vos    = pwr.freeze();
+       let rcc    = p.RCC.constrain();
+       let ccdr   = rcc.sys_ck(160.mhz()).freeze(vos, &p.SYSCFG);
+       let clocks = ccdr.clocks;
 
-       //let clocks =  p.RCC.constrain().cfgr.freeze();
-       // next gives panicked at 'assertion failed: !sysclk_on_pll || 
-       //                  sysclk <= sysclk_max && sysclk >= sysclk_min'
-       let clocks = p.RCC.constrain().cfgr.use_hse(8.mhz()).sysclk(168.mhz()).freeze();
-       let pin_a8 = p.GPIOA.split().pa8.into_open_drain_output();  
+       let pin_a8 = p.GPIOA.split(ccdr.peripheral.GPIOA).pa8.into_open_drain_output();  
        
        (Dht11::new(pin_a8),                  //DHT11 data on A8
         Delay::new(cp.SYST, clocks))

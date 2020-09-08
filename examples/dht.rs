@@ -18,6 +18,8 @@ use dht_sensor::*;
 
 //use crate::hal::{delay, gpio, prelude::*, stm32};
 
+use embedded_hal::blocking::delay::{DelayMs,};
+
 #[cfg(feature = "stm32f1xx")]
 use stm32f1xx_hal::{prelude::*, 
                     pac::{Peripherals, CorePeripherals}, 
@@ -71,9 +73,6 @@ use stm32l1xx_hal::{prelude::*,
 		    gpio::{gpioa::PA8, OpenDrain,  Output, },
 		   };
 
-use embedded_hal::blocking::delay::{DelayMs,};
-//use embedded_hal::digital::v2::{InputPin, OutputPin};
-
 #[cfg(feature = "stm32l4xx")]
 use stm32l4xx_hal::{prelude::*, 
                     pac::{Peripherals, CorePeripherals}, 
@@ -81,6 +80,7 @@ use stm32l4xx_hal::{prelude::*,
 		    gpio::{gpioa::PA8, OpenDrain,  Output, },
 		    };
 
+//use embedded_hal::digital::v2::{InputPin, OutputPin};
 
 #[entry]
 fn main() -> ! {
@@ -165,11 +165,8 @@ fn main() -> ! {
        
        let cp = CorePeripherals::take().unwrap();
        let  p = Peripherals::take().unwrap();
+       let clocks = p.RCC.constrain().cfgr.sysclk(216.mhz()).freeze();
 
-       //let clocks =  p.RCC.constrain().cfgr.freeze();
-       // next gives panicked at 'assertion failed: !sysclk_on_pll || 
-       //                  sysclk <= sysclk_max && sysclk >= sysclk_min'
-       let clocks = p.RCC.constrain().cfgr.use_hse(8.mhz()).sysclk(168.mhz()).freeze();
        let pin_a8 = p.GPIOA.split().pa8.into_open_drain_output();  
               
        // delay is used by `dht-sensor` to wait for signals
@@ -187,13 +184,14 @@ fn main() -> ! {
     fn setup() -> (PA8<Output<OpenDrain>>,  Delay) {
        
        let cp = CorePeripherals::take().unwrap();
-       let  p = Peripherals::take().unwrap();
+       let  p     = Peripherals::take().unwrap();
+       let pwr    = p.PWR.constrain();
+       let vos    = pwr.freeze();
+       let rcc    = p.RCC.constrain();
+       let ccdr   = rcc.sys_ck(160.mhz()).freeze(vos, &p.SYSCFG);
+       let clocks = ccdr.clocks;
 
-       //let clocks =  p.RCC.constrain().cfgr.freeze();
-       // next gives panicked at 'assertion failed: !sysclk_on_pll || 
-       //                  sysclk <= sysclk_max && sysclk >= sysclk_min'
-       let clocks = p.RCC.constrain().cfgr.use_hse(8.mhz()).sysclk(168.mhz()).freeze();
-       let pin_a8 = p.GPIOA.split().pa8.into_open_drain_output();  
+       let pin_a8 = p.GPIOA.split(ccdr.peripheral.GPIOA).pa8.into_open_drain_output();  
               
        // delay is used by `dht-sensor` to wait for signals
        let mut delay = Delay::new(cp.SYST, clocks);   //SysTick: System Timer

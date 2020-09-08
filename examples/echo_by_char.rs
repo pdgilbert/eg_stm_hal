@@ -150,7 +150,7 @@ fn main() -> ! {
     #[cfg(feature = "stm32f7xx")]
     fn setup() -> (Tx<USART1>, Rx<USART1>) {
 
-        let p = Peripherals::take().unwrap();
+        let p      = Peripherals::take().unwrap();
     	let clocks = p.RCC.constrain().cfgr.sysclk(216.mhz()).freeze();
         
         let gpioa = p.GPIOA.split();

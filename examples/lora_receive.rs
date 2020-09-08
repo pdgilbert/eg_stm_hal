@@ -243,10 +243,8 @@ fn main() -> !{
                                      PB13<Output<PushPull>> >, Delay) {
 
        let cp = cortex_m::Peripherals::take().unwrap();
-       let p  = Peripherals::take().unwrap();
-
-       let rcc   = p.RCC.constrain();
-       let clocks = rcc.cfgr.sysclk(64.mhz()).pclk1(32.mhz()).freeze();
+       let p      = Peripherals::take().unwrap();
+       let clocks = p.RCC.constrain().cfgr.sysclk(216.mhz()).freeze();
        
        let gpioa = p.GPIOA.split();
        let gpiob = p.GPIOB.split();
