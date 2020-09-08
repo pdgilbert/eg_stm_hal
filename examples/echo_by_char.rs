@@ -63,6 +63,7 @@ use stm32h7xx_hal::{prelude::*,
 #[cfg(feature = "stm32l0xx")]
 use stm32l0xx_hal::{prelude::*,  
                     pac::Peripherals, 
+		    rcc,   // for ::Config but note name conflict with serial
                     serial::{config::Config, Serial, Tx, Rx},
 		    pac::USART1 
 		    };
@@ -70,7 +71,7 @@ use stm32l0xx_hal::{prelude::*,
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{prelude::*, 
 		    stm32::Peripherals, 
-		    rcc,   // for ::Config but note name conflict with next
+		    rcc,   // for ::Config but note name conflict with serial
                     serial::{Config, SerialExt, Tx, Rx},
 		    stm32::USART1,
 		    };
@@ -200,21 +201,25 @@ fn main() -> ! {
     #[cfg(feature = "stm32l0xx")]
     fn setup() -> (Tx<USART1>, Rx<USART1>) {
 
-        let p = Peripherals::take().unwrap();
-    	let rcc = p.RCC.constrain();
-    	let clocks = rcc.cfgr.freeze();
-    	let gpioa = p.GPIOA.split();
-
-    	p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
-
-    	Serial::usart1(
-    	    p.USART1,
-    	    (gpioa.pa9.into_alternate_af7(),			      //tx pa9
-	     gpioa.pa10.into_alternate_af7()),  		      //rx pa10
-    	    Config::default() .baudrate(9600.bps()),
-    	    clocks,
-    	    ).unwrap().split()
-	}
+       let p       = Peripherals::take().unwrap();
+       let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
+       let gpioa   = p.GPIOA.split(&mut rcc);
+ 
+        //Serial::usart1(
+    	//    p.USART1,
+    	//    (gpioa.pa9,			                        //tx pa9
+	//     gpioa.pa10),  		                        //rx pa10
+    	//    Config::default() .baudrate(9600.bps()),
+    	//    &mut rcc,
+    	//    ).unwrap().split()
+       
+       p.USART1.usart(
+            gpioa.pa9,                                          //tx pa9 
+            gpioa.pa10,                                         //rx pa10
+            Config::default(), 
+            &mut rcc
+            ).unwrap().split()
+       }
 
 
 

@@ -72,6 +72,7 @@ use embedded_hal::digital::v2::OutputPin;
 #[cfg(feature = "stm32l0xx")] 
 use stm32l0xx_hal::{prelude::*,   
                     pac::Peripherals, 
+		    rcc,   // for ::Config but note name conflict with serial
                     gpio::{gpiob::{PB13, PB14, PB15}, Output, PushPull,}, 
                     };
 
@@ -272,7 +273,8 @@ fn main() -> ! {
     fn setup() -> (PB13<Output<PushPull>>, PB14<Output<PushPull>>, PB15<Output<PushPull>>, AsmDelay) { 
 
        let dp    = Peripherals::take().unwrap();
-       let gpiob = dp.GPIOB.split();
+       let mut rcc = dp.RCC.freeze(rcc::Config::hsi16());
+       let gpiob = dp.GPIOB.split(&mut rcc);
        
        // all leds wire with pin as source, cathode connect to ground though a resistor.
        impl LED for PB13<Output<PushPull>> {

@@ -104,7 +104,7 @@ dht11 = "0.3.1"
 #dht-sensor = "0.1.1"
 
 ads1x1x = "0.2" 
-shared-bus = { version = "0.1.4", features = ["cortexm"] }
+# this causes problem with stm32l0xx_hal:  shared-bus = { version = "0.1.4", features = ["cortexm"] }
 
 stm32f1 = "0.11.0"
 stm32f3 = "0.11"
@@ -222,7 +222,7 @@ version = "0.7.0"
 [dev-dependencies]
 panic-halt = "0.2.0"
 panic-semihosting = "0.5.2"
-panic-itm = "0.4.1"
+# this causes problem with stm32l0xx_hal:  panic-itm = "0.4.1"
 cortex-m-rtfm = "0.4.3"
 cortex-m-semihosting = "0.3.3"
 enc28j60 = "0.2.1"

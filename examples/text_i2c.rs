@@ -220,11 +220,12 @@ fn main() -> ! {
        };
 
 
-    //fn setup() -> I2c<I2C1, (PB8<Output<OpenDrain>>, PB9<Output<OpenDrain>>)> {
-    // also requires     gpio::{gpiob::{PB8, PB9}, Output, OpenDrain, },
    
     #[cfg(feature = "stm32l1xx")]
     fn setup() -> I2c<I2C1, impl Pins<I2C1>> {
+
+       //above can use I2c<I2C1, (PB8<Output<OpenDrain>>, PB9<Output<OpenDrain>>)>
+       // that requires also   gpio::{gpiob::{PB8, PB9}, Output, OpenDrain, },
 
        let  p  = Peripherals::take().unwrap();
        let mut rcc = p.RCC.freeze(rcc::Config::hsi());
