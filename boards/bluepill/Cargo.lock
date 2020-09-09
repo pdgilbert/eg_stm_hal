@@ -230,7 +230,6 @@ dependencies = [
  "mfrc522 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "nb 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "panic-halt 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "panic-itm 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "panic-semihosting 0.5.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.115 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.115 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -398,14 +397,6 @@ dependencies = [
 name = "panic-halt"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-
-[[package]]
-name = "panic-itm"
-version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-dependencies = [
- "cortex-m 0.6.3 (registry+https://github.com/rust-lang/crates.io-index)",
-]
 
 [[package]]
 name = "panic-semihosting"
@@ -899,7 +890,6 @@ dependencies = [
 "checksum owned-singleton 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "21aa378869c97c7db706a4c576cf0ce8258dc7e0e1ad25a97ee5aba1fd4eed83"
 "checksum owned-singleton-macros 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "8d5c2ac071b95017bf70a5b607037fb0ef4abfa663fdf6cac8fbf36af9756ee3"
 "checksum panic-halt 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "de96540e0ebde571dc55c73d60ef407c653844e6f9a1e2fdbd40c07b9252d812"
-"checksum panic-itm 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)" = "98830d17a95587207e41edaa3009b143d326ce134b0e3538ac98246a67d66cc3"
 "checksum panic-semihosting 0.5.3 (registry+https://github.com/rust-lang/crates.io-index)" = "c03864ac862876c16a308f5286f4aa217f1a69ac45df87ad3cd2847f818a642c"
 "checksum paste 0.1.18 (registry+https://github.com/rust-lang/crates.io-index)" = "45ca20c77d80be666aef2b45486da86238fabe33e38306bd3118fe4af33fa880"
 "checksum paste-impl 0.1.18 (registry+https://github.com/rust-lang/crates.io-index)" = "d95a7db200b97ef370c8e6de0088252f7e0dfff7d047a28528e47456c0fc98b6"
