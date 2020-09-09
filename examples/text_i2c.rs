@@ -165,12 +165,15 @@ fn main() -> ! {
 
     //fn setup() ->  I2c<I2C1, PB8<Alternate<AF4>>, PB9<Alternate<AF4>>> {
     //fn setup() ->  I2c<I2C1, impl PinScl<AF4>, impl PinSda<AF4>> {
+    //fn setup() ->  I2c<I2C1, impl PinScl<I2C1>, impl PinSda<I2C1>> {
+    //fn setup() ->  I2c<I2C1, impl Pins<I2C1>>{
     #[cfg(feature = "stm32f7xx")]
-    fn setup() ->  I2c<I2C1, impl PinScl<AF4>, impl PinSda<AF4>> {
+    fn setup() ->  I2c<I2C1, PB8<Alternate<AF4>>, PB9<Alternate<AF4>>> {
 
        let  p  = Peripherals::take().unwrap();
        let mut rcc = p.RCC.constrain();
        let clocks = rcc.cfgr.freeze();
+       
        let gpiob  = p.GPIOB.split();
        
        let scl = gpiob.pb8.into_alternate_af4().set_open_drain();   // scl on PB8

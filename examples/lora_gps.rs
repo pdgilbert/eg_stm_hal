@@ -100,12 +100,10 @@ use stm32f7xx_hal::{prelude::*,
                     pac::Peripherals, 
                     serial::{Config, Serial, Tx, Rx, Oversampling, },
 		    pac::{USART2}, 
-                    spi::{Spi, ClockDivider, Polarity, Phase},
+                    spi::{Spi, Pins, Enabled, ClockDivider, },
                     delay::Delay,
-		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5,  
-                           gpioa::{PA0, PA1}, Output, PushPull},
-                    time::MegaHertz,
-		    pac::SPI1,
+		    gpio::{gpioa::{PA0, PA1}, Output, PushPull},
+                    pac::SPI1,
 		    };
 
 #[cfg(feature = "stm32h7xx")] 
@@ -314,19 +312,40 @@ fn main() -> ! {
 
     #[cfg(feature = "stm32f7xx")]
     fn setup() ->  (Tx<USART2>, Rx<USART2>,
-                    sx127x_lora::LoRa<Spi<SPI1, (PA5<Alternate<AF5>>, 
-		                                 PA6<Alternate<AF5>>, 
-						 PA7<Alternate<AF5>>), u8>,
-                                     PA1<Output<PushPull>>, 
-                                     PA0<Output<PushPull>>>, 
-                                     Delay ) {
+                    sx127x_lora::LoRa<Spi<SPI1, impl Pins<SPI1>, Enabled<u8>>,
+                                      PA1<Output<PushPull>>, 
+                                      PA0<Output<PushPull>>>, 
+                    Delay) {
 
        let cp = cortex_m::Peripherals::take().unwrap();
-       let p      = Peripherals::take().unwrap();
-       let rcc    = p.RCC.constrain();
-       let clocks = rcc.cfgr.sysclk(216.mhz()).freeze();
+       let p       = Peripherals::take().unwrap();
+       let mut rcc = p.RCC.constrain();
         
        let gpioa = p.GPIOA.split();
+
+       
+       //let mut ncs = gpioc.pa4.into_push_pull_output();
+       let sck  = gpioa.pa5.into_alternate_af5();   // sck   on PA5
+       let miso = gpioa.pa6.into_alternate_af5();   // miso  on PA6
+       let mosi = gpioa.pa7.into_alternate_af5();   // mosi  on PA7
+ 
+       //   somewhere 8.mhz needs to be set in spi
+
+       let spi = Spi::new(p.SPI1, (sck, miso, mosi)).enable::<u8>(
+           &mut rcc,
+           ClockDivider::DIV32,
+           sx127x_lora::MODE,
+           );
+       
+       let clocks = rcc.cfgr.sysclk(216.mhz()).freeze();
+
+       let mut delay = Delay::new(cp.SYST, clocks);
+
+       let lora = sx127x_lora::LoRa::new(spi, 
+                              gpioa.pa1.into_push_pull_output(),      //  cs   on PA1
+                              gpioa.pa0.into_push_pull_output(),      // reset on PA0
+                              FREQUENCY, 
+                              &mut delay).unwrap();                   // delay
 
        let (tx, rx) = Serial::new(
            p.USART2,
@@ -339,41 +358,6 @@ fn main() -> ! {
                 character_match: None,
                 },
            ).split();
-
-       //let spi = Spi::spi1(
-       //    p.SPI1,                           // nss could be on PA4
-       //    (gpioa.pa5.into_alternate_af5(),  // sck   on PA5
-       //     gpioa.pa6.into_alternate_af5(),  // miso  on PA6
-       //     gpioa.pa7.into_alternate_af5()   // mosi  on PA7
-       //     ),
-       //    sx127x_lora::MODE,
-       //    MegaHertz(8).into(),
-       //    clocks,
-       //    );
-       
-       //let mut ncs = gpioc.pa4.into_push_pull_output();
-       let sck  = gpioa.pa5.into_alternate_af5();    // sck   on PA5
-       let miso = gpioa.pa6.into_alternate_af5();    // miso  on PA6
-       let mosi = gpioa.pa7.into_alternate_af5();   // mosi  on PA7
-       //    Mode {
-       //        polarity: Polarity::IdleHigh,
-       //        phase: Phase::CaptureOnSecondTransition,
-       //        }
-
-       let mut spi = Spi::new(p.SPI1, (sck, miso, mosi)).enable::<u8>(
-           &mut rcc,
-           ClockDivider::DIV32,
-           sx127x_lora::MODE,
-           );
-
-       let mut delay = Delay::new(cp.SYST, clocks);
-
-       let lora = sx127x_lora::LoRa::new(spi, 
-                              gpioa.pa1.into_push_pull_output(),      //  cs   on PA1
-                              gpioa.pa0.into_push_pull_output(),      // reset on PA0
-                              FREQUENCY, 
-                              &mut delay).unwrap();                        // delay
-
 
         (tx, rx,  lora,  delay)
 	}
