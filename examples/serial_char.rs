@@ -41,79 +41,23 @@ use cortex_m_semihosting::hprintln;
 use core::str::from_utf8;
 use nb::block;
 
+
+// setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
+
+// 1. Get access to the device specific peripherals 
+// 2. Take ownership of raw rcc and flash devices and convert to HAL structs
+// 3. Freeze system clocks and store the frozen frequencies in `clocks`
+// 4. Prepare the alternate function I/O registers
+// 5. Prepare the GPIO peripheral
+// 6. Set up usart devices. Take ownership of USART register and tx/rx pins.
+//    Other registers are used to enable and configure the device.
+
+
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
 use stm32f1xx_hal::{prelude::*,   
                     pac::Peripherals, 
                     serial::{Config, Serial, StopBits, Tx, Rx},  
 		    device::{USART1, USART2, USART3}  }; 
-
-#[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
-use stm32f3xx_hal::{prelude::*, 
-                    stm32::Peripherals,
-                    serial::{ Serial, Tx, Rx},
-		    stm32::{USART1, USART2, USART3} };
-
-#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
-use stm32f4xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    serial::{config::Config, Serial, Tx, Rx},
-		    pac::{USART1, USART2, USART6} };
-
-#[cfg(feature = "stm32f7xx")] 
-use stm32f7xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    serial::{Config, Serial, Tx, Rx, Oversampling, },
-		    pac::{USART1, USART2, USART3} };
-
-#[cfg(feature = "stm32h7xx")] 
-use stm32h7xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    serial::{Tx, Rx},
-		    pac::{USART1, USART2, USART3} };
-
-#[cfg(feature = "stm32l0xx")] 
-use stm32l0xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    serial::{config::Config, Serial, Tx, Rx},
-		    pac::{USART1, USART2, USART6} };
-
-#[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
-use stm32l1xx_hal::{prelude::*, 
-		    stm32::Peripherals, 
-		    rcc,   // for ::Config but note name conflict with serial
-                    serial::{Config, SerialExt, Tx, Rx},
-		    stm32::{USART1, USART2, USART3} };
-
-#[cfg(feature = "stm32l4xx")] 
-use stm32l4xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    serial::{Config, Serial, Tx, Rx},
-		    pac::{USART1, USART2, USART3} };
-
-
-#[entry]
-fn main() -> ! {
-
-    //see  examples/echo_by_char.rs for additional comments.
-
-    // 1. Get access to the device specific peripherals 
-    // 2. Take ownership of raw rcc and flash devices and convert to HAL structs
-    // 3. Freeze system clocks and store the frozen frequencies in `clocks`
-    // 4. Prepare the alternate function I/O registers
-    // 5. Prepare the GPIO peripheral
-    // 6. Set up usart devices. Take ownership of USART register and tx/rx pins.
-    //    Other registers are used to enable and configure the device.
-
-    hprintln!("initializing ...").unwrap();
-
-    // BEGIN USART SETUP
-
-
-    // stm32f4xx warns that mut is not needed in next, but other hals require it
-    // let mut rcc = p.RCC.constrain();
-
-
-    // stm32f1xx
 
     #[cfg(feature = "stm32f1xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>, Tx<USART3>, Rx<USART3> )  {
@@ -158,13 +102,11 @@ fn main() -> ! {
 	}
 
 
-    // stm32f3xx
-
-    // stm32f303vct  alternate funtion modes see  
-    // https://www.rlocman.ru/i/File/dat/STMicroelectronics/Microcontrollers_MCU/STM32F303VCT6.pdf p42
-    // AF7 on PA9  is usart1_Tx, on PA10 is usart1_Rx,
-    // AF7 on PA2  is usart2_Tx, on PA3  is usart2_Rx,
-    // AF7 on PB10 is usart3_Tx, on PB11 is usart3_Rx,
+#[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
+use stm32f3xx_hal::{prelude::*, 
+                    stm32::Peripherals,
+                    serial::{ Serial, Tx, Rx},
+		    stm32::{USART1, USART2, USART3} };
 
     #[cfg(feature = "stm32f3xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>, Tx<USART3>, Rx<USART3> )  {
@@ -176,7 +118,7 @@ fn main() -> ! {
         let (tx1, rx1)  = Serial::usart1(
             p.USART1,
             (gpioa.pa9.into_af7( &mut gpioa.moder, &mut gpioa.afrh),   //tx pa9
-	     gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)),  //tx pb10
+	     gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)),  //rx pb10
             9600.bps(),
             clocks,
             &mut rcc.apb2,
@@ -195,8 +137,8 @@ fn main() -> ! {
 
         let (tx3, rx3) = Serial::usart3(
             p.USART3,
-            (gpiob.pb10.into_af7(&mut gpiob.moder, &mut gpiob.afrh),   //rx pb10
-             gpiob.pb11.into_af7(&mut gpiob.moder, &mut gpiob.afrh)),  //tx pb11
+            (gpiob.pb10.into_af7(&mut gpiob.moder, &mut gpiob.afrh),   //tx pb10
+             gpiob.pb11.into_af7(&mut gpiob.moder, &mut gpiob.afrh)),  //rx pb11
             115_200.bps(), // 9600.bps(), 
             clocks,
             &mut rcc.apb1,  
@@ -206,22 +148,22 @@ fn main() -> ! {
 	}
 
 
-
-    // stm32f411re 
-
-    // stm32f411re implements only usarts 1, 2, and 6. These can be configured on different pins.
-    // alternate funtion modes see https://www.st.com/resource/en/datasheet/stm32f411re.pdf  p47.
-    // AF7 on PA9  is usart1_Tx, on PA10 is usart1_Rx,
-    // AF7 on PA2  is usart2_Tx, on PA3  is usart2_Rx,
-    // AF8 on PA11 is usart6_Tx, on PA12 is usart6_Rx
-
+#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
+use stm32f4xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::{USART1, USART2, USART6} };
 
     #[cfg(feature = "stm32f4xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>, Tx<USART6>, Rx<USART6>, )  {
         let p = Peripherals::take().unwrap();
     	let rcc = p.RCC.constrain();  
 	let clocks = rcc.cfgr.freeze();
+
         let gpioa = p.GPIOA.split();
+
+        // alternate function modes see https://www.st.com/resource/en/datasheet/stm32f411re.pdf  p47.
+
         p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
         let (tx1, rx1) =  Serial::usart1(
            p.USART1,
@@ -252,6 +194,12 @@ fn main() -> ! {
         (tx1, rx1,   tx2, rx2,   tx3, rx3 )
 	}
 
+
+#[cfg(feature = "stm32f7xx")] 
+use stm32f7xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{Config, Serial, Tx, Rx, Oversampling, },
+		    pac::{USART1, USART2, USART3} };
 
     #[cfg(feature = "stm32f7xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>, Tx<USART3>, Rx<USART3>, )  {
@@ -302,6 +250,11 @@ fn main() -> ! {
         (tx1, rx1,   tx2, rx2,   tx3, rx3 )
 	}
 
+#[cfg(feature = "stm32h7xx")] 
+use stm32h7xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{Tx, Rx},
+		    pac::{USART1, USART2, USART3} };
 
     #[cfg(feature = "stm32h7xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>, Tx<USART3>, Rx<USART3>, )  {
@@ -342,6 +295,12 @@ fn main() -> ! {
        }
 
 
+#[cfg(feature = "stm32l0xx")] 
+use stm32l0xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::{USART1, USART2, USART6} };
+
     #[cfg(feature = "stm32l0xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>, Tx<USART6>, Rx<USART6>, )  {
         let p = Peripherals::take().unwrap();
@@ -379,6 +338,12 @@ fn main() -> ! {
 	}
 
 
+#[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
+use stm32l1xx_hal::{prelude::*, 
+		    stm32::Peripherals, 
+		    rcc,   // for ::Config but note name conflict with serial
+                    serial::{Config, SerialExt, Tx, Rx},
+		    stm32::{USART1, USART2, USART3} };
 
     #[cfg(feature = "stm32l1xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>, Tx<USART3>, Rx<USART3> )  {
@@ -416,6 +381,12 @@ fn main() -> ! {
         (tx1, rx1,   tx2, rx2,   tx3, rx3 )
 	}
 
+
+#[cfg(feature = "stm32l4xx")] 
+use stm32l4xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{Config, Serial, Tx, Rx},
+		    pac::{USART1, USART2, USART3} };
 
     #[cfg(feature = "stm32l4xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>, Tx<USART3>, Rx<USART3>, )  {
@@ -462,9 +433,13 @@ fn main() -> ! {
        (tx1, rx1,   tx2, rx2,   tx3, rx3 )
        }
 
+// End of hal/MCU specific setup. Following should be generic code.
 
-    // End of hal/MCU specific setup. Following should be generic code.
+#[entry]
+fn main() -> ! {
 
+    //see  examples/echo_by_char.rs for additional comments.
+    hprintln!("initializing ...").unwrap();
     
     let (mut tx1, _rx1,  mut tx2, mut rx2,  mut tx3, mut rx3 ) = setup();  
 

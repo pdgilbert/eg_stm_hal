@@ -26,6 +26,9 @@ use nb::block;
 use panic_semihosting as _;
 use ssd1306::{prelude::*, Builder};
 
+
+// setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
+
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
 use stm32f1xx_hal::{prelude::*,   
                     pac::Peripherals, 
@@ -36,30 +39,6 @@ use stm32f1xx_hal::{prelude::*,
 		    }; 
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
 use embedded_hal::digital::v2::OutputPin;
-
-
-#[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
-use stm32f3xx_hal::{prelude::*, 
-                    stm32::Peripherals,
-                    i2c::I2c,  
-    	            delay::Delay,
-		    gpio::{gpiob::{PB6, PB7}, AF4,   gpioe::PE9, Output, PushPull,  },
-		    stm32::I2C1,
-		    };
-
-#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
-use stm32f4xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    i2c::I2c,  
-    	            delay::Delay,
-		    gpio::{gpiob::{PB8, PB7}, Alternate, AF4,  gpioe::PE9, Output, PushPull,  },
-                    pac::I2C1,
-		    }; 
-#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
-use embedded_hal::digital::v2::OutputPin;
-
-#[entry]
-fn main() -> ! {
 
     #[cfg(feature = "stm32f1xx")]
     fn setup() ->  (BlockingI2c<I2C1,  (PB8<Alternate<OpenDrain>>, PB9<Alternate<OpenDrain>>) >,
@@ -98,8 +77,18 @@ fn main() -> ! {
        let led = gpioc.pc13.into_push_pull_output(&mut gpioc.crh);   // led on pc13
 
        (i2c, led,  Delay::new(cp.SYST, clocks))   // return tuple (i2c, led, delay)
-       };
+       }
 
+
+
+#[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
+use stm32f3xx_hal::{prelude::*, 
+                    stm32::Peripherals,
+                    i2c::I2c,  
+    	            delay::Delay,
+		    gpio::{gpiob::{PB6, PB7}, AF4,   gpioe::PE9, Output, PushPull,  },
+		    stm32::I2C1,
+		    };
 	   
     #[cfg(feature = "stm32f3xx")]
     fn setup() ->  (I2c<I2C1, (PB6<AF4>, PB7<AF4>)>,  PE9<Output<PushPull>>, Delay) {
@@ -129,8 +118,19 @@ fn main() -> ! {
              //.into()  ?? 
 
        (i2c, led,  Delay::new(cp.SYST, clocks) )  // return tuple (i2c, led, delay)
-       };
+       }
 
+
+#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
+use stm32f4xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    i2c::I2c,  
+    	            delay::Delay,
+		    gpio::{gpiob::{PB8, PB7}, Alternate, AF4,  gpioe::PE9, Output, PushPull,  },
+                    pac::I2C1,
+		    }; 
+#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
+use embedded_hal::digital::v2::OutputPin;
 	   
     #[cfg(feature = "stm32f4xx")]
     fn setup() ->  (I2c<I2C1, (PB8<Alternate<AF4>>, PB7<Alternate<AF4>>)>,
@@ -160,11 +160,14 @@ fn main() -> ! {
        //let led = gpiob.pb13.into_push_pull_output();          // external led on pb13
 
        (i2c, led,  Delay::new(cp.SYST, clocks) )     // return tuple (i2c, led, delay)
-       };
+       }
 
 
     // End of hal/MCU specific setup. Following should be generic code.
 
+
+#[entry]
+fn main() -> ! {
 
     let (i2c, mut led, mut delay) = setup();
 

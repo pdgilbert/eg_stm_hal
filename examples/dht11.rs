@@ -19,69 +19,15 @@ use cortex_m_semihosting::hprintln;
 
 use dht11::Dht11;
 
+
+// setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
+
 #[cfg(feature = "stm32f1xx")]
 use stm32f1xx_hal::{prelude::*, 
                     pac::{Peripherals, CorePeripherals}, 
     	            delay::Delay,
 		    gpio::{gpioa::PA8, OpenDrain,  Output, },
 		    };
-
-#[cfg(feature = "stm32f3xx")]
-use stm32f3xx_hal::{prelude::*, 
-                    stm32::{Peripherals, CorePeripherals}, 
-		    delay::Delay ,
-		    gpio::{gpioa::PA8, OpenDrain,  Output, },
-		    };
-
-#[cfg(feature = "stm32f4xx")]
-use stm32f4xx_hal::{prelude::*, 
-                    pac::{Peripherals, CorePeripherals}, 
-		    delay::Delay, 
-		    gpio::{gpioa::PA8, OpenDrain,  Output, },
-		    };
-
-#[cfg(feature = "stm32f7xx")]
-use stm32f7xx_hal::{prelude::*, 
-                    pac::{Peripherals, CorePeripherals}, 
-		    delay::Delay, 
-		    gpio::{gpioa::PA8, OpenDrain,  Output, },
-		    };
-
-#[cfg(feature = "stm32h7xx")]
-use stm32h7xx_hal::{prelude::*, 
-                    pac::{Peripherals, CorePeripherals}, 
-		    delay::Delay, 
-		    gpio::{gpioa::PA8, OpenDrain,  Output, },
-		    };
-
-#[cfg(feature = "stm32l0xx")]
-use stm32l0xx_hal::{prelude::*, 
-                    pac::{Peripherals, CorePeripherals}, 
-		    rcc,   // for ::Config but note name conflict with serial
-		    delay::Delay, 
-		    gpio::{gpioa::PA8, OpenDrain,  Output, },
-		    };
-
-#[cfg(feature = "stm32l1xx")]
-use stm32l1xx_hal::{prelude::*, 
-                    stm32::{Peripherals, CorePeripherals}, 
-		    rcc,   // for ::Config but note name conflict with next
-		    delay::Delay ,
-		    gpio::{gpioa::PA8, OpenDrain,  Output, },
-		   };
-
-#[cfg(feature = "stm32l4xx")]
-use stm32l4xx_hal::{prelude::*, 
-                    pac::{Peripherals, CorePeripherals}, 
-		    delay::Delay, 
-		    gpio::{gpioa::PA8, OpenDrain,  Output, },
-		    };
-
-//#[cfg(feature = "stm32l4xx")]
-//use embedded_hal::digital::v2::{InputPin, OutputPin};
-
-#[entry]
-fn main() -> ! {
 
     #[cfg(feature = "stm32f1xx")]
     fn setup() -> (Dht11<PA8<Output<OpenDrain>>>,  Delay) {
@@ -96,7 +42,15 @@ fn main() -> ! {
        
        (Dht11::new(pin_a8),                   //DHT11 data on A8
         Delay::new(cp.SYST, clocks))
-       };
+       }
+
+
+#[cfg(feature = "stm32f3xx")]
+use stm32f3xx_hal::{prelude::*, 
+                    stm32::{Peripherals, CorePeripherals}, 
+		    delay::Delay ,
+		    gpio::{gpioa::PA8, OpenDrain,  Output, },
+		    };
 
     #[cfg(feature = "stm32f3xx")]
     fn setup() -> (Dht11<PA8<Output<OpenDrain>>>,  Delay) {
@@ -111,8 +65,15 @@ fn main() -> ! {
        
        (Dht11::new(pin_a8),                   //DHT11 data on A8
         Delay::new(cp.SYST, clocks))
-       };
+       }
 
+
+#[cfg(feature = "stm32f4xx")]
+use stm32f4xx_hal::{prelude::*, 
+                    pac::{Peripherals, CorePeripherals}, 
+		    delay::Delay, 
+		    gpio::{gpioa::PA8, OpenDrain,  Output, },
+		    };
 
     #[cfg(feature = "stm32f4xx")]           // Use HSE oscillator
     fn setup() -> (Dht11<PA8<Output<OpenDrain>>>,  Delay) {
@@ -128,8 +89,15 @@ fn main() -> ! {
        
        (Dht11::new(pin_a8),                  //DHT11 data on A8
         Delay::new(cp.SYST, clocks))
-       };
+       }
 
+
+#[cfg(feature = "stm32f7xx")]
+use stm32f7xx_hal::{prelude::*, 
+                    pac::{Peripherals, CorePeripherals}, 
+		    delay::Delay, 
+		    gpio::{gpioa::PA8, OpenDrain,  Output, },
+		    };
 
     #[cfg(feature = "stm32f7xx")]         
     fn setup() -> (Dht11<PA8<Output<OpenDrain>>>,  Delay) {
@@ -142,8 +110,15 @@ fn main() -> ! {
        
        (Dht11::new(pin_a8),                  //DHT11 data on A8
         Delay::new(cp.SYST, clocks))
-       };
+       }
 
+
+#[cfg(feature = "stm32h7xx")]
+use stm32h7xx_hal::{prelude::*, 
+                    pac::{Peripherals, CorePeripherals}, 
+		    delay::Delay, 
+		    gpio::{gpioa::PA8, OpenDrain,  Output, },
+		    };
 
     #[cfg(feature = "stm32h7xx")]         
     fn setup() -> (Dht11<PA8<Output<OpenDrain>>>,  Delay) {
@@ -160,8 +135,16 @@ fn main() -> ! {
        
        (Dht11::new(pin_a8),                  //DHT11 data on A8
         Delay::new(cp.SYST, clocks))
-       };
+       }
 
+
+#[cfg(feature = "stm32l0xx")]
+use stm32l0xx_hal::{prelude::*, 
+                    pac::{Peripherals, CorePeripherals}, 
+		    rcc,   // for ::Config but note name conflict with serial
+		    delay::Delay, 
+		    gpio::{gpioa::PA8, OpenDrain,  Output, },
+		    };
 
     #[cfg(feature = "stm32l0xx")]  
     fn setup() -> (Dht11<PA8<Output<OpenDrain>>>,  Delay) {
@@ -183,8 +166,16 @@ fn main() -> ! {
 
        (Dht11::new(pin_a8),                  //DHT11 data on A8
         delay)
-       };
+       }
 
+
+#[cfg(feature = "stm32l1xx")]
+use stm32l1xx_hal::{prelude::*, 
+                    stm32::{Peripherals, CorePeripherals}, 
+		    rcc,   // for ::Config but note name conflict with next
+		    delay::Delay ,
+		    gpio::{gpioa::PA8, OpenDrain,  Output, },
+		   };
 
     #[cfg(feature = "stm32l1xx")]   
     fn setup() -> (Dht11<PA8<Output<OpenDrain>>>,  Delay) {
@@ -200,8 +191,15 @@ fn main() -> ! {
    
        (Dht11::new(pin_a8),                 //DHT11 data on A8
         delay)
-       };
+       }
 
+
+#[cfg(feature = "stm32l4xx")]
+use stm32l4xx_hal::{prelude::*, 
+                    pac::{Peripherals, CorePeripherals}, 
+		    delay::Delay, 
+		    gpio::{gpioa::PA8, OpenDrain,  Output, },
+		    };
 
     #[cfg(feature = "stm32l4xx")]           // Use HSE oscillator
     fn setup() -> (Dht11<PA8<Output<OpenDrain>>>,  Delay) {
@@ -219,11 +217,13 @@ fn main() -> ! {
   
        (Dht11::new(pin_a8),                  //DHT11 data on A8
         Delay::new(cp.SYST, clocks))
-       };
+       }
+
+// End of hal/MCU specific setup. Following should be generic code.
 
 
-    // End of hal/MCU specific setup. Following should be generic code.
-
+#[entry]
+fn main() -> ! {
 
     hprintln!("dht11 ...").unwrap();
 

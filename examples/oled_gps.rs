@@ -40,6 +40,8 @@ use embedded_graphics::{
 use ssd1306::{prelude::*, Builder, I2CDIBuilder};
 
 
+// setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
+
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
 use stm32f1xx_hal::{prelude::*,   
                     pac::Peripherals, 
@@ -50,90 +52,6 @@ use stm32f1xx_hal::{prelude::*,
 		    gpio::{gpiob::{PB8, PB9}, Alternate, OpenDrain, },
 		    device::I2C1,
 		    }; 
-
-#[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
-use stm32f3xx_hal::{prelude::*, 
-                    stm32::Peripherals,
-                    serial::{ Serial, Tx, Rx},
-		    stm32::{USART2}, 
-                    delay::Delay,
-		    i2c::{I2c, },  
-		    gpio::{gpiob::{PB8, PB9}, AF4, },
-		    pac::I2C1,
-		    };
-
-#[cfg(feature = "stm32f4xx")] // eg Nucleo-64, blackpills stm32f401 and stm32f411
-use stm32f4xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    serial::{config::Config, Serial, Tx, Rx},
-		    pac::{USART2}, 
-                    delay::Delay,
-		    i2c::{I2c, },  
-		    gpio::{gpiob::{PB8, PB9}, AlternateOD, AF4, },
-                    pac::I2C1,
-		    };
-
-#[cfg(feature = "stm32f7xx")] 
-use stm32f7xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    serial::{Config, Serial, Tx, Rx, Oversampling, },
-		    pac::{USART2}, 
-                    delay::Delay,
-		    i2c::{I2c, PinScl, PinSda, Mode, },  
-		    gpio::{gpiob::{PB8, PB9}, Alternate, AF4, },
-                    pac::I2C1,
-		    };
-
-#[cfg(feature = "stm32h7xx")] 
-use stm32h7xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    serial::{Tx, Rx},
-		    pac::{USART2}, 
-                    delay::Delay,
-		    i2c::{I2c, },  
-		    //gpio::{gpiob::{PB8, PB9}, Alternate, AF4, },
-                    pac::I2C1,
-		    };
-
-#[cfg(feature = "stm32l0xx")] 
-use stm32l0xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    serial::{config::Config, Serial, Tx, Rx},
-		    pac::{USART2}, 
-                    delay::Delay,
-		    i2c::{I2c, },  
-		    gpio::{gpiob::{PB8, PB9}, AlternateOD, AF4, },
-                    pac::I2C1,
-		    };
-
-#[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
-use stm32l1xx_hal::{prelude::*, 
-		    stm32::Peripherals, 
-		    rcc,   // for ::Config but note name conflict with serial
-		    serial::{Config, SerialExt, Tx, Rx},
-		    stm32::{USART2},
-                    delay::Delay,
-		    i2c::{I2c, Pins, },  
-		    //gpio::{gpiob::{PB8, PB9}, Output, OpenDrain, },
-                    stm32::I2C1,
-		    };
-
-
-#[cfg(feature = "stm32l4xx")] 
-use stm32l4xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    serial::{Config, Serial, Tx, Rx},
-		    pac::{USART2}, 
-                    delay::Delay,
-		    i2c::{I2c, },  
-		    gpio::{gpiob::{PB8, PB9}, Alternate, AF4, Output, OpenDrain},
-                    pac::I2C1,
-		    };
-
-
-#[entry]
-
-fn main() -> ! {
 
     #[cfg(feature = "stm32f1xx")]
     fn setup() ->  (Tx<USART3>, Rx<USART3>,
@@ -176,9 +94,19 @@ fn main() -> ! {
 
        (tx3, rx3,   i2c,
         Delay::new(cp.SYST, clocks))
-       };
+       }
 
 
+#[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
+use stm32f3xx_hal::{prelude::*, 
+                    stm32::Peripherals,
+                    serial::{ Serial, Tx, Rx},
+		    stm32::{USART2}, 
+                    delay::Delay,
+		    i2c::{I2c, },  
+		    gpio::{gpiob::{PB8, PB9}, AF4, },
+		    pac::I2C1,
+		    };
 
     #[cfg(feature = "stm32f3xx")]
     fn setup() ->  (Tx<USART2>, Rx<USART2>, 
@@ -208,10 +136,19 @@ fn main() -> ! {
        (tx2, rx2,   
         I2c::i2c1(p.I2C1, (scl, sda), 400_000.hz(), clocks, &mut rcc.apb1 ), // i2c
         Delay::new(cp.SYST, clocks))
-       };
+       }
 
 
-
+#[cfg(feature = "stm32f4xx")] // eg Nucleo-64, blackpills stm32f401 and stm32f411
+use stm32f4xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::{USART2}, 
+                    delay::Delay,
+		    i2c::{I2c, },  
+		    gpio::{gpiob::{PB8, PB9}, AlternateOD, AF4, },
+                    pac::I2C1,
+		    };
 
     #[cfg(feature = "stm32f4xx")]
     fn setup() ->  (Tx<USART2>, Rx<USART2>,
@@ -241,11 +178,20 @@ fn main() -> ! {
        (tx2, rx2,   
 	I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks), // i2c
         Delay::new(cp.SYST, clocks))
-       };
+       }
 
 
 
-
+#[cfg(feature = "stm32f7xx")] 
+use stm32f7xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{Config, Serial, Tx, Rx, Oversampling, },
+		    pac::{USART2}, 
+                    delay::Delay,
+		    i2c::{I2c, PinScl, PinSda, Mode, },  
+		    gpio::{gpiob::{PB8, PB9}, Alternate, AF4, },
+                    pac::I2C1,
+		    };
 
     #[cfg(feature = "stm32f7xx")]
     fn setup() ->  (Tx<USART2>, Rx<USART2>,
@@ -279,11 +225,19 @@ fn main() -> ! {
        (tx2, rx2,   
 	I2c::i2c1(p.I2C1, (scl, sda), Mode::standard(400_000.hz()), clocks, &mut rcc.apb1), // i2c
         Delay::new(cp.SYST, clocks))
-       };
+       }
 
 
-
-
+#[cfg(feature = "stm32h7xx")] 
+use stm32h7xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{Tx, Rx},
+		    pac::{USART2}, 
+                    delay::Delay,
+		    i2c::{I2c, },  
+		    //gpio::{gpiob::{PB8, PB9}, Alternate, AF4, },
+                    pac::I2C1,
+		    };
 
     #[cfg(feature = "stm32h7xx")]
     fn setup() ->  (Tx<USART2>, Rx<USART2>,
@@ -314,9 +268,19 @@ fn main() -> ! {
        (tx2, rx2,   
 	p.I2C1 .i2c((scl, sda), 400.khz(), ccdr.peripheral.I2C1, &clocks), // i2c
         Delay::new(cp.SYST, clocks))
-       };
+       }
 
 
+#[cfg(feature = "stm32l0xx")] 
+use stm32l0xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::{USART2}, 
+                    delay::Delay,
+		    i2c::{I2c, },  
+		    gpio::{gpiob::{PB8, PB9}, AlternateOD, AF4, },
+                    pac::I2C1,
+		    };
 
     #[cfg(feature = "stm32l0xx")]
     fn setup() ->  (Tx<USART2>, Rx<USART2>,
@@ -344,7 +308,20 @@ fn main() -> ! {
        (tx2, rx2,   
 	I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks), // i2c
         Delay::new(cp.SYST, clocks))
-       };
+       }
+
+
+#[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
+use stm32l1xx_hal::{prelude::*, 
+		    stm32::Peripherals, 
+		    rcc,   // for ::Config but note name conflict with serial
+		    serial::{Config, SerialExt, Tx, Rx},
+		    stm32::{USART2},
+                    delay::Delay,
+		    i2c::{I2c, Pins, },  
+		    //gpio::{gpiob::{PB8, PB9}, Output, OpenDrain, },
+                    stm32::I2C1,
+		    };
 
 
     //fn setup() ->  (Tx<USART2>, Rx<USART2>,
@@ -377,9 +354,19 @@ fn main() -> ! {
        (tx2, rx2,  
         p.I2C1.i2c((scl, sda), 400.khz(), &mut rcc),   // i2c
         cp.SYST.delay(rcc.clocks))                     // delay
-       };
+       }
 
 
+#[cfg(feature = "stm32l4xx")] 
+use stm32l4xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{Config, Serial, Tx, Rx},
+		    pac::{USART2}, 
+                    delay::Delay,
+		    i2c::{I2c, },  
+		    gpio::{gpiob::{PB8, PB9}, Alternate, AF4, Output, OpenDrain},
+                    pac::I2C1,
+		    };
 
     #[cfg(feature = "stm32l4xx")]
     fn setup() ->  (Tx<USART2>, Rx<USART2>,
@@ -419,9 +406,13 @@ fn main() -> ! {
        (tx2, rx2,   
 	I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks, &mut rcc.apb1r1 ), // i2c
         Delay::new(cp.SYST, clocks))
-       };
+       }
 
     // End of hal/MCU specific setup. Following should be generic code.
+
+#[entry]
+
+fn main() -> ! {
 
     let (mut _tx_gps, mut rx_gps,   i2c,  mut delay) = setup();  //  GPS, i2c, delay
 

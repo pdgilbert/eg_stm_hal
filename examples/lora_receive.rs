@@ -24,6 +24,9 @@ use cortex_m_semihosting::*;
 
 use sx127x_lora;
 
+
+// setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
+
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
 use stm32f1xx_hal::{prelude::*,   
                     pac::Peripherals, 
@@ -33,84 +36,6 @@ use stm32f1xx_hal::{prelude::*,
                            gpiob::{PB13, PB14}, Output, PushPull},
 		    device::SPI1,
 		    }; 
-
-#[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
-use stm32f3xx_hal::{prelude::*, 
-                    stm32::Peripherals,
-                    spi::{Spi},
-                    delay::Delay,
-		    gpio::{gpioa::{PA5, PA6, PA7}, AF5,  
-                           gpiob::{PB13, PB14}, Output, PushPull},
-		    stm32::SPI1,
-		    };
-
-#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
-use stm32f4xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    spi::{Spi},
-                    delay::Delay,
-		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5,  
-                           gpiob::{PB13, PB14}, Output, PushPull},
-                    time::MegaHertz,
-		    pac::SPI1,
-		    }; 
-
-#[cfg(feature = "stm32f7xx")] 
-use stm32f7xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    spi::{Spi, Pins, Enabled, ClockDivider, },
-                    delay::Delay,
-		    gpio::{gpioa::{PA0, PA1}, Output, PushPull},
-                    pac::SPI1,
-		    }; 
-
-#[cfg(feature = "stm32h7xx")] 
-use stm32h7xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    spi::{Spi, Enabled},
-                    delay::Delay,
-		    gpio::{gpioa::{PA0, PA1}, Output, PushPull},
-		    pac::SPI1,
-		    }; 
-
-#[cfg(feature = "stm32l0xx")] 
-use stm32l0xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-		    rcc,   // for ::Config but note name conflict with serial
-                    spi::{Spi, Pins, },
-                    delay::Delay,
-		    gpio::{gpioa::{PA0, PA1}, Output, PushPull},
-		    pac::SPI1,
-		    }; 
-
-
-#[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
-use stm32l1xx_hal::{prelude::*, 
-                    stm32::Peripherals, 
-		    rcc,   // for ::Config but note name conflict with next
-                    spi::{Spi, Pins},
-                    delay::Delay,
-		    gpio::{gpioa::{PA0, PA1}, Output, PushPull},
-                    stm32::SPI1,
-		    };
-
-#[cfg(feature = "stm32l4xx")] 
-use stm32l4xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    spi::{Spi},
-                    delay::Delay,
-		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5, Input, Floating,  
-                           gpioa::{PA0, PA1}, Output, PushPull},
- 		    pac::SPI1,
-		    }; 
-
-
-
-const FREQUENCY: i64 = 915;
-
-#[entry]
-fn main() -> !{
-
     #[cfg(feature = "stm32f1xx")]
     fn setup() ->  (sx127x_lora::LoRa< Spi<SPI1,  Spi1NoRemap,
                          (PA5<Alternate<PushPull>>, PA6<Input<Floating>>, PA7<Alternate<PushPull>>), u8>,
@@ -150,9 +75,20 @@ fn main() -> !{
                               & mut delay                                      // delay
 			      ).unwrap(), 
         delay )                                                                    // delay again
-       };
+       }
 
-    #[cfg(feature = "stm32f3xx")]
+ 
+#[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
+use stm32f3xx_hal::{prelude::*, 
+                    stm32::Peripherals,
+                    spi::{Spi},
+                    delay::Delay,
+		    gpio::{gpioa::{PA5, PA6, PA7}, AF5,  
+                           gpiob::{PB13, PB14}, Output, PushPull},
+		    stm32::SPI1,
+		    };
+
+   #[cfg(feature = "stm32f3xx")]
     fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, (PA5<AF5>, PA6<AF5>, PA7<AF5>)>,
                                      PB14<Output<PushPull>>, 
                                      PB13<Output<PushPull>> >, Delay) {
@@ -189,8 +125,19 @@ fn main() -> !{
                           &mut delay 
 			  ).unwrap(),                                                           // delay
         delay )                                                                                 // delay again
-       };
+       }
 
+
+#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
+use stm32f4xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    spi::{Spi},
+                    delay::Delay,
+		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5,  
+                           gpiob::{PB13, PB14}, Output, PushPull},
+                    time::MegaHertz,
+		    pac::SPI1,
+		    }; 
 
     // with  sx127x_lora = "0.3.1" the return type was this, and lora.poll_irq(Some(30)) did not need delay in arg
 
@@ -233,7 +180,17 @@ fn main() -> !{
                               FREQUENCY, 
                               &mut delay).unwrap(),                   // delay
         delay )                                                       // delay again
-       };
+       }
+
+
+#[cfg(feature = "stm32f7xx")] 
+use stm32f7xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    spi::{Spi, Pins, Enabled, ClockDivider, },
+                    delay::Delay,
+		    gpio::{gpioa::{PA0, PA1}, Output, PushPull},
+                    pac::SPI1,
+		    }; 
 
     #[cfg(feature = "stm32f7xx")]
     fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, impl Pins<SPI1>, Enabled<u8>>,
@@ -270,7 +227,17 @@ fn main() -> !{
                               &mut delay ).unwrap();                 // delay
        
        (lora, delay )                                                // delay again
-       };
+       }
+
+
+#[cfg(feature = "stm32h7xx")] 
+use stm32h7xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    spi::{Spi, Enabled},
+                    delay::Delay,
+		    gpio::{gpioa::{PA0, PA1}, Output, PushPull},
+		    pac::SPI1,
+		    }; 
 
     #[cfg(feature = "stm32h7xx")]
     fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, Enabled>,
@@ -309,9 +276,18 @@ fn main() -> !{
                               &mut delay ).unwrap();                 // delay
        
        (lora, delay )                                                // delay again
-       };
+       }
 
 
+#[cfg(feature = "stm32l0xx")] 
+use stm32l0xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+		    rcc,   // for ::Config but note name conflict with serial
+                    spi::{Spi, Pins, },
+                    delay::Delay,
+		    gpio::{gpioa::{PA0, PA1}, Output, PushPull},
+		    pac::SPI1,
+		    }; 
 
     #[cfg(feature = "stm32l0xx")]
     fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, impl Pins<SPI1>>,
@@ -344,9 +320,19 @@ fn main() -> !{
                               &mut delay ).unwrap();                 // delay
        
        (lora, delay )                                                // delay again
-       };
+       }
 
 
+
+#[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
+use stm32l1xx_hal::{prelude::*, 
+                    stm32::Peripherals, 
+		    rcc,   // for ::Config but note name conflict with next
+                    spi::{Spi, Pins},
+                    delay::Delay,
+		    gpio::{gpioa::{PA0, PA1}, Output, PushPull},
+                    stm32::SPI1,
+		    };
 
     #[cfg(feature = "stm32l1xx")]
     fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, impl Pins<SPI1>>,
@@ -380,9 +366,20 @@ fn main() -> !{
                               &mut delay ).unwrap();                 // delay
        
        (lora, delay )                                                // delay again
-       };
+       }
 
-    #[cfg(feature = "stm32l4xx")]
+ 
+#[cfg(feature = "stm32l4xx")] 
+use stm32l4xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    spi::{Spi},
+                    delay::Delay,
+		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5, Input, Floating,  
+                           gpioa::{PA0, PA1}, Output, PushPull},
+ 		    pac::SPI1,
+		    }; 
+
+   #[cfg(feature = "stm32l4xx")]
     fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, (PA5<Alternate<AF5, Input<Floating>>>, 
                                                  PA6<Alternate<AF5, Input<Floating>>>, 
                                                  PA7<Alternate<AF5, Input<Floating>>>)>,
@@ -420,11 +417,15 @@ fn main() -> !{
                               &mut delay ).unwrap();                 // delay
 
        (lora, delay )                                               
-       };
+       }
 
 
-    // End of hal/MCU specific setup. Following should be generic code.
+// End of hal/MCU specific setup. Following should be generic code.
 
+const FREQUENCY: i64 = 915;
+
+#[entry]
+fn main() -> !{
 
     let (mut lora, mut delay) =  setup();
     

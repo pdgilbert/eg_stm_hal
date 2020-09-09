@@ -24,6 +24,8 @@ use cortex_m_semihosting::hprintln;
 use eg_stm_hal::to_str;
 
 
+// setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
+
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
 use stm32f1xx_hal::{prelude::*,   
                     pac::Peripherals, 
@@ -68,55 +70,6 @@ use stm32f3xx_hal::{prelude::*,
 		    stm32::USART1 
 		    };
 
-#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
-use stm32f4xx_hal::{prelude::*, 
-                    pac::Peripherals, 
-		    serial::{config::Config, Serial, Tx, Rx},
-		    pac::USART1 
-		    };
-
-#[cfg(feature = "stm32f7xx")] 
-use stm32f7xx_hal::{prelude::*, 
-                    pac::Peripherals, 
-		    serial::{Config, Serial, Tx, Rx},
-		    pac::USART1 
-		    };
-
-#[cfg(feature = "stm32h7xx")] 
-use stm32h7xx_hal::{prelude::*, 
-                    pac::Peripherals, 
-		    serial::{Tx, Rx},
-		    pac::USART1 
-		    };
-
-#[cfg(feature = "stm32l0xx")] 
-use stm32l0xx_hal::{prelude::*, 
-                    pac::Peripherals, 
-		    serial::{config::Config, Serial, Tx, Rx},
-		    pac::USART1 
-		    };
-
-#[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
-use stm32l1xx_hal::{prelude::*, 
-                    stm32::Peripherals, 
-		    rcc,   // for ::Config but note name conflict with next
-                    serial::{Config, SerialExt, Tx, Rx},
-		    stm32::USART1 
-		    };
-
-#[cfg(feature = "stm32l4xx")] 
-use stm32l4xx_hal::{prelude::*, 
-                    pac::Peripherals, 
-		    serial::{config::Config, Serial, Tx, Rx},
-		    pac::USART1 
-		    };
-
-
-#[entry]
-fn main() -> ! {
-     
-    //see serial_char.rs and  echo_by_char.rs for additional comments.
-
     #[cfg(feature = "stm32f3xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>)  {
 
@@ -136,8 +89,15 @@ fn main() -> ! {
 
        let (mut tx1, mut rx1)  = txrx1.split();
        (tx1, rx1)
-       };
+       }
 
+
+#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
+use stm32f4xx_hal::{prelude::*, 
+                    pac::Peripherals, 
+		    serial::{config::Config, Serial, Tx, Rx},
+		    pac::USART1 
+		    };
 
     #[cfg(feature = "stm32f4xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>)  {
@@ -158,8 +118,16 @@ fn main() -> ! {
 
        let (mut tx1, mut rx1)  = txrx1.split();
        (tx1, rx1)
-       };
+       }
 
+
+
+#[cfg(feature = "stm32f7xx")] 
+use stm32f7xx_hal::{prelude::*, 
+                    pac::Peripherals, 
+		    serial::{Config, Serial, Tx, Rx},
+		    pac::USART1 
+		    };
 
     #[cfg(feature = "stm32f7xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>)  {
@@ -180,8 +148,16 @@ fn main() -> ! {
 
        let (mut tx1, mut rx1)  = txrx1.split();
        (tx1, rx1)
-       };
+       }
 
+
+
+#[cfg(feature = "stm32h7xx")] 
+use stm32h7xx_hal::{prelude::*, 
+                    pac::Peripherals, 
+		    serial::{Tx, Rx},
+		    pac::USART1 
+		    };
 
     #[cfg(feature = "stm32h7xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>)  {
@@ -210,6 +186,14 @@ fn main() -> ! {
        }
 
 
+
+#[cfg(feature = "stm32l0xx")] 
+use stm32l0xx_hal::{prelude::*, 
+                    pac::Peripherals, 
+		    serial::{config::Config, Serial, Tx, Rx},
+		    pac::USART1 
+		    };
+
     #[cfg(feature = "stm32l0xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>)  {
 
@@ -229,8 +213,17 @@ fn main() -> ! {
 
        let (mut tx1, mut rx1)  = txrx1.split();
        (tx1, rx1)
-       };
+       }
 
+
+
+#[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
+use stm32l1xx_hal::{prelude::*, 
+                    stm32::Peripherals, 
+		    rcc,   // for ::Config but note name conflict with next
+                    serial::{Config, SerialExt, Tx, Rx},
+		    stm32::USART1 
+		    };
 
     #[cfg(feature = "stm32l1xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>)  {
@@ -250,8 +243,16 @@ fn main() -> ! {
  
        let (mut tx1, mut rx1)  = txrx1.split();
        (tx1, rx1)
-       };
+       }
 
+
+
+#[cfg(feature = "stm32l4xx")] 
+use stm32l4xx_hal::{prelude::*, 
+                    pac::Peripherals, 
+		    serial::{config::Config, Serial, Tx, Rx},
+		    pac::USART1 
+		    };
 
     #[cfg(feature = "stm32l4xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>)  {
@@ -272,10 +273,17 @@ fn main() -> ! {
            clocks,
            &mut rcc.apb2,
            ).split()
-       };
+       }
 
 
     // End of hal/MCU specific setup. Following should be generic code.
+
+ 
+
+#[entry]
+fn main() -> ! {
+     
+    //see serial_char.rs and  echo_by_char.rs for additional comments.
 
     let (mut tx1, rx1) = setup();
 

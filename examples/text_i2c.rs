@@ -29,6 +29,9 @@ use panic_halt as _;
 
 use ssd1306::{prelude::*, Builder, I2CDIBuilder};
 
+
+// setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
+
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
 use stm32f1xx_hal::{prelude::*,
                     pac::Peripherals, 
@@ -36,67 +39,6 @@ use stm32f1xx_hal::{prelude::*,
 		    gpio::{gpiob::{PB8, PB9}, Alternate, OpenDrain, },
 		    device::I2C1,
 		    };
-
-#[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
-use stm32f3xx_hal::{prelude::*, 
-                    pac::Peripherals,
-                    i2c::{I2c, },  
-		    gpio::{gpiob::{PB8, PB9}, AF4, },
-		    pac::I2C1,
-		    };
-
-#[cfg(feature = "stm32f4xx")] // eg Nucleo-64, blackpills stm32f401 and stm32f411
-use stm32f4xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    i2c::{I2c, },  
-		    gpio::{gpiob::{PB8, PB9}, AlternateOD, AF4, },
-                    pac::I2C1,
-		    }; 
-
-#[cfg(feature = "stm32f7xx")] 
-use stm32f7xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    i2c::{I2c, PinScl, PinSda},  
-		    gpio::{gpiob::{PB8, PB9}, Alternate, AF4, },
-                    pac::I2C1,
-		    }; 
-
-#[cfg(feature = "stm32h7xx")] 
-use stm32h7xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    i2c::{I2c,},  
-		    //gpio::{gpiob::{PB8, PB9}, Alternate, AF4, }, really! builds without this
-                    pac::I2C1,
-		    }; 
-
-#[cfg(feature = "stm32l0xx")] 
-use stm32l0xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    i2c::{I2c, },  
-		    gpio::{gpiob::{PB8, PB9}, AlternateOD, AF4, },
-                    pac::I2C1,
-		    }; 
-
-
-#[cfg(feature = "stm32l1xx") ] // eg  Discovery STM32L100 and Heltec lora_node STM32L151CCU6
-use stm32l1xx_hal::{prelude::*, 
-                    stm32::Peripherals,
-		    rcc,   // for ::Config but avoid name conflict with serial
-                    i2c::{I2c, Pins, },  
-		    //gpio::{gpiob::{PB8, PB9}, Output, OpenDrain, },
-                    stm32::I2C1,
-                    };
-
-#[cfg(feature = "stm32l4xx")] 
-use stm32l4xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    i2c::{I2c, },  
-		    gpio::{gpiob::{PB8, PB9}, Alternate, AF4, Output, OpenDrain, },
-                    pac::I2C1,
-		    }; 
-
-#[entry]
-fn main() -> ! {
 
     #[cfg(feature = "stm32f1xx")]
     fn setup() ->  BlockingI2c<I2C1,  (PB8<Alternate<OpenDrain>>, PB9<Alternate<OpenDrain>>) > {
@@ -126,8 +68,17 @@ fn main() -> ! {
    	   1000,
    	   1000,
            )
-       };
+       }
 
+
+
+#[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
+use stm32f3xx_hal::{prelude::*, 
+                    pac::Peripherals,
+                    i2c::{I2c, },  
+		    gpio::{gpiob::{PB8, PB9}, AF4, },
+		    pac::I2C1,
+		    };
 	   
     #[cfg(feature = "stm32f3xx")]
     fn setup() ->  I2c<I2C1, (PB8<AF4>, PB9<AF4>)> {
@@ -142,8 +93,16 @@ fn main() -> ! {
       
        // return i2c
        I2c::i2c1(p.I2C1, (scl, sda), 400_000.hz(), clocks, &mut rcc.apb1 )
-       };
+       }
 
+
+#[cfg(feature = "stm32f4xx")] // eg Nucleo-64, blackpills stm32f401 and stm32f411
+use stm32f4xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    i2c::{I2c, },  
+		    gpio::{gpiob::{PB8, PB9}, AlternateOD, AF4, },
+                    pac::I2C1,
+		    }; 
 
     #[cfg(feature = "stm32f4xx")]
     fn setup() ->  I2c<I2C1, (PB8<AlternateOD<AF4>>, PB9<AlternateOD<AF4>>)> {
@@ -160,8 +119,16 @@ fn main() -> ! {
        
        // return i2c
        I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks)
-       };
+       }
 
+
+#[cfg(feature = "stm32f7xx")] 
+use stm32f7xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    i2c::{I2c, PinScl, PinSda},  
+		    gpio::{gpiob::{PB8, PB9}, Alternate, AF4, },
+                    pac::I2C1,
+		    }; 
 
     //fn setup() ->  I2c<I2C1, PB8<Alternate<AF4>>, PB9<Alternate<AF4>>> {
     //fn setup() ->  I2c<I2C1, impl PinScl<AF4>, impl PinSda<AF4>> {
@@ -181,8 +148,16 @@ fn main() -> ! {
        
        // return i2c
        I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks, &mut rcc.apb1)
-       };
+       }
 
+
+#[cfg(feature = "stm32h7xx")] 
+use stm32h7xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    i2c::{I2c,},  
+		    //gpio::{gpiob::{PB8, PB9}, Alternate, AF4, }, really! builds without this
+                    pac::I2C1,
+		    }; 
 
     #[cfg(feature = "stm32h7xx")]
     fn setup() ->  I2c<I2C1> {
@@ -202,8 +177,16 @@ fn main() -> ! {
        // return i2c
        // I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks)
        p.I2C1 .i2c((scl, sda), 400.khz(), ccdr.peripheral.I2C1, &clocks)
-       };
+       }
 
+
+#[cfg(feature = "stm32l0xx")] 
+use stm32l0xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    i2c::{I2c, },  
+		    gpio::{gpiob::{PB8, PB9}, AlternateOD, AF4, },
+                    pac::I2C1,
+		    }; 
 
     #[cfg(feature = "stm32l0xx")]
     fn setup() ->  I2c<I2C1, (PB8<AlternateOD<AF4>>, PB9<AlternateOD<AF4>>)> {
@@ -220,9 +203,18 @@ fn main() -> ! {
        
        // return i2c
        I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks)
-       };
+       }
 
 
+
+#[cfg(feature = "stm32l1xx") ] // eg  Discovery STM32L100 and Heltec lora_node STM32L151CCU6
+use stm32l1xx_hal::{prelude::*, 
+                    stm32::Peripherals,
+		    rcc,   // for ::Config but avoid name conflict with serial
+                    i2c::{I2c, Pins, },  
+		    //gpio::{gpiob::{PB8, PB9}, Output, OpenDrain, },
+                    stm32::I2C1,
+                    };
    
     #[cfg(feature = "stm32l1xx")]
     fn setup() -> I2c<I2C1, impl Pins<I2C1>> {
@@ -243,8 +235,16 @@ fn main() -> ! {
 
        // return i2c
        p.I2C1.i2c((scl, sda), 400.khz(), &mut rcc) 
-       };
+       }
 
+
+#[cfg(feature = "stm32l4xx")] 
+use stm32l4xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    i2c::{I2c, },  
+		    gpio::{gpiob::{PB8, PB9}, Alternate, AF4, Output, OpenDrain, },
+                    pac::I2C1,
+		    }; 
 
     #[cfg(feature = "stm32l4xx")]
     fn setup() ->  I2c<I2C1, (PB8<Alternate<AF4, Output<OpenDrain>>>, PB9<Alternate<AF4, Output<OpenDrain>>>)> {
@@ -270,11 +270,14 @@ fn main() -> ! {
     
        // return i2c
        I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks, &mut rcc.apb1r1)
-       };
+       }
 
 
     // End of hal/MCU specific setup. Following should be generic code.
 
+
+#[entry]
+fn main() -> ! {
 
     let i2c = setup();
     

@@ -58,6 +58,8 @@ use nb::block;
 use sx127x_lora;
 
 
+// setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
+
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
 use stm32f1xx_hal::{prelude::*,   
                     pac::Peripherals, 
@@ -69,96 +71,6 @@ use stm32f1xx_hal::{prelude::*,
                            gpioa::{PA0, PA1}, Output, PushPull},
 		    device::SPI1,
 		    }; 
-
-#[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
-use stm32f3xx_hal::{prelude::*, 
-                    stm32::Peripherals,
-                    serial::{ Serial, Tx, Rx},
-		    stm32::{USART2}, 
-                    spi::{Spi},
-                    delay::Delay,
-		    gpio::{gpioa::{PA5, PA6, PA7}, AF5,  
-                           gpioa::{PA0, PA1}, Output, PushPull},
-		    stm32::SPI1,
-		    };
-
-#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
-use stm32f4xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    serial::{config::Config, Serial, Tx, Rx},
-		    pac::{USART2}, 
-                    spi::{Spi},
-                    delay::Delay,
-		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5,  
-                           gpioa::{PA0, PA1}, Output, PushPull},
-                    time::MegaHertz,
-		    pac::SPI1,
-		    };
-
-#[cfg(feature = "stm32f7xx")] 
-use stm32f7xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    serial::{Config, Serial, Tx, Rx, Oversampling, },
-		    pac::{USART2}, 
-                    spi::{Spi, Pins, Enabled, ClockDivider, },
-                    delay::Delay,
-		    gpio::{gpioa::{PA0, PA1}, Output, PushPull},
-                    pac::SPI1,
-		    };
-
-#[cfg(feature = "stm32h7xx")] 
-use stm32h7xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    serial::{Tx, Rx},
-		    pac::{USART2}, 
-                    spi::{Spi, Enabled},
-                    delay::Delay,
-		    gpio::{gpioa::{PA0, PA1}, Output, PushPull},
-		    pac::SPI1,
-		    };
-
-#[cfg(feature = "stm32l0xx")] 
-use stm32l0xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    serial::{config::Config, Serial, Tx, Rx},
-		    pac::{USART2}, 
-                    spi::{Spi},
-                    delay::Delay,
-		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5,  
-                           gpioa::{PA0, PA1}, Output, PushPull},
-                    time::MegaHertz,
-		    pac::SPI1,
-		    };
-
-#[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
-use stm32l1xx_hal::{prelude::*, 
-		    stm32::Peripherals, 
-		    rcc,   // for ::Config but note name conflict with next
-                    serial::{Config, SerialExt, Tx, Rx},
-		    stm32::{USART2},
-                    spi::{Spi, Pins},
-                    delay::Delay,
-		    gpio::{gpioa::{PA0, PA1}, Output, PushPull},
-                    stm32::SPI1,
-		    };
-
-#[cfg(feature = "stm32l4xx")] 
-use stm32l4xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    serial::{Config, Serial, Tx, Rx},
-		    pac::{USART2}, 
-                    spi::{Spi},
-                    delay::Delay,
-		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5, Input, Floating,  
-                           gpioa::{PA0, PA1}, Output, PushPull},
-		    pac::SPI1,
-		    };
-
-
-
-#[entry]
-
-fn main() -> ! {
 
     #[cfg(feature = "stm32f1xx")]
     fn setup() ->  (Tx<USART3>, Rx<USART3>,
@@ -215,6 +127,17 @@ fn main() -> ! {
 	}
 
 
+#[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
+use stm32f3xx_hal::{prelude::*, 
+                    stm32::Peripherals,
+                    serial::{ Serial, Tx, Rx},
+		    stm32::{USART2}, 
+                    spi::{Spi},
+                    delay::Delay,
+		    gpio::{gpioa::{PA5, PA6, PA7}, AF5,  
+                           gpioa::{PA0, PA1}, Output, PushPull},
+		    stm32::SPI1,
+		    };
 
     #[cfg(feature = "stm32f3xx")]
     fn setup() ->  (Tx<USART2>, Rx<USART2>, 
@@ -264,6 +187,19 @@ fn main() -> ! {
 	}
 
 
+#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
+use stm32f4xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::{USART2}, 
+                    spi::{Spi},
+                    delay::Delay,
+		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5,  
+                           gpioa::{PA0, PA1}, Output, PushPull},
+                    time::MegaHertz,
+		    pac::SPI1,
+		    };
+
     #[cfg(feature = "stm32f4xx")]
     fn setup() ->  (Tx<USART2>, Rx<USART2>,
                     sx127x_lora::LoRa<Spi<SPI1, (PA5<Alternate<AF5>>, 
@@ -309,6 +245,17 @@ fn main() -> ! {
         (tx, rx,  lora,  delay)
 	}
 
+
+#[cfg(feature = "stm32f7xx")] 
+use stm32f7xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{Config, Serial, Tx, Rx, Oversampling, },
+		    pac::{USART2}, 
+                    spi::{Spi, Pins, Enabled, ClockDivider, },
+                    delay::Delay,
+		    gpio::{gpioa::{PA0, PA1}, Output, PushPull},
+                    pac::SPI1,
+		    };
 
     #[cfg(feature = "stm32f7xx")]
     fn setup() ->  (Tx<USART2>, Rx<USART2>,
@@ -363,6 +310,17 @@ fn main() -> ! {
 	}
 
 
+#[cfg(feature = "stm32h7xx")] 
+use stm32h7xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{Tx, Rx},
+		    pac::{USART2}, 
+                    spi::{Spi, Enabled},
+                    delay::Delay,
+		    gpio::{gpioa::{PA0, PA1}, Output, PushPull},
+		    pac::SPI1,
+		    };
+
     #[cfg(feature = "stm32h7xx")]
     fn setup() ->  (Tx<USART2>, Rx<USART2>,
                     sx127x_lora::LoRa<Spi<SPI1, Enabled>,
@@ -412,6 +370,19 @@ fn main() -> ! {
 	}
 
 
+#[cfg(feature = "stm32l0xx")] 
+use stm32l0xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::{USART2}, 
+                    spi::{Spi},
+                    delay::Delay,
+		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5,  
+                           gpioa::{PA0, PA1}, Output, PushPull},
+                    time::MegaHertz,
+		    pac::SPI1,
+		    };
+
     #[cfg(feature = "stm32l0xx")]
     fn setup() ->  (Tx<USART2>, Rx<USART2>,
                     sx127x_lora::LoRa<Spi<SPI1, (PA5<Alternate<AF5>>, 
@@ -458,7 +429,17 @@ fn main() -> ! {
 	}
 
 
-
+#[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
+use stm32l1xx_hal::{prelude::*, 
+		    stm32::Peripherals, 
+		    rcc,   // for ::Config but note name conflict with next
+                    serial::{Config, SerialExt, Tx, Rx},
+		    stm32::{USART2},
+                    spi::{Spi, Pins},
+                    delay::Delay,
+		    gpio::{gpioa::{PA0, PA1}, Output, PushPull},
+                    stm32::SPI1,
+		    };
 
     #[cfg(feature = "stm32l1xx")]
     fn setup() ->  (Tx<USART2>, Rx<USART2>,
@@ -505,6 +486,18 @@ fn main() -> ! {
         (tx, rx,  lora,  delay)
 	}
 
+
+#[cfg(feature = "stm32l4xx")] 
+use stm32l4xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{Config, Serial, Tx, Rx},
+		    pac::{USART2}, 
+                    spi::{Spi},
+                    delay::Delay,
+		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5, Input, Floating,  
+                           gpioa::{PA0, PA1}, Output, PushPull},
+		    pac::SPI1,
+		    };
 
     #[cfg(feature = "stm32l4xx")]
     fn setup() ->  (Tx<USART2>, Rx<USART2>,
@@ -559,11 +552,15 @@ fn main() -> ! {
        }
 
 
-    // End of hal/MCU specific setup. Following should be generic code.
+// End of hal/MCU specific setup. Following should be generic code.
+
+#[entry]
+
+fn main() -> ! {
 
     let (mut _tx_gps, mut rx_gps,   mut lora,   _delay) = setup();  //  GPS, lora, delay
 
-// stm32f7xx_hal problem   lora.set_tx_power(17,1).unwrap(); //Using PA_BOOST. See your board for correct pin.
+    // stm32f7xx_hal problem   lora.set_tx_power(17,1).unwrap(); //Using PA_BOOST. See your board for correct pin.
     
     // byte buffer length 80
     let mut buffer: Vec<u8, consts::U80> = Vec::new();

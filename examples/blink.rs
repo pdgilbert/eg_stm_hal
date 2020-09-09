@@ -35,6 +35,13 @@ use cortex_m_rt::entry;
 use asm_delay::{ AsmDelay, bitrate, };
 
 
+// setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
+// 1. Get device specific peripherals
+// 2. Take ownership of the raw rcc (Reset and Clock Control) device and convert to  HAL structs
+// 3. Configure gpio pin as a push-pull output. 
+// 4. See Note of Interest above.
+
+
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
 use stm32f1xx_hal::{prelude::*,   
                      pac::Peripherals,
@@ -43,85 +50,6 @@ use stm32f1xx_hal::{prelude::*,
 
 #[cfg(feature = "stm32f1xx")] 
 use embedded_hal::digital::v2::OutputPin;
-
-
-
-#[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
-use stm32f3xx_hal::{prelude::*,
-                    stm32::Peripherals, 
-                    gpio::{gpioe::PE15, Output, PushPull,}, 
-                    };
-
-
-#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
-use stm32f4xx_hal::{prelude::*,   
-                    pac::Peripherals, 
-                    gpio::{gpioc::PC13, Output, PushPull,}, 
-                    //gpio::{gpioa::PA5, Output, PushPull,}, 
-                    };
-
-
-#[cfg(feature = "stm32f4xx")]  
-use embedded_hal::digital::v2::OutputPin;
-
-
-#[cfg(feature = "stm32f7xx")] 
-use stm32f7xx_hal::{prelude::*,   
-                    pac::Peripherals, 
-                    gpio::{gpioc::PC13, Output, PushPull,}, 
-                    };
-
-
-
-#[cfg(feature = "stm32h7xx")] 
-use stm32h7xx_hal::{prelude::*,   
-                    pac::Peripherals, 
-                    gpio::{gpioc::PC13, Output, PushPull,}, 
-                    };
-
-#[cfg(feature = "stm32h7xx")] 
-use embedded_hal::digital::v2::OutputPin;
-
-
-#[cfg(feature = "stm32l0xx")] 
-use stm32l0xx_hal::{prelude::*,   
-                    pac::Peripherals, 
-		    rcc,   // for ::Config but note name conflict with serial
-                    gpio::{gpioc::PC13, Output, PushPull,}, 
-                    };
-
-
-#[cfg(feature = "stm32l1xx") ] // eg  Discovery STM32L100 and Heltec lora_node STM32L151CCU6
-use stm32l1xx_hal::{prelude::*, 
-                    stm32::Peripherals,
-                    gpio::{gpiob::PB6, Output, PushPull,}, 
-                    };
-
-#[cfg(feature = "stm32l1xx") ] 
-use embedded_hal::digital::v2::OutputPin;
-
-
-#[cfg(feature = "stm32l4xx")] 
-use stm32l4xx_hal::{prelude::*,   
-                    pac::Peripherals, 
-                    gpio::{gpioc::PC13, Output, PushPull,}, 
-                    };
-
-
-pub trait LED {
-   fn  on(&mut self)  -> () ;
-   fn off(&mut self)  -> () ;
-}
-
-#[entry]
-fn main() -> ! {
-
-    // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
-    
-    // 1. Get device specific peripherals
-    // 2. Take ownership of the raw rcc (Reset and Clock Control) device and convert to  HAL structs
-    // 3. Configure gpio pin as a push-pull output. 
-    // 4. See Note of Interest above.
 
     #[cfg(feature = "stm32f1xx")]
     fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
@@ -138,7 +66,15 @@ fn main() -> ! {
        // return tuple  (led, delay)
        (gpioc.pc13.into_push_pull_output(&mut gpioc.crh),      // led on pc13 with on/off
         AsmDelay::new(bitrate::U32BitrateExt::mhz(16)) )       // delay
-       };
+       }
+
+
+
+#[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
+use stm32f3xx_hal::{prelude::*,
+                    stm32::Peripherals, 
+                    gpio::{gpioe::PE15, Output, PushPull,}, 
+                    };
 
 
     #[cfg(feature = "stm32f3xx")]
@@ -156,8 +92,20 @@ fn main() -> ! {
        // return tuple  (led, delay)
        (gpioe.pe15.into_push_pull_output(&mut gpioe.moder, &mut gpioe.otyper),  // led on pe15 with on/off
         AsmDelay::new(bitrate::U32BitrateExt::mhz(16)) )                        // delay
-       };
+       }
 
+
+
+#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
+use stm32f4xx_hal::{prelude::*,   
+                    pac::Peripherals, 
+                    gpio::{gpioc::PC13, Output, PushPull,}, 
+                    //gpio::{gpioa::PA5, Output, PushPull,}, 
+                    };
+
+
+#[cfg(feature = "stm32f4xx")]  
+use embedded_hal::digital::v2::OutputPin;
 
     #[cfg(feature = "stm32f4xx")]
     fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {    //(PA5<Output<PushPull>>, AsmDelay) {
@@ -175,7 +123,15 @@ fn main() -> ! {
        // return tuple  (led, delay)
        (gpioc.pc13.into_push_pull_output(),                        // led on pc13 with on/off
         AsmDelay::new(bitrate::U32BitrateExt::mhz(32)) )           // delay
-       };
+       }
+
+
+
+#[cfg(feature = "stm32f7xx")] 
+use stm32f7xx_hal::{prelude::*,   
+                    pac::Peripherals, 
+                    gpio::{gpioc::PC13, Output, PushPull,}, 
+                    };
 
 
     #[cfg(feature = "stm32f7xx")]
@@ -192,8 +148,18 @@ fn main() -> ! {
        // return tuple  (led, delay)
        (gpioc.pc13.into_push_pull_output(),                        // led on pc13 with on/off
         AsmDelay::new(bitrate::U32BitrateExt::mhz(32)) )           // delay
-       };
+       }
 
+
+
+#[cfg(feature = "stm32h7xx")] 
+use stm32h7xx_hal::{prelude::*,   
+                    pac::Peripherals, 
+                    gpio::{gpioc::PC13, Output, PushPull,}, 
+                    };
+
+#[cfg(feature = "stm32h7xx")] 
+use embedded_hal::digital::v2::OutputPin;
 
     #[cfg(feature = "stm32h7xx")]
     fn setup() -> (PC13<Output<PushPull>>, AsmDelay) { 
@@ -214,8 +180,16 @@ fn main() -> ! {
        // return tuple  (led, delay)
        (gpioc.pc13.into_push_pull_output(),                        // led on pc13 with on/off
         AsmDelay::new(bitrate::U32BitrateExt::mhz(32)) )           // delay
-       };
+       }
 
+
+
+#[cfg(feature = "stm32l0xx")] 
+use stm32l0xx_hal::{prelude::*,   
+                    pac::Peripherals, 
+		    rcc,   // for ::Config but note name conflict with serial
+                    gpio::{gpioc::PC13, Output, PushPull,}, 
+                    };
 
     #[cfg(feature = "stm32l0xx")]
     fn setup() -> (PC13<Output<PushPull>>, AsmDelay) { 
@@ -232,8 +206,18 @@ fn main() -> ! {
        // return tuple  (led, delay)
        (gpioc.pc13.into_push_pull_output(),                        // led on pc13 with on/off
         AsmDelay::new(bitrate::U32BitrateExt::mhz(32)) )           // delay
-       };
+       }
 
+
+
+#[cfg(feature = "stm32l1xx") ] // eg  Discovery STM32L100 and Heltec lora_node STM32L151CCU6
+use stm32l1xx_hal::{prelude::*, 
+                    stm32::Peripherals,
+                    gpio::{gpiob::PB6, Output, PushPull,}, 
+                    };
+
+#[cfg(feature = "stm32l1xx") ] 
+use embedded_hal::digital::v2::OutputPin;
 
     #[cfg(feature = "stm32l1xx")]
     fn setup() -> (PB6<Output<PushPull>>, AsmDelay) {
@@ -249,8 +233,15 @@ fn main() -> ! {
        // return tuple  (led, delay)
        (gpiob.pb6.into_push_pull_output(),                        // led on pb6 with on/off
         AsmDelay::new(bitrate::U32BitrateExt::mhz(4)) )           // delay
-       };
+       }
 
+
+
+#[cfg(feature = "stm32l4xx")] 
+use stm32l4xx_hal::{prelude::*,   
+                    pac::Peripherals, 
+                    gpio::{gpioc::PC13, Output, PushPull,}, 
+                    };
 
 
     #[cfg(feature = "stm32l4xx")]
@@ -268,9 +259,19 @@ fn main() -> ! {
        // return tuple  (led, delay)
        (gpioc.pc13.into_push_pull_output(&mut gpioc.moder, &mut gpioc.otyper),  // led on pc13 with on/off
         AsmDelay::new(bitrate::U32BitrateExt::mhz(32)) )                        // delay
-       };
+       }
 
-    // End of hal/MCU specific setup. Following should be generic code.
+
+// End of hal/MCU specific setup. Following should be generic code.
+
+ 
+pub trait LED {
+   fn  on(&mut self)  -> () ;
+   fn off(&mut self)  -> () ;
+}
+
+#[entry]
+fn main() -> ! {
 
     let (mut led, mut delay)  = setup();
 

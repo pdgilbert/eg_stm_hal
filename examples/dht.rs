@@ -20,6 +20,9 @@ use dht_sensor::*;
 
 use embedded_hal::blocking::delay::{DelayMs,};
 
+
+// setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
+
 #[cfg(feature = "stm32f1xx")]
 use stm32f1xx_hal::{prelude::*, 
                     pac::{Peripherals, CorePeripherals}, 
@@ -27,69 +30,7 @@ use stm32f1xx_hal::{prelude::*,
 		    gpio::{gpioa::PA8, OpenDrain,  Output, },
 		    };
 
-#[cfg(feature = "stm32f3xx")]
-use stm32f3xx_hal::{prelude::*, 
-                    stm32::{Peripherals, CorePeripherals}, 
-		    delay::Delay ,
-		    gpio::{gpioa::PA8, OpenDrain,  Output, },
-		    };
-//#[cfg(feature = "stm32f3xx")]
-//use embedded_hal::digital::v2::OutputPin;
-
-#[cfg(feature = "stm32f4xx")]
-use stm32f4xx_hal::{prelude::*, 
-                    pac::{Peripherals, CorePeripherals}, 
-		    delay::Delay, 
-		    gpio::{gpioa::PA8, OpenDrain,  Output, },
-		    };
-
-#[cfg(feature = "stm32f7xx")]
-use stm32f7xx_hal::{prelude::*, 
-                    pac::{Peripherals, CorePeripherals}, 
-		    delay::Delay, 
-		    gpio::{gpioa::PA8, OpenDrain,  Output, },
-		    };
-
-#[cfg(feature = "stm32h7xx")]
-use stm32h7xx_hal::{prelude::*, 
-                    pac::{Peripherals, CorePeripherals}, 
-		    delay::Delay, 
-		    gpio::{gpioa::PA8, OpenDrain,  Output, },
-		    };
-
-#[cfg(feature = "stm32l0xx")]
-use stm32l0xx_hal::{prelude::*, 
-                    pac::{Peripherals, CorePeripherals}, 
-		    rcc,   // for ::Config but note name conflict with serial
-		    delay::Delay, 
-		    gpio::{gpioa::PA8, OpenDrain,  Output, },
-		    };
-
-#[cfg(feature = "stm32l1xx")]
-use stm32l1xx_hal::{prelude::*, 
-                    stm32::{Peripherals, CorePeripherals}, 
-		    rcc,   // for ::Config but note name conflict with next
-		    delay::Delay ,
-		    gpio::{gpioa::PA8, OpenDrain,  Output, },
-		   };
-
-#[cfg(feature = "stm32l4xx")]
-use stm32l4xx_hal::{prelude::*, 
-                    pac::{Peripherals, CorePeripherals}, 
-		    delay::Delay, 
-		    gpio::{gpioa::PA8, OpenDrain,  Output, },
-		    };
-
-//use embedded_hal::digital::v2::{InputPin, OutputPin};
-
-#[entry]
-fn main() -> ! {
-
     // open_drain_output is really input and output
-
-    //fn setup() -> (PA8<Output<OpenDrain>>,  Delay) {
-//found tuple //`(stm32f1xx_hal::gpio::gpioa::PA8<stm32f1xx_hal::gpio::Output<stm32f1xx_hal::gpio::OpenDrain>>, //stm32f1xx_hal::delay::Delay)`
-//found tuple `(stm32f1xx_hal::gpio::gpioa::PA8<Output<OpenDrain>>, Delay)`
 
     #[cfg(feature = "stm32f1xx")]
     fn setup() -> (PA8<Output<OpenDrain>>,  Delay) {
@@ -112,8 +53,15 @@ fn main() -> ! {
       
        (pin_a8,                   //DHT data will be on A8
         delay)
-       };
+       }
 
+
+#[cfg(feature = "stm32f3xx")]
+use stm32f3xx_hal::{prelude::*, 
+                    stm32::{Peripherals, CorePeripherals}, 
+		    delay::Delay ,
+		    gpio::{gpioa::PA8, OpenDrain,  Output, },
+		    };
 
     #[cfg(feature = "stm32f3xx")]
     fn setup() -> (PA8<Output<OpenDrain>>,  Delay) {
@@ -134,8 +82,15 @@ fn main() -> ! {
        
        (pin_a8,                   //DHT data will be on A8
         delay)
-       };
+       }
 
+
+#[cfg(feature = "stm32f4xx")]
+use stm32f4xx_hal::{prelude::*, 
+                    pac::{Peripherals, CorePeripherals}, 
+		    delay::Delay, 
+		    gpio::{gpioa::PA8, OpenDrain,  Output, },
+		    };
 
     #[cfg(feature = "stm32f4xx")]           // Use HSE oscillator
     fn setup() -> (PA8<Output<OpenDrain>>,  Delay) {
@@ -157,8 +112,15 @@ fn main() -> ! {
 
        (pin_a8,                   //DHT data will be on A8
         delay)
-       };
+       }
 
+
+#[cfg(feature = "stm32f7xx")]
+use stm32f7xx_hal::{prelude::*, 
+                    pac::{Peripherals, CorePeripherals}, 
+		    delay::Delay, 
+		    gpio::{gpioa::PA8, OpenDrain,  Output, },
+		    };
 
     #[cfg(feature = "stm32f7xx")]           // Use HSE oscillator
     fn setup() -> (PA8<Output<OpenDrain>>,  Delay) {
@@ -177,8 +139,15 @@ fn main() -> ! {
 
        (pin_a8,                   //DHT data will be on A8
         delay)
-       };
+       }
 
+
+#[cfg(feature = "stm32h7xx")]
+use stm32h7xx_hal::{prelude::*, 
+                    pac::{Peripherals, CorePeripherals}, 
+		    delay::Delay, 
+		    gpio::{gpioa::PA8, OpenDrain,  Output, },
+		    };
 
     #[cfg(feature = "stm32h7xx")]  
     fn setup() -> (PA8<Output<OpenDrain>>,  Delay) {
@@ -201,8 +170,16 @@ fn main() -> ! {
 
        (pin_a8,                   //DHT data will be on A8
         delay)
-       };
+       }
 
+
+#[cfg(feature = "stm32l0xx")]
+use stm32l0xx_hal::{prelude::*, 
+                    pac::{Peripherals, CorePeripherals}, 
+		    rcc,   // for ::Config but note name conflict with serial
+		    delay::Delay, 
+		    gpio::{gpioa::PA8, OpenDrain,  Output, },
+		    };
 
     #[cfg(feature = "stm32l0xx")]      
     fn setup() -> (PA8<Output<OpenDrain>>,  Delay) {
@@ -226,8 +203,16 @@ fn main() -> ! {
 
        (pin_a8,                   //DHT data will be on A8
         delay)
-       };
+       }
 
+
+#[cfg(feature = "stm32l1xx")]
+use stm32l1xx_hal::{prelude::*, 
+                    stm32::{Peripherals, CorePeripherals}, 
+		    rcc,   // for ::Config but note name conflict with next
+		    delay::Delay ,
+		    gpio::{gpioa::PA8, OpenDrain,  Output, },
+		   };
 
     #[cfg(feature = "stm32l1xx")]   
     fn setup() -> (PA8<Output<OpenDrain>>,  Delay) {
@@ -248,8 +233,15 @@ fn main() -> ! {
        delay.delay_ms(1000_u16);
    
        (pin_a8,  delay)                  //DHT data will be on A8
-       };
+       }
 
+
+#[cfg(feature = "stm32l4xx")]
+use stm32l4xx_hal::{prelude::*, 
+                    pac::{Peripherals, CorePeripherals}, 
+		    delay::Delay, 
+		    gpio::{gpioa::PA8, OpenDrain,  Output, },
+		    };
 
     #[cfg(feature = "stm32l4xx")]        
     fn setup() -> (PA8<Output<OpenDrain>>,  Delay) {
@@ -272,11 +264,14 @@ fn main() -> ! {
        delay.delay_ms(1000_u16);
 
        (pin_a8, delay)                   //DHT data will be on A8
-       };
+       }
 
 
-    // End of hal/MCU specific setup. Following should be generic code.
+// End of hal/MCU specific setup. Following should be generic code.
 
+
+#[entry]
+fn main() -> ! {
     let (mut pin_a8, mut delay) = setup();
     
     hprintln!("Reading sensor...").unwrap();

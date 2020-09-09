@@ -22,6 +22,9 @@ use panic_semihosting as _;
 use cortex_m_rt::entry;
 use cortex_m_semihosting::hprintln;
 
+
+// setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
+
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
 use stm32f1xx_hal::{prelude::*, 
                     pac::Peripherals, 
@@ -29,52 +32,6 @@ use stm32f1xx_hal::{prelude::*,
 		    gpio::{gpiob::{PB1}, Analog},
 		    device::{ADC1, ADC2},
                     };
-
-#[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
-use stm32f3xx_hal::{prelude::*, 
-                    stm32::Peripherals, 
-                    adc::Adc,
-		    gpio::{gpiob::{PB1}, Analog},
-		    stm32::{ADC1, ADC2},
-                    };
-
-#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
-use stm32f4xx_hal::{prelude::*, 
-                    pac::Peripherals, 
-                    adc::{Adc, Temperature, config::{AdcConfig, SampleTime}},
-		    gpio::{gpiob::{PB1}, Analog},
-		    stm32::{ADC1}, //ADC2},          // 405 has ADC2 but 401 and 411 have only one adc
-                    };
-
-//use stm32f4xx_hal::{ gpio::gpioa, adc::{ Adc, config::AdcConfig, config::{SampleTime,
-//           Sequence, Eoc, Scan, Clock}, }, };
-
-
-#[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
-use stm32l1xx_hal::{prelude::*, 
-                    stm32::Peripherals, 
-                    adc::Adc,
-		    gpio::{gpiob::{PB1}, Analog},  
-		    pac::{ADC1, ADC2},
-                    };
-
-pub struct AdcCh <T, U> {                  // combined ADC and  channel
-   adc : T,  //Adc<ADC1>,
-   ch  : U,  //PB1<Analog>,
-   }
-
-pub trait ReadTempC {                      // generics for reading AdcCh temp
-   #![allow(non_snake_case)]
-   fn read_tempC(&mut self) -> i32;        // temperature in degrees Celsius   
-   }
-
-pub trait ReadMV {                         // generics for reading AdcCh
-   fn read_mv(&mut self)    -> u32;        // millivolts
-   }
-
-
-#[entry]
-fn main() -> ! {
 
     #[cfg(feature = "stm32f1xx")]
     fn setup() ->  (AdcCh<Adc<ADC1>, ()>, AdcCh<Adc<ADC2>, PB1<Analog>>) {
@@ -141,8 +98,16 @@ fn main() -> ! {
           };
 
        (mcutemp, tmp36)
-       };
+       }
 
+
+#[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
+use stm32f3xx_hal::{prelude::*, 
+                    stm32::Peripherals, 
+                    adc::Adc,
+		    gpio::{gpiob::{PB1}, Analog},
+		    stm32::{ADC1, ADC2},
+                    };
 
     #[cfg(feature = "stm32f3xx")]
     fn setup() ->  (Adc<ADC1>, Adc<ADC2>, PB1<Analog>)  {
@@ -181,8 +146,19 @@ fn main() -> ! {
           };
 
        (mcutemp, tmp36)
-       };
+       }
 
+
+#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
+use stm32f4xx_hal::{prelude::*, 
+                    pac::Peripherals, 
+                    adc::{Adc, Temperature, config::{AdcConfig, SampleTime}},
+		    gpio::{gpiob::{PB1}, Analog},
+		    stm32::{ADC1}, //ADC2},          // 405 has ADC2 but 401 and 411 have only one adc
+                    };
+
+//use stm32f4xx_hal::{ gpio::gpioa, adc::{ Adc, config::AdcConfig, config::{SampleTime,
+//           Sequence, Eoc, Scan, Clock}, }, };
 
     #[cfg(feature = "stm32f4xx")]
     fn setup() ->  (AdcCh<&'static Adc<ADC1>, Temperature>, AdcCh<&'static Adc<ADC1>, PB1<Analog>>) {
@@ -251,11 +227,39 @@ fn main() -> ! {
        //mcutemp
        //tmp36
        (mcutemp, tmp36)
-       };
+       }
 
 
-    // End of hal/MCU specific setup. Following should be generic code.
 
+#[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
+use stm32l1xx_hal::{prelude::*, 
+                    stm32::Peripherals, 
+                    adc::Adc,
+		    gpio::{gpiob::{PB1}, Analog},  
+		    pac::{ADC1, ADC2},
+                    };
+
+
+// End of hal/MCU specific setup. Following should be generic code.
+
+
+pub struct AdcCh <T, U> {                  // combined ADC and  channel
+   adc : T,  //Adc<ADC1>,
+   ch  : U,  //PB1<Analog>,
+   }
+
+pub trait ReadTempC {                      // generics for reading AdcCh temp
+   #![allow(non_snake_case)]
+   fn read_tempC(&mut self) -> i32;        // temperature in degrees Celsius   
+   }
+
+pub trait ReadMV {                         // generics for reading AdcCh
+   fn read_mv(&mut self)    -> u32;        // millivolts
+   }
+
+
+#[entry]
+fn main() -> ! {
 
     let (mut mcutemp,   mut tmp36) = setup();  
 

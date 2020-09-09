@@ -30,68 +30,13 @@ use nb::block;
 //use eg_stm_hal::to_str;
 
 
+// setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
+
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
 use stm32f1xx_hal::{prelude::*,   
                     pac::Peripherals, 
                     serial::{Config, Serial, StopBits, Tx, Rx},  
 		    device::{USART1, USART3}  }; 
-
-#[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
-use stm32f3xx_hal::{prelude::*, 
-                    stm32::Peripherals,
-                    serial::{ Serial, Tx, Rx},
-		    stm32::{USART1, USART2} };
-
-#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
-use stm32f4xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    serial::{config::Config, Serial, Tx, Rx},
-		    pac::{USART1, USART2} };
-
-#[cfg(feature = "stm32f7xx")] 
-use stm32f7xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    serial::{Config, Serial, Tx, Rx, Oversampling, },
-		    pac::{USART1, USART2} };
-
-#[cfg(feature = "stm32h7xx")] 
-use stm32h7xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    serial::{Tx, Rx},
-		    pac::{USART1, USART2} };
-
-#[cfg(feature = "stm32l0xx")] 
-use stm32l0xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    serial::{config::Config, Serial, Tx, Rx},
-		    pac::{USART1, USART2} };
-
-#[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
-use stm32l1xx_hal::{prelude::*, 
-		    stm32::Peripherals, 
-		    rcc,   // for ::Config but note name conflict with next
-                    serial::{Config, SerialExt, Tx, Rx},
-		    stm32::{USART1, USART2} };
-
-#[cfg(feature = "stm32l4xx")] 
-use stm32l4xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    serial::{Config, Serial, Tx, Rx},
-		    pac::{USART1, USART2} };
-
-
-
-//use heapless::{consts, Vec};
-
-#[entry]
-
-fn main() -> ! {
-
-    //see serial_loopback_char.rs and serial_cross.rs in examples/ for more USART config notes.
-    //    USART    (tx, rx)
-
-    //hprintln!("{}", to_str("just checking to_str".as_bytes())).expect("hprintln error."); 
-    //hprintln!("{:?}",      "just checking to_str".as_bytes()).expect("hprintln error."); 
 
     #[cfg(feature = "stm32f1xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART3>, Rx<USART3>)  {
@@ -127,6 +72,11 @@ fn main() -> ! {
 	}
 
 
+#[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
+use stm32f3xx_hal::{prelude::*, 
+                    stm32::Peripherals,
+                    serial::{ Serial, Tx, Rx},
+		    stm32::{USART1, USART2} };
 
     #[cfg(feature = "stm32f3xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2> )  {
@@ -156,6 +106,12 @@ fn main() -> ! {
 	}
 
 
+#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
+use stm32f4xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::{USART1, USART2} };
+
     #[cfg(feature = "stm32f4xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2> )  {
         let p = Peripherals::take().unwrap();
@@ -182,6 +138,12 @@ fn main() -> ! {
         (tx1, rx1,   tx2, rx2 )
 	}
 
+
+#[cfg(feature = "stm32f7xx")] 
+use stm32f7xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{Config, Serial, Tx, Rx, Oversampling, },
+		    pac::{USART1, USART2} };
 
     #[cfg(feature = "stm32f7xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2> )  {
@@ -218,6 +180,12 @@ fn main() -> ! {
 	}
 
 
+#[cfg(feature = "stm32h7xx")] 
+use stm32h7xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{Tx, Rx},
+		    pac::{USART1, USART2} };
+
     #[cfg(feature = "stm32h7xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2> )  {
 
@@ -248,6 +216,12 @@ fn main() -> ! {
 	}
 
 
+#[cfg(feature = "stm32l0xx")] 
+use stm32l0xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::{USART1, USART2} };
+
     #[cfg(feature = "stm32l0xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2> )  {
         let p = Peripherals::take().unwrap();
@@ -275,6 +249,13 @@ fn main() -> ! {
 	}
 
 
+#[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
+use stm32l1xx_hal::{prelude::*, 
+		    stm32::Peripherals, 
+		    rcc,   // for ::Config but note name conflict with next
+                    serial::{Config, SerialExt, Tx, Rx},
+		    stm32::{USART1, USART2} };
+
     #[cfg(feature = "stm32l1xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2> )  {
 
@@ -299,6 +280,12 @@ fn main() -> ! {
        (tx1, rx1,   tx2, rx2 )
        }
 
+
+#[cfg(feature = "stm32l4xx")] 
+use stm32l4xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{Config, Serial, Tx, Rx},
+		    pac::{USART1, USART2} };
 
 
     #[cfg(feature = "stm32l4xx")]
@@ -335,7 +322,17 @@ fn main() -> ! {
        }
 
 
-    // End of hal/MCU specific setup. Following should be generic code.
+// End of hal/MCU specific setup. Following should be generic code.
+
+
+//use heapless::{consts, Vec};
+
+#[entry]
+
+fn main() -> ! {
+
+    //hprintln!("{}", to_str("just checking to_str".as_bytes())).expect("hprintln error."); 
+    //hprintln!("{:?}",      "just checking to_str".as_bytes()).expect("hprintln error."); 
 
     let (mut tx_con, mut _rx_con,   mut _tx_gps, mut rx_gps) = setup();  // console, GPS
 

@@ -33,58 +33,6 @@ use stm32f1xx_hal::{prelude::*,
                     dma::{TxDma, RxDma, dma1::{C2, C3, C4, C5, C6, C7}},
                     }; 
 
-#[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
-use stm32f3xx_hal::{prelude::*, 
-                    stm32::Peripherals,
-                    serial::{ Serial, Tx, Rx},
-		    stm32::{USART1, USART2, USART3} };
-
-#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
-use stm32f4xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    serial::{config::Config, Serial, Tx, Rx},
-		    pac::{USART1, USART2, USART6} };
-
-#[cfg(feature = "stm32f7xx")] 
-use stm32f7xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    serial::{Config, Serial, Tx, Rx, Oversampling, },
-		    pac::{USART1, USART2, USART3} };
-
-#[cfg(feature = "stm32h7xx")] 
-use stm32h7xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    serial::{Tx, Rx},
-		    pac::{USART1, USART2, USART3} };
-
-#[cfg(feature = "stm32l0xx")] 
-use stm32l0xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    serial::{config::Config, Serial, Tx, Rx},
-		    pac::{USART1, USART2, USART6} };
-
-#[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
-use stm32l1xx_hal::{prelude::*, 
-		    stm32::Peripherals, 
-		    rcc,   // for ::Config but note name conflict with serial
-                    serial::{Config, SerialExt, Tx, Rx},
-		    stm32::{USART1, USART2, USART3} };
-
-#[cfg(feature = "stm32l4xx")] 
-use stm32l4xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    serial::{Config, Serial, Tx, Rx},
-		    pac::{USART1, USART2, USART3} };
-
-
-#[entry]
-fn main() -> ! {
-
-    hprintln!("initializing ...").unwrap();
-
-    hprintln!("testing console output ").unwrap();
-
-
     #[cfg(feature = "stm32f1xx")]
     fn setup() ->  (TxDma<Tx<USART1>, C4>, RxDma<Rx<USART1>, C5>, 
                     TxDma<Tx<USART2>, C7>, RxDma<Rx<USART2>, C6>, 
@@ -157,13 +105,11 @@ fn main() -> ! {
     //let (_, tx) = tx.write(b"The quick brown fox").wait(); //works on stm32f1xx_hal but not others
 
 
-    // stm32f3xx
-
-    // stm32f303vct  alternate funtion modes see  
-    // https://www.rlocman.ru/i/File/dat/STMicroelectronics/Microcontrollers_MCU/STM32F303VCT6.pdf p42
-    // AF7 on PA9  is usart1_Tx, on PA10 is usart1_Rx,
-    // AF7 on PA2  is usart2_Tx, on PA3  is usart2_Rx,
-    // AF7 on PB10 is usart3_Tx, on PB11 is usart3_Rx,
+#[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
+use stm32f3xx_hal::{prelude::*, 
+                    stm32::Peripherals,
+                    serial::{ Serial, Tx, Rx},
+		    stm32::{USART1, USART2, USART3} };
 
     #[cfg(feature = "stm32f3xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>, Tx<USART3>, Rx<USART3> )  {
@@ -206,14 +152,11 @@ fn main() -> ! {
 
 
 
-    // stm32f411re 
-
-    // stm32f411re implements only usarts 1, 2, and 6. These can be configured on different pins.
-    // alternate funtion modes see https://www.st.com/resource/en/datasheet/stm32f411re.pdf  p47.
-    // AF7 on PA9  is usart1_Tx, on PA10 is usart1_Rx,
-    // AF7 on PA2  is usart2_Tx, on PA3  is usart2_Rx,
-    // AF8 on PA11 is usart6_Tx, on PA12 is usart6_Rx
-
+#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
+use stm32f4xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::{USART1, USART2, USART6} };
 
     #[cfg(feature = "stm32f4xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>, Tx<USART6>, Rx<USART6>, )  {
@@ -251,6 +194,12 @@ fn main() -> ! {
         (tx1, rx1,   tx2, rx2,   tx3, rx3 )
 	}
 
+
+#[cfg(feature = "stm32f7xx")] 
+use stm32f7xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{Config, Serial, Tx, Rx, Oversampling, },
+		    pac::{USART1, USART2, USART3} };
 
     #[cfg(feature = "stm32f7xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>, Tx<USART3>, Rx<USART3>, )  {
@@ -302,6 +251,12 @@ fn main() -> ! {
 	}
 
 
+#[cfg(feature = "stm32h7xx")] 
+use stm32h7xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{Tx, Rx},
+		    pac::{USART1, USART2, USART3} };
+
     #[cfg(feature = "stm32h7xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>, Tx<USART3>, Rx<USART3>, )  {
 
@@ -341,6 +296,12 @@ fn main() -> ! {
        }
 
 
+#[cfg(feature = "stm32l0xx")] 
+use stm32l0xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{config::Config, Serial, Tx, Rx},
+		    pac::{USART1, USART2, USART6} };
+
     #[cfg(feature = "stm32l0xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>, Tx<USART6>, Rx<USART6>, )  {
         let p = Peripherals::take().unwrap();
@@ -378,6 +339,12 @@ fn main() -> ! {
 	}
 
 
+#[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
+use stm32l1xx_hal::{prelude::*, 
+		    stm32::Peripherals, 
+		    rcc,   // for ::Config but note name conflict with serial
+                    serial::{Config, SerialExt, Tx, Rx},
+		    stm32::{USART1, USART2, USART3} };
 
     #[cfg(feature = "stm32l1xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>, Tx<USART3>, Rx<USART3> )  {
@@ -415,6 +382,12 @@ fn main() -> ! {
         (tx1, rx1,   tx2, rx2,   tx3, rx3 )
 	}
 
+
+#[cfg(feature = "stm32l4xx")] 
+use stm32l4xx_hal::{prelude::*,  
+                    pac::Peripherals, 
+                    serial::{Config, Serial, Tx, Rx},
+		    pac::{USART1, USART2, USART3} };
 
     #[cfg(feature = "stm32l4xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>, Tx<USART3>, Rx<USART3>, )  {
@@ -464,6 +437,13 @@ fn main() -> ! {
 
     // End of hal/MCU specific setup. Following should be generic code.
 
+
+
+#[entry]
+fn main() -> ! {
+
+    hprintln!("initializing ...").unwrap();
+    hprintln!("testing console output ").unwrap();
     
     let ( tx1, _rx1,   mut tx2,  _rx2,    _tx3, rx3 ) = setup();  
 
