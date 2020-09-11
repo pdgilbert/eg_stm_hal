@@ -301,7 +301,7 @@ Development boards I have tried:
 ```
   export INTERFACE=stlink-v2-1  PROC=stm32f3x  #discovery-stm32f303
   export INTERFACE=stlink-v2-1  PROC=stm32f4x  #nucleo-64
-  export INTERFACE=stlink-v2    PROC=stm32l1x  #discovery-stm32l100 
+  export INTERFACE=stlink-v2    PROC=stm32l1   #discovery-stm32l100 
 ```
 These may pop up a a window with Mbed.htm which I dismiss and then run `openocd`.
 
