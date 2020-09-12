@@ -4,10 +4,8 @@
 //! With all HALs and boards the console is on USART1 and uses pins pa9 and pa10.
 //! With all HALs and boards one of the serially connected ports is USART2 using
 //! pins pa2 and pa3.
-//! With HALs stm32f1xx and stm32f3xx the other serially connected port is USART3 
-//! using pins pb10 and pb11.
-//! With HAL stm32f4xx  the other serially connected port is USART6 using pins pa11
-//! and pa12. (USART3 is not available and pb11 is used interanl on some boards.)
+//! The third USART varies depending on what is available. 
+//! Some details follow but see also comment in the code.
 //! 
 //! Console connection details:
 //! Connect usart1  to serial-usb converter on computer for the console.
@@ -16,9 +14,9 @@
 //! Set up the serial console (e.g. minicom) with the same settings used here (8-N-1).
 //! (Using 9600bps. This could be higher but needs serial console to be the same.)
 //! 
-//! USART interconnect details:
-//! For HALs stm32f1xx and stm32f3xx connect pa2 to pb11 and pa3 to pb10.
-//! For HAL stm32f4xx connect pa2 to pa12 and pa3 to pa11.
+//! Serial USART interconnect details:
+//! For HALs stm32f1xx, stm32f3xx and stm32l1xx connect USART2 to USART3: pa2 to pb11 and pa3 to pb10.
+//! For HAL stm32f4xx connect USART2 to USART6:  pa2 to pa12 and pa3 to pa11.
 
 
 // This example contains the most extensive notes. 

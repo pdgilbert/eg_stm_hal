@@ -272,8 +272,8 @@ use stm32l1xx_hal::{prelude::*,
                             &mut rcc).unwrap().split();
 
        let (tx2, rx2) = p.USART2.usart(
-                           (gpioa.pa2,                 //tx pa2   for GPS
-                            gpioa.pa3),                //rx pa3   for GPS
+                           (gpioa.pa2,                 //tx pa2   for GPS rx
+                            gpioa.pa3),                //rx pa3   for GPS tx
                            Config::default() .baudrate(115_200.bps()), 
                            &mut rcc).unwrap().split();
 

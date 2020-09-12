@@ -7,6 +7,7 @@
 //!  another option would be PA5  which is onboard green LD2 LED on STM32F411RET6 Nucleo-64 board.
 //! stm32l1xx below uses PB6   On some STM32L1.. Discovery boards there are onboard LD3 and LD4 LEDs on PB7 
 //!                            and PB6 but mine are defective and so tested with off board LED on PB6.
+//!                            Heltec-lora-node151 tested with off board LED on PB6.
 //! 
 //! Note of Interest:  board wiring can have the LED cathode connected to the GPIO pin and anode to Vcc,
 //! so pin low is a sink and allows current flow. Alternate wiring has the GPIO pin as source.
