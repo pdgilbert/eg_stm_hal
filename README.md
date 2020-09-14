@@ -29,7 +29,7 @@ indication of the versions of dependencies.
 
 These examples use only the indicated hal and the main embedded crates.
 The names in the board column are also the names of the build directories. 
-Those names link to a file recording the commit that was used for the example tests.
+Those names link to a file recording the commit that was used for the last CI example build tests.
 
 {% assign b01 = "[bluepill](examplesStatus/bluepill/COMMIT)" %}
 {% assign b02 = "[discovery-stm32f303](examplesStatus/discovery-stm32f303/COMMIT)" %}
