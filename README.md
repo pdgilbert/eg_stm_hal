@@ -267,7 +267,7 @@ FILL IN LAYOUT
 The openocd  command above uses `INTERFACE` and `PROC` environment variables that indicate the
 ST-Link version and the development board MCU family respectively. 
 (The PROC will be similar to the HAL and MCU setting, unfortunately they are not exactly the same.)
-Typical specification for a bluepill development board and ST-Link dongle would be
+Typical specifications for a bluepill development board and ST-Link dongle would be
 
 ```
   export INTERFACE=stlink-v2    PROC=stm32f1x  #cheap  dongle and blue pill
@@ -297,13 +297,7 @@ file which gets installed in various places, possibly
 line `swj_newdap ... -expected-id $_CPUTAPID` to `swj_newdap ... -expected-id 0` so that
 CPUTAID is ignored.
 
-Development boards I have tried:
-```
-  export INTERFACE=stlink-v2-1  PROC=stm32f3x  #discovery-stm32f303
-  export INTERFACE=stlink-v2-1  PROC=stm32f4x  #nucleo-64
-  export INTERFACE=stlink-v2    PROC=stm32l1   #discovery-stm32l100 
-```
-These may pop up a a window with Mbed.htm which I dismiss and then run `openocd`.
+Some development boards pop up a a window with Mbed.htm which I dismiss and then run `openocd`.
 
 It is possible to use the built in STlink on some development boards to program another board. 
 To do this it is necessary to  removing 2 connectors on the 'ST-LINK' header and connect the 
@@ -321,19 +315,17 @@ Either power the blue pill with its own supply (eg. battery) or with separate 3.
 lines from the development board (typically pins 1 and 2) and do not exceed about 100mw for 
 the blue pill and other things attached.
 
-Here are settings I have used
+Here are settings I used for manual testing as reported at 
+[status of examples](https://pdgilbert.github.io/eg_stm_hal/)
 ```
-  export  PROC=stm32f1x  # bluepill
-  export  PROC=stm32l1   # MCU on Discovery STM32L100
-  export  PROC=stm32f3x  # MCU on Discovery STM32F303
-  export  PROC=stm32f4x  # blackpills  with STM32F401 and STM32F411
+  export INTERFACE=stlink-v2    PROC=stm32f1x  #cheap dongle and blue pill
+  export INTERFACE=stlink-v2-1  PROC=stm32f3x  #discovery-stm32f303
+  export INTERFACE=stlink-v2    PROC=stm32f4x  # blackpills  with STM32F401 and STM32F411
+  export INTERFACE=stlink-v2-1  PROC=stm32f4x  #nucleo-64
+  export INTERFACE=stlink-v2    PROC=stm32l1   #discovery-stm32l100 
+  export INTERFACE=stlink-v2    PROC=stm32l1   #heltec-lora-node151 with cheap dongle  
 ```
-and
-```
-  export INTERFACE=stlink-v2   #  WaveGat and other cheapo dongles
-  export INTERFACE=stlink-v2   #  STlink on Discovery STM32L100
-  export INTERFACE=stlink-v2-1 #  STlink on Discovery STM32F303
-```
+
 The complete list of possible  openocd cfg file options are in
 `/usr/share/openocd/scripts/interface/`, `/usr/share/openocd/scripts/target`
 and `/usr/share/openocd/scripts/board`

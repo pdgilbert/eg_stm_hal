@@ -467,7 +467,7 @@ use stm32l4xx_hal::{prelude::*,
 //const LORA_CS_PIN: u64 = 8;
 //const LORA_RESET_PIN: u64 = 21;
 
-const FREQUENCY: i64 = 915;  // needs decimal not hz not Mhz
+const FREQUENCY: i64 = 915;  // needs decimal or hz not Mhz to set channels other than default
 
 #[entry]
 fn main() -> !{
@@ -522,6 +522,7 @@ fn main() -> !{
     }
 
     let transmit = lora.transmit_payload(buffer, message.len());
+    //let transmit = lora.transmit_payload(&buffer);
     match transmit {
     	Ok(_size)   => hprintln!("Sent packet: {}", message).unwrap(),
     	//Ok(size) => hprintln!("Sent packet with size: {}", size).unwrap(),
@@ -536,6 +537,7 @@ fn main() -> !{
        buffer[1 + message.len()] = j ;
        
        let transmit = lora.transmit_payload(buffer, message.len());
+       //let transmit = lora.transmit_payload(&buffer);
        match transmit {
            Ok(_size)   => hprintln!("Sent packet: {} {}", message, j).unwrap(),
            //Ok(size) => hprintln!("Sent packet with size: {}", size).unwrap(),
