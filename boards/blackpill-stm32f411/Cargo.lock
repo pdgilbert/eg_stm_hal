@@ -159,7 +159,7 @@ checksum = "4717562afbba06e760d34451919f5c3bf3ac15c7bb897e8b04862a7428378647"
 dependencies = [
  "proc-macro2 1.0.21",
  "quote 1.0.7",
- "syn 1.0.40",
+ "syn 1.0.41",
 ]
 
 [[package]]
@@ -293,9 +293,9 @@ dependencies = [
 
 [[package]]
 name = "either"
-version = "1.6.0"
+version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cd56b59865bce947ac5958779cfa508f6c3b9497cc762b7e24a12d11ccde2c4f"
+checksum = "e78d4f1cc4ae33bbfc157ed5d5a5ef3bc29227303d595861deb238fcec4e9457"
 
 [[package]]
 name = "embedded-dma"
@@ -619,19 +619,19 @@ checksum = "388a1df253eca08550bef6c72392cfe7c30914bf41df5269b68cbd6ff8f570a3"
 
 [[package]]
 name = "serde"
-version = "1.0.115"
+version = "1.0.116"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e54c9a88f2da7238af84b5101443f0c0d0a3bbdc455e34a5c9497b1903ed55d5"
+checksum = "96fe57af81d28386a513cbc6858332abc6117cfdb5999647c6444b8f43a370a5"
 
 [[package]]
 name = "serde_derive"
-version = "1.0.115"
+version = "1.0.116"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "609feed1d0a73cc36a0182a840a9b37b4a82f0b1150369f0536a9e3f2a31dc48"
+checksum = "f630a6370fd8e457873b4bd2ffdae75408bc291ba72be773772a4c2a065d9ae8"
 dependencies = [
  "proc-macro2 1.0.21",
  "quote 1.0.7",
- "syn 1.0.40",
+ "syn 1.0.41",
 ]
 
 [[package]]
@@ -679,7 +679,7 @@ dependencies = [
 [[package]]
 name = "stm32f1xx-hal"
 version = "0.6.1"
-source = "git+https://github.com/stm32-rs/stm32f1xx-hal#1d9ec16dc4cd25d837a6a185cdbde26d2043ae4c"
+source = "git+https://github.com/stm32-rs/stm32f1xx-hal#b19fbb0316b764d866a1bbadbf7e862b10e533c6"
 dependencies = [
  "as-slice",
  "cast",
@@ -706,7 +706,7 @@ dependencies = [
 [[package]]
 name = "stm32f3xx-hal"
 version = "0.5.0"
-source = "git+https://github.com/stm32-rs/stm32f3xx-hal#788aedbb179ecb9bbdcddfdf110dd5896fb38bac"
+source = "git+https://github.com/stm32-rs/stm32f3xx-hal#4352ea8ed3ddc43c434f846ed59ce3d4d3299239"
 dependencies = [
  "bare-metal",
  "cast",
@@ -736,7 +736,7 @@ dependencies = [
 [[package]]
 name = "stm32f4xx-hal"
 version = "0.8.3"
-source = "git+https://github.com/stm32-rs/stm32f4xx-hal#4a1a019f8e6e81a69c726bcab1f7caadefdbd32e"
+source = "git+https://github.com/stm32-rs/stm32f4xx-hal#eaefada036f3f5faabcdd1499f5082409e7bb14a"
 dependencies = [
  "bare-metal",
  "cast",
@@ -822,7 +822,7 @@ dependencies = [
 [[package]]
 name = "stm32l0xx-hal"
 version = "0.6.2"
-source = "git+https://github.com/stm32-rs/stm32l0xx-hal#6c33eb909228d4fcb1a5395c941bfaa179191e4f"
+source = "git+https://github.com/stm32-rs/stm32l0xx-hal#e4f479318fc49054096d967fbed0b57262a8f0fc"
 dependencies = [
  "as-slice",
  "cast",
@@ -850,7 +850,7 @@ dependencies = [
 [[package]]
 name = "stm32l1xx-hal"
 version = "0.1.0"
-source = "git+https://github.com/stm32-rs/stm32l1xx-hal#17fa193ba68b74ca7e3253e6e1e7857691aa63b4"
+source = "git+https://github.com/stm32-rs/stm32l1xx-hal#b5bfb4ff069889233baf5bfda75eea4cbb5ce5f8"
 dependencies = [
  "bare-metal",
  "cast",
@@ -876,7 +876,7 @@ dependencies = [
 [[package]]
 name = "stm32l4xx-hal"
 version = "0.5.0"
-source = "git+https://github.com/stm32-rs/stm32l4xx-hal#eb4f436e2cd728d5f77ec7dd5e7eb72587ce41bb"
+source = "git+https://github.com/stm32-rs/stm32l4xx-hal#b27ec08a312696420967421c0884e6aadc8a4da3"
 dependencies = [
  "as-slice",
  "cast",
@@ -892,7 +892,7 @@ dependencies = [
 [[package]]
 name = "sx127x_lora"
 version = "0.3.1"
-source = "git+https://github.com/mvniekerk/sx127x_lora#fbc866816843f26e16ba91c81cc1ad5bf11f7aa0"
+source = "git+https://github.com/hdoordt/sx127x_lora#69548a73c86706974b1b0fcd54b1b385fb1b62ed"
 dependencies = [
  "bit_field",
  "embedded-hal",
@@ -911,9 +911,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "1.0.40"
+version = "1.0.41"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "963f7d3cc59b59b9325165add223142bbf1df27655d07789f109896d353d8350"
+checksum = "6690e3e9f692504b941dc6c3b188fd28df054f7fb8469ab40680df52fdcc842b"
 dependencies = [
  "proc-macro2 1.0.21",
  "quote 1.0.7",

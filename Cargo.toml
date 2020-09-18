@@ -123,9 +123,9 @@ git = "https://github.com/jamwaffles/ssd1306"
 version = "0.6.0" #  "0.4.4" # "0.4.9"  "0.6.2" 
 
 [dependencies.sx127x_lora]
-git = "https://github.com/mr-git/sx127x_lora"
+#git = "https://github.com/mr-git/sx127x_lora"
 #git = "https://github.com/mvniekerk/sx127x_lora"
-#git = "https://github.com/hdoordt/sx127x_lora" 
+git = "https://github.com/hdoordt/sx127x_lora" 
 #features = ["version_0x12"]
 #version = "0.3.1"
 #optional = true

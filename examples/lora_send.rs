@@ -140,7 +140,7 @@ use stm32f3xx_hal::{prelude::*,
        }
 
 
-#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
+#[cfg(feature = "stm32f4xx")] // eg Nucleo-64 stm32f411, blackpill stm32f411, blackpill stm32f401
 use stm32f4xx_hal::{prelude::*,  
                     pac::Peripherals, 
                     spi::{Spi},
@@ -176,18 +176,16 @@ use stm32f4xx_hal::{prelude::*,
            MegaHertz(8).into(),
            clocks,
            );
-       
-       //let reset = gpiof.pf13.into_push_pull_output(&mut gpiof.moder, &mut gpiof.otyper);
-       //let cs    = gpiod.pd14.into_push_pull_output(&mut gpiod.moder, &mut gpiod.otyper);
-       
+              
        let mut delay = Delay::new(cp.SYST, clocks);
        
-       let lora = sx127x_lora::LoRa::new(spi, 
+       let mut lora = sx127x_lora::LoRa::new(spi, 
                               gpioa.pa1.into_push_pull_output(),     //  cs   on PA1
                               gpioa.pa0.into_push_pull_output(),     // reset on PA0
                               FREQUENCY, 
                               &mut delay ).unwrap();                 // delay
        
+
        (lora, delay )                                                // delay again
        }
 
@@ -455,92 +453,56 @@ use stm32l4xx_hal::{prelude::*,
 // End of hal/MCU specific setup. Following should be generic code.
 
 
-//#![feature(extern_crate_item_prelude)]
-//extern crate sx127x_lora;
-//extern crate linux_embedded_hal as hal;
-
-//use hal::spidev::{self, SpidevOptions};
-//use hal::{Pin, Spidev};
-//use hal::sysfs_gpio::Direction;
-//use hal::Delay;
-//
-//const LORA_CS_PIN: u64 = 8;
-//const LORA_RESET_PIN: u64 = 21;
-
 const FREQUENCY: i64 = 915;  // needs decimal or hz not Mhz to set channels other than default
 
 #[entry]
 fn main() -> !{
-    //    let mut spi = Spidev::open("/dev/spidev0.0").unwrap();
-    //    let options = SpidevOptions::new()
-    //        .bits_per_word(8)
-    //        .max_speed_hz(20_000)
-    //        .mode(spidev::SPI_MODE_0)
-    //        .build();
-    //    spi.configure(&options).unwrap();
-    //
-    //    let cs = Pin::new(LORA_CS_PIN);
-    //    cs.export().unwrap();
-    //    cs.set_direction(Direction::Out).unwrap();
-    //
-    //    let reset = Pin::new(LORA_RESET_PIN);
-    //    reset.export().unwrap();
-    //    reset.set_direction(Direction::Out).unwrap();
-
-    // "stm32f7xx" can be done with
-    //fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, (PA5<Alternate<AF5>>, 
-    //                                             PA6<Alternate<AF5>>, 
-    //                                             PA7<Alternate<AF5>>), Enabled<u8>>,
-    //                                  PA1<Output<PushPull>>, 
-    //                                  PA0<Output<PushPull>>>, 
-    //                Delay) {
-    //   needs also    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5,
-
 
     let (mut lora, _delay) =  setup();
 
-    lora.set_mode(sx127x_lora::RadioMode::Stdby).unwrap();
-    lora.set_signal_bandwidth(125_000).unwrap();
-    lora.set_coding_rate_4(5).unwrap();
-    lora.set_spreading_factor(7).unwrap();
-    lora.set_invert_iq(false).unwrap();
-    lora.set_tx_power(17,1).unwrap();    //Using PA_BOOST. See your board for correct pin.
+//    lora.set_mode(sx127x_lora::RadioMode::Stdby).unwrap();
+//    lora.set_signal_bandwidth(125_000).unwrap();
+//    lora.set_coding_rate_4(5).unwrap();
+//    lora.set_spreading_factor(7).unwrap();
+//    lora.set_invert_iq(false).unwrap();
+//    lora.set_tx_power(17,1).unwrap();    //Using PA_BOOST. See your board for correct pin.
 
     //hprintln!("mode             {}", lora.get_mode()).unwrap();
     //hprintln!("mode             {}", lora.read_register(Register::RegOpMode.addr())).unwrap();
     hprintln!("bandwidth        {:?}", lora.get_signal_bandwidth()).unwrap();
     //hprintln!("coding_rate      {:?}",  lora.get_coding_rate_4()).unwrap();
     hprintln!("spreading_factor {:?}",  lora.get_spreading_factor()).unwrap();
+    //hprintln!("spreading_factor {:?}",  Ok(lora.read_register(sx127x_lora::Register::RegModemConfig2.addr())? >> 4)).unwrap();
     //hprintln!("invert_iq        {:?}",  lora.get_invert_iq()).unwrap();
     //hprintln!("tx_power         {:?}",  lora.get_tx_power()).unwrap();
 
 
-    let message = "Hello, world!";
+    let message = "Hello, LoRa!";
     let mut buffer = [0;255];
     for (i,c) in message.chars().enumerate() {
         buffer[i] = c as u8;
     }
 
-    let transmit = lora.transmit_payload(buffer, message.len());
-    //let transmit = lora.transmit_payload(&buffer);
+    //let transmit = lora.transmit_payload(buffer, message.len());
+    let transmit = lora.transmit_payload(&buffer);
     match transmit {
-    	Ok(_size)   => hprintln!("Sent packet: {}", message).unwrap(),
-    	//Ok(size) => hprintln!("Sent packet with size: {}", size).unwrap(),
+    	//Ok(_size)   => hprintln!("Sent packet: {}", message).unwrap(),
+    	Ok(size) => hprintln!("Sent packet with size: {:?}", size).unwrap(),
     	Err(_error) => hprintln!("Error").unwrap(),
     };
 
     let mut j : u8  = 0;
     loop { 
-       j += 1;
+       j = (j + 1) % 255 ; // wrap u8
        let message = "message " ;
        for (i,c) in message.chars().enumerate() { buffer[i] = c as u8; }
        buffer[1 + message.len()] = j ;
        
-       let transmit = lora.transmit_payload(buffer, message.len());
-       //let transmit = lora.transmit_payload(&buffer);
+       //let transmit = lora.transmit_payload(buffer, message.len());
+       let transmit = lora.transmit_payload(&buffer);
        match transmit {
-           Ok(_size)   => hprintln!("Sent packet: {} {}", message, j).unwrap(),
-           //Ok(size) => hprintln!("Sent packet with size: {}", size).unwrap(),
+           //Ok(_size)   => hprintln!("Sent packet: {} {}", message, j).unwrap(),
+           Ok(size) => hprintln!("Sent {} packet {} with size: {:?}", message, j, size).unwrap(),
            Err(_error) => hprintln!("Error").unwrap(),
        };
           };
