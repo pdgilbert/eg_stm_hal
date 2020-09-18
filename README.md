@@ -18,7 +18,11 @@ In the table cells:
 green check marks and red X marks indicate that the CI of the example builds or fails.
 `runs` is an indication that a manual test on actual hardware has been done and it works correctly or as noted, and 
 `no` means the manual test fails badly as noted. The CI testing is automatic and corresponds to the most recent
-example code, and using recent git versions of crates. The manual tests are not automatic, and less current.
+example code, and using recent git versions of crates. Note however, if the build fails before checking
+examples, the old status marks will be left in place and not indicated the proper status. This can happen,
+for example, because a repository has disappeared. To check for that it is necessary to consult the
+[Travis CI](https://travis-ci.org/pdgilbert/eg_stm_hal).
+The manual tests are not automatic, and less current.
 When I remember to record it, 
 clicking on `runs` will go to the code repository history for the commit when a manual test was done.
 In addition to the example code at the time, the `Cargo.lock` file in the board directories gives an
