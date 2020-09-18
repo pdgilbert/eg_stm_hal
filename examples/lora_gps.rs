@@ -598,7 +598,7 @@ fn main() -> ! {
 	      
 	      //hprintln!("transmit buffer2 {:?}", to_str(&buffer2)).unwrap();
 	      
-	      let transmit = lora.transmit_payload(buffer2, size);
+	      let transmit = lora.transmit_payload(&buffer2);
               match transmit {
     	          //Ok(_v)   => hprintln!("Sent packet: {:?}", buffer2).unwrap(),
     	          Ok(v) => hprintln!("return code: {:?} for size  {}", v, size).unwrap(),
