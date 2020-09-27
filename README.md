@@ -104,8 +104,8 @@ Those names link to a file recording the commit that was used for the last CI ex
 2.  Stalls waiting to receive. Possibly need thread to receive started before send?
 3.  Usart2 with Usart3 connection works both ways but jibberish written on console.
 4.  The Heltec lora_node 151 uses USART2 and USART3 pins for on board LoRa connections and power detection,
-so, only USART1 is available. This means that examples using more than one USARTs cannot be run. In examples 
-`oled_gps` and `lora_gps` the available USART is used for the GPS in the hope that they might work. 
+so, only USART1 is available. This means that examples using more than one USART cannot be run. In examples 
+`oled_gps` and `lora_gps` the available USART1 is used for the GPS so they might work. 
 5.  Works as long as typing is slow.
 6.  Fails reading gps (does not return). 
 7.  Works once, repeat problems.
@@ -129,12 +129,12 @@ The status of the additional examples is
 | stm32f7xx | {{b06}} |<img src="{{db06}}dht.png" {{p}} />         |<img src="{{db06}}dht11.png" {{p}} />         |<img src="{{db06}}text_i2c.png" {{p}} />          |<img src="{{db06}}oled_gps.png" {{p}} />          |<img src="{{db06}}lora_send.png" {{p}} />   |<img src="{{db06}}lora_receive.png" {{p}} />   |<img src="{{db06}}lora_gps.png" {{p}} />   |
 | stm32h7xx | {{b07}} |<img src="{{db07}}dht.png" {{p}} />         |<img src="{{db07}}dht11.png" {{p}} />         |<img src="{{db07}}text_i2c.png" {{p}} />          |<img src="{{db07}}oled_gps.png" {{p}} />          |<img src="{{db07}}lora_send.png" {{p}} />   |<img src="{{db07}}lora_receive.png" {{p}} />   |<img src="{{db07}}lora_gps.png" {{p}} />   |
 | stm32l0xx | {{b08}} |<img src="{{db08}}dht.png" {{p}} />         |<img src="{{db08}}dht11.png" {{p}} />         |<img src="{{db08}}text_i2c.png" {{p}} />          |<img src="{{db08}}oled_gps.png" {{p}} />          |<img src="{{db08}}lora_send.png" {{p}} />   |<img src="{{db08}}lora_receive.png" {{p}} />   |<img src="{{db08}}lora_gps.png" {{p}} />   |
-| stm32l1xx | {{b09}} |<img src="{{db09}}dht.png" {{p}} />         |<img src="{{db09}}dht11.png" {{p}} />         |<img src="{{db09}}text_i2c.png" {{p}} /> {{runC}} |<img src="{{db09}}oled_gps.png" {{p}} />   no-6   |<img src="{{db09}}lora_send.png" {{p}} />   |<img src="{{db09}}lora_receive.png" {{p}} />   |<img src="{{db09}}lora_gps.png" {{p}} />   |
-| stm32l1xx | {{b10}} |<img src="{{db10}}dht.png" {{p}} />         |<img src="{{db10}}dht11.png" {{p}} />         |<img src="{{db10}}text_i2c.png" {{p}} /> {{runC}} |<img src="{{db10}}oled_gps.png" {{p}} />   no-6   |<img src="{{db10}}lora_send.png" {{p}} />   |<img src="{{db10}}lora_receive.png" {{p}} />   |<img src="{{db10}}lora_gps.png" {{p}} />   |
+| stm32l1xx | {{b09}} |<img src="{{db09}}dht.png" {{p}} />         |<img src="{{db09}}dht11.png" {{p}} />         |<img src="{{db09}}text_i2c.png" {{p}} /> {{runC}} |<img src="{{db09}}oled_gps.png" {{p}} />   no-5   |<img src="{{db09}}lora_send.png" {{p}} />   |<img src="{{db09}}lora_receive.png" {{p}} />   |<img src="{{db09}}lora_gps.png" {{p}} />   |
+| stm32l1xx | {{b10}} |<img src="{{db10}}dht.png" {{p}} />         |<img src="{{db10}}dht11.png" {{p}} />         |<img src="{{db10}}text_i2c.png" {{p}} /> {{runC}} |<img src="{{db10}}oled_gps.png" {{p}} />   no-5   |<img src="{{db10}}lora_send.png" {{p}} />   |<img src="{{db10}}lora_receive.png" {{p}} />   |<img src="{{db10}}lora_gps.png" {{p}} />   |
 | stm32l4xx | {{b11}} |<img src="{{db11}}dht.png" {{p}} />         |<img src="{{db11}}dht11.png" {{p}} />         |<img src="{{db11}}text_i2c.png" {{p}} />          |<img src="{{db11}}oled_gps.png" {{p}} />          |<img src="{{db11}}lora_send.png" {{p}} />   |<img src="{{db11}}lora_receive.png" {{p}} />   |<img src="{{db11}}lora_gps.png" {{p}} />   |
 
 1. panic. Timer not set right yet.
 2. stall/timeout reading sensor.
 3. too large for flash.
 4. not very reliably. Better on 5v than 3v.
-6.  Fails reading gps (does not return). 
+5.  Fails reading gps (does not return). 
