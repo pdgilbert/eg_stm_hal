@@ -33,10 +33,10 @@ use stm32f1xx_hal::{prelude::*,
                     pac::Peripherals, 
                     spi::{Spi, Spi1NoRemap},
                     delay::Delay,
-		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, Input, Floating,  
+                    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, Input, Floating,  
                            gpioa::{PA0, PA1}, Output, PushPull},
-		    device::SPI1,
-		    }; 
+                    device::SPI1,
+                    }; 
 
     #[cfg(feature = "stm32f1xx")]
     fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1,  Spi1NoRemap, (PA5<Alternate<PushPull>>, 
@@ -60,7 +60,7 @@ use stm32f1xx_hal::{prelude::*,
             gpioa.pa6.into_floating_input(&mut gpioa.crl),       //   miso  on PA6
             gpioa.pa7.into_alternate_push_pull(&mut gpioa.crl)   //   mosi  on PA7
             ),
-    	   &mut afio.mapr,
+               &mut afio.mapr,
            sx127x_lora::MODE,
            8.mhz(),
            clocks, 
@@ -75,16 +75,16 @@ use stm32f1xx_hal::{prelude::*,
                               gpioa.pa0.into_push_pull_output(&mut gpioa.crl),     // reset on PA0
                               FREQUENCY, 
                               &mut delay );                                                // delay
-			      // .expect("Failed to communicate with radio module!")
+                              // .expect("Failed to communicate with radio module!")
        
        let lora =  lora.unwrap();
 
        //let mut lora =  match lora {
-    	//  Ok(v)   => v,
-    	//  Err(error) => {hprintln!("Setup Error: {:?}", error);
-	//                 asm::bkpt();
-	//                 //panic();
-	//                 }
+            //  Ok(v)   => v,
+            //  Err(error) => {hprintln!("Setup Error: {:?}", error);
+        //                 asm::bkpt();
+        //                 //panic();
+        //                 }
         //  };
 
        (lora, delay )                                                               // delay again
@@ -96,10 +96,10 @@ use stm32f3xx_hal::{prelude::*,
                     stm32::Peripherals,
                     spi::{Spi},
                     delay::Delay,
-		    gpio::{gpioa::{PA5, PA6, PA7}, AF5,  
+                    gpio::{gpioa::{PA5, PA6, PA7}, AF5,  
                            gpioa::{PA0, PA1}, Output, PushPull},
-		    stm32::SPI1,
-		    };
+                    stm32::SPI1,
+                    };
 
     #[cfg(feature = "stm32f3xx")]
     fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, (PA5<AF5>, PA6<AF5>, PA7<AF5>)>,
@@ -145,11 +145,11 @@ use stm32f4xx_hal::{prelude::*,
                     pac::Peripherals, 
                     spi::{Spi},
                     delay::Delay,
-		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5,  
+                    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5,  
                            gpioa::{PA0, PA1}, Output, PushPull},
                     time::MegaHertz,
-		    pac::SPI1,
-		    }; 
+                    pac::SPI1,
+                    }; 
 
     #[cfg(feature = "stm32f4xx")]
     fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, (PA5<Alternate<AF5>>, PA6<Alternate<AF5>>, PA7<Alternate<AF5>>)>,
@@ -179,7 +179,7 @@ use stm32f4xx_hal::{prelude::*,
               
        let mut delay = Delay::new(cp.SYST, clocks);
        
-       let mut lora = sx127x_lora::LoRa::new(spi, 
+       let lora = sx127x_lora::LoRa::new(spi, 
                               gpioa.pa1.into_push_pull_output(),     //  cs   on PA1
                               gpioa.pa0.into_push_pull_output(),     // reset on PA0
                               FREQUENCY, 
@@ -195,9 +195,9 @@ use stm32f7xx_hal::{prelude::*,
                     pac::Peripherals, 
                     spi::{Spi, Pins, Enabled, ClockDivider, },
                     delay::Delay,
-		    gpio::{gpioa::{PA0, PA1}, Output, PushPull},
-		    pac::SPI1,
-		    }; 
+                    gpio::{gpioa::{PA0, PA1}, Output, PushPull},
+                    pac::SPI1,
+                    }; 
 
     #[cfg(feature = "stm32f7xx")]
     fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, impl Pins<SPI1>, Enabled<u8>>,
@@ -242,10 +242,10 @@ use stm32h7xx_hal::{prelude::*,
                     pac::Peripherals, 
                     spi::{Spi, Enabled},
                     delay::Delay,
-		    gpio::{   //gpioa::{PA5, PA6, PA7}, Alternate, AF5,  really!
+                    gpio::{   //gpioa::{PA5, PA6, PA7}, Alternate, AF5,  really!
                            gpioa::{PA0, PA1}, Output, PushPull},
-		    pac::SPI1,
-		    }; 
+                    pac::SPI1,
+                    }; 
 
     #[cfg(feature = "stm32h7xx")]
     fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, Enabled>,
@@ -303,12 +303,12 @@ use stm32h7xx_hal::{prelude::*,
 #[cfg(feature = "stm32l0xx")] 
 use stm32l0xx_hal::{prelude::*,  
                     pac::Peripherals, 
-		    rcc,   // for ::Config but note name conflict with serial
+                    rcc,   // for ::Config but note name conflict with serial
                     spi::{Spi, Pins, },
                     delay::Delay,
-		    gpio::{gpioa::{PA0, PA1}, Output, PushPull},
+                    gpio::{gpioa::{PA0, PA1}, Output, PushPull},
                     pac::SPI1,
-		    }; 
+                    }; 
 
     #[cfg(feature = "stm32l0xx")]
     fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, impl Pins<SPI1>>,
@@ -348,18 +348,18 @@ use stm32l0xx_hal::{prelude::*,
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{prelude::*, 
                     stm32::Peripherals, 
-		    rcc,   // for ::Config but note name conflict with next
+                    rcc,   // for ::Config but note name conflict with serial
                     spi::{Spi, Pins},
                     delay::Delay,
-		    gpio::{//gpioa::{PA5, PA6, PA7}, Input,  Floating,   
-                           gpioa::{PA0, PA1}, Output, PushPull},
+                    gpio::{//gpioa::{PA5, PA6, PA7}, Input,  Floating,   
+                           gpioa::{PA3, PA4}, Output, PushPull},
                     stm32::SPI1,
-		    };
+                    };
 
     #[cfg(feature = "stm32l1xx")]
     fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, impl Pins<SPI1>>,
-                                      PA1<Output<PushPull>>, 
-                                      PA0<Output<PushPull>>>, 
+                                      PA4<Output<PushPull>>, 
+                                      PA3<Output<PushPull>>>, 
                     Delay) {
 
        // instead of impl Pins<SPI1>  above could use 
@@ -387,8 +387,8 @@ use stm32l1xx_hal::{prelude::*,
        let mut delay = cp.SYST.delay(rcc.clocks);
        
        let lora = sx127x_lora::LoRa::new(spi, 
-                              gpioa.pa1.into_push_pull_output(),     //  cs   on PA1
-                              gpioa.pa0.into_push_pull_output(),     // reset on PA0
+                              gpioa.pa4.into_push_pull_output(),     //  cs   on PA4
+                              gpioa.pa3.into_push_pull_output(),     // reset on PA3
                               FREQUENCY, 
                               &mut delay ).unwrap();                 // delay
        
@@ -402,10 +402,10 @@ use stm32l4xx_hal::{prelude::*,
                     pac::Peripherals, 
                     spi::{Spi},
                     delay::Delay,
-		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5, Input, Floating, 
+                    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5, Input, Floating, 
                            gpioa::{PA0, PA1}, Output, PushPull},
-		    pac::SPI1,
-		    }; 
+                    pac::SPI1,
+                    }; 
 
     #[cfg(feature = "stm32l4xx")]
     fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1, (PA5<Alternate<AF5, Input<Floating>>>, 
@@ -458,14 +458,24 @@ const FREQUENCY: i64 = 915;  // needs decimal or hz not Mhz to set channels othe
 #[entry]
 fn main() -> !{
 
-    let (mut lora, _delay) =  setup();
+    let (mut lora, mut delay) =  setup();
 
 //    lora.set_mode(sx127x_lora::RadioMode::Stdby).unwrap();
-//    lora.set_signal_bandwidth(125_000).unwrap();
+    lora.set_signal_bandwidth(125_000).unwrap();
+    lora.set_coding_rate_4(8).unwrap();
 //    lora.set_coding_rate_4(5).unwrap();
 //    lora.set_spreading_factor(7).unwrap();
 //    lora.set_invert_iq(false).unwrap();
-//    lora.set_tx_power(17,1).unwrap();    //Using PA_BOOST. See your board for correct pin.
+//       set_tx_power(level, output_pin) level >17 => PA_BOOST. 
+//       See your board for correct output_pin.
+// Debugging note: with one of these set_tx_power uncommented, the second time gdb 
+// session is started there is a startup chirp, even before reaching entry brkpt. 
+// After that there are no transmissions.
+//    lora.set_tx_power(17,1).unwrap();  
+//    lora.set_tx_power(15,1).unwrap();  
+    lora.set_tx_power(15,0).unwrap();  
+    lora.set_preamble_length(8).unwrap();
+    lora.set_crc(true).unwrap();
 
     //hprintln!("mode             {}", lora.get_mode()).unwrap();
     //hprintln!("mode             {}", lora.read_register(Register::RegOpMode.addr())).unwrap();
@@ -486,9 +496,9 @@ fn main() -> !{
     //let transmit = lora.transmit_payload(buffer, message.len());
     let transmit = lora.transmit_payload(&buffer);
     match transmit {
-    	//Ok(_size)   => hprintln!("Sent packet: {}", message).unwrap(),
-    	Ok(size) => hprintln!("Sent packet with size: {:?}", size).unwrap(),
-    	Err(_error) => hprintln!("Error").unwrap(),
+            //Ok(_size)   => hprintln!("Sent packet: {}", message).unwrap(),
+            Ok(size) => hprintln!("Sent packet with size: {:?}", size).unwrap(),
+            Err(_error) => hprintln!("Error").unwrap(),
     };
 
     let mut j : u8  = 0;
@@ -503,7 +513,8 @@ fn main() -> !{
        match transmit {
            //Ok(_size)   => hprintln!("Sent packet: {} {}", message, j).unwrap(),
            Ok(size) => hprintln!("Sent {} packet {} with size: {:?}", message, j, size).unwrap(),
-           Err(_error) => hprintln!("Error").unwrap(),
-       };
-          };
+           Err(error) => hprintln!("Error: {:?}", error).unwrap(),
+           };
+      delay.delay_ms(3000u32)
+      };
 }

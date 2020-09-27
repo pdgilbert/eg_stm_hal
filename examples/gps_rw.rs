@@ -256,8 +256,16 @@ use stm32l1xx_hal::{prelude::*,
                     serial::{Config, SerialExt, Tx, Rx},
 		    stm32::{USART1, USART2} };
 
+/*
+The Heltec lora_node 151 uses USART2 and USART3 pins for on board LoRa connections and power detection.
+See https://resource.heltec.cn/download/LoRa_Node_151/LoRa_Node_151_Pinout_Diagram.pdf.
+So only USART1 is available and this example cannot work on Heltec lora_node 151 as it needs 2 USARTs. 
+USART1 is used for the GPS as oled_gps and lora_gps examples might work. 
+For simplicity of this example the same setup is used on the Discovery kit stm32l100.
+*/
+
     #[cfg(feature = "stm32l1xx")]
-    fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2> )  {
+    fn setup() ->  (Tx<USART2>, Rx<USART2>, Tx<USART1>, Rx<USART1> )  {
 
        let p = Peripherals::take().unwrap();
        let mut rcc = p.RCC.freeze(rcc::Config::hsi());
@@ -265,19 +273,19 @@ use stm32l1xx_hal::{prelude::*,
 
        let gpioa = p.GPIOA.split();
 
-       let (tx1, rx1) =  p.USART1.usart(
-                            (gpioa.pa9,                //tx pa9  for console
-                             gpioa.pa10),              //rx pa10 for console
-                            Config::default() .baudrate(9600.bps()), 
-                            &mut rcc).unwrap().split();
-
-       let (tx2, rx2) = p.USART2.usart(
-                           (gpioa.pa2,                 //tx pa2   for GPS rx
-                            gpioa.pa3),                //rx pa3   for GPS tx
+       let (txc, rxc) = p.USART2.usart(
+                           (gpioa.pa2,                 //tx pa2   for console
+                            gpioa.pa3),                //rx pa3   for console
                            Config::default() .baudrate(115_200.bps()), 
                            &mut rcc).unwrap().split();
 
-       (tx1, rx1,   tx2, rx2 )
+       let (txg, rxg) =  p.USART1.usart(
+                            (gpioa.pa9,                //tx pa9  for GPS rx
+                             gpioa.pa10),              //rx pa10 for GPS tx
+                            Config::default() .baudrate(9600.bps()), 
+                            &mut rcc).unwrap().split();
+
+       (txc, rxc,   txg, rxg )
        }
 
 

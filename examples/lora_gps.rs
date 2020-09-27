@@ -432,17 +432,24 @@ use stm32l0xx_hal::{prelude::*,
 #[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{prelude::*, 
 		    stm32::Peripherals, 
-		    rcc,   // for ::Config but note name conflict with next
+		    rcc,   // for ::Config but note name conflict with serial
                     serial::{Config, SerialExt, Tx, Rx},
-		    stm32::{USART2},
+		    stm32::{USART1},
                     spi::{Spi, Pins},
                     delay::Delay,
 		    gpio::{gpioa::{PA0, PA1}, Output, PushPull},
                     stm32::SPI1,
 		    };
 
+/*
+The Heltec lora_node 151 uses USART2 and USART3 pins for on board LoRa connections and power detection.
+See https://resource.heltec.cn/download/LoRa_Node_151/LoRa_Node_151_Pinout_Diagram.pdf.
+So only USART1 is available. It is used for the GPS. 
+For simplicity of this example the same setup is used on the Discovery kit stm32l100.
+*/
+
     #[cfg(feature = "stm32l1xx")]
-    fn setup() ->  (Tx<USART2>, Rx<USART2>,
+    fn setup() ->  (Tx<USART1>, Rx<USART1>,
                     sx127x_lora::LoRa<Spi<SPI1, impl Pins<SPI1>>,
                                       PA1<Output<PushPull>>, 
                                       PA0<Output<PushPull>>>, 
@@ -455,10 +462,10 @@ use stm32l1xx_hal::{prelude::*,
        let gpioa = p.GPIOA.split();
 
 
-       let (tx, rx) = p.USART2.usart(
-                           (gpioa.pa2,                 //tx pa2   for GPS
-                            gpioa.pa3),                //rx pa3   for GPS
-                           Config::default() .baudrate(115_200.bps()), 
+       let (tx, rx) = p.USART1.usart(
+                           (gpioa.pa9,                 //tx pa9   for GPS rx
+                            gpioa.pa10),               //rx pa10  for GPS tx
+                           Config::default() .baudrate(9600.bps()), 
                            &mut rcc).unwrap().split();
 
 

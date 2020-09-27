@@ -260,7 +260,7 @@ dependencies = [
  "stm32l1 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "stm32l1xx-hal 0.1.0 (git+https://github.com/stm32-rs/stm32l1xx-hal)",
  "stm32l4xx-hal 0.5.0 (git+https://github.com/stm32-rs/stm32l4xx-hal)",
- "sx127x_lora 0.3.1 (git+https://github.com/mvniekerk/sx127x_lora)",
+ "sx127x_lora 0.3.1 (git+https://github.com/hdoordt/sx127x_lora)",
  "void 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -815,7 +815,7 @@ dependencies = [
 [[package]]
 name = "sx127x_lora"
 version = "0.3.1"
-source = "git+https://github.com/mvniekerk/sx127x_lora#fbc866816843f26e16ba91c81cc1ad5bf11f7aa0"
+source = "git+https://github.com/hdoordt/sx127x_lora#69548a73c86706974b1b0fcd54b1b385fb1b62ed"
 dependencies = [
  "bit_field 0.10.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "embedded-hal 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -972,7 +972,7 @@ dependencies = [
 "checksum stm32l1xx-hal 0.1.0 (git+https://github.com/stm32-rs/stm32l1xx-hal)" = "<none>"
 "checksum stm32l4 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)" = "3f58fc9ed772b4d742ed566cc14e224497c179d15c594d6108bebddd8d6a9452"
 "checksum stm32l4xx-hal 0.5.0 (git+https://github.com/stm32-rs/stm32l4xx-hal)" = "<none>"
-"checksum sx127x_lora 0.3.1 (git+https://github.com/mvniekerk/sx127x_lora)" = "<none>"
+"checksum sx127x_lora 0.3.1 (git+https://github.com/hdoordt/sx127x_lora)" = "<none>"
 "checksum syn 0.15.44 (registry+https://github.com/rust-lang/crates.io-index)" = "9ca4b3b69a77cbe1ffc9e198781b7acb0c7365a883670e8f1c1bc66fba79a5c5"
 "checksum syn 1.0.40 (registry+https://github.com/rust-lang/crates.io-index)" = "963f7d3cc59b59b9325165add223142bbf1df27655d07789f109896d353d8350"
 "checksum typenum 1.12.0 (registry+https://github.com/rust-lang/crates.io-index)" = "373c8a200f9e67a0c95e62a4f52fbf80c23b4381c05a17845531982fa99e6b33"
