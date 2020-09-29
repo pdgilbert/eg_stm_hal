@@ -24,6 +24,9 @@ matrix:
     #fast_finish: true
 
     include:
+        - name: "none-stm32f030"
+          env: HAL="stm32f0xx"  MCU="stm32f030"  TARGET="thumbv6m-none-eabi"    BOARD="none-stm32f030"
+
         - name: "bluepill"
           env: HAL="stm32f1xx"  MCU="stm32f103"  TARGET="thumbv7m-none-eabi"     BOARD="bluepill"
 

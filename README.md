@@ -30,12 +30,12 @@ Also please enter an issue if you think there is something that really needs to 
 in many places. However, the examples should work in other development 
 environments. Just the setup may change.)
 
-The coded in the examples is organized so that the setup for different HALs and hardware is in the 
+The code in the examples is organized so that the setup for different HALs and hardware is in the 
 first section and the generic application code follows. The hope is that this will make clear how
 to best take advantage of the generic aspect of `embedded-hal`. (The setup in many examples, 
 including these, tends to dominate the application code, so the advantage of the HAL is not
 always so obvious.) 
-These examples are divided into two groups. The first group if core examples uses only the MCU specific HAL crate and
+These examples are divided into two groups. The first group of core examples uses only the MCU specific HAL crate and
 the main crates associated with `embedded-hal`. The second group of additional examples uses additional device driver crates.
 
 
@@ -182,6 +182,7 @@ The variable `HAL` is used in the example code whereas some of the underlying HA
 actually need the specific `MCU`.
 Board directories use one of 
 ```
+  export HAL=stm32f0xx MCU=stm32f030   TARGET=thumbv6m-none-eabi     # none-stm32f030      Cortex-M
   export HAL=stm32f1xx MCU=stm32f103   TARGET=thumbv7m-none-eabi     # bluepill            Cortex-M3
   export HAL=stm32f1xx MCU=stm32f100   TARGET=thumbv7m-none-eabi     # none-stm32f100      Cortex-M3
   export HAL=stm32f1xx MCU=stm32f101   TARGET=thumbv7m-none-eabi     # none-stm32f101      Cortex-M3
