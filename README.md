@@ -14,6 +14,10 @@ The examples are run with `stm32f1xx_hal` on a `bluepill`,
 `stm32f3xx_hal` on a `Discovery kit STM32F303`, `stm32l1xx_hal` on a `STM32L100C Discovery` 
 and  a `heltec-lora-node151`, `stm32f4xx_hal` on a `Nucleo-64 STM32F411`, a `blackpill` with MCU `stm32f401`, 
 and a `blackpill` with MCU `stm32f411`.
+A board name starting with `none-` is an indication that I do not have hardware for an MCU that uses the
+hal, so cannot do the manual testing myself.
+(If you do run the examples on MCUs using these HALs, please report via
+[the repository issues](https://github.com/pdgilbert/eg_stm_hal/issues) and I will add notes.)
 In the table cells: 
 green check marks and red X marks indicate that the CI of the example builds or fails.
 `runs` is an indication that a manual test on actual hardware has been done and it works correctly or as noted, and 
