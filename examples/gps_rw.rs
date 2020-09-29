@@ -216,6 +216,7 @@ use stm32h7xx_hal::{prelude::*,
 	}
 
 
+#[cfg(feature = "stm32l0xx")]
 use stm32l0xx_hal::{prelude::*,  
                     pac::Peripherals, 
 		    rcc,   // for ::Config but note name conflict with serial
