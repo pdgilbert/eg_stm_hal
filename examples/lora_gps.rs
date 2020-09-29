@@ -373,50 +373,58 @@ use stm32h7xx_hal::{prelude::*,
 #[cfg(feature = "stm32l0xx")] 
 use stm32l0xx_hal::{prelude::*,  
                     pac::Peripherals, 
-                    serial::{config::Config, Serial, Tx, Rx},
+		    rcc,   // for ::Config but note name conflict with serial
+                    serial::{Config, Tx, Rx, Serial2Ext},
 		    pac::{USART2}, 
                     spi::{Spi},
                     delay::Delay,
-		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5,  
+		    gpio::{gpioa::{PA5, PA6, PA7},  Analog, 
                            gpioa::{PA0, PA1}, Output, PushPull},
-                    time::MegaHertz,
-		    pac::SPI1,
+                    pac::SPI1,
 		    };
 
     #[cfg(feature = "stm32l0xx")]
     fn setup() ->  (Tx<USART2>, Rx<USART2>,
-                    sx127x_lora::LoRa<Spi<SPI1, (PA5<Alternate<AF5>>, 
-		                                 PA6<Alternate<AF5>>, 
-						 PA7<Alternate<AF5>>)>,
+                    sx127x_lora::LoRa<Spi<SPI1, (PA5<Analog>, 
+		                                 PA6<Analog>, 
+						 PA7<Analog>)>,
                                      PA1<Output<PushPull>>, 
                                      PA0<Output<PushPull>>>, 
                                      Delay ) {
 
         let cp = cortex_m::Peripherals::take().unwrap();
         let p = Peripherals::take().unwrap();
-        let clocks    =  p.RCC.constrain().cfgr.freeze();
-        let gpioa = p.GPIOA.split();
+        let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
+        //let clocks    =  p.RCC.constrain().cfgr.freeze();
+        //let clocks    =  p.RCC.constrain().cfgr.freeze();
+        let gpioa = p.GPIOA.split(&mut rcc);
 
-        let (tx, rx) = Serial::usart2(
-           p.USART2,
-           (gpioa.pa2.into_alternate_af7(),            //tx pa2  for GPS
-	    gpioa.pa3.into_alternate_af7()),           //rx pa3  for GPS
+        let (tx, rx) = p.USART2.usart(
+           gpioa.pa2,                               //tx pa2  for GPS
+	   gpioa.pa3,                               //rx pa3  for GPS
            Config::default() .baudrate(9600.bps()), 
-           clocks,
+           &mut rcc
            ).unwrap().split();
 
-       let spi = Spi::spi1(
-           p.SPI1,
-           (gpioa.pa5.into_alternate_af5(),  // sck   on PA5
-            gpioa.pa6.into_alternate_af5(),  // miso  on PA6
-            gpioa.pa7.into_alternate_af5()   // mosi  on PA7
+       // consider
+       //let mut nss = gpioa.pa4.into_push_pull_output();
+       //loop {
+       //    nss.set_low().unwrap();
+       //    spi.write(&[0, 1]).unwrap();
+       //    nss.set_high().unwrap();
+       //    }
+
+       let spi = p.SPI1.spi(
+           (gpioa.pa5,                              // sck   on PA5
+            gpioa.pa6,                              // miso  on PA6
+            gpioa.pa7                               // mosi  on PA7
             ),
            sx127x_lora::MODE,
-           MegaHertz(8).into(),
-           clocks,
+           8.mhz(),
+           &mut rcc,
            );
 
-       let mut delay = Delay::new(cp.SYST, clocks);
+       let mut delay = Delay::new(cp.SYST, rcc.clocks);
 
        let lora = sx127x_lora::LoRa::new(spi, 
                               gpioa.pa1.into_push_pull_output(),      //  cs   on PA1

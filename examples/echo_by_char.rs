@@ -172,7 +172,7 @@ use stm32h7xx_hal::{prelude::*,
 use stm32l0xx_hal::{prelude::*,  
                     pac::Peripherals, 
 		    rcc,   // for ::Config but note name conflict with serial
-                    serial::{config::Config, Serial, Tx, Rx},
+                    serial::{Config, Tx, Rx, Serial1Ext},
 		    pac::USART1 
 		    };
 
@@ -182,15 +182,7 @@ use stm32l0xx_hal::{prelude::*,
        let p       = Peripherals::take().unwrap();
        let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
        let gpioa   = p.GPIOA.split(&mut rcc);
- 
-        //Serial::usart1(
-    	//    p.USART1,
-    	//    (gpioa.pa9,			                        //tx pa9
-	//     gpioa.pa10),  		                        //rx pa10
-    	//    Config::default() .baudrate(9600.bps()),
-    	//    &mut rcc,
-    	//    ).unwrap().split()
-       
+        
        p.USART1.usart(
             gpioa.pa9,                                          //tx pa9 
             gpioa.pa10,                                         //rx pa10
