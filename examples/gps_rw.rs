@@ -224,8 +224,10 @@ use stm32l0xx_hal::{prelude::*,
 
     #[cfg(feature = "stm32l0xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2> )  {
+
         let p = Peripherals::take().unwrap();
         let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
+
         let gpioa   = p.GPIOA.split(&mut rcc);
 
         let (tx1, rx1) =  p.USART1.usart(

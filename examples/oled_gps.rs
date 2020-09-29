@@ -293,7 +293,7 @@ use stm32l0xx_hal::{prelude::*,
        let cp = cortex_m::Peripherals::take().unwrap();
        let p = Peripherals::take().unwrap();
        let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
-       //let clocks    =  p.RCC.constrain().cfgr.freeze();
+       
        let gpioa = p.GPIOA.split(&mut rcc);
 
        let (tx2, rx2) = p.USART2.usart(
