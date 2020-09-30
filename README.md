@@ -49,7 +49,7 @@ Those names link to a file recording the commit that was used for the last CI ex
 {% capture stm32l1 %}<a href="https://github.com/stm32-rs/stm32l1xx-hal" title="link to HAL git repository">stm32l1xx</a>{% endcapture %}
 {% capture stm32l4 %}<a href="https://github.com/stm32-rs/stm32l4xx-hal" title="link to HAL git repository">stm32l4xx</a>{% endcapture %}
 
-{% assign b00 = "[none-stm32f030]](examplesStatus/none-stm32f030/COMMIT)" %}
+{% assign b00 = "[none-stm32f030](examplesStatus/none-stm32f030/COMMIT)" %}
 {% assign b01 = "[bluepill](examplesStatus/bluepill/COMMIT)" %}
 {% assign b02 = "[discovery-stm32f303](examplesStatus/discovery-stm32f303/COMMIT)" %}
 {% assign b03 = "[nucleo-64](examplesStatus/nucleo-64/COMMIT)" %}
