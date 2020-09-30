@@ -25,11 +25,47 @@ use asm_delay::{ AsmDelay, bitrate, };
 
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
 
-#[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
-use stm32f1xx_hal::{prelude::*,   
+#[cfg(feature = "stm32f0xx")]  //  eg stm32f030
+use stm32f0xx_hal::{prelude::*,   
                      pac::Peripherals,
 		     gpio::{gpiob::{PB13, PB14, PB15}, Output, PushPull,}, 
 		     };
+
+//#[cfg(feature = "stm32f0xx")]  
+//use embedded_hal::digital::v2::OutputPin;
+
+    #[cfg(feature = "stm32f0xx")]
+    fn setup() -> (PB13<Output<PushPull>>, PB14<Output<PushPull>>, PB15<Output<PushPull>>, AsmDelay) {
+       
+       let dp        = Peripherals::take().unwrap();
+       let mut rcc   = dp.RCC.constrain(); 
+       let mut gpiob = dp.GPIOB.split(&mut rcc.apb2);
+
+       impl LED for PB13<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           };
+
+       impl LED for PB14<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           };
+
+       impl LED for PB15<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_low().unwrap() }
+           };
+
+
+       // return (led1, led2, led3, delay)
+       (gpiob.pb13.into_push_pull_output(&mut gpiob.crh),  // led on pb13
+        gpiob.pb14.into_push_pull_output(&mut gpiob.crh),  // led on pb14
+        gpiob.pb15.into_push_pull_output(&mut gpiob.crh),  // led on pb15
+        AsmDelay::new(bitrate::U32BitrateExt::mhz(16)) )             // delay	
+       }
+
+
+
 
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
 use embedded_hal::digital::v2::OutputPin;

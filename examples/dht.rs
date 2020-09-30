@@ -23,6 +23,38 @@ use embedded_hal::blocking::delay::{DelayMs,};
 
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
 
+#[cfg(feature = "stm32f0xx")]
+use stm32f0xx_hal::{prelude::*, 
+                    pac::{Peripherals, CorePeripherals}, 
+    	            delay::Delay,
+		    gpio::{gpioa::PA8, OpenDrain,  Output, },
+		    };
+
+    // open_drain_output is really input and output
+
+    #[cfg(feature = "stm32f0xx")]
+    fn setup() -> (PA8<Output<OpenDrain>>,  Delay) {
+      
+       let cp = CorePeripherals::take().unwrap();
+       let  p = Peripherals::take().unwrap();
+
+       let mut rcc = p.RCC.constrain();
+       let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
+       
+       // delay is used by `dht-sensor` to wait for signals
+       let mut delay = Delay::new(cp.SYST, clocks);   //SysTick: System Timer
+
+       let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
+       let pin_a8    = gpioa.pa8.into_open_drain_output(&mut gpioa.crh); 
+       //let mut pin_a8 = cortex_m::interrupt::free(|cs| pin_a8.into_open_drain_output(cs));
+ 
+       //  1 second delay (for DHT11 setup?) Wait on  sensor initialization?
+       delay.delay_ms(1000_u16);
+      
+       (pin_a8,                   //DHT data will be on A8
+        delay)
+       }
+
 #[cfg(feature = "stm32f1xx")]
 use stm32f1xx_hal::{prelude::*, 
                     pac::{Peripherals, CorePeripherals}, 

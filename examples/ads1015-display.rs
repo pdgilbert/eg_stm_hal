@@ -29,6 +29,58 @@ use ssd1306::{prelude::*, Builder};
 
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
 
+#[cfg(feature = "stm32f0xx")]  //  eg blue pill stm32f103
+use stm32f0xx_hal::{prelude::*,   
+                    pac::Peripherals, 
+                    i2c::{BlockingI2c, DutyCycle, Mode},   
+    	            delay::Delay,
+		    gpio::{gpiob::{PB8, PB9}, Alternate, OpenDrain,  gpioc::PC13, Output, PushPull,},
+		    device::I2C1,
+		    }; 
+#[cfg(feature = "stm32f0xx")]  //  eg blue pill stm32f103
+use embedded_hal::digital::v2::OutputPin;
+
+    #[cfg(feature = "stm32f0xx")]
+    fn setup() ->  (BlockingI2c<I2C1,  (PB8<Alternate<OpenDrain>>, PB9<Alternate<OpenDrain>>) >,
+                        PC13<Output<PushPull>>, Delay) {
+       
+       let cp = cortex_m::Peripherals::take().unwrap();
+       let dp = Peripherals::take().unwrap();
+       
+       let mut rcc   = dp.RCC.constrain();
+       let clocks    = rcc.cfgr.freeze(&mut dp.FLASH.constrain().acr);
+
+       let mut gpiob = dp.GPIOB.split(&mut rcc.apb2);  // for i2c scl and sda 
+
+       let i2c = BlockingI2c::i2c1(  
+   	   dp.I2C1,
+   	   
+	   (gpiob.pb8.into_alternate_open_drain(&mut gpiob.crh),    // i2c scl on pb8
+	    gpiob.pb9.into_alternate_open_drain(&mut gpiob.crh)),   // i2c sda on pb9
+   	   
+	   &mut dp.AFIO.constrain(&mut rcc.apb2).mapr,
+
+   	   Mode::Fast {
+   	       frequency: 100_000.hz(),
+   	       duty_cycle: DutyCycle::Ratio2to1,
+   	       },
+   	   clocks,
+   	   &mut rcc.apb1,
+   	   1000,
+   	   10,
+   	   1000,
+   	   1000,
+   	   );
+
+       // led
+       let mut gpioc = dp.GPIOC.split(&mut rcc.apb2);
+       let led = gpioc.pc13.into_push_pull_output(&mut gpioc.crh);   // led on pc13
+
+       (i2c, led,  Delay::new(cp.SYST, clocks))   // return tuple (i2c, led, delay)
+       }
+
+
+
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
 use stm32f1xx_hal::{prelude::*,   
                     pac::Peripherals, 

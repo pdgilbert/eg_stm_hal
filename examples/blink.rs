@@ -43,6 +43,33 @@ use asm_delay::{ AsmDelay, bitrate, };
 // 4. See Note of Interest above.
 
 
+#[cfg(feature = "stm32f0xx")]  //  eg  stm32f303
+use stm32f1xx_hal::{prelude::*,   
+                     pac::Peripherals,
+                     gpio::{gpioc::PC13, Output, PushPull,}, 
+                     };
+
+//#[cfg(feature = "stm32f0xx")]  
+//use embedded_hal::digital::v2::OutputPin;
+
+    #[cfg(feature = "stm32f0xx")]
+    fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
+       
+       let dp        = Peripherals::take().unwrap();
+       let mut rcc   = dp.RCC.constrain(); 
+       let mut gpioc = dp.GPIOC.split(&mut rcc.apb2);
+       
+       impl LED for PC13<Output<PushPull>> {
+           fn   on(&mut self)  -> () { self.set_low().unwrap()  }   
+           fn  off(&mut self)  -> () { self.set_high().unwrap() }
+           };
+
+       // return tuple  (led, delay)
+       (gpioc.pc13.into_push_pull_output(&mut gpioc.crh),      // led on pc13 with on/off
+        AsmDelay::new(bitrate::U32BitrateExt::mhz(16)) )       // delay
+       }
+
+
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
 use stm32f1xx_hal::{prelude::*,   
                      pac::Peripherals,

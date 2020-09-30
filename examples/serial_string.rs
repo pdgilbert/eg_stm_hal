@@ -25,6 +25,80 @@ use cortex_m_semihosting::hprintln;
 
 use eg_stm_hal::to_str;
 
+#[cfg(feature = "stm32f0xx")]  //  eg blue pill stm32f103
+use stm32f0xx_hal::{prelude::*,   
+                    pac::Peripherals, 
+                    serial::{Config, Serial, StopBits, Tx, Rx},  
+		    device::{USART1, USART2, USART3},  
+                    dma::{TxDma, RxDma, dma1::{C2, C3, C4, C5, C6, C7}},
+                    }; 
+
+    #[cfg(feature = "stm32f0xx")]
+    fn setup() ->  (TxDma<Tx<USART1>, C4>, RxDma<Rx<USART1>, C5>, 
+                    TxDma<Tx<USART2>, C7>, RxDma<Rx<USART2>, C6>, 
+                    TxDma<Tx<USART3>, C2>, RxDma<Rx<USART3>, C3> )  {
+
+        let p = Peripherals::take().unwrap();
+    	let mut rcc = p.RCC.constrain();  
+	let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr); 
+        let mut afio = p.AFIO.constrain(&mut rcc.apb2);
+        
+        let channels = p.DMA1.split(&mut rcc.ahb);
+
+    	let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
+
+	let txrx1 = Serial::usart1(
+    	    p.USART1,
+    	    (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),     //tx pa9 
+	     gpioa.pa10),					     //rx pa10
+    	    &mut afio.mapr,
+    	    Config::default() .baudrate(9600.bps()), //.stopbits(StopBits::STOP1
+    	    clocks,
+    	    &mut rcc.apb2,
+    	    );
+
+        let ( tx1, rx1)  = txrx1.split();
+        let tx1  = tx1.with_dma(channels.4);            // console
+        let rx1  = rx1.with_dma(channels.5);
+
+        // ok let (_, tx1) = tx1.write(b"console connect check.").wait(); 
+        // No (_, tx1) = tx1.write(b"console connect check.").wait(); 
+        let tx1 = tx1.write(b"console connect check.").wait().1; 
+ 
+        let txrx2 = Serial::usart2(
+            p.USART2,
+            (gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),     //tx pa2 
+             gpioa.pa3), 					     //rx pa3
+            &mut afio.mapr,
+            Config::default() .baudrate(9_600.bps()) .parity_odd() .stopbits(StopBits::STOP1),
+            clocks,
+            &mut rcc.apb1,
+        );
+
+        let ( tx2, rx2)  = txrx2.split();
+        let tx2  = tx2.with_dma(channels.7);
+        let rx2  = rx2.with_dma(channels.6);
+
+        let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
+
+        let txrx3 = Serial::usart3(
+            p.USART3,
+            ( gpiob.pb10.into_alternate_push_pull(&mut gpiob.crh),   //rx pb10  
+              gpiob.pb11),  					     //tx pb11
+            &mut afio.mapr,
+            Config::default() .baudrate(9_600.bps()) .parity_odd() .stopbits(StopBits::STOP1),
+            clocks,
+            &mut rcc.apb1,    
+        );
+
+        let ( tx3, rx3)  = txrx3.split();
+        let tx3  = tx3.with_dma(channels.2);
+        let rx3  = rx3.with_dma(channels.3);
+
+        (tx1, rx1,   tx2, rx2,   tx3, rx3 )
+	}
+
+
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
 use stm32f1xx_hal::{prelude::*,   
                     pac::Peripherals, 

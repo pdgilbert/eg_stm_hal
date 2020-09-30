@@ -182,7 +182,7 @@ The variable `HAL` is used in the example code whereas some of the underlying HA
 actually need the specific `MCU`.
 Board directories use one of 
 ```
-  export HAL=stm32f0xx MCU=stm32f030   TARGET=thumbv6m-none-eabi     # none-stm32f030      Cortex-M
+  export HAL=stm32f0xx MCU=stm32f030   TARGET=thumbv6m-none-eabi     # none-stm32f030      Cortex-M0
   export HAL=stm32f1xx MCU=stm32f103   TARGET=thumbv7m-none-eabi     # bluepill            Cortex-M3
   export HAL=stm32f1xx MCU=stm32f100   TARGET=thumbv7m-none-eabi     # none-stm32f100      Cortex-M3
   export HAL=stm32f1xx MCU=stm32f101   TARGET=thumbv7m-none-eabi     # none-stm32f101      Cortex-M3

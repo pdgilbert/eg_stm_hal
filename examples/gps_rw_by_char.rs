@@ -33,6 +33,46 @@ use nb::block;
 
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
 
+#[cfg(feature = "stm32f0xx")]  //  eg blue pill stm32f103
+use stm32f0xx_hal::{prelude::*,   
+                    pac::Peripherals, 
+                    serial::{Config, Serial, StopBits, Tx, Rx},  
+		    device::{USART1, USART3}  }; 
+
+    #[cfg(feature = "stm32f0xx")]
+    fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART3>, Rx<USART3>)  {
+        let p = Peripherals::take().unwrap();
+    	let mut rcc = p.RCC.constrain();  
+	let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr); 
+        let mut afio = p.AFIO.constrain(&mut rcc.apb2);
+    	let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
+
+    	// next consumes (moves) arguments other than clocks,  &mut rcc.apb2 and afio.
+	let (tx1, rx1) = Serial::usart1(
+    	    p.USART1,
+    	    (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),     //tx pa9  for console
+	     gpioa.pa10),					     //rx pa10 for console
+    	    &mut afio.mapr,
+    	    Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1), //.parity_odd()
+    	    clocks,
+    	    &mut rcc.apb2,
+    	    ).split();
+
+	let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
+        let (tx3, rx3) = Serial::usart3(
+            p.USART3,
+            (gpiob.pb10.into_alternate_push_pull(&mut gpiob.crh),     //tx pb10  for GPS
+             gpiob.pb11), 					      //rx pb11  for GPS
+            &mut afio.mapr,
+            Config::default() .baudrate(9_600.bps()), 
+            clocks,
+            &mut rcc.apb1,
+        ).split();
+
+        (tx1, rx1,   tx3, rx3 )
+	}
+
+
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
 use stm32f1xx_hal::{prelude::*,   
                     pac::Peripherals, 

@@ -27,6 +27,57 @@ use sx127x_lora;
 
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
 
+#[cfg(feature = "stm32f0xx")]  //  eg blue pill stm32f103
+use stm32f0xx_hal::{prelude::*,   
+                    pac::Peripherals, 
+                    spi::{Spi, Spi1NoRemap},
+                    delay::Delay,
+		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, Input, Floating,  
+                           gpiob::{PB13, PB14}, Output, PushPull},
+		    device::SPI1,
+		    }; 
+    #[cfg(feature = "stm32f0xx")]
+    fn setup() ->  (sx127x_lora::LoRa< Spi<SPI1,  Spi1NoRemap,
+                         (PA5<Alternate<PushPull>>, PA6<Input<Floating>>, PA7<Alternate<PushPull>>), u8>,
+                      PB14<Output<PushPull>>,  PB13<Output<PushPull>> >, Delay) {  //
+
+       let cp = cortex_m::Peripherals::take().unwrap();
+       let p  = Peripherals::take().unwrap();
+
+       let mut rcc   = p.RCC.constrain();
+       let clocks = rcc.cfgr.sysclk(64.mhz()).pclk1(32.mhz()).freeze(&mut p.FLASH.constrain().acr);
+       
+       let mut afio = p.AFIO.constrain(&mut rcc.apb2);
+       let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
+       
+       let spi = Spi::spi1(
+           p.SPI1,
+           (gpioa.pa5.into_alternate_push_pull(&mut gpioa.crl),  //   sck   on PA5
+            gpioa.pa6.into_floating_input(&mut gpioa.crl),       //   miso  on PA6
+            gpioa.pa7.into_alternate_push_pull(&mut gpioa.crl)   //   mosi  on PA7
+            ),
+    	   &mut afio.mapr,
+           sx127x_lora::MODE,
+           8.mhz(),
+           clocks, 
+           &mut rcc.apb2,
+           );
+
+       let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
+                    
+       let mut delay = Delay::new(cp.SYST, clocks);
+
+       // return LoRa object
+       (sx127x_lora::LoRa::new(spi, 
+                              gpiob.pb14.into_push_pull_output(&mut gpiob.crh),     //  cs   on PB14
+                              gpiob.pb13.into_push_pull_output(&mut gpiob.crh),     // reset on PB13
+                              FREQUENCY, 
+                              & mut delay                                      // delay
+			      ).unwrap(), 
+        delay )                                                                    // delay again
+       }
+
+ 
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
 use stm32f1xx_hal::{prelude::*,   
                     pac::Peripherals, 
