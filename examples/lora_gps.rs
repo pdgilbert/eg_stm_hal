@@ -60,71 +60,58 @@ use sx127x_lora;
 
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
 
-#[cfg(feature = "stm32f0xx")]  //  eg blue pill stm32f103
+#[cfg(feature = "stm32f0xx")]  //  eg stm32f030xc
 use stm32f0xx_hal::{prelude::*,   
                     pac::Peripherals, 
-                    serial::{Config, Serial, Tx, Rx},  //, StopBits
-		    device::{USART3},  
-                    spi::{Spi, Spi1NoRemap},
+                    serial::{Serial, Tx, Rx},
+		    pac::{USART3},  
+                    spi::{Spi, EightBit},
                     delay::Delay,
-		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, Input, Floating,  
-                           gpioa::{PA0, PA1}, Output, PushPull},
-		    device::SPI1,
+                    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF0,
+                           gpioa::{PA1}, Output, PushPull,
+                           gpiob::{PB1}, },
+                    pac::SPI1,
 		    }; 
 
     #[cfg(feature = "stm32f0xx")]
     fn setup() ->  (Tx<USART3>, Rx<USART3>,
-                    sx127x_lora::LoRa<Spi<SPI1,  Spi1NoRemap,
-                                          (PA5<Alternate<PushPull>>, 
-		                           PA6<Input<Floating>>, 
-			                   PA7<Alternate<PushPull>>), u8>,
-                                      PA1<Output<PushPull>>,  
-                                      PA0<Output<PushPull>>>, 
-		    Delay )  {
-        let cp = cortex_m::Peripherals::take().unwrap();
-        let p = Peripherals::take().unwrap();
-    	let mut rcc = p.RCC.constrain();  
-	let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr); 
-        let mut afio = p.AFIO.constrain(&mut rcc.apb2);
+                    sx127x_lora::LoRa<Spi<SPI1,  PA5<Alternate<AF0>>, 
+                                          PA6<Alternate<AF0>>, PA7<Alternate<AF0>>, EightBit>,
+                                      PA1<Output<PushPull>>, PB1<Output<PushPull>>>, 
+                    Delay) {
 
-    	let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
-        let (tx, rx) = Serial::usart3(
-            p.USART3,
-            (gpiob.pb10.into_alternate_push_pull(&mut gpiob.crh),    //tx pb10  for GPS
-             gpiob.pb11), 					     //rx pb11  for GPS
-            &mut afio.mapr,
-            Config::default() .baudrate(9_600.bps()), 
-            clocks,
-            &mut rcc.apb1,
-        ).split();
+       let cp = cortex_m::Peripherals::take().unwrap();
+       let mut p  = Peripherals::take().unwrap();
+       let mut rcc = p.RCC.configure().freeze(&mut p.FLASH);
 
-    
-       let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
-       let spi = Spi::spi1(
-           p.SPI1,
-           (gpioa.pa5.into_alternate_push_pull(&mut gpioa.crl),  //   sck   on PA5
-            gpioa.pa6.into_floating_input(&mut gpioa.crl),       //   miso  on PA6
-            gpioa.pa7.into_alternate_push_pull(&mut gpioa.crl)   //   mosi  on PA7
-            ),
-    	   &mut afio.mapr,
-           sx127x_lora::MODE,
-           8.mhz(),
-           clocks, 
-           &mut rcc.apb2,
-           );
+       let gpioa = p.GPIOA.split(&mut rcc);
+       let gpiob = p.GPIOB.split(&mut rcc);
 
-       let mut delay = Delay::new(cp.SYST, clocks);
+       let (tx, rx, sck, miso, mosi, cs, rst) = cortex_m::interrupt::free(move |cs| {
+            (   
+                gpiob.pb10.into_alternate_af4(cs),        //tx pb10  for GPS
+                gpiob.pb11.into_alternate_af4(cs),        //rx pb11  for GPS
+	        
+		gpioa.pa5.into_alternate_af0(cs),         //   sck   on PA5
+                gpioa.pa6.into_alternate_af0(cs),	  //   miso  on PA6
+                gpioa.pa7.into_alternate_af0(cs),	  //   mosi  on PA7
+                
+                gpioa.pa1.into_push_pull_output(cs),	  //  cs   on PA1
+                gpiob.pb1.into_push_pull_output(cs),	  // reset on PB1
+                )
+            });
 
-       let lora = sx127x_lora::LoRa::new(spi, 
-                              gpioa.pa1.into_push_pull_output(&mut gpioa.crl), //  cs   on PA1
-                              gpioa.pa0.into_push_pull_output(&mut gpioa.crl), // reset on PA0
-                              FREQUENCY, 
-                              &mut delay ).unwrap();                           // delay
-			      // .expect("Failed to communicate with radio module!")
+       let (tx, rx) = Serial::usart3(p.USART3, (tx, rx),  9600.bps(), &mut rcc, ).split();
 
+ 
+       let spi = Spi::spi1(p.SPI1, (sck, miso, mosi), sx127x_lora::MODE, 8.mhz(), &mut rcc);
+     
+       let mut delay = Delay::new(cp.SYST, &rcc);
 
-        (tx, rx,  lora,  delay)
-	}
+       let lora = sx127x_lora::LoRa::new(spi, cs, rst, FREQUENCY, &mut delay ).unwrap();
+
+       (tx, rx,  lora,  delay)
+       }
 
 
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103

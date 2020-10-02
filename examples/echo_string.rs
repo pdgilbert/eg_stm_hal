@@ -29,30 +29,31 @@ use eg_stm_hal::to_str;
 #[cfg(feature = "stm32f0xx")]  //  eg blue pill stm32f103
 use stm32f0xx_hal::{prelude::*,   
                     pac::Peripherals, 
-                    serial::{Config, Serial, StopBits, Tx, Rx},
+                    serial::{Serial, Tx, Rx},
 		    dma::{RxDma, dma1::{C5}},     //TxDma,  C4, 
-		    device::USART1 }; 
+		    pac::USART1 }; 
     
     #[cfg(feature = "stm32f0xx")]
-    fn setup() ->  (Tx<USART1>, RxDma<Rx<USART1>, C5>)  {
+    fn setup() ->  (Tx<USART1>, RxDma<Rx<USART1>>)  {
        
-       // with TxDma return    TxDma<Tx<USART1>, C4>
-       let p = Peripherals::take().unwrap();
-       let mut rcc = p.RCC.constrain();  
-       let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr); 
-       let mut afio = p.AFIO.constrain(&mut rcc.apb2);
-       let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
+        let mut p = Peripherals::take().unwrap();
+        let mut rcc = p.RCC.configure().sysclk(48.mhz()).freeze(&mut p.FLASH);
 
-       //let (tx1, rx1) = Serial::usart1(
-       let txrx1 = Serial::usart1(
-	   p.USART1,
-	   (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),     //tx pa9, 
-            gpioa.pa10),					    //rx pa10
-	   &mut afio.mapr,
-	   Config::default() .baudrate(9600.bps()) .stopbits(StopBits::STOP1),
-	   clocks,
-	   &mut rcc.apb2,
-	   );  //.split();
+	let gpioa = p.GPIOA.split(&mut rcc);
+
+        let (tx, rx) = cortex_m::interrupt::free(move |cs| {
+            (
+                gpioa.pa9.into_alternate_af1(cs),     //tx pa9
+                gpioa.pa10.into_alternate_af1(cs),    //rx pa10
+            )
+        });
+
+	let txrx1 = Serial::usart1(
+    	    p.USART1,
+    	    (tx, rx),					    
+    	    9600.bps(),   
+    	    &mut rcc,
+    	    );
 
        let channels = p.DMA1.split(&mut rcc.ahb);
        let (tx1, rx1)  = txrx1.split();

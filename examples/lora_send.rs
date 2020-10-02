@@ -28,66 +28,48 @@ use sx127x_lora;
 
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
 
-#[cfg(feature = "stm32f0xx")]  //  eg blue pill stm32f103
+#[cfg(feature = "stm32f0xx")]  //  eg stm32f030xc
 use stm32f0xx_hal::{prelude::*,   
                     pac::Peripherals, 
-                    spi::{Spi, Spi1NoRemap},
+                    spi::{Spi, EightBit},
                     delay::Delay,
-                    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, Input, Floating,  
-                           gpioa::{PA0, PA1}, Output, PushPull},
-                    device::SPI1,
+                    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF0,
+                           gpioa::{PA1}, Output, PushPull,
+                           gpiob::{PB1}, },
+                    pac::SPI1,
                     }; 
 
     #[cfg(feature = "stm32f0xx")]
-    fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1,  Spi1NoRemap, (PA5<Alternate<PushPull>>, 
-                                          PA6<Input<Floating>>, PA7<Alternate<PushPull>>), u8>,
-                                      PA1<Output<PushPull>>, PA0<Output<PushPull>>>, 
+    fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1,  PA5<Alternate<AF0>>, 
+                                          PA6<Alternate<AF0>>, PA7<Alternate<AF0>>, EightBit>,
+                                      PA1<Output<PushPull>>, PB1<Output<PushPull>>>, 
                     Delay) {
 
        let cp = cortex_m::Peripherals::take().unwrap();
-       let p  = Peripherals::take().unwrap();
+       let mut p  = Peripherals::take().unwrap();
+       let mut rcc = p.RCC.configure().freeze(&mut p.FLASH);
 
-       let mut rcc   = p.RCC.constrain();
-       let clocks = rcc.cfgr.sysclk(64.mhz()).pclk1(32.mhz()).freeze(&mut p.FLASH.constrain().acr);
+       let gpioa = p.GPIOA.split(&mut rcc);
+       let gpiob = p.GPIOB.split(&mut rcc);
        
-       let mut afio = p.AFIO.constrain(&mut rcc.apb2);
-       let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
-       //let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
-    
-       let spi = Spi::spi1(
-           p.SPI1,
-           (gpioa.pa5.into_alternate_push_pull(&mut gpioa.crl),  //   sck   on PA5
-            gpioa.pa6.into_floating_input(&mut gpioa.crl),       //   miso  on PA6
-            gpioa.pa7.into_alternate_push_pull(&mut gpioa.crl)   //   mosi  on PA7
-            ),
-               &mut afio.mapr,
-           sx127x_lora::MODE,
-           8.mhz(),
-           clocks, 
-           &mut rcc.apb2,
-           );
+       let (sck, miso, mosi, cs, rst) = cortex_m::interrupt::free(move |cs| {
+            (   gpioa.pa5.into_alternate_af0(cs),         //   sck   on PA5
+                gpioa.pa6.into_alternate_af0(cs),	  //   miso  on PA6
+                gpioa.pa7.into_alternate_af0(cs),	  //   mosi  on PA7
+                
+                gpioa.pa1.into_push_pull_output(cs),	  //  cs   on PA1
+                gpiob.pb1.into_push_pull_output(cs),	  // reset on PB1
+            )
+        });
 
+   
+       let spi = Spi::spi1(p.SPI1, (sck, miso, mosi), sx127x_lora::MODE, 8.mhz(), &mut rcc);
      
-       let mut delay = Delay::new(cp.SYST, clocks);
+       let mut delay = Delay::new(cp.SYST, &rcc);
 
-       let lora = sx127x_lora::LoRa::new(spi, 
-                              gpioa.pa1.into_push_pull_output(&mut gpioa.crl),     //  cs   on PA1
-                              gpioa.pa0.into_push_pull_output(&mut gpioa.crl),     // reset on PA0
-                              FREQUENCY, 
-                              &mut delay );                                                // delay
-                              // .expect("Failed to communicate with radio module!")
-       
-       let lora =  lora.unwrap();
+       let lora = sx127x_lora::LoRa::new(spi, cs, rst, FREQUENCY, &mut delay ).unwrap();
 
-       //let mut lora =  match lora {
-            //  Ok(v)   => v,
-            //  Err(error) => {hprintln!("Setup Error: {:?}", error);
-        //                 asm::bkpt();
-        //                 //panic();
-        //                 }
-        //  };
-
-       (lora, delay )                                                               // delay again
+       (lora, delay )                                                // delay again
        }
 
 

@@ -44,58 +44,43 @@ use ssd1306::{prelude::*, Builder, I2CDIBuilder};
 
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
 
-#[cfg(feature = "stm32f0xx")]  //  eg blue pill stm32f103
+#[cfg(feature = "stm32f0xx")]  //  eg  stm32f030xc
 use stm32f0xx_hal::{prelude::*,   
                     pac::Peripherals, 
-                    serial::{Config, Serial, Tx, Rx},  //, StopBits
-		    device::{USART3},  
+                    serial::{Serial, Tx, Rx},  
+		    pac::{USART3},  
                     delay::Delay,
-		    i2c::{BlockingI2c, DutyCycle, Mode},
-		    gpio::{gpiob::{PB8, PB9}, Alternate, OpenDrain, },
-		    device::I2C1,
+		    i2c::{I2c, },
+		    gpio::{gpiob::{PB7, PB8}, Alternate, AF1, },
+		    pac::I2C1,
 		    }; 
 
     #[cfg(feature = "stm32f0xx")]
     fn setup() ->  (Tx<USART3>, Rx<USART3>,
-                    BlockingI2c<I2C1,  (PB8<Alternate<OpenDrain>>, PB9<Alternate<OpenDrain>>) >, 
+                    I2c<I2C1,  PB8<Alternate<AF1>>, PB7<Alternate<AF1>> >, 
 		    Delay )  {
 
        let cp = cortex_m::Peripherals::take().unwrap();
-       let p = Peripherals::take().unwrap();
-       let mut rcc = p.RCC.constrain();  
-       let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr); 
-       let mut afio = p.AFIO.constrain(&mut rcc.apb2);
+       let mut p = Peripherals::take().unwrap();
+       let mut rcc = p.RCC.configure().sysclk(48.mhz()).freeze(&mut p.FLASH);
 
-       let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
-       let (tx3, rx3) = Serial::usart3(
-           p.USART3,
-           (gpiob.pb10.into_alternate_push_pull(&mut gpiob.crh),    //tx pb10  for GPS rx
-            gpiob.pb11),					    //rx pb11  for GPS tx
-           &mut afio.mapr,
-           Config::default() .baudrate(9_600.bps()), 
-           clocks,
-           &mut rcc.apb1,
-       ).split();
+       let gpiob = p.GPIOB.split(&mut rcc);
 
-       let i2c = BlockingI2c::i2c1(
-          p.I2C1,
-          (gpiob.pb8.into_alternate_open_drain(&mut gpiob.crh),   // scl on PB8
-           gpiob.pb9.into_alternate_open_drain(&mut gpiob.crh)),  // sda on PB9
-          &mut afio.mapr,
-          Mode::Fast {
-              frequency: 400_000.hz(),
-              duty_cycle: DutyCycle::Ratio2to1,
-          },
-          clocks,
-          &mut rcc.apb1,
-          1000,
-          10,
-          1000,
-          1000,
-          );
+       let (tx3, rx3, scl,  sda) = cortex_m::interrupt::free(move |cs| {
+            (   gpiob.pb10.into_alternate_af4(cs),    //tx pb10
+                gpiob.pb11.into_alternate_af4(cs),    //rx pb11
+             
+                gpiob.pb8.into_alternate_af1(cs),   // scl on PB8
+                gpiob.pb7.into_alternate_af1(cs),   // sda on PB7
+            )
+       });
+
+       let (tx3, rx3) = Serial::usart3( p.USART3, (tx3, rx3),9600.bps(), &mut rcc ).split();
+ 
+       let i2c =  I2c::i2c1(p.I2C1, (scl,  sda), 400.khz(), &mut rcc, );
 
        (tx3, rx3,   i2c,
-        Delay::new(cp.SYST, clocks))
+        Delay::new(cp.SYST, &rcc))
        }
 
 

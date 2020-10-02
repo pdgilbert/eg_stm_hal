@@ -31,26 +31,30 @@ use nb::block;
 #[cfg(feature = "stm32f0xx")]  //  eg blue pill stm32f103
 use stm32f0xx_hal::{prelude::*,   
                     pac::Peripherals, 
-                    serial::{Config, Serial, Tx, Rx},  
-		    device::USART1 
+                    serial::{Serial, Tx, Rx},  
+		    pac::USART1 
 		    }; 
 
     #[cfg(feature = "stm32f0xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>)  {
-        let p = Peripherals::take().unwrap();
-    	let mut rcc = p.RCC.constrain();  
-	let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr); 
-        let mut afio = p.AFIO.constrain(&mut rcc.apb2);
-    	let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
-    	// next consumes (moves) arguments other than clocks,  &mut rcc.apb2 and afio.
+
+        let mut p = Peripherals::take().unwrap();
+        let mut rcc = p.RCC.configure().sysclk(48.mhz()).freeze(&mut p.FLASH);
+
+	let gpioa = p.GPIOA.split(&mut rcc);
+
+        let (tx, rx) = cortex_m::interrupt::free(move |cs| {
+            (
+                gpioa.pa9.into_alternate_af1(cs),     //tx pa9
+                gpioa.pa10.into_alternate_af1(cs),    //rx pa10
+            )
+        });
+
 	Serial::usart1(
     	    p.USART1,
-    	    (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),     //tx pa9
-	     gpioa.pa10),					     //rx pa10
-    	    &mut afio.mapr,
-    	    Config::default() .baudrate(9600.bps()),        //.stopbits(StopBits::STOP1
-    	    clocks,
-    	    &mut rcc.apb2,
+    	    (tx, rx),					    
+    	    9600.bps(),   
+    	    &mut rcc,
     	    ).split()
 	}
 

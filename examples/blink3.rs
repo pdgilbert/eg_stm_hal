@@ -25,7 +25,7 @@ use asm_delay::{ AsmDelay, bitrate, };
 
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
 
-#[cfg(feature = "stm32f0xx")]  //  eg stm32f030
+#[cfg(feature = "stm32f0xx")]  //  eg stm32f030xc
 use stm32f0xx_hal::{prelude::*,   
                      pac::Peripherals,
 		     gpio::{gpiob::{PB13, PB14, PB15}, Output, PushPull,}, 
@@ -37,9 +37,10 @@ use stm32f0xx_hal::{prelude::*,
     #[cfg(feature = "stm32f0xx")]
     fn setup() -> (PB13<Output<PushPull>>, PB14<Output<PushPull>>, PB15<Output<PushPull>>, AsmDelay) {
        
-       let dp        = Peripherals::take().unwrap();
-       let mut rcc   = dp.RCC.constrain(); 
-       let mut gpiob = dp.GPIOB.split(&mut rcc.apb2);
+       let mut p   = Peripherals::take().unwrap();
+       let mut rcc = p.RCC.configure().sysclk(8.mhz()).freeze(&mut p.FLASH);
+       
+       let gpiob = p.GPIOB.split(&mut rcc);
 
        impl LED for PB13<Output<PushPull>> {
            fn   on(&mut self)  -> () { self.set_high().unwrap()  }   
@@ -56,11 +57,18 @@ use stm32f0xx_hal::{prelude::*,
            fn  off(&mut self)  -> () { self.set_low().unwrap() }
            };
 
+      // Next is following examples in https://github.com/stm32-rs/stm32f0xx-hal/
+      // I do not understand the logic and advantage / disadvantage of this  relative
+      // to the setup for other hals.
+
+      let (led1, led2, led3) = cortex_m::interrupt::free(move |cs| {
+               (gpiob.pb13.into_push_pull_output(cs),                      // led on pb13
+		gpiob.pb14.into_push_pull_output(cs),                      // led on pb14
+		gpiob.pb15.into_push_pull_output(cs),                      // led on pb15
+		) });
 
        // return (led1, led2, led3, delay)
-       (gpiob.pb13.into_push_pull_output(&mut gpiob.crh),  // led on pb13
-        gpiob.pb14.into_push_pull_output(&mut gpiob.crh),  // led on pb14
-        gpiob.pb15.into_push_pull_output(&mut gpiob.crh),  // led on pb15
+       (led1, led2, led3, 
         AsmDelay::new(bitrate::U32BitrateExt::mhz(16)) )             // delay	
        }
 

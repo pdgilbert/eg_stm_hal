@@ -51,50 +51,55 @@ use nb::block;
 //    Other registers are used to enable and configure the device.
 
 
-#[cfg(feature = "stm32f0xx")]  //  eg blue pill stm32f103
+#[cfg(feature = "stm32f0xx")]  //  eg stm32f030xc
 use stm32f0xx_hal::{prelude::*,   
                     pac::Peripherals, 
-                    serial::{Config, Serial, StopBits, Tx, Rx},  
-		    device::{USART1, USART2, USART3}  }; 
+                    serial::{Serial, Tx, Rx},  
+		    pac::{USART1, USART2, USART3} 
+		    }; 
 
     #[cfg(feature = "stm32f0xx")]
     fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>, Tx<USART3>, Rx<USART3> )  {
-        let p = Peripherals::take().unwrap();
-    	let mut rcc = p.RCC.constrain();  
-	let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr); 
-        let mut afio = p.AFIO.constrain(&mut rcc.apb2);
-    	let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
-    	// next consumes (moves) arguments other than clocks,  &mut rcc.apb2 and afio.
+
+        let mut p = Peripherals::take().unwrap();
+        let mut rcc = p.RCC.configure().sysclk(48.mhz()).freeze(&mut p.FLASH);
+
+	let gpioa = p.GPIOA.split(&mut rcc);
+	let gpiob = p.GPIOB.split(&mut rcc);
+
+        let (tx1, rx1,  tx2, rx2,  tx3, rx3) = cortex_m::interrupt::free(move |cs| {
+            (
+                gpioa.pa9.into_alternate_af1(cs),     //tx pa9
+                gpioa.pa10.into_alternate_af1(cs),    //rx pa10
+
+                gpioa.pa2.into_alternate_af1(cs),     //tx pa2
+                gpioa.pa3.into_alternate_af1(cs),     //rx pa3
+
+                gpiob.pb10.into_alternate_af4(cs),    //tx pb10
+                gpiob.pb11.into_alternate_af4(cs),    //rx pb11
+                )
+            });
+
 	let (tx1, rx1) = Serial::usart1(
     	    p.USART1,
-    	    (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),     //tx pa9 
-	     gpioa.pa10),					     //rx pa10
-    	    &mut afio.mapr,
-    	    Config::default() .baudrate(9600.bps()), //.stopbits(StopBits::STOP1
-    	    clocks,
-    	    &mut rcc.apb2,
+    	    (tx1, rx1),					    
+    	    9600.bps(),   
+    	    &mut rcc,
     	    ).split();
-        let (tx2, rx2) = Serial::usart2(
-            p.USART2,
-            (gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),     //tx pa2 
-             gpioa.pa3), 					     //rx pa3
-            &mut afio.mapr,
-            Config::default() .baudrate(9_600.bps()) .parity_odd() .stopbits(StopBits::STOP1),
-            clocks,
-            &mut rcc.apb1,
-        ).split();
 
-        let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
+	let (tx2, rx2) = Serial::usart2(
+    	    p.USART2,
+    	    (tx2, rx2),					    
+    	    9600.bps(),   
+    	    &mut rcc,
+    	    ).split();
 
-        let (tx3, rx3) = Serial::usart3(
-            p.USART3,
-            ( gpiob.pb10.into_alternate_push_pull(&mut gpiob.crh),   //rx pb10  
-              gpiob.pb11),  					     //tx pb11
-            &mut afio.mapr,
-            Config::default() .baudrate(9_600.bps()) .parity_odd() .stopbits(StopBits::STOP1),
-            clocks,
-            &mut rcc.apb1,    
-        ).split();
+	let (tx3, rx3) = Serial::usart3(
+    	    p.USART3,
+    	    (tx3, rx3),					    
+    	    9600.bps(),   
+    	    &mut rcc,
+    	    ).split();
 
         (tx1, rx1,   tx2, rx2,   tx3, rx3 )
 	}

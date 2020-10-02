@@ -32,42 +32,30 @@ use ssd1306::{prelude::*, Builder, I2CDIBuilder};
 
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
 
-#[cfg(feature = "stm32f0xx")]  //  eg blue pill stm32f103
+#[cfg(feature = "stm32f0xx")]  //  eg stm32f030xc
 use stm32f0xx_hal::{prelude::*,
                     pac::Peripherals, 
-		    i2c::{BlockingI2c, DutyCycle, Mode},
-		    gpio::{gpiob::{PB8, PB9}, Alternate, OpenDrain, },
-		    device::I2C1,
+		    i2c::{I2c, },
+		    gpio::{gpiob::{PB7, PB8}, Alternate, AF1, },
+		    pac::I2C1,
 		    };
 
     #[cfg(feature = "stm32f0xx")]
-    fn setup() ->  BlockingI2c<I2C1,  (PB8<Alternate<OpenDrain>>, PB9<Alternate<OpenDrain>>) > {
-  
-       let p = Peripherals::take().unwrap();
-       let mut rcc = p.RCC.constrain();
+    fn setup() ->  I2c<I2C1,  PB8<Alternate<AF1>>, PB7<Alternate<AF1>> > {
 
-       let clocks = rcc.cfgr.freeze(&mut  p.FLASH.constrain().acr);
-       let mut afio = p.AFIO.constrain(&mut rcc.apb2);
+       let mut p   = Peripherals::take().unwrap();
+       let mut rcc = p.RCC.configure().freeze(&mut p.FLASH);
 
-       let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
+       let gpiob = p.GPIOB.split(&mut rcc);
        
+       let  (scl,  sda) = cortex_m::interrupt::free(move |cs| {
+            (gpiob.pb8.into_alternate_af1(cs),   // scl on PB8
+             gpiob.pb7.into_alternate_af1(cs),   // sda on PB7
+             )
+            });
+ 
        // return i2c
-       BlockingI2c::i2c1(
-   	   p.I2C1,
-   	   (gpiob.pb8.into_alternate_open_drain(&mut gpiob.crh),   // scl on PB8
-	    gpiob.pb9.into_alternate_open_drain(&mut gpiob.crh)),  // sda on PB9
-   	   &mut afio.mapr,
-   	   Mode::Fast {
-   	       frequency: 400_000.hz(),
-   	       duty_cycle: DutyCycle::Ratio2to1,
-   	   },
-   	   clocks,
-   	   &mut rcc.apb1,
-   	   1000,
-   	   10,
-   	   1000,
-   	   1000,
-           )
+       I2c::i2c1(p.I2C1, (scl,  sda), 400.khz(), &mut rcc, )
        }
 
 
