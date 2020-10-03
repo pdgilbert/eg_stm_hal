@@ -73,7 +73,11 @@ use stm32f0xx_hal::{prelude::*,
        }
 
 
-
+#[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
+use stm32f1xx_hal::{prelude::*, 
+                    pac::{Peripherals}, 
+    	            gpio::{gpiob::{PB13, PB14, PB15}, Output, PushPull,}, 
+		    };
 
 #[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
 use embedded_hal::digital::v2::OutputPin;

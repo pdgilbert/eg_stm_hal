@@ -226,6 +226,9 @@ use stm32l4xx_hal::{prelude::*,
 		    gpio::{gpioa::PA8, OpenDrain,  Output, },
 		    };
 
+//#[cfg(feature = "stm32l4xx")]
+//use embedded_hal::digital::v2::OutputPin;
+
     #[cfg(feature = "stm32l4xx")]           // Use HSE oscillator
     fn setup() -> (Dht11<PA8<Output<OpenDrain>>>,  Delay) {
        
