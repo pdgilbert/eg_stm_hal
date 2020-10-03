@@ -443,7 +443,6 @@ use stm32l4xx_hal::{prelude::*,
 
        let p         = Peripherals::take().unwrap();
        let mut flash = p.FLASH.constrain();
-       let rcc       = p.RCC.constrain();  
        let mut rcc   = p.RCC.constrain();
        let mut pwr   = p.PWR.constrain(&mut rcc.apb1r1);
        let clocks    = rcc.cfgr .sysclk(80.mhz()) .pclk1(80.mhz()) 
@@ -477,7 +476,7 @@ use stm32l4xx_hal::{prelude::*,
            gpiob.pb11.into_af7(&mut gpiob.moder, &mut gpiob.afrh)),          //rx pb11 
           Config::default() .baudrate(115_200.bps()) ,
           clocks,
-          &mut rcc.apb2,
+          &mut rcc.apb1r1,
           ).split();
 
        (tx1, rx1,   tx2, rx2,   tx3, rx3 )
