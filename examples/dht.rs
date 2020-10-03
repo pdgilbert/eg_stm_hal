@@ -35,19 +35,17 @@ use stm32f0xx_hal::{prelude::*,
     #[cfg(feature = "stm32f0xx")]
     fn setup() -> (PA8<Output<OpenDrain>>,  Delay) {
       
-       let cp = CorePeripherals::take().unwrap();
-       let  p = Peripherals::take().unwrap();
+       let cp      = CorePeripherals::take().unwrap();
+       let mut p   = Peripherals::take().unwrap();
+       let mut rcc = p.RCC.configure().freeze(&mut p.FLASH);
+      
+       let gpioa  = p.GPIOA.split(&mut rcc);
 
-       let mut rcc = p.RCC.constrain();
-       let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
-       
-       // delay is used by `dht-sensor` to wait for signals
-       let mut delay = Delay::new(cp.SYST, clocks);   //SysTick: System Timer
+       let pin_a8 = cortex_m::interrupt::free(move |cs| 
+                   gpioa.pa8.into_open_drain_output(cs) );
 
-       let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
-       let pin_a8    = gpioa.pa8.into_open_drain_output(&mut gpioa.crh); 
-       //let mut pin_a8 = cortex_m::interrupt::free(|cs| pin_a8.into_open_drain_output(cs));
- 
+       let mut delay = Delay::new(cp.SYST, &rcc);
+
        //  1 second delay (for DHT11 setup?) Wait on  sensor initialization?
        delay.delay_ms(1000_u16);
       

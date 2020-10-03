@@ -80,8 +80,8 @@ use stm32f0xx_hal::{prelude::*,
                                       PA1<Output<PushPull>>, PB1<Output<PushPull>>>, 
                     Delay) {
 
-       let cp = cortex_m::Peripherals::take().unwrap();
-       let mut p  = Peripherals::take().unwrap();
+       let cp      = cortex_m::Peripherals::take().unwrap();
+       let mut p   = Peripherals::take().unwrap();
        let mut rcc = p.RCC.configure().freeze(&mut p.FLASH);
 
        let gpioa = p.GPIOA.split(&mut rcc);

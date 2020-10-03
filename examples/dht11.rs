@@ -32,16 +32,18 @@ use stm32f0xx_hal::{prelude::*,
     #[cfg(feature = "stm32f0xx")]
     fn setup() -> (Dht11<PA8<Output<OpenDrain>>>,  Delay) {
        
-       let cp = CorePeripherals::take().unwrap();
-       let  p = Peripherals::take().unwrap();
-       
-       let mut rcc = p.RCC.constrain();
-       let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
-       let mut gpioa  = p.GPIOA.split(&mut rcc.apb2);
-       let pin_a8 = gpioa.pa8.into_open_drain_output(&mut gpioa.crh);
-       
+       let cp      = CorePeripherals::take().unwrap();
+       let mut p   = Peripherals::take().unwrap();
+       let mut rcc = p.RCC.configure().freeze(&mut p.FLASH);
+      
+       let gpioa  = p.GPIOA.split(&mut rcc);
+
+       let pin_a8 = cortex_m::interrupt::free(move |cs| 
+                   gpioa.pa8.into_open_drain_output(cs) );
+
+     
        (Dht11::new(pin_a8),                   //DHT11 data on A8
-        Delay::new(cp.SYST, clocks))
+        Delay::new(cp.SYST, &rcc))
        }
 
 
