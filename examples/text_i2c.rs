@@ -270,12 +270,12 @@ use stm32l1xx_hal::{prelude::*,
 use stm32l4xx_hal::{prelude::*,  
                     pac::Peripherals, 
                     i2c::{I2c, },  
-		    gpio::{gpiob::{PB8, PB9}, Alternate, AF4, Output, OpenDrain, },
-                    pac::I2C1,
+		    gpio::{gpiob::{PB10, PB11}, Alternate, AF4, Output, OpenDrain, },
+                    pac::I2C2,
 		    }; 
 
     #[cfg(feature = "stm32l4xx")]
-    fn setup() ->  I2c<I2C1, (PB8<Alternate<AF4, Output<OpenDrain>>>, PB9<Alternate<AF4, Output<OpenDrain>>>)> {
+    fn setup() ->  I2c<I2C2, (PB10<Alternate<AF4, Output<OpenDrain>>>, PB11<Alternate<AF4, Output<OpenDrain>>>)> {
   
        let  p     = Peripherals::take().unwrap();
        let mut flash = p.FLASH.constrain();
@@ -288,16 +288,16 @@ use stm32l4xx_hal::{prelude::*,
        
        
        // following ttps://github.com/stm32-rs/stm32l4xx-hal/blob/master/examples/i2c_write.rs
-       let mut scl = gpiob.pb8.into_open_drain_output(&mut gpiob.moder, &mut gpiob.otyper);  // scl on PB8
+       let mut scl = gpiob.pb10.into_open_drain_output(&mut gpiob.moder, &mut gpiob.otyper);  // scl on PB10
        scl.internal_pull_up(&mut gpiob.pupdr, true);
        let scl = scl.into_af4(&mut gpiob.moder, &mut gpiob.afrh);
 
-       let mut sda = gpiob.pb9.into_open_drain_output(&mut gpiob.moder, &mut gpiob.otyper);  // sda on PB9
+       let mut sda = gpiob.pb11.into_open_drain_output(&mut gpiob.moder, &mut gpiob.otyper);  // sda on PB11
        sda.internal_pull_up(&mut gpiob.pupdr, true);
        let sda = sda.into_af4(&mut gpiob.moder, &mut gpiob.afrh);
     
        // return i2c
-       I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks, &mut rcc.apb1r1)
+       I2c::i2c2(p.I2C2, (scl, sda), 400.khz(), clocks, &mut rcc.apb1r1)
        }
 
 
