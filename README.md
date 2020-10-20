@@ -141,7 +141,7 @@ embedded-graphics,
 and
 [sx127x_lora from hdoordt](https://github.com/hdoordt/sx127x_lora) 
 (or possibly from
-[mr-git](https://github.com/mr-git/sx127x_lora).
+[mr-git](https://github.com/mr-glt/sx127x_lora).
 or
 [mvniekerk](https://github.com/mvniekerk/sx127x_lora) )
 The status of the additional examples is
