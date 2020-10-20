@@ -153,17 +153,16 @@ use stm32f4xx_hal::{prelude::*,
 #[cfg(feature = "stm32f7xx")] 
 use stm32f7xx_hal::{prelude::*,  
                     pac::Peripherals, 
-                    i2c::{I2c, PinScl, PinSda},  
-		    gpio::{gpiob::{PB8, PB9}, Alternate, AF4, },
-                    pac::I2C1,
+                    i2c::{BlockingI2c, Mode, PinScl, PinSda},  
+		    pac::I2C1,
 		    }; 
 
-    //fn setup() ->  I2c<I2C1, PB8<Alternate<AF4>>, PB9<Alternate<AF4>>> {
-    //fn setup() ->  I2c<I2C1, impl PinScl<AF4>, impl PinSda<AF4>> {
-    //fn setup() ->  I2c<I2C1, impl PinScl<I2C1>, impl PinSda<I2C1>> {
-    //fn setup() ->  I2c<I2C1, impl Pins<I2C1>>{
+    //fn setup() ->  BlockingI2c<I2C1, PB8<Alternate<AF4>>, PB9<Alternate<AF4>>> {
+    //fn setup() ->  BlockingI2c<I2C1, impl PinScl<AF4>, impl PinSda<AF4>> {
+    //fn setup() ->  BlockingI2c<I2C1, impl PinScl<I2C1>, impl PinSda<I2C1>> {
+    //fn setup() ->  BlockingI2c<I2C1, impl PinScl<I2C1>, impl PinSda<I2C1>> {
     #[cfg(feature = "stm32f7xx")]
-    fn setup() ->  I2c<I2C1, PB8<Alternate<AF4>>, PB9<Alternate<AF4>>> {
+    fn setup() ->  BlockingI2c<I2C1, impl PinScl<I2C1>, impl PinSda<I2C1>> {
 
        let  p  = Peripherals::take().unwrap();
        let mut rcc = p.RCC.constrain();
@@ -175,7 +174,14 @@ use stm32f7xx_hal::{prelude::*,
        let sda = gpiob.pb9.into_alternate_af4().set_open_drain();   // sda on PB9
        
        // return i2c
-       I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks, &mut rcc.apb1)
+       BlockingI2c::i2c1(
+           p.I2C1, 
+	   (scl, sda), 
+	   //400.khz(), 
+   	   Mode::Fast { frequency: 400_000.hz(), },
+	   clocks, 
+	   &mut rcc.apb1,
+	   1000)
        }
 
 

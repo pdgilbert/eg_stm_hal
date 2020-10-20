@@ -230,14 +230,13 @@ use stm32f7xx_hal::{prelude::*,
                     serial::{Config, Serial, Tx, Rx, Oversampling, },
 		    pac::{USART2}, 
                     delay::Delay,
-		    i2c::{I2c, PinScl, PinSda, Mode, },  
-		    gpio::{gpiob::{PB8, PB9}, Alternate, AF4, },
-                    pac::I2C1,
+		    i2c::{BlockingI2c, PinScl, PinSda, Mode, },  
+		    pac::I2C1,
 		    };
 
     #[cfg(feature = "stm32f7xx")]
     fn setup() ->  (Tx<USART2>, Rx<USART2>,
-                    I2c<I2C1, PB8<Alternate<AF4>>, PB9<Alternate<AF4>>>, 
+                    BlockingI2c<I2C1, impl PinScl<I2C1>, impl PinSda<I2C1>>, 
                     Delay ) {
 
        let cp = cortex_m::Peripherals::take().unwrap();
@@ -265,7 +264,8 @@ use stm32f7xx_hal::{prelude::*,
        let sda = gpiob.pb9.into_alternate_af4().set_open_drain();   // sda on PB9
        
        (tx2, rx2,   
-	I2c::i2c1(p.I2C1, (scl, sda), Mode::standard(400_000.hz()), clocks, &mut rcc.apb1), // i2c
+	BlockingI2c::i2c1(p.I2C1, (scl, sda), 
+	            Mode::standard(400_000.hz()), clocks, &mut rcc.apb1,1000), // i2c
         Delay::new(cp.SYST, clocks))
        }
 
