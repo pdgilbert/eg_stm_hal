@@ -133,6 +133,17 @@ so, only USART1 is available. This means that examples using more than one USART
 
 ## Table of Additional Examples Status
 
+Additional examples use crates 
+[dht-sensor](https://github.com/michaelbeaumont/dht-sensor),
+[dht11](https://github.com/plorefice/dht11-rs),
+[ssd1306](https://github.com/jamwaffles/ssd1306),
+embedded-graphics,
+and
+[sx127x_lora from hdoordt](https://github.com/hdoordt/sx127x_lora) 
+(or possibly from
+[mr-git](https://github.com/mr-git/sx127x_lora).
+or
+[mvniekerk](https://github.com/mvniekerk/sx127x_lora) )
 The status of the additional examples is
 
 |    hal      | board   |                {{dht}}                     |                {{dht11}}                    |                 {{text_i2c}}                      |                {{oled_gps}}                      |                {{lora_send}}               |                {{lora_receive}}               |                {{lora_gps}}               |
