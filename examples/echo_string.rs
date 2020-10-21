@@ -17,7 +17,7 @@ extern crate panic_halt;
 
 use cortex_m::singleton;
 use cortex_m_rt::entry;
-use core::fmt::Write;  // for writeln, but not supported by stm32f3xx_hal
+//use core::fmt::Write;  // for writeln, but not supported by stm32f3xx_hal
 use cortex_m_semihosting::hprintln;
 //use nb::block;
 
@@ -68,13 +68,13 @@ use stm32f0xx_hal::{prelude::*,
 use stm32f1xx_hal::{prelude::*,   
                     pac::Peripherals, 
                     serial::{Config, Serial, StopBits, Tx, Rx},
-		    dma::{RxDma, dma1::{C5}},     //TxDma,  C4, 
+		    dma::{RxDma, TxDma,  dma1::{C5, C4},}, 
 		    device::USART1 }; 
     
     #[cfg(feature = "stm32f1xx")]
-    fn setup() ->  (Tx<USART1>, RxDma<Rx<USART1>, C5>)  {
+    fn setup() ->  (TxDma<Tx<USART1>, C4>, RxDma<Rx<USART1>, C5>)  {
        
-       // with TxDma return    TxDma<Tx<USART1>, C4>
+       // with Tx return  Tx<USART1> ; with TxDma return  TxDma<Tx<USART1>, C4>
        let p = Peripherals::take().unwrap();
        let mut rcc = p.RCC.constrain();  
        let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr); 
@@ -92,9 +92,13 @@ use stm32f1xx_hal::{prelude::*,
 	   &mut rcc.apb2,
 	   );  //.split();
 
+       // Note: in stm32f1xx_hal writeln! does not work with TxDma
+       //  writeln!(tx1, "\r\ncheck console output.\r\n").unwrap();
+       //  and without dma tx1.write() expects u8 not &[u8; 25]
+
        let channels = p.DMA1.split(&mut rcc.ahb);
        let (tx1, rx1)  = txrx1.split();
-       //let tx1 = tx1.with_dma(channels.4);
+       let tx1 = tx1.with_dma(channels.4);
        let rx1 = rx1.with_dma(channels.5);
        (tx1, rx1)
        }
@@ -105,11 +109,12 @@ use stm32f1xx_hal::{prelude::*,
 use stm32f3xx_hal::{prelude::*, 
                     stm32::Peripherals,
 		    serial::{Serial, Tx, Rx}, 
+		    dma::dma1, 
 		    stm32::USART1 
 		    };
 
     #[cfg(feature = "stm32f3xx")]
-    fn setup() ->  (Tx<USART1>, Rx<USART1>)  {
+    fn setup() ->  (Tx<USART1>, dma1::C4, Rx<USART1>, dma1::C5)  {
 
        let p = Peripherals::take().unwrap();
        let mut rcc = p.RCC.constrain();  
@@ -125,8 +130,15 @@ use stm32f3xx_hal::{prelude::*,
     	   &mut rcc.apb2,
            );
 
-       let (mut tx1, mut rx1)  = txrx1.split();
-       (tx1, rx1)
+       let (tx1, rx1)  = txrx1.split();
+
+       let dma1 = p.DMA1.split(&mut rcc.ahb);
+       let (tx1_ch, rx1_ch) = (dma1.ch4, dma1.ch5);
+       //let (tx2_ch, rx2_ch) = (dma1.ch6, dma1.ch7);
+       //let (tx3_ch, rx3_ch) = (dma1.ch3, dma1.ch2);
+
+
+       (tx1, tx1_ch,   rx1, rx1_ch)
        }
 
 
@@ -318,36 +330,61 @@ fn main() -> ! {
      
     //see serial_char.rs and  echo_by_char.rs for additional comments.
 
-    let (mut tx1, rx1) = setup();
-
-    let mut rx1buf = (singleton!(: [u8; 15] = [0; 15]).unwrap(), rx1);
-    //let mut tx1buf = (singleton!(: [u8; 15] = [0; 15]).unwrap(), tx1);
+    let (tx1, tx1_ch,   rx1, rx1_ch) = setup();
 
     hprintln!("test write to console ...").unwrap();
 
-    // writeln! does not work with TxDma
-    writeln!(tx1, "\r\ncheck console output.\r\n").unwrap();
-    // and without dma next expects u8 not &[u8; 25]
-    //let (_, tx1) = tx1.write(b"\r\ncheck console output.\r\n").wait();
-    //let tx1buf = tx1buf.1.write(b"\r\ncheck console output.\r\n").wait();
+    let buf = singleton!(: [u8; 15] = *b"\r\ncheck console").unwrap();
+    
+    let send = tx1.write_all(buf, tx1_ch);
+    let x = send.wait();                         //this is 3-tuple
+    let (buf, tx1_ch, tx1) = x;
+    
+    // But attempting to modify rather than re-assign does not work.
+    //   (buf, tx1_ch, tx1) = x;
+    // gives cannot ... destructuring assignments are not currently supported
 
+    *buf = *b"\r\nSlowly type  ";  //NB. 15 characters
+    
+    // Note that the buf assigned next is the one that will be used below in recv() and
+    //   its size is determined by the size of the argument buf (15 as set above).
+    
+    let (buf, tx1_ch, tx1) = tx1.write_all(buf, tx1_ch).wait();
+    
+    let longer_buf = singleton!(: [u8; 36] = *b"15 characters in console.  Repeat.\r\n").unwrap();
+    let (_longer_buf, tx1_ch, tx1) = tx1.write_all(longer_buf, tx1_ch).wait();
+
+
+    // Now read from console into  buf and echo back to console
 
     hprintln!("Enter 15 characters in console. Repeat.").unwrap();
     hprintln!("Use ^C in gdb to exit.").unwrap();
 
-    writeln!(tx1, "\r\nEnter 15 characters here in the console. Repeat.\r\n").unwrap();
-    //let (_, tx1) =  tx1.write(b"\r\nEnter 15 characters below. Repeat.\r\n").wait();
-    //let tx1buf = tx1buf.1.write(b"\r\nEnter 15 characters below. Repeat.\r\n").wait();
+    // repeat read buf and echo. Outside of loop this would work, even multple times:
+    //   let (buf, rx1_ch, rx1) = rx1.read_exact(buf, rx1_ch).wait();
+    //   let (buf, tx1_ch, tx1) = tx1.write_all( buf, tx1_ch).wait();
+    // but  when moved into a loop there are problems with
+    // value moved in previous iteration of loop.
+    // That problem would be fixed by modifying mut variables but because of 
+    // "cannot ... destructuring assignments" problem the 3-tuple needs to be kept
+    // and elements referenced.
 
-    // cannot get loop to work with tuple (buf, rx1), there seem to be circular problems
-    // with move/borrow/mut  but rx1buf structure works ...
 
-    //each pass in loop waits for input of 15 chars typed in console
+    // create recv and send structures that can be modified in loop rather than re-assigned.
+    let mut recv = rx1.read_exact(buf, rx1_ch).wait();    //this is 3-tuple (buf, rx1_ch, rx1)
+    hprintln!("first 15 characters received {:?}", to_str(recv.0)).unwrap();
+    let mut send = tx1.write_all(recv.0, tx1_ch).wait();  //this is 3-tuple (buf, tx1_ch, tx1)
+
+    // Note send (write) is using buf as put into recv (read). The returned buffer in recv and
+    //   the argument buffer in send are data. The argument buffer in recv may be a holding spot 
+    //   to put return buffer? but it is not part of the program logic. The size of the return
+    //   buffer from recv does seem to be determined by the size of the recv argument buffer.
+    //   The return buffer from send seems like it should be unnecessary, but it does provide
+    //   the buffer needed in the recv argument.
+    
+    //each pass in loop waits for input of 15 chars typed in console then echos them
     loop { 
-       rx1buf = rx1buf.1.read(rx1buf.0).wait();
-       hprintln!("received {:?}", to_str(rx1buf.0)).unwrap();
-       //tx1buf = tx1buf.1.write(rx1buf.0).wait();
-       //tx1.write(rx1buf.0).wait();
-       writeln!(tx1, "{}\r", to_str(rx1buf.0)).unwrap();
+       recv = recv.2.read_exact(send.0, recv.1).wait();   
+       send = send.2.write_all( recv.0, send.1).wait(); 
        }
 }
