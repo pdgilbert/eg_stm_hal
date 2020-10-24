@@ -3,7 +3,7 @@
 //! This example differs from example serial_char in that it attempts to send 
 //! a whole buffer rather than a single byte.
 //! See example serial_char regarding the usart details, pins connections,
-//! and additional comments.
+//! and echo_string.rs for additional comments.
 
 
 #![deny(unsafe_code)]
@@ -178,10 +178,13 @@ use stm32f1xx_hal::{prelude::*,
 use stm32f3xx_hal::{prelude::*, 
                     stm32::Peripherals,
                     serial::{ Serial, Tx, Rx},
+		    dma::dma1, 
 		    stm32::{USART1, USART2, USART3} };
 
     #[cfg(feature = "stm32f3xx")]
-    fn setup() ->  (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>, Tx<USART3>, Rx<USART3> )  {
+    fn setup() ->  (Tx<USART1>, dma1::C4, Rx<USART1>, dma1::C5,
+                    Tx<USART2>, dma1::C7, Rx<USART2>, dma1::C6, 
+		    Tx<USART3>, dma1::C2, Rx<USART3>, dma1::C3 )  {
         let p = Peripherals::take().unwrap();
     	let mut rcc = p.RCC.constrain();  
 	let clocks  = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr); 
@@ -200,7 +203,7 @@ use stm32f3xx_hal::{prelude::*,
             p.USART2,
             (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl),    //tx pa2
              gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)),   //rx pa3
-            115_200.bps(), // 9600.bps(), 
+            115_200.bps(), // or 9600.bps(), 
             clocks,
             &mut rcc.apb1,
             ).split();
@@ -209,14 +212,19 @@ use stm32f3xx_hal::{prelude::*,
 
         let (tx3, rx3) = Serial::usart3(
             p.USART3,
-            (gpiob.pb10.into_af7(&mut gpiob.moder, &mut gpiob.afrh),   //rx pb10
-             gpiob.pb11.into_af7(&mut gpiob.moder, &mut gpiob.afrh)),  //tx pb11
-            115_200.bps(), // 9600.bps(), 
+            (gpiob.pb10.into_af7(&mut gpiob.moder, &mut gpiob.afrh),   //tx pb10
+             gpiob.pb11.into_af7(&mut gpiob.moder, &mut gpiob.afrh)),  //rx pb11
+            115_200.bps(), // or 9600.bps(), 
             clocks,
             &mut rcc.apb1,  
             ).split();
 
-        (tx1, rx1,   tx2, rx2,   tx3, rx3 )
+       let dma1 = p.DMA1.split(&mut rcc.ahb);
+       let (tx1_ch, rx1_ch) = (dma1.ch4, dma1.ch5);
+       let (tx2_ch, rx2_ch) = (dma1.ch7, dma1.ch6);
+       let (tx3_ch, rx3_ch) = (dma1.ch2, dma1.ch3);
+
+        (tx1, tx1_ch,  rx1, rx1_ch,    tx2, tx2_ch, rx2, rx2_ch,   tx3, tx3_ch, rx3, rx3_ch )
 	}
 
 
@@ -506,107 +514,73 @@ use stm32l4xx_hal::{prelude::*,
 
     // End of hal/MCU specific setup. Following should be generic code.
 
+const BUF_SIZE: usize = 20;
 
 
 #[entry]
 fn main() -> ! {
-
-    hprintln!("initializing ...").unwrap();
-    hprintln!("testing console output ").unwrap();
     
-    let ( tx1, _rx1,   mut tx2,  _rx2,    _tx3, rx3 ) = setup();  
+    // See echo_string.rs for additional comments.
+    
+    let ( tx1, tx1_ch,  _rx1, _rx1_ch,    tx2, tx2_ch,  _rx2, _rx2_ch,    _tx3, _tx3_ch, rx3, rx3_ch ) = setup();
 
-//    fn putTx1(string: &[u8] ) -> usize {
-//	 tx1.write(string).ok() ;
-//	 string.len()
-//	 }
-//    
-//    #[not(cfg(feature = "stm32f1xx"))]
-//    fn putTx1(string: &[u8] ) -> usize {
-//	 for byte in  string { block!(tx1.write(*byte)).ok() };
-//	 string.len()
-//	 }
-//     iterator fails if string is too long
-//    for byte in  b"tx2 to rx3 test with X\r\n" { block!(tx1.write(*byte)).unwrap(); }
+    // The first use of read_exact() and write_all() create send1, recv3, and send2 structures that can be
+    // modified (even inside a loop). Those structures are then used for additional  read_exact() and write_all(). 
 
-//    type Tx = stm32f1xx_hal::serial::Tx<USART1>;
-//
-//    pub fn putTx(tx: Tx,   string: &[u8] ) -> bool {
-//       for byte in  string {
-//	   block!(tx.write(*byte)).unwrap() 
-//	   //match block!(tx.write(*byte)).unwrap() {
-//	   //Ok(str)	=> &str,
-//	   //Err(error) => '.'asUtf8,
-//	   //}
-//	   }
-//       true
-//       }
-//    putTx(tx1,  send);
+    hprintln!("testing write to console").unwrap();
 
-//    let mut received = [0u8; 64];
-//    for i in  range(0..len(received))  {
-//     received[0] = block!(rx3.read()).unwrap();  
-//       i += 1;
-//    }
+    //this is 3-tuple send structure (buf1, tx1_ch, tx1)
+    let buf1 = singleton!(: [u8; BUF_SIZE] = *b"\r\ncheck console...\r\n").unwrap();
+    let mut send1 = tx1.write_all( buf1, tx1_ch).wait();
 
-    #[cfg(feature = "stm32f3xx")]
-    for byte in b"\r\nconsole connect check.\r\n" { block!(tx1.write(*byte)).ok(); }
+    *send1.0  = *b"Display on console\r\n";                  // BUF_SIZE characters
+    send1 = send1.2.write_all(send1.0, send1.1).wait();  
 
-    #[cfg(feature = "stm32f4xx")]
-    for byte in b"\r\nconsole connect check.\r\n" { block!(tx1.write(*byte)).ok(); }
-
-    #[cfg(feature = "stm32l1xx")]
-    for byte in b"\r\nconsole connect check.\r\n" { block!(tx1.write(*byte)).ok(); }
 
     hprintln!("testing  tx2 to rx3").unwrap();
-    hprintln!("   sending on tx2 ...").unwrap();
 
-    let send =  b"The quick brown fox";
+    // rx process should be started before tx, or rx misses the transmition and stalls waiting.
+
+    //send1 using recv3 requires buf3 has same size as buf1
+    let buf3= singleton!(: [u8; BUF_SIZE] = [0; BUF_SIZE]).unwrap();  
+    let mut rx = rx3.read_exact(buf3, rx3_ch); 
+
+    //CHECK IF buf2 REALLY NEED TO BE SAME SIZE?
+    let buf2= singleton!(: [u8; BUF_SIZE] = [b' '; BUF_SIZE]).unwrap(); 
+    let  tx = tx2.write_all( buf2, tx2_ch);  
     
-    // Write and wait until the write is successful
-    // For .write() discard the buffer returned as a new buffer is supplied to the the next write.
-    // This can be done either with this
-    //let (_, mut tx2) = tx2.write(send).wait();
-    // or this
-    tx2 = tx2.write(send).wait().1;
-
-    //putTx1(send);
-    //for byte in send.iter() { block!(tx1.write(*byte)).unwrap(); }   // using iter
-
-    // For .read() the buffer is maintained as part of the tuple, but buf and rx need 
-    // to be separated when it is used.
-    // (buf, rx)  tuple for RxDma VS read() a single u8
-    let mut br3 = (singleton!(: [u8; 32] = [0; 32]).unwrap(),  rx3);
-
-    hprintln!("   receiving on rx3 ...").unwrap();
-
-    br3 = br3.1.read(br3.0).wait();
-  
-    hprintln!("  checking received = send,  {} = {} byte", to_str(br3.0), to_str(send)).unwrap();
+    let mut send2 = tx.wait();   //when tx is complete return 3-tuple send structure (buf2, tx2_ch, tx2)
+    let mut recv3 = rx.wait();   //when rx is complete return 3-tuple recv structure (buf3, rx3_ch, rx3)
+    
+    //hprintln!("  check received = sent,  '{}' = '{}' ", to_str(recv3.0), to_str(send2.0)).unwrap();
+    assert_eq!(recv3.0, send2.0);
 
 
-    hprintln!("testing  tx2 to rx3 again").unwrap();
-    let send = b" jumps\n";
-    //tx2 =  don't reassign last time it is used will prevent a warning.
-    tx2.write(send).wait().1;
-    br3 = br3.1.read(br3.0).wait();
+    // Now recvX and sendX structures can be modified rather than assigned
 
-    hprintln!("  checking received = send,  {} = {} byte", to_str(br3.0), to_str(send)).unwrap();
+    
+    // BUF_SIZE characters each
+    let buf4: &[_] = &[*b"in for iter 1     \r\n",   *b"in for iter 2     \r\n",   *b"in for iter 3     \r\n"];
 
-    hprintln!("  sending  received to console...").unwrap();
+    //hprintln!(" buf4 {:?}", &buf4).unwrap();
+    
+    for i in  buf4.iter()  {
+       //hprintln!(" i is '{:?}'", i).unwrap();
+       hprintln!(" i is '{}'", to_str(i)).unwrap();
 
-    // this cannot be above to_str(br3.0) because buffer does not implement copy trait
-    // _tx1 the last time it is used prevents warning.
-    let (_, _tx1) = tx1.write(br3.0).wait();  // and send to console
+       rx = recv3.2.read_exact(send1.0, recv3.1);             // rx ready to receive into send1 buf
+                                                              // This requires buf3 has same size as buf1.
 
-    // sent should be the same as received
-    //assert_eq!(received, send, "testing received = send,  {} = {}", received, send);
+       *send2.0  = *i;                                        // BUF_SIZE characters
+       send2 = send2.2.write_all(send2.0, send2.1).wait();    // tx and return
 
-    // PUT A TEST HERE THAT WILL SHOW FAILURE. ASSERT SEEMS TO PANIC HALT SO ...
+       recv3 = rx.wait();                                     // rx returns
 
-    // Trigger a breakpoint to inspect the values
-    //asm::bkpt();
+       assert_eq!(recv3.0, send2.0);                          // check received  = sent
+
+       send1 = send1.2.write_all(recv3.0, send1.1).wait();    // send received to console
+       };
 
     hprintln!("entering empty loop. ^C to exit.").unwrap();
-    loop {}
+    loop {};
 }
