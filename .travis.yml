@@ -126,4 +126,7 @@ script:
   # last command in next is to get 0 return code for travis
   - git commit -m "commiting new examplesStatus/${BOARD}."  ; RC=$? ; echo x >/dev/null
   # in next try to narrow chance of conflict (expected head...) with parallel jobs 
-  - if [ ${RC} -eq  0 ]; then git  pull  ;  git push  ; fi
+  - if [ ${RC} -eq  0 ]; then git  pull  ;  git push  ; fi ; RC=$? ; echo x >/dev/null
+  - sleep 10
+  - if [ ${RC} -eq  0 ]; then git  pull  ;  git push  ; fi ; RC=$? ; echo x >/dev/null
+  
