@@ -1,5 +1,5 @@
-//! Transmit a simple message with LoRa using crate radio_sx127x (on SPI).
-//! This example is similar to gps_rw,  lora_spi_gps_rw,  lora_gps_rw and  lora_spi_send.
+//! Receive message with LoRa using crate radio_sx127x (on SPI).
+//! See also examples gps_rw,  lora_spi_gps_rw,  lora_spi_send.
 
 //   Using  sck, miso, mosi, cs, reset and D00, D01.
 //   See hardware sections below for pin setup.
@@ -637,48 +637,23 @@ use stm32l4xx_hal::{prelude::*,
 #[entry]
 fn main() -> !{
 
+
     let mut lora =  setup();  //delay is available in lora
-
-    
-    // print out configuration (for debugging)
-    
-//    let v = lora.lora_get_config();
-//    hprintln!("configuration {}", v).unwrap();
-    
-//    hprintln!("chammel	  {}", lora.get_chammel()).unwrap();
-
-    //hprintln!("mode		  {}", lora.get_mode()).unwrap();
-    //hprintln!("mode		  {}", lora.read_register(Register::RegOpMode.addr())).unwrap();
-    //hprintln!("bandwidth	  {:?}", lora.get_signal_bandwidth()).unwrap();
-    //hprintln!("coding_rate	  {:?}",  lora.get_coding_rate_4()).unwrap();
-    //hprintln!("spreading_factor {:?}",  lora.get_spreading_factor()).unwrap();
-    //hprintln!("spreading_factor {:?}",  
-    //hprintln!("invert_iq	  {:?}",  lora.get_invert_iq()).unwrap();
-    //hprintln!("tx_power	  {:?}",  lora.get_tx_power()).unwrap();
-    
-    
-    
-    // transmit something
-      
-    //let buffer = &[0xaa, 0xbb, 0xcc];
-    
-    let message = b"Hello, LoRa!";
-    
-    //let mut buffer = [0;100];      //Nov 2020 limit data.len() < 255 in radio_sx127x  .start_transmit
-    //for (i,c) in message.chars().enumerate() {
-    //	buffer[i] = c as u8;
-    //	}    
     
     loop {
-       lora.start_transmit(message).unwrap();    // should handle error
-       
-       match lora.check_transmit() {
-           Ok(b) => if b {hprintln!("TX complete").unwrap()} 
-                    else {hprintln!("TX not complete").unwrap()},
-           
-           Err(_err) => hprintln!("Error in lora.check_transmit(). Should return True or False.").unwrap(),
-           };
-       
-       lora.delay_ms(5000u32);
-       };
+        let poll = lora.poll_irq(Some(30), &mut delay); //30 Second timeout
+        match poll {
+            Ok(size) =>{
+                hprintln!("New Packet with size {} and RSSI: {}", size, lora.get_packet_rssi().unwrap()).unwrap();
+                let buffer = lora.read_packet().unwrap(); // Received buffer. NOTE: 255 bytes are always returned
+                hprint!("with Payload: ").unwrap();
+                for i in 0..size{
+                    hprint!("{}", buffer[i] as char).unwrap();
+                }
+                hprintln!().unwrap();
+            },
+            Err(_error) => hprintln!("Timeout").unwrap(),
+        }
+    }
+
 }
