@@ -97,6 +97,7 @@ script:
   - checkExample  text_i2c
   - checkExample  oled_gps
   #- checkExample  ads1015-display
+  - checkExample  lora_spi_send
   - checkExample  lora_send
   - checkExample  lora_receive
   - checkExample  lora_gps
