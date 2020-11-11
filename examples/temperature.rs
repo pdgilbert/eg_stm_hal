@@ -58,7 +58,7 @@ pub trait ReadTempC {  // for reading channel temperature in degrees C on channe
    #[cfg(feature = "stm32l1xx")]  
    fn read_tempC (&mut self, adcs: &mut Adcs<Adc<ADC>> ) -> i32;      
    #[cfg(feature = "stm32l4xx")]  
-   fn read_tempC (&mut self, adcs: &mut Adcs<Adc<ADC>> ) -> i32;      
+   fn read_tempC (&mut self, adcs: &mut Adcs<Adc<ADC1>> ) -> i32;      
    }
 
 pub trait ReadMV {     // for reading channel millivolts on channel (self.ch)
@@ -79,7 +79,7 @@ pub trait ReadMV {     // for reading channel millivolts on channel (self.ch)
    #[cfg(feature = "stm32l1xx")] 
    fn read_mv(&mut self, adcs: &mut Adcs<Adc<ADC>> )    -> u32;    
    #[cfg(feature = "stm32l4xx")] 
-   fn read_mv(&mut self, adcs: &mut Adcs<Adc<ADC>> )    -> u32;    
+   fn read_mv(&mut self, adcs: &mut Adcs<Adc<ADC1>> )    -> u32;    
    }
 
 
@@ -266,11 +266,12 @@ use stm32f1xx_hal::{prelude::*,
 
 #[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
 use stm32f3xx_hal::{prelude::*, 
-                    stm32::Peripherals, 
+                    pac::Peripherals, 
                     adc::{Adc, CkMode,},
 		    gpio::{gpiob::{PB1}, Analog},
-		    stm32::{ADC1, ADC3},
+		    pac::{ADC1, ADC3},
                     };
+
 
     #[cfg(feature = "stm32f3xx")]
     fn setup() ->  (impl ReadTempC,  impl ReadTempC+ReadMV,   Adcs<Adc<ADC1>, Adc<ADC3>> ) {
@@ -317,6 +318,8 @@ use stm32f3xx_hal::{prelude::*,
                    
                      None      => {let z = &mut a.ad_1st;
                                   //z.read_temp() as i32  NEEDS TO CONNECT USING INTERNAL CHANNEL 16
+				  //let t = read_mcu_temp(&mut dp.ADC1_2, &mut dp.ADC1);
+				  //t as i32
 				  32 as i32
                                   }
                      }
@@ -747,13 +750,13 @@ use stm32l1xx_hal::{prelude::*,
 #[cfg(feature = "stm32l4xx")] 
 use stm32l4xx_hal::{prelude::*,   
                     pac::Peripherals, 
-                    adc::Adc,
+                    adc::{Adc, VTemp},
 		    gpio::{gpiob::{PB1}, Analog},  
-		    pac::{ADC},
+		    pac::{ADC1},
                     };
 
     #[cfg(feature = "stm32l4xx")]
-    fn setup() ->  (impl ReadTempC,  impl ReadTempC+ReadMV,   Adcs<Adc<ADC>> ) {
+    fn setup() ->  (impl ReadTempC,  impl ReadTempC+ReadMV,   Adcs<Adc<ADC1>> ) {
 
        let p         = Peripherals::take().unwrap();
        let mut flash = p.FLASH.constrain();
@@ -764,11 +767,11 @@ use stm32l4xx_hal::{prelude::*,
 
        let mut gpiob = p.GPIOB.split(&mut rcc.ahb2);
 
-     //    ONLY ONE ADC
+       //    for adc developments consider fork from   https://github.com/SelmanOzleyen/stm32l4xx-hal   
+
+       //    only one adc   
        
-       // START DIRECT COPY FROM BLUEPILL
-           
-       let adcs: Adcs<Adc<ADC>> = Adcs{ 
+       let adcs: Adcs<Adc<ADC1>> = Adcs{ 
                          ad_1st : Adc::adc(p.ADC, &mut rcc.apb2, clocks), 
                          };
        
@@ -782,7 +785,7 @@ use stm32l4xx_hal::{prelude::*,
    
 
        impl ReadTempC for  Sensor<Option<PB1<Analog>>> {                    
-           fn read_tempC(&mut self, a: &mut Adcs<Adc<ADC>>) -> i32 {
+           fn read_tempC(&mut self, a: &mut Adcs<Adc<ADC1>>) -> i32 {
                  match &mut self.ch {
                      // it should be possible to call next method here  read_tempC(ch) on Sensor<PB1<Analog>>
                      // but doesn't seem to get to this impl when there is Some(ch)?
@@ -790,14 +793,14 @@ use stm32l4xx_hal::{prelude::*,
                                     panic!()}, 
                    
                      None      => {let z = &mut a.ad_1st;
-                                  z.read_temp() as i32
+                                  z.read(VTemp) as i32
                                   }
                      }
                   }
             };
 
        impl ReadTempC for  Sensor<PB1<Analog>> {                    
-           fn read_tempC(&mut self, a: &mut Adcs<Adc<ADC>>) -> i32 {
+           fn read_tempC(&mut self, a: &mut Adcs<Adc<ADC1>>) -> i32 {
                  match &mut self.ch {
                      Some(ch)  => {let v:  f32 = a.ad_1st.read(ch).unwrap();
                                    (v / 12.412122 ) as i32 - 50 as i32
@@ -810,7 +813,7 @@ use stm32l4xx_hal::{prelude::*,
 
 
        impl ReadMV for Sensor<PB1<Analog>> {   // TMP36 on PB1 using ADC
-           fn read_mv(&mut self, a: &mut Adcs<Adc<ADC>>) -> u32 { 
+           fn read_mv(&mut self, a: &mut Adcs<Adc<ADC1>>) -> u32 { 
                  match &mut self.ch {
                    Some(ch)  => a.ad_1st.read(ch).unwrap(),
                    None => panic!(),

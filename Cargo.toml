@@ -77,6 +77,7 @@ path = "examples/text_i2c.rs"
 name = "ads1015-display"
 path = "examples/ads1015-display.rs"
 
+
 [[example]]
 name = "lora_send"
 path = "examples/lora_send.rs"
@@ -88,6 +89,16 @@ path = "examples/lora_receive.rs"
 [[example]]
 name = "lora_gps"
 path = "examples/lora_gps.rs"
+
+
+[[example]]
+name = "lora_spi_send"
+path = "examples/lora_spi_send.rs"
+
+
+[[example]]
+name = "digi_pot"
+path = "examples/digi_pot.rs"
 
 
 [dependencies]
@@ -106,6 +117,14 @@ dht11 = "0.3.1"
 ads1x1x = "0.2" 
 # this causes problem with stm32l0xx_hal:  shared-bus = { version = "0.1.4", features = ["cortexm"] }
 
+# for example digi_pot
+# mcp4x = "0.1"
+f3 = "0.6.1"
+
+# for  lora_spi_send
+radio = "0.7"
+embedded-spi = { version = "0.6", default-features = false }
+
 stm32f1 = "0.11.0"
 stm32f3 = "0.11"
 stm32f4 = "0.11"
@@ -121,6 +140,14 @@ git = "https://github.com/jamwaffles/ssd1306"
 [dependencies.embedded-graphics]
 #optional = true
 version = "0.6.0" #  "0.4.4" # "0.4.9"  "0.6.2" 
+
+# for  lora_spi_send
+[dependencies.radio-sx127x]
+git = "https://github.com/ryankurte/rust-radio-sx127x"
+#git = "https://github.com/rust-iot/rust-radio-sx127x"
+# some default features need std
+default-features = false
+#optional = true
 
 [dependencies.sx127x_lora]
 #git = "https://github.com/mr-glt/sx127x_lora"
@@ -139,6 +166,12 @@ git = "https://github.com/hdoordt/sx127x_lora"
 git = "https://github.com/michaelbeaumont/dht-sensor"
 #version = "0.1.1"
 #optional = true
+
+# for example digi_pot
+[dependencies.mcp4x]
+git = "https://github.com/eldruin/mcp4x-rs"
+# #version = "0.1"
+# optional = true
 
 [dependencies.stm32f0xx-hal]
 git = "https://github.com/stm32-rs/stm32f0xx-hal"
@@ -180,6 +213,7 @@ default-features = false
 optional = true
 
 [dependencies.stm32l4xx-hal]
+#git = "https://github.com/SelmanOzleyen/stm32l4xx-hal"  # for adc in temperature example
 git = "https://github.com/stm32-rs/stm32l4xx-hal"
 optional = true
 

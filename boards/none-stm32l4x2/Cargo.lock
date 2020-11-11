@@ -850,7 +850,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3f58fc9ed772b4d742ed566cc14e224497c179d15c594d6108bebddd8d6a9452"
 dependencies = [
  "bare-metal",
- "cortex-m 0.6.3",
+ "cortex-m 0.5.10",
  "cortex-m-rt",
  "vcell",
 ]
@@ -858,7 +858,7 @@ dependencies = [
 [[package]]
 name = "stm32l4xx-hal"
 version = "0.5.0"
-source = "git+https://github.com/stm32-rs/stm32l4xx-hal#8c80a206de04713975b6a08d3596e3a391fb6438"
+source = "git+https://github.com/stm32-rs/stm32l4xx-hal#b954de7ff8c615a77ae0697a5eea0b5ffd7860ca"
 dependencies = [
  "as-slice",
  "cast",

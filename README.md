@@ -249,11 +249,15 @@ to start running the example code.
 
 ## Hardware Notes
 
-If you have not yet bought a development board and are just looking to start then consider 
-a 'blue pill' with a cheap ST-Link dongle. It is not only the cheapest by far (I think I got
-5 for $10 with a dongle) but it also seems to be the best supported by HAL at the moment (July 2020). 
-No doubt the support is because all the developers have a few lying around.
-You could well want a more expensive development board when you get further along.
+If you have not yet bought a development board and are just looking to start then consider the
+recommendation of an STM32F4x1 MiniF4 at https://therealprof.github.io/blog/usb-c-pill-part1/ 
+which includes a suggestion to
+buy two and turn one into a development dongle (which I have not yet tried). My previous suggestion
+was to consider a 'blue pill' with a cheap ST-Link dongle. Both of these options are inexpensive. 
+As of November 2020, I am having about equal success with the stm32f1xx_hal used on the bluepill and
+the stm32f4xx_hal used on the STM32F4x1 MiniF4. However, the STM32F4x1 MiniF4 is a much more
+substantial setup. With the blue pill I have already hit a memory constraint in development builds
+for the not especially complicated `oled_gps` example. (It might work with a `--release` build.) 
 
 With the 'blue pill' beware that it
 should have 1.5K pull up resistor on D+ (R10 on board). Ones I purchased do,
@@ -396,6 +400,7 @@ TO BE ORGANIZED SOMETIME
 - https://github.com/japaric/rust-cross
 - http://blog.japaric.io/brave-new-io/
 
+- https://therealprof.github.io/blog/usb-c-pill-part1/
 
 ## License
 

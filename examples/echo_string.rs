@@ -137,7 +137,6 @@ use stm32f3xx_hal::{prelude::*,
        //let (tx2_ch, rx2_ch) = (dma1.ch6, dma1.ch7);
        //let (tx3_ch, rx3_ch) = (dma1.ch3, dma1.ch2);
 
-
        (tx1, tx1_ch,   rx1, rx1_ch)
        }
 
@@ -146,17 +145,18 @@ use stm32f3xx_hal::{prelude::*,
 use stm32f4xx_hal::{prelude::*, 
                     pac::Peripherals, 
 		    serial::{config::Config, Serial, Tx, Rx},
+		    //dma::dma1, 
 		    pac::USART1 
 		    };
 
     #[cfg(feature = "stm32f4xx")]
-    fn setup() ->  (Tx<USART1>, Rx<USART1>)  {
+    fn setup() ->  (Tx<USART1>, dma1::C4, Rx<USART1>, dma1::C5)  {
 
        let p = Peripherals::take().unwrap();
        let mut rcc = p.RCC.constrain();  
        let clocks = rcc.cfgr.freeze();
        let gpioa = p.GPIOA.split();
-       p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
+       //p.USART1.cr1.modify(|_,w| w.rxneie().set_bit());  //need RX interrupt? 
 
        let txrx1 =  Serial::usart1(
           p.USART1,
@@ -167,7 +167,11 @@ use stm32f4xx_hal::{prelude::*,
           ).unwrap();    
 
        let (mut tx1, mut rx1)  = txrx1.split();
-       (tx1, rx1)
+       
+       let dma1 = p.DMA1.split(&mut rcc.cfgr);  
+       let (tx1_ch, rx1_ch) = (dma1.ch4, dma1.ch5);
+       
+       (tx1, tx1_ch,   rx1, rx1_ch)
        }
 
 
