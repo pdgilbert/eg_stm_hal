@@ -32,7 +32,7 @@ extern crate panic_halt;
 use cortex_m_rt::entry;
 use cortex_m_semihosting::*;
 
-// use asm_delay::{ AsmDelay, bitrate, };
+//use asm_delay::{ AsmDelay, bitrate, };
 
 //use cortex_m::asm;  //for breakpoint
 
@@ -44,7 +44,7 @@ use radio_sx127x::{prelude::*,                                     // prelude ha
 		   };
 
 //use radio::{Receive, Transmit}; 
-use radio::{Transmit}; // trait needs to be in scope to find  methods start_transmit and check_transmit.
+use radio::{Receive}; // trait needs to be in scope to find  methods start_transmit and check_transmit.
 
 use embedded_spi::wrapper::Wrapper;
 
@@ -640,20 +640,42 @@ fn main() -> !{
 
     let mut lora =  setup();  //delay is available in lora
     
+    lora.start_receive().unwrap();    // should handle error
+
+    //let mut received = false;
+    let mut buff = [0u8; 1024];
+    let mut n = 0;
+    let mut info = PacketInfo::default();
+
+
     loop {
-        let poll = lora.poll_irq(Some(30), &mut delay); //30 Second timeout
-        match poll {
-            Ok(size) =>{
-                hprintln!("New Packet with size {} and RSSI: {}", size, lora.get_packet_rssi().unwrap()).unwrap();
-                let buffer = lora.read_packet().unwrap(); // Received buffer. NOTE: 255 bytes are always returned
-                hprint!("with Payload: ").unwrap();
-                for i in 0..size{
-                    hprint!("{}", buffer[i] as char).unwrap();
-                }
-                hprintln!().unwrap();
-            },
-            Err(_error) => hprintln!("Timeout").unwrap(),
-        }
-    }
+
+       let poll = lora.check_receive(false);    
+       // The restart option (false) specifies whether transient timeout or CRC errors should be
+       // internally handled (returning Ok(false) or passed back to the caller as errors.
+
+       //received = false;
+       match poll {
+            Ok(v)       =>{if v {n = lora.get_received(&mut info, &mut buff).unwrap();
+                                 //received = true;
+                                 hprintln!("RX complete ({}) ", n).unwrap();
+                                 hprintln!("    ({:?})", info).unwrap();
+                                 hprintln!("RX complete ({:?})", &buff[..n]).unwrap();
+                                 } else {
+                                 hprint!(".").unwrap();
+                                 }
+                          },
+            Err(err) => hprintln!("poll error {:?} ", err).unwrap(),
+            };
+
+       lora.delay_ms(100u32);
+       };
 
 }
+    let num = Some(4);
+
+    match num {
+        Some(x) if x < 5 => println!("less than five: {}", x),
+        Some(x) => println!("{}", x),
+        None => (),
+    }
