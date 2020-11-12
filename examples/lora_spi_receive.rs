@@ -48,6 +48,7 @@ use radio::{Receive}; // trait needs to be in scope to find  methods start_trans
 
 use embedded_spi::wrapper::Wrapper;
 
+use eg_stm_hal::to_str;
 
 // lora and radio parameters
 
@@ -638,44 +639,37 @@ use stm32l4xx_hal::{prelude::*,
 fn main() -> !{
 
 
-    let mut lora =  setup();  //delay is available in lora
+    let mut lora =  setup();         //delay is available in lora
     
-    lora.start_receive().unwrap();    // should handle error
+    lora.start_receive().unwrap();   // should handle error
 
     //let mut received = false;
     let mut buff = [0u8; 1024];
-    let mut n = 0;
+    let mut n: usize ;
     let mut info = PacketInfo::default();
 
 
     loop {
 
        let poll = lora.check_receive(false);    
-       // The restart option (false) specifies whether transient timeout or CRC errors should be
+       // false (the restart option) specifies whether transient timeout or CRC errors should be
        // internally handled (returning Ok(false) or passed back to the caller as errors.
 
        //received = false;
        match poll {
-            Ok(v)       =>{if v {n = lora.get_received(&mut info, &mut buff).unwrap();
-                                 //received = true;
-                                 hprintln!("RX complete ({}) ", n).unwrap();
-                                 hprintln!("    ({:?})", info).unwrap();
-                                 hprintln!("RX complete ({:?})", &buff[..n]).unwrap();
-                                 } else {
-                                 hprint!(".").unwrap();
-                                 }
-                          },
-            Err(err) => hprintln!("poll error {:?} ", err).unwrap(),
+            Ok(v)  if v  =>  {n = lora.get_received(&mut info, &mut buff).unwrap();
+                              //received = true;
+                              hprintln!("RX complete ({:?}, length: {})", info, n).unwrap();
+                              //hprintln!("{:?}", &buff[..n]).unwrap();
+                              hprintln!("{}", to_str(&buff[..n])).unwrap();
+                              },
+
+            Ok(_v)       =>  hprint!(".").unwrap(),           // print . if nothing received
+            
+	    Err(err)     =>  hprintln!("poll error {:?} ", err).unwrap(),
             };
 
        lora.delay_ms(100u32);
        };
 
 }
-    let num = Some(4);
-
-    match num {
-        Some(x) if x < 5 => println!("less than five: {}", x),
-        Some(x) => println!("{}", x),
-        None => (),
-    }
