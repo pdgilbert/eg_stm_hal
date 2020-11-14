@@ -32,6 +32,7 @@ extern crate panic_halt;
 use cortex_m_rt::entry;
 use cortex_m_semihosting::*;
 
+use embedded_hal::blocking::delay::DelayMs;
 //use asm_delay::{ AsmDelay, bitrate, };
 
 //use cortex_m::asm;  //for breakpoint
@@ -44,7 +45,7 @@ use radio_sx127x::{prelude::*,                                     // prelude ha
 		   };
 
 //use radio::{Receive, Transmit}; 
-use radio::{Receive}; // trait needs to be in scope to find  methods start_transmit and check_transmit.
+use radio::{Receive, Radio}; // trait needs to be in scope to find  methods start_transmit and check_transmit.
 
 use embedded_spi::wrapper::Wrapper;
 
@@ -294,12 +295,12 @@ use stm32f4xx_hal::{prelude::*,
                     }; 
 
     #[cfg(feature = "stm32f4xx")]
-    fn setup() ->  Sx127x<Wrapper<Spi<SPI1, 
-                           (PA5<Alternate<AF5>>,    PA6<Alternate<AF5>>,   PA7<Alternate<AF5>>)>,  Error, 
-                   PA1<Output<PushPull>>,  PB8<Input<Floating>>,  PB9<Input<Floating>>,  PA0<Output<PushPull>>, 
-                   core::convert::Infallible,  Delay>,  Error, core::convert::Infallible> {
+    fn setup() ->  impl DelayMs<u32> + Receive<Error=radio_sx127x::Error<Error, core::convert::Infallible>> {
 
-    //fn setup() ->  impl Transmit {
+    //fn setup() ->  Sx127x<Wrapper<Spi<SPI1, 
+    //                       (PA5<Alternate<AF5>>,    PA6<Alternate<AF5>>,   PA7<Alternate<AF5>>)>,  Error, 
+    //               PA1<Output<PushPull>>,  PB8<Input<Floating>>,  PB9<Input<Floating>>,  PA0<Output<PushPull>>, 
+    //               core::convert::Infallible,  Delay>,  Error, core::convert::Infallible> {
 
        let cp = cortex_m::Peripherals::take().unwrap();
        let p  = Peripherals::take().unwrap();
@@ -420,6 +421,7 @@ use stm32h7xx_hal::{prelude::*,
     fn setup() -> Sx127x<Wrapper<Spi<SPI1, Enabled>, Error, 
                    PA1<Output<PushPull>>,  PB8<Input<Floating>>,  PB9<Input<Floating>>,  PA0<Output<PushPull>>, 
                    stm32h7xx_hal::Never,  Delay>,  Error, stm32h7xx_hal::Never> {
+    //fn setup() ->  impl Receive<Error=radio_sx127x::Error<Error, stm32h7xx_hal::Never>> {
 
        let cp = cortex_m::Peripherals::take().unwrap();
        let p      = Peripherals::take().unwrap();
@@ -638,16 +640,15 @@ use stm32l4xx_hal::{prelude::*,
 #[entry]
 fn main() -> !{
 
-
     let mut lora =  setup();         //delay is available in lora
     
     lora.start_receive().unwrap();   // should handle error
 
-    //let mut received = false;
     let mut buff = [0u8; 1024];
     let mut n: usize ;
     let mut info = PacketInfo::default();
 
+    //let mut delay  = AsmDelay::new(bitrate::U32BitrateExt::mhz(16));
 
     loop {
 
@@ -655,10 +656,9 @@ fn main() -> !{
        // false (the restart option) specifies whether transient timeout or CRC errors should be
        // internally handled (returning Ok(false) or passed back to the caller as errors.
 
-       //received = false;
        match poll {
+            //Ok(v)  if v  =>  {n = lora.get_received(&mut info, &mut buff).unwrap();
             Ok(v)  if v  =>  {n = lora.get_received(&mut info, &mut buff).unwrap();
-                              //received = true;
                               hprintln!("RX complete ({:?}, length: {})", info, n).unwrap();
                               //hprintln!("{:?}", &buff[..n]).unwrap();
                               hprintln!("{}", to_str(&buff[..n])).unwrap();
@@ -670,6 +670,7 @@ fn main() -> !{
             };
 
        lora.delay_ms(100u32);
+       //delay.delay_ms(5000u32);       
        };
 
 }

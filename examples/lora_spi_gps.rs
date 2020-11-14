@@ -34,12 +34,13 @@ use cortex_m_semihosting::*;
 
 use heapless::{consts, Vec};
 
+use embedded_hal::blocking::delay::DelayMs;
 //use asm_delay::{ AsmDelay, bitrate, };
 
 //use cortex_m::asm;  //for breakpoint
 
-extern crate radio_sx127x;
-use radio_sx127x::{prelude::*,                                     // prelude has Sx127x,
+use radio_sx127x::Error as sx127xError;                           // Error name conflict with hals
+use radio_sx127x::{prelude::*,                                    // prelude has Sx127x,
 		   device::{Modem, Channel, PaConfig, PaSelect,},
                    device::lora::{LoRaConfig, LoRaChannel, Bandwidth, SpreadingFactor, CodingRate,
                                   PayloadLength, PayloadCrc, FrequencyHopping, },
@@ -48,8 +49,7 @@ use radio_sx127x::{prelude::*,                                     // prelude ha
 //use radio::{Receive, Transmit}; 
 use radio::{Transmit}; // trait needs to be in scope to find  methods start_transmit and check_transmit.
 
-use embedded_spi::wrapper::Wrapper;
-
+use eg_stm_hal::to_str;
 
 // lora and radio parameters
 
@@ -102,22 +102,11 @@ use stm32f0xx_hal::{prelude::*,
 		    pac::{USART3},  
                     spi::{Spi, EightBit},
                     delay::Delay,
-                    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF0,
-                           gpioa::{PA1}, Output, PushPull,
-                           gpiob::{PB1}, },
-                    pac::SPI1,
                     }; 
 
     #[cfg(feature = "stm32f0xx")]
-    fn setup() ->  (Tx<USART3>, Rx<USART3>,
-                     Sx127x<Wrapper<Spi<SPI1, Spi1NoRemap,
-                        (PA5<Alternate<AF0>>,  PA6<Input<AF0>>, PA7<Alternate<AF0>>),  EightBit>, //Error, 
-                   PA1<Output<PushPull>>,  PB8<Input<Floating>>,  PB9<Input<Floating>>,  PA0<Output<PushPull>>, 
-                   core::convert::Infallible,  Delay>, Error, core::convert::Infallible> ) {
-
-    //fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1,  PA5<Alternate<AF0>>, 
-    //                                      PA6<Alternate<AF0>>, PA7<Alternate<AF0>>, EightBit>,
-    //                                  PA1<Output<PushPull>>, PB1<Output<PushPull>>> ) {
+    fn setup() ->  (Tx<USART2>, Rx<USART2>,
+                    impl DelayMs<u32> + Transmit<Error=sx127xError<Error, core::convert::Infallible>> ) {
 
        let cp = cortex_m::Peripherals::take().unwrap();
        let mut p  = Peripherals::take().unwrap();
@@ -166,23 +155,13 @@ use stm32f1xx_hal::{prelude::*,
                     pac::Peripherals, 
                     serial::{Config, Serial, Tx, Rx},  //, StopBits
 		    device::{USART3},  
-                    spi::{Spi, Spi1NoRemap, Error,},
+                    spi::{Spi, Error,},
                     delay::Delay,
-                    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, Input, Floating,  
-                           gpioa::{PA0, PA1}, Output, PushPull,
-			   gpiob::{PB8, PB9},  },
-                    device::SPI1,
                     }; 
 
     #[cfg(feature = "stm32f1xx")]
     fn setup() ->  (Tx<USART3>, Rx<USART3>,
-                    Sx127x<Wrapper<Spi<SPI1, Spi1NoRemap,
-                        (PA5<Alternate<PushPull>>,  PA6<Input<Floating>>, PA7<Alternate<PushPull>>), u8>, Error, 
-                   PA1<Output<PushPull>>,  PB8<Input<Floating>>,  PB9<Input<Floating>>,  PA0<Output<PushPull>>, 
-                   core::convert::Infallible,  Delay>, Error, core::convert::Infallible> ) {
-
-    //fn setup() ->  impl Transmit {
-
+                    impl DelayMs<u32> + Transmit<Error=sx127xError<Error, core::convert::Infallible>> ) {
 
        let cp = cortex_m::Peripherals::take().unwrap();
        let p  = Peripherals::take().unwrap();
@@ -251,19 +230,12 @@ use stm32f3xx_hal::{prelude::*,
 		    stm32::{USART2}, 
                     spi::{Spi, Error},
                     delay::Delay,
-                    gpio::{gpioa::{PA5, PA6, PA7}, AF5,  
-                           gpioa::{PA0, PA1}, Output, PushPull,
-			   gpiob::{PB8, PB9}, Input, Floating},
-                    stm32::SPI1,
                     };
 
     #[cfg(feature = "stm32f3xx")]
-    fn setup() ->  (Tx<USART2>, Rx<USART2>, 
-                    Sx127x<Wrapper<Spi<SPI1, 
-                           (PA5<AF5>,    PA6<AF5>,   PA7<AF5>)>,  Error, 
-                   PA1<Output<PushPull>>,  PB8<Input<Floating>>,  PB9<Input<Floating>>,  PA0<Output<PushPull>>, 
-                   core::convert::Infallible,  Delay>,  Error, core::convert::Infallible> ) {
-       
+    fn setup() ->  (Tx<USART2>, Rx<USART2>,
+                    impl DelayMs<u32> + Transmit<Error=sx127xError<Error, core::convert::Infallible>> ) {
+      
        let cp = cortex_m::Peripherals::take().unwrap();
        let p  = Peripherals::take().unwrap();
 
@@ -320,21 +292,12 @@ use stm32f4xx_hal::{prelude::*,
 		    pac::{USART2}, 
                     spi::{Spi, Error},
                     delay::Delay,
-                    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5,  
-                           gpioa::{PA0, PA1}, Output, PushPull,
-			   gpiob::{PB8, PB9}, Input, Floating},
                     time::MegaHertz,
-                    pac::SPI1,
                     }; 
 
     #[cfg(feature = "stm32f4xx")]
     fn setup() ->  (Tx<USART2>, Rx<USART2>,
-                    Sx127x<Wrapper<Spi<SPI1, 
-                           (PA5<Alternate<AF5>>,    PA6<Alternate<AF5>>,   PA7<Alternate<AF5>>)>,  Error, 
-                   PA1<Output<PushPull>>,  PB8<Input<Floating>>,  PB9<Input<Floating>>,  PA0<Output<PushPull>>, 
-                   core::convert::Infallible,  Delay>,  Error, core::convert::Infallible> ) {
-
-    //fn setup() ->  impl Transmit {
+                    impl DelayMs<u32> + Transmit<Error=sx127xError<Error, core::convert::Infallible>> ) {
 
        let cp = cortex_m::Peripherals::take().unwrap();
        let p  = Peripherals::take().unwrap();
@@ -397,18 +360,13 @@ use stm32f7xx_hal::{prelude::*,
                     pac::Peripherals, 
                     serial::{Config, Serial, Tx, Rx, Oversampling, },
 		    pac::{USART2}, 
-                    spi::{Spi, Pins, Enabled, ClockDivider, Error, },
+                    spi::{Spi, ClockDivider, Error, },
                     delay::Delay,
-                    gpio::{gpioa::{PA0, PA1}, Output, PushPull,
-			   gpiob::{PB8, PB9}, Input, Floating},
-                    pac::SPI1,
                     }; 
 
     #[cfg(feature = "stm32f7xx")]
-   fn setup() ->  (Tx<USART2>, Rx<USART2>,
-                   Sx127x<Wrapper<Spi<SPI1,impl Pins<SPI1>, Enabled<u8>>,  Error, 
-                   PA1<Output<PushPull>>,  PB8<Input<Floating>>,  PB9<Input<Floating>>,  PA0<Output<PushPull>>, 
-                   core::convert::Infallible,  Delay>,  Error, core::convert::Infallible> ) {
+    fn setup() ->  (Tx<USART2>, Rx<USART2>,
+                    impl DelayMs<u32> + Transmit<Error=sx127xError<Error, core::convert::Infallible>> ) {
 
     //fn setup() ->  (Tx<USART2>, Rx<USART2>,
     //                sx127x_lora::LoRa<Spi<SPI1, impl Pins<SPI1>, Enabled<u8>>,
@@ -474,19 +432,13 @@ use stm32h7xx_hal::{prelude::*,
                     pac::Peripherals, 
                     serial::{Tx, Rx},
 		    pac::{USART2}, 
-                    spi::{Spi, Enabled, Error},
+                    spi::{Error},
                     delay::Delay,
-                    gpio::{   //gpioa::{PA5, PA6, PA7}, Alternate, AF5,  really!
-                           gpioa::{PA0, PA1}, Output, PushPull,
-                           gpiob::{PB8, PB9}, Input, Floating},
-                    pac::SPI1,
                     }; 
 
     #[cfg(feature = "stm32h7xx")]
-    fn setup() -> (Tx<USART2>, Rx<USART2>,
-                    Sx127x<Wrapper<Spi<SPI1, Enabled>, Error, 
-                   PA1<Output<PushPull>>,  PB8<Input<Floating>>,  PB9<Input<Floating>>,  PA0<Output<PushPull>>, 
-                   stm32h7xx_hal::Never,  Delay>,  Error, stm32h7xx_hal::Never> ) {
+    fn setup() ->  (Tx<USART2>, Rx<USART2>,
+                    impl DelayMs<u32> + Transmit<Error=sx127xError<Error, stm32h7xx_hal::Never>> ) {
 
        let cp = cortex_m::Peripherals::take().unwrap();
        let p      = Peripherals::take().unwrap();
@@ -542,18 +494,12 @@ use stm32l0xx_hal::{prelude::*,
                     rcc,   // for ::Config but note name conflict with serial
                     serial::{Config, Tx, Rx, Serial2Ext},
 		    pac::{USART2}, 
-                    spi::{Spi, Pins, Error, },
-                    delay::Delay,
-                    gpio::{gpioa::{PA0, PA1}, Output, PushPull,
-			   gpiob::{PB8, PB9}, Input, Floating},
-                    pac::SPI1,
+                    spi::{ Error, },
                     }; 
 
     #[cfg(feature = "stm32l0xx")]
-    fn setup() -> (Tx<USART2>, Rx<USART2>,
-                    Sx127x<Wrapper<Spi<SPI1,impl Pins<SPI1>>, Error, 
-                   PA1<Output<PushPull>>,  PB8<Input<Floating>>,  PB9<Input<Floating>>,  PA0<Output<PushPull>>, 
-                   void::Void,  Delay>,  Error, void::Void> ) {
+    fn setup() ->  (Tx<USART2>, Rx<USART2>,
+                    impl DelayMs<u32> + Transmit<Error=sx127xError<Error, void::Void>> ) {
 
        let cp = cortex_m::Peripherals::take().unwrap();
        let p         = Peripherals::take().unwrap();
@@ -604,19 +550,12 @@ use stm32l1xx_hal::{prelude::*,
                     rcc,   // for ::Config but note name conflict with serial
                     serial::{Config, SerialExt, Tx, Rx},
 		    stm32::{USART1},
-                    spi::{Spi, Pins, Error,},
-                    delay::Delay,
-                    gpio::{//gpioa::{PA5, PA6, PA7}, Input,  Floating,   
-                           gpioa::{PA3, PA4}, Output, PushPull,
-			   gpiob::{PB8, PB9}, Input, Floating},
-                    stm32::SPI1,
+                    spi::{Error,},
                     };
 
     #[cfg(feature = "stm32l1xx")]
-    fn setup() -> (Tx<USART1>, Rx<USART1>,
-                    Sx127x<Wrapper<Spi<SPI1,impl Pins<SPI1>>, Error, 
-                   PA4<Output<PushPull>>,  PB8<Input<Floating>>,  PB9<Input<Floating>>,  PA3<Output<PushPull>>, 
-                   core::convert::Infallible,  Delay>,  Error, core::convert::Infallible> ) {
+    fn setup() ->  (Tx<USART1>, Rx<USART1>,
+                    impl DelayMs<u32> + Transmit<Error=sx127xError<Error, core::convert::Infallible>> ) {
 
        // instead of impl Pins<SPI1>  above could use 
        // Spi<SPI1, (PA5<Input<Floating>>,  PA6<Input<Floating>>, PA7<Input<Floating>>)>
@@ -673,19 +612,11 @@ use stm32l4xx_hal::{prelude::*,
 		    pac::{USART2}, 
                     spi::{Spi, Error,},
                     delay::Delay,
-                    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5, Input, Floating, 
-                           gpioa::{PA0, PA1}, Output, PushPull,
-			   gpiob::{PB8, PB9}, },
-                    pac::SPI1,
                     }; 
 
     #[cfg(feature = "stm32l4xx")]
-    fn setup() -> (Tx<USART2>, Rx<USART2>,
-                    Sx127x<Wrapper<Spi<SPI1, (PA5<Alternate<AF5, Input<Floating>>>, 
-		                            PA6<Alternate<AF5, Input<Floating>>>, 
-					    PA7<Alternate<AF5, Input<Floating>>> )>, Error, 
-                   PA1<Output<PushPull>>,  PB8<Input<Floating>>,  PB9<Input<Floating>>,  PA0<Output<PushPull>>, 
-                   core::convert::Infallible,  Delay>,  Error, core::convert::Infallible> ) {
+    fn setup() ->  (Tx<USART2>, Rx<USART2>,
+                    impl DelayMs<u32> + Transmit<Error=sx127xError<Error, core::convert::Infallible>> ) {
 
        let cp        = cortex_m::Peripherals::take().unwrap();
        let p         = Peripherals::take().unwrap();
@@ -755,8 +686,8 @@ fn main() -> !{
 
     let e: u8 = 9;           // replace char errors with "9"
     let mut good = false;    // true while capturing a line
-    let mut size: usize;     // buffer size should not be needed
-    
+    //let mut size: usize;     // buffer size should not be needed
+        
     loop {
         let byte = match block!(rx_gps.read()) {
 	    Ok(byt)	  => byt,
@@ -772,19 +703,25 @@ fn main() -> !{
 	   if buffer.push(byte).is_err() ||  byte == 13  { //transmit if end of line. \r is 13, \n is 10
               	      
 	      lora.start_transmit(&buffer).unwrap();    // should handle error
+	      
+	      // Note hprintln! requires semihosting. If the match section and hprintln! below are 
+	      // removed then this example works on battery power with no computer attached.
+	      // (tested only on blackpill with stm32f411 )
      	      
 	      match lora.check_transmit() {
-     		   Ok(b) => if ! b {hprintln!("TX not complete").unwrap()},
-     		   
-     		   Err(_err) => hprintln!("Error in lora.check_transmit(). Should return True or False.").unwrap(),
-     		   };
+		 Ok(b) => if ! b {hprintln!("TX not complete").unwrap()},
+		 
+		 Err(_err) => hprintln!("Error in lora.check_transmit(). Should return True or False.").unwrap(),
+		 };
               
-              // this seems unnecessary but without it there are spurious chars in transmission
-	      size = buffer.len();                         //packet size
-	      hprintln!("read buffer {} of {}", size, buffer.capacity()).unwrap();
+	      //size = buffer.len();                         //packet size
+	      //hprintln!("read buffer {} of {}", size, buffer.capacity()).unwrap();
+	      //hprintln!("{:?}", &buffer).unwrap();
+	      hprintln!("{}", to_str(&buffer)).unwrap();
      	      
 	      buffer.clear();
      	      good = false;
+	      lora.delay_ms(5000u32);
      	      };
      	   };
      	}

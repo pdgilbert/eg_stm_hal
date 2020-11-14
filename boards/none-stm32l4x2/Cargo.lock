@@ -580,9 +580,9 @@ checksum = "de96540e0ebde571dc55c73d60ef407c653844e6f9a1e2fdbd40c07b9252d812"
 
 [[package]]
 name = "panic-semihosting"
-version = "0.5.4"
+version = "0.5.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aed16eb761d0ee9161dd1319cb38c8007813b20f9720a5a682b283e7b8cdfe58"
+checksum = "c3d55dedd501dfd02514646e0af4d7016ce36bc12ae177ef52056989966a1eec"
 dependencies = [
  "cortex-m 0.6.4",
  "cortex-m-semihosting",
@@ -773,9 +773,9 @@ dependencies = [
 
 [[package]]
 name = "stm32f0"
-version = "0.11.0"
+version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9673b9c3ecdf8ea1133492f3070515d64f51e98439710eae062552fc80b94a6c"
+checksum = "401a6a390b26fff7c8166049cac102511d557fd5204f5d4795bfb00301b00730"
 dependencies = [
  "bare-metal 0.2.5",
  "cortex-m 0.6.4",
@@ -786,13 +786,13 @@ dependencies = [
 [[package]]
 name = "stm32f0xx-hal"
 version = "0.17.1"
-source = "git+https://github.com/stm32-rs/stm32f0xx-hal#e679ab190f1097fb0611061bbc4464ee7e5b8713"
+source = "git+https://github.com/stm32-rs/stm32f0xx-hal#2bb8bb9637bbba6163c885ca48524a708128413e"
 dependencies = [
- "bare-metal 0.2.5",
+ "bare-metal 1.0.0",
  "cast",
  "cortex-m 0.6.4",
  "embedded-hal",
- "nb 0.1.3",
+ "nb 1.0.0",
  "stm32f0",
  "void",
 ]
@@ -966,7 +966,7 @@ dependencies = [
 [[package]]
 name = "stm32h7xx-hal"
 version = "0.8.0"
-source = "git+https://github.com/stm32-rs/stm32h7xx-hal#cbb31d0b6d0c8530437367032a600a4ff74657f7"
+source = "git+https://github.com/stm32-rs/stm32h7xx-hal#9426c3fa6d10e847bd739843322f07ef31d21071"
 dependencies = [
  "bare-metal 1.0.0",
  "cast",
