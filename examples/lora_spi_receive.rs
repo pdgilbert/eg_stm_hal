@@ -44,8 +44,8 @@ use radio_sx127x::{prelude::*,                                     // prelude ha
                                   PayloadLength, PayloadCrc, FrequencyHopping, },
 		   };
 
-//use radio::{Receive, Transmit}; 
-use radio::{Receive, Radio}; // trait needs to be in scope to find  methods start_transmit and check_transmit.
+//use radio::{Receive, Transmit, Radio}; 
+use radio::{Receive}; // trait Receive needs to be in scope to find  methods start_transmit and check_transmit.
 
 use embedded_spi::wrapper::Wrapper;
 
@@ -294,13 +294,43 @@ use stm32f4xx_hal::{prelude::*,
                     pac::SPI1,
                     }; 
 
-    #[cfg(feature = "stm32f4xx")]
-    fn setup() ->  impl DelayMs<u32> + Receive<Error=radio_sx127x::Error<Error, core::convert::Infallible>> {
 
-    //fn setup() ->  Sx127x<Wrapper<Spi<SPI1, 
-    //                       (PA5<Alternate<AF5>>,    PA6<Alternate<AF5>>,   PA7<Alternate<AF5>>)>,  Error, 
-    //               PA1<Output<PushPull>>,  PB8<Input<Floating>>,  PB9<Input<Floating>>,  PA0<Output<PushPull>>, 
-    //               core::convert::Infallible,  Delay>,  Error, core::convert::Infallible> {
+
+    #[cfg(feature = "stm32f4xx")]
+    fn setup() ->  Sx127x<Wrapper<Spi<SPI1, 
+                           (PA5<Alternate<AF5>>,    PA6<Alternate<AF5>>,   PA7<Alternate<AF5>>)>,  Error, 
+                   PA1<Output<PushPull>>,  PB8<Input<Floating>>,  PB9<Input<Floating>>,  PA0<Output<PushPull>>, 
+                   core::convert::Infallible,  Delay>,  Error, core::convert::Infallible> {
+
+// this
+//    fn setup() ->  impl DelayMs<u32> + Receive<Error=radio_sx127x::Error<Error, core::convert::Infallible>> { 
+// gives
+//   Ok(v)  if v  =>  {n = lora.get_received(&mut info, &mut buff).unwrap();
+//                                           ^^^^^^^^^ expected associated type, 
+//					   found struct `radio_sx127x::device::PacketInfo`
+
+// this
+//   fn setup() ->  impl DelayMs<u32> + Receive<Info=radio_sx127x::ReceiveInfo, 
+//                                          Error=radio_sx127x::Error<Error, core::convert::Infallible>> { 
+// gives
+//   cannot find type `ReceiveInfo` in crate `radio_sx127x`
+
+
+// this
+//    fn setup() ->  impl DelayMs<u32> + Receive<Info=radio::Receive::Info, 
+//                                              Error=radio_sx127x::Error<Error, core::convert::Infallible>> { 
+// gives
+//   fn setup() ->  impl DelayMs<u32> + Receive<Info=radio::Receive::Info, 
+//                                                   ^^^^^^^^^^^^^^^^^^^^ help: use fully-qualified syntax: 
+//						     `<Type as radio::Receive>::Info`
+
+
+// this
+//    fn setup() ->  impl DelayMs<u32> + Receive<Info=<radio_sx127x::device::PacketInfo as radio::Receive>::Info, 
+//                                               Error=radio_sx127x::Error<Error, core::convert::Infallible>> { 
+// gives
+//    the trait `radio::Receive` is not implemented for `radio_sx127x::device::PacketInfo`
+
 
        let cp = cortex_m::Peripherals::take().unwrap();
        let p  = Peripherals::take().unwrap();

@@ -144,6 +144,10 @@ version = "0.6.0" #  "0.4.4" # "0.4.9"  "0.6.2"
 # for  lora_spi_send
 [dependencies.radio-sx127x]
 git = "https://github.com/ryankurte/rust-radio-sx127x"
+#branch = "update-everything"
+#git = "https://github.com/ryankurte/rust-radio-sx127x"
+#git = "https://github.com/rust-iot/rust-radio-sx127x/commit/2285c1ca9f527ab464a27f6a43af3b0a93130d2f
+#git = "https://github.com/ryankurte/rust-radio-sx127x"
 #git = "https://github.com/rust-iot/rust-radio-sx127x"
 # some default features need std
 default-features = false
@@ -257,7 +261,8 @@ version = "0.2.2"
 
 [dependencies.embedded-hal]
 version = "0.2.4"
-features = ["unproven"]
+#version = "1.0.0-alpha.3"  Nov works for blink ... not for lora_spi
+#features = ["unproven"]
 #version = "1.0.0-alpha.1"   July 2020 gives ... led3.set_low() method not found ...
 
 [dependencies.asm-delay]
