@@ -79,8 +79,8 @@ use stm32f1xx_hal::{prelude::*,
     	            gpio::{gpiob::{PB13, PB14, PB15}, Output, PushPull,}, 
 		    };
 
-#[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
-use embedded_hal::digital::v2::OutputPin;
+//#[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
+//use embedded_hal::digital::v2::OutputPin;
 
     #[cfg(feature = "stm32f1xx")]
     fn setup() -> (PB13<Output<PushPull>>, PB14<Output<PushPull>>, PB15<Output<PushPull>>, AsmDelay) {
@@ -167,8 +167,8 @@ use  stm32f4xx_hal::{prelude::*,
 		     gpio::{gpiob::{PB13, PB14, PB15}, Output, PushPull,}, 
 		     };
 
-#[cfg(feature = "stm32f4xx")]  //  eg Nucleo-64  stm32f411
-use embedded_hal::digital::v2::OutputPin;
+//#[cfg(feature = "stm32f4xx")]  //  eg Nucleo-64  stm32f411
+//use embedded_hal::digital::v2::OutputPin;
 
     #[cfg(feature = "stm32f4xx")]
     fn setup() -> (PB13<Output<PushPull>>, PB14<Output<PushPull>>, PB15<Output<PushPull>>, AsmDelay) {
@@ -247,8 +247,8 @@ use stm32h7xx_hal::{prelude::*,
                     gpio::{gpiob::{PB13, PB14, PB15}, Output, PushPull,}, 
                     };
 
-#[cfg(feature = "stm32h7xx")] 
-use embedded_hal::digital::v2::OutputPin;
+//#[cfg(feature = "stm32h7xx")] 
+//use embedded_hal::digital::v2::OutputPin;
 
     #[cfg(feature = "stm32h7xx")]
     fn setup() -> (PB13<Output<PushPull>>, PB14<Output<PushPull>>, PB15<Output<PushPull>>, AsmDelay) { 
@@ -334,8 +334,8 @@ use stm32l1xx_hal::{prelude::*,
 		     gpio::{gpiob::{PB13, PB14, PB15}, Output, PushPull,}, 
                      };
 
-#[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
-use embedded_hal::digital::v2::OutputPin;
+//#[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
+//use embedded_hal::digital::v2::OutputPin;
 
     #[cfg(feature = "stm32l1xx")]
     fn setup() -> (PB13<Output<PushPull>>, PB14<Output<PushPull>>, PB15<Output<PushPull>>, AsmDelay) {

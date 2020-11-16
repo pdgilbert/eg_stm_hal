@@ -37,8 +37,8 @@ use stm32f0xx_hal::{prelude::*,
 		    gpio::{gpiob::{PB8, PB9}, Alternate, OpenDrain,  gpioc::PC13, Output, PushPull,},
 		    device::I2C1,
 		    }; 
-#[cfg(feature = "stm32f0xx")]  //  eg blue pill stm32f103
-use embedded_hal::digital::v2::OutputPin;
+//#[cfg(feature = "stm32f0xx")]  //  eg blue pill stm32f103
+//use embedded_hal::digital::v2::OutputPin;
 
     #[cfg(feature = "stm32f0xx")]
     fn setup() ->  (BlockingI2c<I2C1,  (PB8<Alternate<OpenDrain>>, PB9<Alternate<OpenDrain>>) >,
@@ -89,8 +89,8 @@ use stm32f1xx_hal::{prelude::*,
 		    gpio::{gpiob::{PB8, PB9}, Alternate, OpenDrain,  gpioc::PC13, Output, PushPull,},
 		    device::I2C1,
 		    }; 
-#[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
-use embedded_hal::digital::v2::OutputPin;
+//#[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
+//use embedded_hal::digital::v2::OutputPin;
 
     #[cfg(feature = "stm32f1xx")]
     fn setup() ->  (BlockingI2c<I2C1,  (PB8<Alternate<OpenDrain>>, PB9<Alternate<OpenDrain>>) >,
@@ -181,8 +181,8 @@ use stm32f4xx_hal::{prelude::*,
 		    gpio::{gpiob::{PB8, PB7}, Alternate, AF4,  gpioe::PE9, Output, PushPull,  },
                     pac::I2C1,
 		    }; 
-#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
-use embedded_hal::digital::v2::OutputPin;
+//#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
+//use embedded_hal::digital::v2::OutputPin;
 	   
     #[cfg(feature = "stm32f4xx")]
     fn setup() ->  (I2c<I2C1, (PB8<Alternate<AF4>>, PB7<Alternate<AF4>>)>,
