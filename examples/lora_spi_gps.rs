@@ -149,13 +149,13 @@ use stm32f0xx_hal::{prelude::*,
 use stm32f1xx_hal::{prelude::*,   
                     pac::Peripherals, 
                     serial::{Config, Serial, Tx, Rx},  //, StopBits
-		    device::{USART3},  
+		    device::{USART2},  
                     spi::{Spi, Error,},
                     delay::Delay,
                     }; 
 
     #[cfg(feature = "stm32f1xx")]
-    fn setup() ->  (Tx<USART3>, Rx<USART3>,
+    fn setup() ->  (Tx<USART2>, Rx<USART2>,
                     impl DelayMs<u32> + Transmit<Error=sx127xError<Error, core::convert::Infallible>> ) {
 
        let cp = cortex_m::Peripherals::take().unwrap();
@@ -168,10 +168,10 @@ use stm32f1xx_hal::{prelude::*,
        let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
        let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
     
-       let (tx, rx) = Serial::usart3(
-            p.USART3,
-            (gpiob.pb10.into_alternate_push_pull(&mut gpiob.crh),    //tx pb10  for GPS
-             gpiob.pb11), 					     //rx pb11  for GPS
+       let (tx, rx) = Serial::usart2(
+            p.USART2,
+            (gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),    //tx pa2  for GPS
+             gpioa.pa3), 					    //rx pa3  for GPS
             &mut afio.mapr,
             Config::default() .baudrate(9_600.bps()), 
             clocks,
