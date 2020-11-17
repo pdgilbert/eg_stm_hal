@@ -84,8 +84,8 @@ use stm32f1xx_hal::{prelude::*,
                      gpio::{gpioc::PC13, Output, PushPull,}, 
                      };
 
-//#[cfg(feature = "stm32f1xx")] 
-//use embedded_hal::digital::v2::OutputPin;
+#[cfg(feature = "stm32f1xx")] 
+use embedded_hal::digital::v2::OutputPin;
 
     #[cfg(feature = "stm32f1xx")]
     fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
@@ -194,8 +194,8 @@ use stm32h7xx_hal::{prelude::*,
                     gpio::{gpioc::PC13, Output, PushPull,}, 
                     };
 
-//#[cfg(feature = "stm32h7xx")] 
-//use embedded_hal::digital::v2::OutputPin;
+#[cfg(feature = "stm32h7xx")] 
+use embedded_hal::digital::v2::OutputPin;
 
     #[cfg(feature = "stm32h7xx")]
     fn setup() -> (PC13<Output<PushPull>>, AsmDelay) { 
@@ -252,8 +252,8 @@ use stm32l1xx_hal::{prelude::*,
                     gpio::{gpiob::PB6, Output, PushPull,}, 
                     };
 
-//#[cfg(feature = "stm32l1xx") ] 
-//use embedded_hal::digital::v2::OutputPin;
+#[cfg(feature = "stm32l1xx") ] 
+use embedded_hal::digital::v2::OutputPin;
 
     #[cfg(feature = "stm32l1xx")]
     fn setup() -> (PB6<Output<PushPull>>, AsmDelay) {
