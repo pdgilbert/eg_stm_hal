@@ -109,6 +109,7 @@ cortex-m-rt = "0.6.8"
 #as-slice = "0.1.2"
 #as-slice = "0.1"
 panic-halt = "0.2.0"
+panic-reset = "0.1.0"
 
 # for example  ads1015-display
 dht11 = "0.3.1"

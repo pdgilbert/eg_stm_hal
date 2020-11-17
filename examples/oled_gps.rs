@@ -538,7 +538,7 @@ fn main() -> ! {
 	      //$GPRMC north = to_str(&buffer[19..31]) east = to_str(&buffer[32..45])
 	      
 	      //if to_str(&buffer[0..6]) == "$GPRMC" {           // message id
-	      if &buffer[0..6] == [36, 71, 80, 82, 77, 67] {   // message id
+	      if &buffer[0..6] == [36, 71, 80, 82, 77, 67] {   // message id $GPRMC
 	          let north = to_str(&buffer[19..31]);
 	          hprintln!("north {}", north).unwrap();
 	          let east  = to_str(&buffer[32..45]);
