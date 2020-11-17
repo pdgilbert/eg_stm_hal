@@ -1,13 +1,8 @@
 //! Serial interface read GPS on usart and transmit with LoRa using crate radio_sx127x (on SPI).
 //! This example is similar to gps_rw,  lora_gps_rw and  lora_spi_send.
 
-//   Using  sck, miso, mosi, cs, reset and D00, D01.
-//   See hardware sections below for pin setup.
-//   Not yet using  D02, D03
-
-
 //https://www.rfwireless-world.com/Tutorials/LoRa-channels-list.html
-//channels = {
+// channels are as follows
 //   'CH_00_900': 903.08, 'CH_01_900': 905.24, 'CH_02_900': 907.40,
 //   'CH_03_900': 909.56, 'CH_04_900': 911.72, 'CH_05_900': 913.88,
 //   'CH_06_900': 916.04, 'CH_07_900': 918.20, 'CH_08_900': 920.36,
@@ -16,7 +11,8 @@
 //   'CH_10_868': 865.20, 'CH_11_868': 865.50, 'CH_12_868': 865.80,
 //   'CH_13_868': 866.10, 'CH_14_868': 866.40, 'CH_15_868': 866.70,
 //   'CH_16_868': 867   , 'CH_17_868': 868   ,   
-//   }
+
+// See FREQUENCY below to set the channel.
 
 
 #![no_std]
@@ -53,7 +49,7 @@ use eg_stm_hal::to_str;
 
 // lora and radio parameters
 
-const FREQUENCY: u32 = 907_400_000;     // frequency in hertz ch_12: 915_000_000, ch_2: 907_400_000
+const FREQUENCY: u32 = 907_400_000;   // frequency in hertz ch_12_900: 915_000_000, ch_2_900: 907_400_000
 
 const CONFIG_CH: LoRaChannel = LoRaChannel {
 	    freq: FREQUENCY as u32,	       // frequency in hertz
@@ -100,12 +96,12 @@ use stm32f0xx_hal::{prelude::*,
                     pac::Peripherals, 
                     serial::{Serial, Tx, Rx},
 		    pac::{USART3},  
-                    spi::{Spi, EightBit},
+                    spi::{Spi, Error},
                     delay::Delay,
                     }; 
 
     #[cfg(feature = "stm32f0xx")]
-    fn setup() ->  (Tx<USART2>, Rx<USART2>,
+    fn setup() ->  (Tx<USART3>, Rx<USART3>,
                     impl DelayMs<u32> + Transmit<Error=sx127xError<Error, core::convert::Infallible>> ) {
 
        let cp = cortex_m::Peripherals::take().unwrap();
@@ -115,7 +111,7 @@ use stm32f0xx_hal::{prelude::*,
        let gpioa = p.GPIOA.split(&mut rcc);
        let gpiob = p.GPIOB.split(&mut rcc);
        
-       let (tx, rx, sck, miso, mosi, cs, rst) = cortex_m::interrupt::free(move |cs| {
+       let (tx, rx, sck, miso, mosi, _rst, pa1, pb8, pb9, pa0) = cortex_m::interrupt::free(move |cs| {
             (   
                 gpiob.pb10.into_alternate_af4(cs),        //tx pb10  for GPS
                 gpiob.pb11.into_alternate_af4(cs),        //rx pb11  for GPS
@@ -123,8 +119,13 @@ use stm32f0xx_hal::{prelude::*,
                 gpioa.pa6.into_alternate_af0(cs),	  //   miso  on PA6
                 gpioa.pa7.into_alternate_af0(cs),	  //   mosi  on PA7
                 
-                gpioa.pa1.into_push_pull_output(cs),	  //  cs   on PA1
-                gpiob.pb1.into_push_pull_output(cs),	  // reset on PB1
+                //gpioa.pa1.into_push_pull_output(cs),	  //   cs            on PA1
+                gpiob.pb1.into_push_pull_output(cs),	  //   reset         on PB1
+    	    
+	        gpioa.pa1.into_push_pull_output(cs),      //   CsPin	     on PA1
+    	        gpiob.pb8.into_floating_input(cs),        //   BusyPin  DIO0 on PB8
+                gpiob.pb9.into_floating_input(cs),        //   ReadyPin DIO1 on PB9
+    	        gpioa.pa0.into_push_pull_output(cs),      //   ResetPin	      on PA0
             )
         });
 
@@ -132,19 +133,12 @@ use stm32f0xx_hal::{prelude::*,
    
        let spi = Spi::spi1(p.SPI1, (sck, miso, mosi), sx127x_lora::MODE, 8.mhz(), &mut rcc);
      
-       let mut delay = Delay::new(cp.SYST, &rcc);
+       let delay = Delay::new(cp.SYST, &rcc);
 
        // Create lora radio instance 
 
-       let lora = Sx127x::spi(
-    	    spi,					             //Spi
-    	    gpioa.pa1.into_push_pull_output(&mut gpioa.crl),         //CsPin         on PA1
-    	    gpiob.pb8.into_floating_input(&mut gpiob.crh),           //BusyPin  DIO0 on PB8
-            gpiob.pb9.into_floating_input(&mut gpiob.crh),           //ReadyPin DIO1 on PB9
-    	    gpioa.pa0.into_push_pull_output(&mut gpioa.crl),         //ResetPin      on PA0
-    	    delay,					             //Delay
-    	    &CONFIG_RADIO,					     //&Config
-    	    ).unwrap();      // should handle error
+       let lora = Sx127x::spi( spi, pa1, pb8, pb9, pa0, delay, &CONFIG_RADIO, ).unwrap(); // should handle error
+
 
        (tx, rx,  lora)
        }

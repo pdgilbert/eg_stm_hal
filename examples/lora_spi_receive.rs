@@ -1,13 +1,12 @@
 //! Receive message with LoRa using crate radio_sx127x (on SPI).
 //! See also examples gps_rw,  lora_spi_gps_rw,  lora_spi_send.
 
-//   Using  sck, miso, mosi, cs, reset and D00, D01.
-//   See hardware sections below for pin setup.
-//   Not yet using  D02, D03
+//   Using  sck, miso, mosi, cs, reset and D00, D01. Not yet using  D02, D03
+//   See setup() sections below for pins.
 
 
 //https://www.rfwireless-world.com/Tutorials/LoRa-channels-list.html
-//channels = {
+// channels are as follows
 //   'CH_00_900': 903.08, 'CH_01_900': 905.24, 'CH_02_900': 907.40,
 //   'CH_03_900': 909.56, 'CH_04_900': 911.72, 'CH_05_900': 913.88,
 //   'CH_06_900': 916.04, 'CH_07_900': 918.20, 'CH_08_900': 920.36,
@@ -16,8 +15,8 @@
 //   'CH_10_868': 865.20, 'CH_11_868': 865.50, 'CH_12_868': 865.80,
 //   'CH_13_868': 866.10, 'CH_14_868': 866.40, 'CH_15_868': 866.70,
 //   'CH_16_868': 867   , 'CH_17_868': 868   ,   
-//   }
 
+// See FREQUENCY below to set the channel.
 
 #![no_std]
 #![no_main]
@@ -99,23 +98,20 @@ const CONFIG_RADIO: radio_sx127x::device::Config = radio_sx127x::device::Config 
 #[cfg(feature = "stm32f0xx")]  //  eg stm32f030xc
 use stm32f0xx_hal::{prelude::*,   
                     pac::Peripherals, 
-                    spi::{Spi, EightBit},
+                    spi::{Spi, EightBit, Error},
                     delay::Delay,
-                    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF0,
-                           gpioa::{PA1}, Output, PushPull,
-                           gpiob::{PB1}, },
+                    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, Input, AF0,
+                           gpioa::{PA0, PA1}, Output, PushPull,
+                           gpiob::{PB8, PB9}, Floating },
                     pac::SPI1,
                     }; 
 
+
     #[cfg(feature = "stm32f0xx")]
-    fn setup() ->  Sx127x<Wrapper<Spi<SPI1, Spi1NoRemap,
-                        (PA5<Alternate<AF0>>,  PA6<Input<AF0>>, PA7<Alternate<AF0>>),  EightBit>, //Error, 
+    fn setup() ->   Sx127x<Wrapper<Spi<SPI1, 
+                        PA5<Alternate<AF0>>,  PA6<Alternate<AF0>>, PA7<Alternate<AF0>>,  EightBit>, Error, 
                    PA1<Output<PushPull>>,  PB8<Input<Floating>>,  PB9<Input<Floating>>,  PA0<Output<PushPull>>, 
                    core::convert::Infallible,  Delay>, Error, core::convert::Infallible> {
-
-    //fn setup() ->  (sx127x_lora::LoRa<Spi<SPI1,  PA5<Alternate<AF0>>, 
-    //                                      PA6<Alternate<AF0>>, PA7<Alternate<AF0>>, EightBit>,
-    //                                  PA1<Output<PushPull>>, PB1<Output<PushPull>>>, 
 
        let cp = cortex_m::Peripherals::take().unwrap();
        let mut p  = Peripherals::take().unwrap();
@@ -124,32 +120,29 @@ use stm32f0xx_hal::{prelude::*,
        let gpioa = p.GPIOA.split(&mut rcc);
        let gpiob = p.GPIOB.split(&mut rcc);
        
-       let (sck, miso, mosi, cs, rst) = cortex_m::interrupt::free(move |cs| {
+       let (sck, miso, mosi, _rst, pa1, pb8, pb9, pa0) = cortex_m::interrupt::free(move |cs| {
             (   gpioa.pa5.into_alternate_af0(cs),         //   sck   on PA5
                 gpioa.pa6.into_alternate_af0(cs),	  //   miso  on PA6
                 gpioa.pa7.into_alternate_af0(cs),	  //   mosi  on PA7
                 
-                gpioa.pa1.into_push_pull_output(cs),	  //  cs   on PA1
-                gpiob.pb1.into_push_pull_output(cs),	  // reset on PB1
+                //gpioa.pa1.into_push_pull_output(cs),	  //   cs            on PA1
+                gpiob.pb1.into_push_pull_output(cs),	  //   reset         on PB1
+    	    
+	        gpioa.pa1.into_push_pull_output(cs),      //   CsPin	     on PA1
+    	        gpiob.pb8.into_floating_input(cs),        //   BusyPin  DIO0 on PB8
+                gpiob.pb9.into_floating_input(cs),        //   ReadyPin DIO1 on PB9
+    	        gpioa.pa0.into_push_pull_output(cs),      //   ResetPin	     on PA0
             )
         });
 
    
        let spi = Spi::spi1(p.SPI1, (sck, miso, mosi), sx127x_lora::MODE, 8.mhz(), &mut rcc);
      
-       let mut delay = Delay::new(cp.SYST, &rcc);
+       let delay = Delay::new(cp.SYST, &rcc);
 
        // Create lora radio instance 
 
-       let lora = Sx127x::spi(
-    	    spi,					             //Spi
-    	    gpioa.pa1.into_push_pull_output(&mut gpioa.crl),         //CsPin         on PA1
-    	    gpiob.pb8.into_floating_input(&mut gpiob.crh),           //BusyPin  DIO0 on PB8
-            gpiob.pb9.into_floating_input(&mut gpiob.crh),           //ReadyPin DIO1 on PB9
-    	    gpioa.pa0.into_push_pull_output(&mut gpioa.crl),         //ResetPin      on PA0
-    	    delay,					             //Delay
-    	    &CONFIG_RADIO,					     //&Config
-    	    ).unwrap();      // should handle error
+       let lora = Sx127x::spi( spi, pa1, pb8, pb9, pa0, delay, &CONFIG_RADIO, ).unwrap(); // should handle error
 
        lora
        }
