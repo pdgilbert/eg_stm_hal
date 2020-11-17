@@ -121,8 +121,6 @@ ads1x1x = "0.2"
 # mcp4x = "0.1"
 f3 = "0.6.1"
 
-# for  lora_spi_send
-radio = "0.7"
 embedded-spi = { version = "0.6", default-features = false }
 
 stm32f1 = "0.11.0"
@@ -130,18 +128,12 @@ stm32f3 = "0.11"
 stm32f4 = "0.11"
 stm32l1 = "0.5.0"
 
-# for  text_i2c 
-[dependencies.ssd1306]
-git = "https://github.com/jamwaffles/ssd1306"
-#version = "0.3.1" # "0.2.6" "0.3.1" 
-#optional = true
+# for  lora_spi_*
+radio = "0.7"
+#[dependencies.radio]
+#git = "https://github.com/ryankurte/rust-radio-hal"   # breaks a trait bound 
 
-# for  text_i2c which uses ssd1306, ads1015-display example.    need rust 1.40.0 for #[non_exhaustive]
-[dependencies.embedded-graphics]
-#optional = true
-version = "0.6.0" #  "0.4.4" # "0.4.9"  "0.6.2" 
-
-# for  lora_spi_send
+# for  lora_spi_*
 [dependencies.radio-sx127x]
 git = "https://github.com/ryankurte/rust-radio-sx127x"
 #branch = "update-everything"
@@ -160,6 +152,17 @@ git = "https://github.com/hdoordt/sx127x_lora"
 #features = ["version_0x12"]
 #version = "0.3.1"
 #optional = true
+
+# for  text_i2c 
+[dependencies.ssd1306]
+git = "https://github.com/jamwaffles/ssd1306"
+#version = "0.3.1" # "0.2.6" "0.3.1" 
+#optional = true
+
+# for  text_i2c which uses ssd1306, ads1015-display example.    need rust 1.40.0 for #[non_exhaustive]
+[dependencies.embedded-graphics]
+#optional = true
+version = "0.6.0" #  "0.4.4" # "0.4.9"  "0.6.2" 
 
 #[dependencies.dht11]
 #git = "https://github.com/plorefice/dht11-rs"
@@ -261,7 +264,7 @@ version = "0.2.2"
 
 [dependencies.embedded-hal]
 version = "0.2.4"
-#version = "1.0.0-alpha.3"  Nov works for blink ... not for lora_spi
+#version = "1.0.0-alpha.3"  #Nov works for blink ... not for lora_spi
 #features = ["unproven"]
 #version = "1.0.0-alpha.1"   July 2020 gives ... led3.set_low() method not found ...
 

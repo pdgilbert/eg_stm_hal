@@ -44,9 +44,10 @@ use radio_sx127x::{prelude::*,                                     // prelude ha
                                   PayloadLength, PayloadCrc, FrequencyHopping, },
 		   };
 
+// trait needs to be in scope to find  methods start_transmit and check_transmit.
 //use radio::{Receive, Transmit, Radio}; 
-use radio::{Receive}; // trait Receive needs to be in scope to find  methods start_transmit and check_transmit.
-
+//use radio::{Receive, ReceiveInfo}; 
+use radio::{Receive, }; 
 use embedded_spi::wrapper::Wrapper;
 
 use eg_stm_hal::to_str;
@@ -295,12 +296,14 @@ use stm32f4xx_hal::{prelude::*,
                     }; 
 
 
-
     #[cfg(feature = "stm32f4xx")]
-    fn setup() ->  Sx127x<Wrapper<Spi<SPI1, 
+        fn setup() ->  Sx127x<Wrapper<Spi<SPI1, 
                            (PA5<Alternate<AF5>>,    PA6<Alternate<AF5>>,   PA7<Alternate<AF5>>)>,  Error, 
                    PA1<Output<PushPull>>,  PB8<Input<Floating>>,  PB9<Input<Floating>>,  PA0<Output<PushPull>>, 
                    core::convert::Infallible,  Delay>,  Error, core::convert::Infallible> {
+
+//    fn setup() ->  impl DelayMs<u32> + Receive<Info= dyn radio::ReceiveInfo, 
+//                                          Error=radio_sx127x::Error<Error, core::convert::Infallible>> { 
 
 // this
 //    fn setup() ->  impl DelayMs<u32> + Receive<Error=radio_sx127x::Error<Error, core::convert::Infallible>> { 
@@ -314,6 +317,7 @@ use stm32f4xx_hal::{prelude::*,
 //                                          Error=radio_sx127x::Error<Error, core::convert::Infallible>> { 
 // gives
 //   cannot find type `ReceiveInfo` in crate `radio_sx127x`
+// It seems that ReceiveInfo is in the git version of radio, but that breaks other things!!
 
 
 // this
