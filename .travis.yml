@@ -28,7 +28,7 @@ matrix:
           env: HAL="stm32f0xx"  MCU="stm32f030xc"  TARGET="thumbv6m-none-eabi"    BOARD="none-stm32f030"
 
         - name: "bluepill"
-          env: HAL="stm32f1xx"  MCU="stm32f103"  TARGET="thumbv7m-none-eabi --release"     BOARD="bluepill"
+          env: HAL="stm32f1xx"  MCU="stm32f103"   TARGET="thumbv7m-none-eabi"    BOARD="bluepill" RELEASE="--release"
 
         #- name: "none-stm32f100"
         #  env: HAL="stm32f1xx"  MCU="stm32f100"  TARGET="thumbv7m-none-eabi"    BOARD="none-stm32f100"

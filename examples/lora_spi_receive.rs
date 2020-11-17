@@ -290,7 +290,7 @@ use stm32f4xx_hal::{prelude::*,
 
 
     #[cfg(feature = "stm32f4xx")]
-        fn setup() ->  Sx127x<Wrapper<Spi<SPI1, 
+    fn setup() ->  Sx127x<Wrapper<Spi<SPI1, 
                            (PA5<Alternate<AF5>>,    PA6<Alternate<AF5>>,   PA7<Alternate<AF5>>)>,  Error, 
                    PA1<Output<PushPull>>,  PB8<Input<Floating>>,  PB9<Input<Floating>>,  PA0<Output<PushPull>>, 
                    core::convert::Infallible,  Delay>,  Error, core::convert::Infallible> {
@@ -320,6 +320,12 @@ use stm32f4xx_hal::{prelude::*,
 //   fn setup() ->  impl DelayMs<u32> + Receive<Info=radio::Receive::Info, 
 //                                                   ^^^^^^^^^^^^^^^^^^^^ help: use fully-qualified syntax: 
 //						     `<Type as radio::Receive>::Info`
+
+// this
+//    fn setup() ->  impl DelayMs<u32> + Receive<Info=radio_sx127x::device::PacketInfo::Info, 
+//                                               Error=radio_sx127x::Error<Error, core::convert::Infallible>> { 
+// gives
+//                 use fully-qualified syntax: `<radio_sx127x::device::PacketInfo as Trait>::Info`
 
 
 // this

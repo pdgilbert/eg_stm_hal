@@ -14,7 +14,7 @@ mkdir -p examplesNewStatus
 
 cp ${UTILS}/Xmark.png   examplesNewStatus/$1.png
 
-eval  cargo build  --target ${TARGET}  --features ${HAL},${MCU}  --example  $1  ; RC=$?
+eval  cargo build  --target ${TARGET}  ${RELEASE}  --features ${HAL},${MCU}  --example  $1  ; RC=$?
 
 if [ ${RC} -eq  0 ]; then 
    cp ${UTILS}/checkMark.png   examplesNewStatus/$1.png
