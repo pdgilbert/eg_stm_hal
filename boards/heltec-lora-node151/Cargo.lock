@@ -273,6 +273,7 @@ dependencies = [
  "mfrc522 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "nb 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "panic-halt 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "panic-reset 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "panic-semihosting 0.5.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "radio 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "radio-sx127x 0.10.1 (git+https://github.com/ryankurte/rust-radio-sx127x)",
@@ -519,6 +520,14 @@ dependencies = [
 name = "panic-halt"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "panic-reset"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "cortex-m 0.6.4 (registry+https://github.com/rust-lang/crates.io-index)",
+]
 
 [[package]]
 name = "panic-semihosting"
@@ -1104,6 +1113,7 @@ dependencies = [
 "checksum owned-singleton 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "21aa378869c97c7db706a4c576cf0ce8258dc7e0e1ad25a97ee5aba1fd4eed83"
 "checksum owned-singleton-macros 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "8d5c2ac071b95017bf70a5b607037fb0ef4abfa663fdf6cac8fbf36af9756ee3"
 "checksum panic-halt 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "de96540e0ebde571dc55c73d60ef407c653844e6f9a1e2fdbd40c07b9252d812"
+"checksum panic-reset 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "acee8535a38487c5c70d61ee87284710452cb3b265304463f20a0c5327a4a8a5"
 "checksum panic-semihosting 0.5.6 (registry+https://github.com/rust-lang/crates.io-index)" = "c3d55dedd501dfd02514646e0af4d7016ce36bc12ae177ef52056989966a1eec"
 "checksum paste 1.0.3 (registry+https://github.com/rust-lang/crates.io-index)" = "7151b083b0664ed58ed669fcdd92f01c3d2fdbf10af4931a301474950b52bfa9"
 "checksum proc-macro2 0.4.30 (registry+https://github.com/rust-lang/crates.io-index)" = "cf3d2011ab5c909338f7887f4fc896d35932e29146c12c8d01da6b22a80ba759"

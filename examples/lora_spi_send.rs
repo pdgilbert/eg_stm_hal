@@ -500,7 +500,7 @@ use stm32l1xx_hal::{prelude::*,
     fn setup() ->  impl DelayMs<u32> + Transmit<Error=sx127xError<Error, core::convert::Infallible>> {
     
     //fn setup() -> Sx127x<Wrapper<Spi<SPI1,impl Pins<SPI1>>, Error, 
-    //               PA4<Output<PushPull>>,  PB8<Input<Floating>>,  PB9<Input<Floating>>,  PA3<Output<PushPull>>, 
+    //               PA4<Output<PushPull>>,  PB11<Input<Floating>>,  PB10<Input<Floating>>,  PA3<Output<PushPull>>, 
     //               core::convert::Infallible,  Delay>,  Error, core::convert::Infallible> {
 
        // instead of impl Pins<SPI1>  above could use 
@@ -516,9 +516,9 @@ use stm32l1xx_hal::{prelude::*,
        let gpiob = p.GPIOB.split();
 
        let spi = p.SPI1.spi(
-                          (gpioa.pa5,            // sck   on PA5 
-                           gpioa.pa6,            // miso  on PA6 
-                           gpioa.pa7             // mosi  on PA7
+                          (gpioa.pa5,            // sck   on PA5  in board on Heltec
+                           gpioa.pa6,            // miso  on PA6  in board on Heltec
+                           gpioa.pa7             // mosi  on PA7  in board on Heltec
                            ), 
                           sx127x_lora::MODE, 
                           8.mhz(), 
@@ -530,12 +530,13 @@ use stm32l1xx_hal::{prelude::*,
        
        // Create lora radio instance 
 
+//  Heltec lora_node STM32L151CCU6
        let lora = Sx127x::spi(
     	    spi,				                     //Spi
-    	    gpioa.pa4.into_push_pull_output(),                       //CsPin         on PA4
-    	    gpiob.pb8.into_floating_input(),                         //BusyPin  DIO0 on PB8
-            gpiob.pb9.into_floating_input(),                         //ReadyPin DIO1 on PB9
-    	    gpioa.pa3.into_push_pull_output(),                       //ResetPin      on PA3
+    	    gpioa.pa4.into_push_pull_output(),                       //CsPin         on PA4  in board on Heltec
+    	    gpiob.pb11.into_floating_input(),                        //BusyPin  DIO0 on PB11 in board on Heltec
+            gpiob.pb10.into_floating_input(),                        //ReadyPin DIO1 on PB10 in board on Heltec
+    	    gpioa.pa3.into_push_pull_output(),                       //ResetPin      on PA3  in board on Heltec
     	    delay,					             //Delay
     	    &CONFIG_RADIO,					     //&Config
     	    ).unwrap();      // should handle error
