@@ -26,6 +26,8 @@ use cortex_m_semihosting::hprintln;
 //use core::ascii;
 use nb::block;
 
+use embedded_hal::blocking::delay::DelayMs;
+
 use cortex_m::asm;  //for breakpoint
 
 use eg_stm_hal::to_str;
@@ -88,17 +90,22 @@ use stm32f0xx_hal::{prelude::*,
 use stm32f1xx_hal::{prelude::*,   
                     pac::Peripherals, 
                     serial::{Config, Serial, Tx, Rx},  //, StopBits
-		    device::{USART3},  
+		    device::{USART2},  
                     delay::Delay,
 		    i2c::{BlockingI2c, DutyCycle, Mode},
-		    gpio::{gpiob::{PB8, PB9}, Alternate, OpenDrain, },
-		    device::I2C1,
+		    gpio::{gpioa::{PA2, PA3}, Alternate,
+		           gpiob::{PB10, PB11}, OpenDrain, },
+		    device::I2C2,
 		    }; 
 
     #[cfg(feature = "stm32f1xx")]
-    fn setup() ->  (Tx<USART3>, Rx<USART3>,
-                    BlockingI2c<I2C1,  (PB8<Alternate<OpenDrain>>, PB9<Alternate<OpenDrain>>) >, 
-		    Delay )  {
+    fn setup() ->  (Tx<USART2>, Rx<USART2>,
+                    BlockingI2c<I2C2,  (PB10<Alternate<OpenDrain>>, PB11<Alternate<OpenDrain>>) >, 
+                    Delay  ) {
+
+    //fn setup() ->  (Tx<USART3>, Rx<USART3>,
+    //                BlockingI2c<I2C2,  (PB10<Alternate<OpenDrain>>, PB11<Alternate<OpenDrain>>) >, 
+   //		    Delay )  {
 
        let cp = cortex_m::Peripherals::take().unwrap();
        let p = Peripherals::take().unwrap();
@@ -106,22 +113,25 @@ use stm32f1xx_hal::{prelude::*,
        let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr); 
        let mut afio = p.AFIO.constrain(&mut rcc.apb2);
 
+       let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
        let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
-       let (tx3, rx3) = Serial::usart3(
-           p.USART3,
-           (gpiob.pb10.into_alternate_push_pull(&mut gpiob.crh),    //tx pb10  for GPS rx
-            gpiob.pb11),					    //rx pb11  for GPS tx
-           &mut afio.mapr,
-           Config::default() .baudrate(9_600.bps()), 
-           clocks,
-           &mut rcc.apb1,
-       ).split();
 
-       let i2c = BlockingI2c::i2c1(
-          p.I2C1,
-          (gpiob.pb8.into_alternate_open_drain(&mut gpiob.crh),   // scl on PB8
-           gpiob.pb9.into_alternate_open_drain(&mut gpiob.crh)),  // sda on PB9
-          &mut afio.mapr,
+       let (tx, rx) = Serial::usart2(
+            p.USART2,
+            (gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),    //tx pa2  for GPS
+             gpioa.pa3), 					    //rx pa3  for GPS
+            &mut afio.mapr,
+            Config::default() .baudrate(9_600.bps()), 
+            clocks,
+            &mut rcc.apb1,
+            ).split();
+
+ 
+       let i2c = BlockingI2c::i2c2(
+          p.I2C2,
+          (gpiob.pb10.into_alternate_open_drain(&mut gpiob.crh),   // scl on PB8 10
+           gpiob.pb11.into_alternate_open_drain(&mut gpiob.crh)),  // sda on PB9 11
+          //&mut afio.mapr,  need this for i2c1 but not i2c2
           Mode::Fast {
               frequency: 400_000.hz(),
               duty_cycle: DutyCycle::Ratio2to1,
@@ -134,7 +144,7 @@ use stm32f1xx_hal::{prelude::*,
           1000,
           );
 
-       (tx3, rx3,   i2c,
+       (tx, rx,   i2c,
         Delay::new(cp.SYST, clocks))
        }
 
@@ -188,13 +198,13 @@ use stm32f4xx_hal::{prelude::*,
 		    pac::{USART2}, 
                     delay::Delay,
 		    i2c::{I2c, },  
-		    gpio::{gpiob::{PB8, PB9}, AlternateOD, AF4, },
-                    pac::I2C1,
+		    gpio::{gpiob::{PB10, PB3}, AlternateOD, AF4, AF9, },
+                    pac::I2C2,
 		    };
 
     #[cfg(feature = "stm32f4xx")]
     fn setup() ->  (Tx<USART2>, Rx<USART2>,
-                    I2c<I2C1, (PB8<AlternateOD<AF4>>, PB9<AlternateOD<AF4>>)>, 
+                    I2c<I2C2, (PB10<AlternateOD<AF4>>, PB3<AlternateOD<AF9>>)>, 
                     Delay ) {
 
        let cp = cortex_m::Peripherals::take().unwrap();
@@ -212,13 +222,15 @@ use stm32f4xx_hal::{prelude::*,
 
        let gpiob  = p.GPIOB.split();
        
-       // could also have scl on PB6, sda on PB7
-       //BlockingI2c::i2c1(
-       let scl = gpiob.pb8.into_alternate_af4().set_open_drain();   // scl on PB8
-       let sda = gpiob.pb9.into_alternate_af4().set_open_drain();   // sda on PB9
+       // can have (scl, sda) using I2C1  on (PB8  _af4, PB9 _af4) or on  (PB6 _af4, PB7 _af4)
+       //     or   (scl, sda) using I2C2  on (PB10 _af4, PB3 _af9)
+
+       //BlockingI2c::i2c2(
+       let scl = gpiob.pb10.into_alternate_af4().set_open_drain();   // scl on PB10
+       let sda = gpiob.pb3.into_alternate_af9().set_open_drain();    // sda on PB3
        
        (tx2, rx2,   
-	I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks), // i2c
+	I2c::i2c2(p.I2C2, (scl, sda), 400.khz(), clocks), // i2c
         Delay::new(cp.SYST, clocks))
        }
 
@@ -513,14 +525,14 @@ fn main() -> ! {
     let mut good = false;
     //let mut size: usize = 0;
     
-    asm::bkpt();
+    //asm::bkpt();
 
     loop {
         let byte = match block!(rx_gps.read()) {
 	    Ok(byt)	  => byt,
 	    Err(_error) => e,
 	    };
-        hprintln!("{}", byte).unwrap();
+        //hprintln!("{}", byte).unwrap();
         if   byte == 36  {  //  $ is 36. start of a line
 	   buffer.clear();
 	   good = true;     //start capturing line
@@ -531,17 +543,19 @@ fn main() -> ! {
               //hprintln!("buffer at {} of {}", buffer.len(), buffer.capacity()).unwrap();
               //hprintln!("read buffer {:?}", to_str(&buffer)).unwrap();
                             
-	      //if buffer[0..6] == [36, 71, 80, 84, 88, 84] {  //$GPTXT
-	      //if buffer[0..6] == [36, 71, 80, 82, 77, 67] {  //$GPRMC
+	      //if buffer[0..6] == [36, 71, 80, 84, 88, 84]   //$GPTXT
+	      //if buffer[0..6] == [36, 71, 80, 82, 77, 67]   //$GPRMC
 	      
 	      //$GPGLL north ~ to_str(&buffer[7..19])  east ~ to_str(&buffer[19..33])
 	      //$GPRMC north = to_str(&buffer[19..31]) east = to_str(&buffer[32..45])
 	      
-	      //if to_str(&buffer[0..6]) == "$GPRMC" {           // message id
+	      //if to_str(&buffer[0..6]) == "$GPRMC"           // message id
 	      if &buffer[0..6] == [36, 71, 80, 82, 77, 67] {   // message id $GPRMC
-	          let north = to_str(&buffer[19..31]);
+	          hprintln!("{}",to_str(&buffer[..])).unwrap();
+		  let north = to_str(&buffer[19..31]);
 	          hprintln!("north {}", north).unwrap();
 	          let east  = to_str(&buffer[32..45]);
+	          hprintln!("east {}", east).unwrap();
 	          Text::new(north, Point::new(0, 0))
                       .into_styled(text_style)
                       .draw(&mut disp)
