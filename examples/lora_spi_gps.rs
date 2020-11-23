@@ -170,8 +170,8 @@ use stm32f1xx_hal::{prelude::*,
     
        let (tx, rx) = Serial::usart2(
             p.USART2,
-            (gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),    //tx pa2  for GPS
-             gpioa.pa3), 					    //rx pa3  for GPS
+            (gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),    //tx pa2  for GPS rx
+             gpioa.pa3), 					    //rx pa3  for GPS tx
             &mut afio.mapr,
             Config::default() .baudrate(9_600.bps()), 
             clocks,
@@ -242,8 +242,8 @@ use stm32f3xx_hal::{prelude::*,
 
        let (tx, rx) = Serial::usart2(
             p.USART2,
-            (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl),    //tx pa2  for GPS
-             gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)),   //rx pa3  for GPS
+            (gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl),    //tx pa2  for GPS rx
+             gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl)),   //rx pa3  for GPS tx
             9600.bps(),    // 115_200.bps(),
             clocks,
             &mut rcc.apb1,
@@ -305,8 +305,8 @@ use stm32f4xx_hal::{prelude::*,
 
        let (tx, rx) = Serial::usart2(
            p.USART2,
-           (gpioa.pa2.into_alternate_af7(),            //tx pa2  for GPS
-	    gpioa.pa3.into_alternate_af7()),           //rx pa3  for GPS
+           (gpioa.pa2.into_alternate_af7(),            //tx pa2  for GPS rx
+	    gpioa.pa3.into_alternate_af7()),           //rx pa3  for GPS tx
            Config::default() .baudrate(9600.bps()), 
            clocks,
            ).unwrap().split();
@@ -333,8 +333,8 @@ use stm32f4xx_hal::{prelude::*,
        let lora = Sx127x::spi(
     	    spi,                                                       //Spi
     	    gpioa.pa1.into_push_pull_output(),                         //CsPin         on PA1
-    	    gpiob.pb8.into_floating_input(),                           //BusyPin  DI00 on PB8
-            gpiob.pb9.into_floating_input(),                           //ReadyPin DI01 on PB9
+    	    gpiob.pb8.into_floating_input(),                           //BusyPin  DIO0 on PB8
+            gpiob.pb9.into_floating_input(),                           //ReadyPin DIO1 on PB9
     	    gpioa.pa0.into_push_pull_output(),                         //ResetPin      on PA0
     	    delay,					               //Delay
     	    &CONFIG_RADIO,					       //&Config
@@ -650,7 +650,7 @@ use stm32l4xx_hal::{prelude::*,
        // Create lora radio instance 
 
        let lora = Sx127x::spi(
-    	    spi,					             //Spi
+    	    spi,					                             //Spi
     	    gpioa.pa1.into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper),    //CsPin	     on PA1
     	    gpiob.pb8.into_floating_input(  &mut gpiob.moder, &mut gpiob.pupdr),     //BusyPin  DIO0 on PB8
             gpiob.pb9.into_floating_input(  &mut gpiob.moder, &mut gpiob.pupdr),     //ReadyPin DIO1 on PB9
