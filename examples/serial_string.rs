@@ -99,73 +99,75 @@ use stm32f1xx_hal::{prelude::*,
                     pac::Peripherals, 
                     serial::{Config, Serial, StopBits, Tx, Rx},  
 		    device::{USART1, USART2, USART3},  
-                    dma::{TxDma, RxDma, dma1::{C2, C3, C4, C5, C6, C7}},
+                    dma::{dma1, }, 
+                    //dma::{TxDma, RxDma, dma1::{C2, C3, C4, C5, C6, C7}},
                     }; 
 
     #[cfg(feature = "stm32f1xx")]
-    fn setup() ->  (TxDma<Tx<USART1>, C4>, RxDma<Rx<USART1>, C5>, 
-                    TxDma<Tx<USART2>, C7>, RxDma<Rx<USART2>, C6>, 
-                    TxDma<Tx<USART3>, C2>, RxDma<Rx<USART3>, C3> )  {
+    fn setup() ->  (Tx<USART1>, dma1::C4, Rx<USART1>, dma1::C5, 
+                    Tx<USART2>, dma1::C7, Rx<USART2>, dma1::C6, 
+                    Tx<USART3>, dma1::C2, Rx<USART3>, dma1::C3 )  {
 
-        let p = Peripherals::take().unwrap();
-    	let mut rcc = p.RCC.constrain();  
-	let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr); 
-        let mut afio = p.AFIO.constrain(&mut rcc.apb2);
-        
-        let channels = p.DMA1.split(&mut rcc.ahb);
+    //fn setup() ->  (TxDma<Tx<USART1>, C4>, RxDma<Rx<USART1>, C5>, 
+    //                TxDma<Tx<USART2>, C7>, RxDma<Rx<USART2>, C6>, 
+    //                TxDma<Tx<USART3>, C2>, RxDma<Rx<USART3>, C3> )  {
 
-    	let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
+ 	let p = Peripherals::take().unwrap();
+ 	let mut rcc = p.RCC.constrain();  
+ 	let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr); 
+ 	let mut afio = p.AFIO.constrain(&mut rcc.apb2);
+ 	
+ 	let channels = p.DMA1.split(&mut rcc.ahb);
 
-	let txrx1 = Serial::usart1(
-    	    p.USART1,
-    	    (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),     //tx pa9 
-	     gpioa.pa10),					     //rx pa10
-    	    &mut afio.mapr,
-    	    Config::default() .baudrate(9600.bps()), //.stopbits(StopBits::STOP1
-    	    clocks,
-    	    &mut rcc.apb2,
-    	    );
+ 	let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
 
-        let ( tx1, rx1)  = txrx1.split();
-        let tx1  = tx1.with_dma(channels.4);            // console
-        let rx1  = rx1.with_dma(channels.5);
+ 	let ( tx1, rx1) = Serial::usart1(
+ 	    p.USART1,
+ 	    (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),     //tx pa9 
+ 	     gpioa.pa10),					     //rx pa10
+ 	    &mut afio.mapr,
+ 	    Config::default() .baudrate(9600.bps()), //.stopbits(StopBits::STOP1
+ 	    clocks,
+ 	    &mut rcc.apb2,
+ 	    ).split();
 
-        // ok let (_, tx1) = tx1.write(b"console connect check.").wait(); 
-        // No (_, tx1) = tx1.write(b"console connect check.").wait(); 
-        let tx1 = tx1.write(b"console connect check.").wait().1; 
- 
-        let txrx2 = Serial::usart2(
-            p.USART2,
-            (gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),     //tx pa2 
-             gpioa.pa3), 					     //rx pa3
-            &mut afio.mapr,
-            Config::default() .baudrate(9_600.bps()) .parity_odd() .stopbits(StopBits::STOP1),
-            clocks,
-            &mut rcc.apb1,
-        );
 
-        let ( tx2, rx2)  = txrx2.split();
-        let tx2  = tx2.with_dma(channels.7);
-        let rx2  = rx2.with_dma(channels.6);
+ 	let ( tx2, rx2) = Serial::usart2(
+ 	    p.USART2,
+ 	    (gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl),     //tx pa2 
+ 	     gpioa.pa3),					     //rx pa3
+ 	    &mut afio.mapr,
+ 	    Config::default() .baudrate(9_600.bps()) .parity_odd() .stopbits(StopBits::STOP1),
+ 	    clocks,
+ 	    &mut rcc.apb1,
+ 	    ).split();
 
-        let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
+ 	let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
 
-        let txrx3 = Serial::usart3(
-            p.USART3,
-            ( gpiob.pb10.into_alternate_push_pull(&mut gpiob.crh),   //rx pb10  
-              gpiob.pb11),  					     //tx pb11
-            &mut afio.mapr,
-            Config::default() .baudrate(9_600.bps()) .parity_odd() .stopbits(StopBits::STOP1),
-            clocks,
-            &mut rcc.apb1,    
-        );
+ 	let ( tx3, rx3)  = Serial::usart3(
+ 	    p.USART3,
+ 	    ( gpiob.pb10.into_alternate_push_pull(&mut gpiob.crh),   //rx pb10  
+ 	      gpiob.pb11),					     //tx pb11
+ 	    &mut afio.mapr,
+ 	    Config::default() .baudrate(9_600.bps()) .parity_odd() .stopbits(StopBits::STOP1),
+ 	    clocks,
+ 	    &mut rcc.apb1,    
+ 	    ).split();
 
-        let ( tx3, rx3)  = txrx3.split();
-        let tx3  = tx3.with_dma(channels.2);
-        let rx3  = rx3.with_dma(channels.3);
+ 	//let tx1  = tx1.with_dma(channels.4);		// console
+ 	//let rx1  = rx1.with_dma(channels.5);
+ 	//let tx2  = tx2.with_dma(channels.7);	
+ 	//let rx2  = rx2.with_dma(channels.6);
+ 	//let tx3  = tx3.with_dma(channels.2);
+ 	//let rx3  = rx3.with_dma(channels.3);
 
-        (tx1, rx1,   tx2, rx2,   tx3, rx3 )
-	}
+ 	let dma1 = p.DMA1.split(&mut rcc.ahb);
+ 	let (tx1_ch, rx1_ch) = (dma1.4, dma1.5);	// console
+ 	let (tx2_ch, rx2_ch) = (dma1.7, dma1.6);
+ 	let (tx3_ch, rx3_ch) = (dma1.2, dma1.3);
+
+ 	(tx1, tx1_ch,  rx1, rx1_ch,	tx2, tx2_ch, rx2, rx2_ch,   tx3, tx3_ch, rx3, rx3_ch )
+ 	}
 
 
     //#[cfg(any(feature = "stm32f1xx", feature = "stm32l1xx"))]
@@ -219,10 +221,10 @@ use stm32f3xx_hal::{prelude::*,
             &mut rcc.apb1,  
             ).split();
 
-       let dma1 = p.DMA1.split(&mut rcc.ahb);
-       let (tx1_ch, rx1_ch) = (dma1.ch4, dma1.ch5);
-       let (tx2_ch, rx2_ch) = (dma1.ch7, dma1.ch6);
-       let (tx3_ch, rx3_ch) = (dma1.ch2, dma1.ch3);
+        let dma1 = p.DMA1.split(&mut rcc.ahb);
+        let (tx1_ch, rx1_ch) = (dma1.ch4, dma1.ch5);
+        let (tx2_ch, rx2_ch) = (dma1.ch7, dma1.ch6);
+        let (tx3_ch, rx3_ch) = (dma1.ch2, dma1.ch3);
 
         (tx1, tx1_ch,  rx1, rx1_ch,    tx2, tx2_ch, rx2, rx2_ch,   tx3, tx3_ch, rx3, rx3_ch )
 	}

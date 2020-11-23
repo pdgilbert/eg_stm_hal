@@ -58,7 +58,7 @@ use stm32f0xx_hal::{prelude::*,
        let channels = p.DMA1.split(&mut rcc.ahb);
        let (tx1, rx1)  = txrx1.split();
        //let tx1 = tx1.with_dma(channels.4);
-       let rx1 = rx1.with_dma(channels.5);
+       //let rx1 = rx1.with_dma(channels.5);
        (tx1, rx1)
        }
 
@@ -68,12 +68,14 @@ use stm32f0xx_hal::{prelude::*,
 use stm32f1xx_hal::{prelude::*,   
                     pac::Peripherals, 
                     serial::{Config, Serial, StopBits, Tx, Rx},
-		    dma::{RxDma, TxDma,  dma1::{C5, C4},}, 
+		    dma::{dma1, }, 
 		    device::USART1 }; 
     
     #[cfg(feature = "stm32f1xx")]
-    fn setup() ->  (TxDma<Tx<USART1>, C4>, RxDma<Rx<USART1>, C5>)  {
-       
+    fn setup() ->  (Tx<USART1>, dma1::C4, Rx<USART1>, dma1::C5)  {
+
+    // fn setup() ->  (TxDma<Tx<USART1>, C4>, RxDma<Rx<USART1>, C5>)  {
+    
        // with Tx return  Tx<USART1> ; with TxDma return  TxDma<Tx<USART1>, C4>
        let p = Peripherals::take().unwrap();
        let mut rcc = p.RCC.constrain();  
@@ -81,7 +83,6 @@ use stm32f1xx_hal::{prelude::*,
        let mut afio = p.AFIO.constrain(&mut rcc.apb2);
        let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
 
-       //let (tx1, rx1) = Serial::usart1(
        let txrx1 = Serial::usart1(
 	   p.USART1,
 	   (gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh),     //tx pa9, 
@@ -92,15 +93,20 @@ use stm32f1xx_hal::{prelude::*,
 	   &mut rcc.apb2,
 	   );  //.split();
 
+       let (tx1, rx1)  = txrx1.split();
+
        // Note: in stm32f1xx_hal writeln! does not work with TxDma
        //  writeln!(tx1, "\r\ncheck console output.\r\n").unwrap();
        //  and without dma tx1.write() expects u8 not &[u8; 25]
 
-       let channels = p.DMA1.split(&mut rcc.ahb);
-       let (tx1, rx1)  = txrx1.split();
-       let tx1 = tx1.with_dma(channels.4);
-       let rx1 = rx1.with_dma(channels.5);
-       (tx1, rx1)
+       let dma1 = p.DMA1.split(&mut rcc.ahb);
+       let (tx1_ch, rx1_ch) = (dma1.4, dma1.5);
+ 
+       //let tx1 = tx1.with_dma(dma1.4);
+       //let rx1 = rx1.with_dma(dma1.5);
+       //(tx1, rx1)
+
+       (tx1, tx1_ch,   rx1, rx1_ch)
        }
 
 
@@ -145,12 +151,12 @@ use stm32f3xx_hal::{prelude::*,
 use stm32f4xx_hal::{prelude::*, 
                     pac::Peripherals, 
 		    serial::{config::Config, Serial, Tx, Rx},
-		    //dma::dma1, 
+		    pac::dma1, 
 		    pac::USART1 
 		    };
 
     #[cfg(feature = "stm32f4xx")]
-    fn setup() ->  (Tx<USART1>, dma1::C4, Rx<USART1>, dma1::C5)  {
+    fn setup() ->  () {  //(Tx<USART1>, dma1::C4, Rx<USART1>, dma1::C5)  {
 
        let p = Peripherals::take().unwrap();
        let mut rcc = p.RCC.constrain();  
@@ -299,12 +305,14 @@ use stm32l1xx_hal::{prelude::*,
 #[cfg(feature = "stm32l4xx")] 
 use stm32l4xx_hal::{prelude::*, 
                     pac::Peripherals, 
-		    serial::{config::Config, Serial, Tx, Rx},
+		    serial::{Config, Serial, Tx, Rx},
+		    //pac::dma1, 
+		    dma::dma1::{C4, C5},
 		    pac::USART1 
 		    };
 
     #[cfg(feature = "stm32l4xx")]
-    fn setup() ->  (Tx<USART1>, Rx<USART1>)  {
+    fn setup() -> (Tx<USART1>, C4, Rx<USART1>, C5)  {
 
        let p = Peripherals::take().unwrap();
        let mut flash = p.FLASH.constrain();
@@ -314,15 +322,25 @@ use stm32l4xx_hal::{prelude::*,
                              .pclk2(80.mhz()) .freeze(&mut flash.acr, &mut pwr);
        let mut gpioa = p.GPIOA.split(&mut rcc.ahb2);
 
-       Serial::usart1(
+       let txrx1 =  Serial::usart1(
            p.USART1,
            (gpioa.pa9.into_af7(&mut gpioa.moder, &mut gpioa.afrh),    //tx pa9
             gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh)),  //rx pa10
            Config::default() .baudrate(9600.bps()),
            clocks,
            &mut rcc.apb2,
-           ).split()
+           );
+
+       let (tx1, rx1)  = txrx1.split();
+
+       let dma1 = p.DMA1.split(&mut rcc.ahb1);
+       let (tx1_ch, rx1_ch) = (dma1.4, dma1.5);
+       //let (tx2_ch, rx2_ch) = (dma1.6, dma1.7);
+       //let (tx3_ch, rx3_ch) = (dma1.3, dma1.2);
+
+       (tx1, tx1_ch,   rx1, rx1_ch)
        }
+
 
 
     // End of hal/MCU specific setup. Following should be generic code.
