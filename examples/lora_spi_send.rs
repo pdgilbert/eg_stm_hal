@@ -29,7 +29,10 @@ extern crate panic_halt;
 use cortex_m_rt::entry;
 use cortex_m_semihosting::*;
 
-use embedded_hal::blocking::delay::DelayMs;
+use embedded_hal::{blocking::delay::DelayMs,
+                   spi::{Mode, Phase, Polarity},
+		   };
+
 //use asm_delay::{ AsmDelay, bitrate, };
 
 //use cortex_m::asm;  //for breakpoint
@@ -56,6 +59,11 @@ use radio::{Transmit}; // trait needs to be in scope to find  methods start_tran
 
 
 // lora and radio parameters
+
+pub const MODE: Mode = Mode {		    //  SPI mode for radio
+    phase: Phase::CaptureOnSecondTransition,
+    polarity: Polarity::IdleHigh,
+    };
 
 const FREQUENCY: u32 = 907_400_000;     // frequency in hertz ch_12: 915_000_000, ch_2: 907_400_000
 
@@ -132,7 +140,7 @@ use stm32f0xx_hal::{prelude::*,
         });
 
    
-       let spi = Spi::spi1(p.SPI1, (sck, miso, mosi), sx127x_lora::MODE, 8.mhz(), &mut rcc);
+       let spi = Spi::spi1(p.SPI1, (sck, miso, mosi), MODE, 8.mhz(), &mut rcc);
      
        let delay = Delay::new(cp.SYST, &rcc);
 
@@ -176,7 +184,7 @@ use stm32f1xx_hal::{prelude::*,
             gpioa.pa7.into_alternate_push_pull(&mut gpioa.crl)   //   mosi  on PA7
             ),
                &mut afio.mapr,
-           sx127x_lora::MODE,
+           MODE,
            8.mhz(),
            clocks, 
            &mut rcc.apb2,
@@ -239,7 +247,7 @@ use stm32f3xx_hal::{prelude::*,
             gpioa.pa6.into_af5(&mut gpioa.moder, &mut gpioa.afrl),                // miso  on PA6
             gpioa.pa7.into_af5(&mut gpioa.moder, &mut gpioa.afrl)                 // mosi  on PA7
             ),
-           sx127x_lora::MODE,
+           MODE,
            8.mhz(),
            clocks,
            &mut rcc.apb2,
@@ -328,7 +336,7 @@ use stm32f4xx_hal::{prelude::*,
             gpioa.pa6.into_alternate_af5(),  // miso  on PA6
             gpioa.pa7.into_alternate_af5()   // mosi  on PA7
             ),
-           sx127x_lora::MODE,
+           MODE,
            MegaHertz(8).into(),
            clocks,
            );
@@ -393,7 +401,7 @@ use stm32f7xx_hal::{prelude::*,
        let spi = Spi::new(p.SPI1, (sck, miso, mosi)).enable::<u8>(
           &mut rcc,
           ClockDivider::DIV32,
-          sx127x_lora::MODE,
+          MODE,
           );
 
        let clocks = rcc.cfgr.sysclk(64.mhz()).pclk1(32.mhz()).freeze();
@@ -443,7 +451,7 @@ use stm32h7xx_hal::{prelude::*,
             gpioa.pa6.into_alternate_af5(),  // miso  on PA6 
             gpioa.pa7.into_alternate_af5()   // mosi  on PA7
             ),
-           sx127x_lora::MODE,
+           MODE,
            8.mhz(),
            ccdr.peripheral.SPI1,
            &clocks,
@@ -493,7 +501,7 @@ use stm32l0xx_hal::{prelude::*,
                          gpioa.pa6,   // miso  on PA6
                          gpioa.pa7    // mosi  on PA7
                          ), 
-                        sx127x_lora::MODE,
+                        MODE,
                         8.mhz(),
                         &mut rcc
                         );
@@ -548,7 +556,7 @@ use stm32l1xx_hal::{prelude::*,
                            gpioa.pa6,            // miso  on PA6  in board on Heltec
                            gpioa.pa7             // mosi  on PA7  in board on Heltec
                            ), 
-                          sx127x_lora::MODE, 
+                          MODE, 
                           8.mhz(), 
                           &mut rcc
                           );
@@ -601,7 +609,7 @@ use stm32l4xx_hal::{prelude::*,
             gpioa.pa6.into_af5(&mut gpioa.moder, &mut gpioa.afrl),  // miso  on PA6
             gpioa.pa7.into_af5(&mut gpioa.moder, &mut gpioa.afrl)   // mosi  on PA7
             ),
-           sx127x_lora::MODE,
+           MODE,
            8.mhz(),
            clocks,
            &mut rcc.apb2,
