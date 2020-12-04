@@ -35,6 +35,16 @@ use embedded_hal::blocking::delay::DelayMs;
 //use cortex_m::asm;  //for breakpoint
 
 use radio_sx127x::Error as sx127xError;                           // Error name conflict with hals
+//use radio_sx127x::Error::{CommsError, PinError, DelayError};
+
+// Error is an associated type in embedded_hal::spi::FullDuplex
+// Error is an associated type in embedded_hal::blocking::serial::Write
+// Error is an associated type in embedded_hal::digital::v2::InputPin
+// Error is an associated type in embedded_hal::digital::v2::OutputPin
+// Error is an associated type in embedded_hal::digital::v2::ToggleableOutputPin
+// Error is an associated type in embedded_hal::blocking::i2c::Read  , Write and others
+
+
 use radio_sx127x::{prelude::*,                                    // prelude has Sx127x,
 		   device::{Modem, Channel, PaConfig, PaSelect,},
                    device::lora::{LoRaConfig, LoRaChannel, Bandwidth, SpreadingFactor, CodingRate,
@@ -258,12 +268,12 @@ use stm32f4xx_hal::{prelude::*,
                     pac::Peripherals, 
                     spi::{Spi, Error},
                     delay::Delay,
-                    //  next would be needed to define exact type 
-		    //gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5,  
-                    //       gpioa::{PA0, PA1}, Output, PushPull,
-		    //       gpiob::{PB8, PB9}, Input, Floating},
                     time::MegaHertz,
-                    //pac::SPI1,
+                    //  following would be needed to define exact type 
+		    gpio::{gpioa::{PA5, PA6, PA7}, Alternate, AF5,  
+                           gpioa::{PA0, PA1}, Output, PushPull,
+		           gpiob::{PB8, PB9}, Input, Floating},
+                    pac::SPI1,
                     }; 
 
 // If the type for the lora object is needed somewhere other than just in the setup() return type then it
@@ -283,7 +293,25 @@ use stm32f4xx_hal::{prelude::*,
 // works.
 
     #[cfg(feature = "stm32f4xx")]
-    fn setup() ->  impl  DelayMs<u32> + Transmit<Error=sx127xError<Error, core::convert::Infallible>> {
+    fn setup() ->   impl  DelayMs<u32> + Transmit<Error=sx127xError<Error, core::convert::Infallible, Delay>> {
+//                  impl  DelayMs<u32> + Transmit<Error=sx127xError<Error, core::convert::Infallible>> {
+
+//    fn setup() ->   Sx127x<Wrapper<Spi<SPI1,
+//         (PA5<Alternate<AF5>>, PA6<Alternate<AF5>>, PA7<Alternate<AF5>>)>, _, 
+//	  PA1<Output<PushPull>>, PB8<Input<Floating>>, PB9<Input<Floating>>, PA0<Output<PushPull>>,
+//	   _, Delay, _>, _, _, _> {
+
+//                 found struct 
+//		 `radio_sx127x::Sx127x<driver_pal::wrapper::Wrapper<stm32f4xx_hal::spi::Spi<stm32f4::stm32f411::SPI1, 
+//		 (stm32f4xx_hal::gpio::gpioa::PA5<stm32f4xx_hal::gpio::Alternate<stm32f4xx_hal::gpio::AF5>>, 
+//		 stm32f4xx_hal::gpio::gpioa::PA6<stm32f4xx_hal::gpio::Alternate<stm32f4xx_hal::gpio::AF5>>, 
+//		 stm32f4xx_hal::gpio::gpioa::PA7<stm32f4xx_hal::gpio::Alternate<stm32f4xx_hal::gpio::AF5>>)>, _, 
+//		 stm32f4xx_hal::gpio::gpioa::PA1<stm32f4xx_hal::gpio::Output<stm32f4xx_hal::gpio::PushPull>>, 
+//		 stm32f4xx_hal::gpio::gpiob::PB8<stm32f4xx_hal::gpio::Input<stm32f4xx_hal::gpio::Floating>>, 
+//		 stm32f4xx_hal::gpio::gpiob::PB9<stm32f4xx_hal::gpio::Input<stm32f4xx_hal::gpio::Floating>>, 
+//		 stm32f4xx_hal::gpio::gpioa::PA0<stm32f4xx_hal::gpio::Output<stm32f4xx_hal::gpio::PushPull>>, _, 
+//		 stm32f4xx_hal::delay::Delay, _>, _, _, _>`
+
 
        let cp = cortex_m::Peripherals::take().unwrap();
        let p  = Peripherals::take().unwrap();
@@ -608,11 +636,9 @@ fn main() -> !{
     
     // print out configuration (for debugging)
     
-//    let v = lora.lora_get_config();
-//    hprintln!("configuration {}", v).unwrap();
-    
-//    hprintln!("chammel	  {}", lora.get_chammel()).unwrap();
-
+    // Heva not yet got this to work. Methods are for wrong object?
+    //hprintln!("configuration {}", lora.lora_get_config()).unwrap();
+    //hprintln!("channel	  {}", lora.lora_get_channel()).unwrap();
     //hprintln!("mode		  {}", lora.get_mode()).unwrap();
     //hprintln!("mode		  {}", lora.read_register(Register::RegOpMode.addr())).unwrap();
     //hprintln!("bandwidth	  {:?}", lora.get_signal_bandwidth()).unwrap();
@@ -635,6 +661,8 @@ fn main() -> !{
     //	buffer[i] = c as u8;
     //	}    
     
+    hprintln!("entering loop").unwrap();
+    
     loop {
        lora.start_transmit(message).unwrap();    // should handle error
        
@@ -645,6 +673,6 @@ fn main() -> !{
            Err(_err) => hprintln!("Error in lora.check_transmit(). Should return True or False.").unwrap(),
            };
        
-       lora.delay_ms(5000u32); //omit pending fix
+       lora.delay_ms(5000u32);
        };
 }
