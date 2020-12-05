@@ -50,13 +50,13 @@ dependencies = [
 
 [[package]]
 name = "async-trait"
-version = "0.1.41"
+version = "0.1.42"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b246867b8b3b6ae56035f1eb1ed557c1d8eae97f0d53696138a50fa0e3a3b8c0"
+checksum = "8d3a45e77e34375a7923b1e8febb049bb011f064714a8e17a1a616fef01da13d"
 dependencies = [
  "proc-macro2 1.0.24",
  "quote 1.0.7",
- "syn 1.0.48",
+ "syn 1.0.53",
 ]
 
 [[package]]
@@ -132,6 +132,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4785bdd1c96b2a846b2bd7cc02e86b6b3dbf14e7e53446c4f54c92a361040822"
 
 [[package]]
+name = "cfg-if"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
+
+[[package]]
 name = "chrono"
 version = "0.4.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -189,7 +195,7 @@ checksum = "4717562afbba06e760d34451919f5c3bf3ac15c7bb897e8b04862a7428378647"
 dependencies = [
  "proc-macro2 1.0.24",
  "quote 1.0.7",
- "syn 1.0.48",
+ "syn 1.0.53",
 ]
 
 [[package]]
@@ -219,9 +225,9 @@ dependencies = [
 
 [[package]]
 name = "cortex-m-semihosting"
-version = "0.3.5"
+version = "0.3.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "113ef0ecffee2b62b58f9380f4469099b30e9f9cbee2804771b4203ba1762cfa"
+checksum = "6bffa6c1454368a6aa4811ae60964c38e6996d397ff8095a8b9211b1c1f749bc"
 dependencies = [
  "cortex-m 0.6.4",
 ]
@@ -473,7 +479,7 @@ version = "0.4.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4fabed175da42fed1fa0746b0ea71f412aa9d35e76e95e59b192c64b9dc2bf8b"
 dependencies = [
- "cfg-if",
+ "cfg-if 0.1.10",
 ]
 
 [[package]]
@@ -661,7 +667,7 @@ dependencies = [
 [[package]]
 name = "radio-sx127x"
 version = "0.10.1"
-source = "git+https://github.com/ryankurte/rust-radio-sx127x#2285c1ca9f527ab464a27f6a43af3b0a93130d2f"
+source = "git+https://github.com/rust-iot/rust-radio-sx127x?rev=2285c1ca9f527ab464a27f6a43af3b0a93130d2f#2285c1ca9f527ab464a27f6a43af3b0a93130d2f"
 dependencies = [
  "bitflags",
  "embedded-hal",
@@ -748,13 +754,13 @@ checksum = "cbd1ae72adb44aab48f325a02444a5fc079349a8d804c1fc922aed3f7454c74e"
 dependencies = [
  "proc-macro2 1.0.24",
  "quote 1.0.7",
- "syn 1.0.48",
+ "syn 1.0.53",
 ]
 
 [[package]]
 name = "ssd1306"
-version = "0.4.0"
-source = "git+https://github.com/jamwaffles/ssd1306#dc4111f5087d62d3f769ddb774f5cf863dad5492"
+version = "0.4.1"
+source = "git+https://github.com/jamwaffles/ssd1306#bac7fc51b46d90f8d6ffcbe997a205124411e1d7"
 dependencies = [
  "display-interface",
  "display-interface-i2c",
@@ -796,7 +802,7 @@ dependencies = [
 [[package]]
 name = "stm32f0xx-hal"
 version = "0.17.1"
-source = "git+https://github.com/stm32-rs/stm32f0xx-hal#2bb8bb9637bbba6163c885ca48524a708128413e"
+source = "git+https://github.com/stm32-rs/stm32f0xx-hal#a7daf77cf0e9707e0d9b8f441ffbe82d80654fb5"
 dependencies = [
  "bare-metal 1.0.0",
  "cast",
@@ -822,7 +828,7 @@ dependencies = [
 [[package]]
 name = "stm32f1xx-hal"
 version = "0.7.0"
-source = "git+https://github.com/stm32-rs/stm32f1xx-hal#a100426a2726048715d058c195b0d6e08aeea4c8"
+source = "git+https://github.com/stm32-rs/stm32f1xx-hal#b3e2d75b1e9d7e4398304855d4e2ae892c745fc7"
 dependencies = [
  "cast",
  "cortex-m 0.6.4",
@@ -885,11 +891,10 @@ dependencies = [
 [[package]]
 name = "stm32f3xx-hal"
 version = "0.5.0"
-source = "git+https://github.com/stm32-rs/stm32f3xx-hal#f88d50eaa1397969735ba03335331d5a8437c27a"
+source = "git+https://github.com/stm32-rs/stm32f3xx-hal#835bd85107b13913e9244dd9362863cb5fb16d73"
 dependencies = [
  "bare-metal 0.2.5",
- "cast",
- "cfg-if",
+ "cfg-if 1.0.0",
  "cortex-m 0.6.4",
  "cortex-m-rt",
  "embedded-dma",
@@ -917,7 +922,7 @@ dependencies = [
 [[package]]
 name = "stm32f4xx-hal"
 version = "0.8.3"
-source = "git+https://github.com/stm32-rs/stm32f4xx-hal#757e9c7efe531f49dd56fcc0bc9d55fb4bb2ddb9"
+source = "git+https://github.com/stm32-rs/stm32f4xx-hal#4b04112d37bc14ed752d1c4cd6591950d9d26b2a"
 dependencies = [
  "bare-metal 0.2.5",
  "cast",
@@ -946,7 +951,7 @@ dependencies = [
 [[package]]
 name = "stm32f7xx-hal"
 version = "0.2.0"
-source = "git+https://github.com/stm32-rs/stm32f7xx-hal#0dcdd250c9ad964b28eb9b89bcd4c9ecf1bab31a"
+source = "git+https://github.com/stm32-rs/stm32f7xx-hal#8ec273dd3455425f1bd1452fdd48c3ce8cf51993"
 dependencies = [
  "as-slice",
  "bare-metal 0.2.5",
@@ -956,6 +961,7 @@ dependencies = [
  "embedded-hal",
  "micromath",
  "nb 0.1.3",
+ "rand_core 0.5.1",
  "rtcc",
  "stm32f7",
  "void",
@@ -1004,7 +1010,7 @@ dependencies = [
 [[package]]
 name = "stm32l0xx-hal"
 version = "0.6.2"
-source = "git+https://github.com/stm32-rs/stm32l0xx-hal#5e32fa4321dc061cdabb23a49bc055529ce08f14"
+source = "git+https://github.com/stm32-rs/stm32l0xx-hal#f9f5d14425afa1e0031ee978426d4fdb1e0747af"
 dependencies = [
  "as-slice",
  "cast",
@@ -1058,7 +1064,7 @@ dependencies = [
 [[package]]
 name = "stm32l4xx-hal"
 version = "0.5.0"
-source = "git+https://github.com/stm32-rs/stm32l4xx-hal#3533f78598d200b0cb2ef2614dc503a7061486e8"
+source = "git+https://github.com/stm32-rs/stm32l4xx-hal#9226cc71a1d5d01a14e4ba555657956c0c3077c6"
 dependencies = [
  "as-slice",
  "cast",
@@ -1093,9 +1099,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "1.0.48"
+version = "1.0.53"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cc371affeffc477f42a221a1e4297aedcea33d47d19b61455588bd9d8f6b19ac"
+checksum = "8833e20724c24de12bbaba5ad230ea61c3eafb05b881c7c9d3cfe8638b187e68"
 dependencies = [
  "proc-macro2 1.0.24",
  "quote 1.0.7",
