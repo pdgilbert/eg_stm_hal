@@ -276,7 +276,7 @@ dependencies = [
  "panic-reset 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "panic-semihosting 0.5.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "radio 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "radio-sx127x 0.10.1 (git+https://github.com/ryankurte/rust-radio-sx127x)",
+ "radio-sx127x 0.10.1 (git+https://github.com/rust-iot/rust-radio-sx127x?rev=2285c1ca9f527ab464a27f6a43af3b0a93130d2f)",
  "serde 1.0.117 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.117 (registry+https://github.com/rust-lang/crates.io-index)",
  "ssd1306 0.4.0 (git+https://github.com/jamwaffles/ssd1306)",
@@ -594,7 +594,7 @@ dependencies = [
 [[package]]
 name = "radio-sx127x"
 version = "0.10.1"
-source = "git+https://github.com/ryankurte/rust-radio-sx127x#2285c1ca9f527ab464a27f6a43af3b0a93130d2f"
+source = "git+https://github.com/rust-iot/rust-radio-sx127x?rev=2285c1ca9f527ab464a27f6a43af3b0a93130d2f#2285c1ca9f527ab464a27f6a43af3b0a93130d2f"
 dependencies = [
  "bitflags 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "embedded-hal 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1122,7 +1122,7 @@ dependencies = [
 "checksum quote 1.0.7 (registry+https://github.com/rust-lang/crates.io-index)" = "aa563d17ecb180e500da1cfd2b028310ac758de548efdd203e18f283af693f37"
 "checksum r0 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "e2a38df5b15c8d5c7e8654189744d8e396bddc18ad48041a500ce52d6948941f"
 "checksum radio 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)" = "c2cfe519d23c26c678d169b34bf51e9c5cb0267ae18901f1037fa7caabc70dc5"
-"checksum radio-sx127x 0.10.1 (git+https://github.com/ryankurte/rust-radio-sx127x)" = "<none>"
+"checksum radio-sx127x 0.10.1 (git+https://github.com/rust-iot/rust-radio-sx127x?rev=2285c1ca9f527ab464a27f6a43af3b0a93130d2f)" = "<none>"
 "checksum rand 0.5.6 (registry+https://github.com/rust-lang/crates.io-index)" = "c618c47cd3ebd209790115ab837de41425723956ad3ce2e6a7f09890947cacb9"
 "checksum rand_core 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "7a6fdeb83b075e8266dcc8762c22776f6877a63111121f5f8c7411e5be7eed4b"
 "checksum rand_core 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)" = "9c33a3c44ca05fa6f1807d8e6743f3824e8509beca625669633be0acbdf509dc"
