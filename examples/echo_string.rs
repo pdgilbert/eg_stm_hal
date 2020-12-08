@@ -47,16 +47,24 @@ pub trait WriteDma {
   fn  write(&self)  -> () ;  
 }
 
+//pub struct RxDma <T, U> {
+//    buf : &'static mut [u8; BUFSIZE],
+//    ch  : T,
+//    rx  : U,
+//    }
+//
+//pub struct TxDma <T, U> {
+//    buf : &'static mut [u8; BUFSIZE],
+//    ch  : T,
+//    tx  : U,
+//    }
+
 pub struct RxDma <T, U> {
-    buf : &'static mut [u8; BUFSIZE],
-    ch  : T,
-    rx  : U,
+    tup : (&'static mut [u8; BUFSIZE],  T,  U),
     }
 
 pub struct TxDma <T, U> {
-    buf : &'static mut [u8; BUFSIZE],
-    ch  : T,
-    tx  : U,
+    tup : (&'static mut [u8; BUFSIZE],  T,  U),
     }
 
 
@@ -196,8 +204,11 @@ use stm32f3xx_hal::{prelude::*,
        let mut txbuf = singleton!(: [u8; BUFSIZE] = *b"---- empty ----").unwrap(); //NB. 15 characters
        let mut rxbuf = singleton!(: [u8; BUFSIZE] = *b"---- empty ----").unwrap(); //NB. 15 characters
  
-       let  send = (txbuf,  tx1_ch,  tx1);  
-       let  recv = (rxbuf,  rx1_ch,  rx1);		      
+       //let  send = (txbuf,  tx1_ch,  tx1);  
+       //let  recv = (rxbuf,  rx1_ch,  rx1);		      
+ 
+       let  send = TxDma{tup: (txbuf,  tx1_ch,  tx1)};  
+       let  recv = RxDma{tup: (rxbuf,  rx1_ch,  rx1)};		      
  
 //       let  send = TxDma{buf: txbuf,  ch: tx1_ch,  tx:tx1};  
 //       let  recv = RxDma{buf: rxbuf,  ch: rx1_ch,  rx:rx1};		     
@@ -483,6 +494,9 @@ fn main() -> ! {
     //see serial_char.rs and  echo_by_char.rs for additional comments.
 
     let (mut send,  mut recv) = setup();
+    
+    let mut send = send.tup;
+    let mut recv = recv.tup;
 
     hprintln!("test write to console ...").unwrap();
 
