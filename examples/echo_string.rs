@@ -173,8 +173,9 @@ use stm32f3xx_hal::{prelude::*,
 		    };
 
     #[cfg(feature = "stm32f3xx")]
-    fn setup() ->  ((&'static mut [u8; 15], dma1::C4, Tx<USART1>),
-                    (&'static mut [u8; 15], dma1::C5, Rx<USART1>))  {
+    fn setup() ->  (TxDma<dma1::C4, Tx<USART1>>,  RxDma<dma1::C5, Rx<USART1>>) {
+    //fn setup() ->  ((&'static mut [u8; 15], dma1::C4, Tx<USART1>),
+    //                (&'static mut [u8; 15], dma1::C5, Rx<USART1>))  {
 
     //fn setup() ->  (TxDma<dma1::C4, Tx<USART1>>,  RxDma<dma1::C5, Rx<USART1>>) {
     
@@ -495,13 +496,16 @@ fn main() -> ! {
 
     let (mut send,  mut recv) = setup();
     
-    let mut send = send.tup;
-    let mut recv = recv.tup;
+//    let mut send = send.tup;
+//    let mut recv = recv.tup;
 
     hprintln!("test write to console ...").unwrap();
 
-    *send.0 = *b"\r\nSlowly type  ";  //NB. 15 characters    
-    send = send.2.write_all( send.0, send.1).wait(); 
+//    *send.0 = *b"\r\nSlowly type  ";  //NB. 15 characters    
+//    send = send.2.write_all( send.0, send.1).wait(); 
+
+    *send.tup.0 = *b"\r\nSlowly type  ";  //NB. 15 characters    
+    send.tup = send.tup.2.write_all( send.tup.0, send.tup.1).wait(); 
 
 //    *send.buf = *b"\r\nSlowly type  ";  //NB. 15 characters
 //    send.write(); 
@@ -522,8 +526,10 @@ fn main() -> ! {
     
     //each pass in loop waits for input of 15 chars typed in console then echos them
     loop { 
-       recv = recv.2.read_exact(send.0, recv.1).wait();   
-       send = send.2.write_all( recv.0, send.1).wait(); 
+//       recv = recv.2.read_exact(send.0, recv.1).wait();   
+//       send = send.2.write_all( recv.0, send.1).wait(); 
+       recv.tup = recv.tup.2.read_exact(send.tup.0, recv.tup.1).wait();   
+       send.tup = send.tup.2.write_all( recv.tup.0, send.tup.1).wait(); 
 //       bf = &recv.rx.read_exact(send.buf, recv.ch).wait();   
 //       recv.read(); 
 //       send.buf = recv.buf;  
