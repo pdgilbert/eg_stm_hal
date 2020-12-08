@@ -123,9 +123,8 @@ use stm32f3xx_hal::{prelude::*,
        let sda = gpiob.pb9.into_af4(&mut gpiob.moder, &mut gpiob.afrh);   // sda on PB9
       
        // return i2c
-       I2c::i2c1(p.I2C1, (scl, sda), 400_000.hz(), clocks, &mut rcc.apb1 )
+       I2c::new(p.I2C1, (scl, sda), 400_000.hz(), clocks, &mut rcc.apb1 )
        }
-
 
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64, blackpills stm32f401 and stm32f411
 use stm32f4xx_hal::{prelude::*,  

@@ -28,7 +28,7 @@ use nb::block;
 
 use embedded_hal::blocking::delay::DelayMs;
 
-use cortex_m::asm;  //for breakpoint
+//use cortex_m::asm;  //for breakpoint
 
 use eg_stm_hal::to_str;
 
@@ -186,7 +186,7 @@ use stm32f3xx_hal::{prelude::*,
        let sda = gpiob.pb9.into_af4(&mut gpiob.moder, &mut gpiob.afrh);   // sda on PB9
       
        (tx2, rx2,   
-        I2c::i2c1(p.I2C1, (scl, sda), 400_000.hz(), clocks, &mut rcc.apb1 ), // i2c
+        I2c::new(p.I2C1, (scl, sda), 400_000.hz(), clocks, &mut rcc.apb1 ), // i2c
         Delay::new(cp.SYST, clocks))
        }
 
