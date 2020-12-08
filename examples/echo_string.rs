@@ -36,37 +36,35 @@ use cortex_m_semihosting::hprintln;
 const BUFSIZE: usize = 15;
 
 pub trait ReadDma {
+  // might be nice if this returned buf rather than leaving it as element of self
    fn  read(&mut self)  -> () ;
 }
-//pub trait ReadDma {
-//   fn  read(&mut self, buf: &'static mut [u8; BUFSIZE])  -> &'static mut [u8; BUFSIZE] ;
-//}
 
 pub trait WriteDma {
-  // might be nice if this took buf as argument
+  // might be nice if this took buf as argument rather than needing it as element of self
   fn  write(&self)  -> () ;  
 }
 
-pub struct RxDma <T, U> {
-    buf : &'static mut [u8; BUFSIZE],
-    ch  : T,
-    rx  : U,
-    }
-
-pub struct TxDma <T, U> {
-    buf : &'static mut [u8; BUFSIZE],
-    ch  : T,
-    tx  : U,
-    }
-
-//pub struct RxDma <T, U> {
-//    tup : (&'static mut [u8; BUFSIZE],  T,  U),
+//pub struct RxDma <B, T, U> {
+//    buf : B,    //&'static mut [u8; BUFSIZE],
+//    ch  : T,
+//    rx  : U,
 //    }
 //
-//pub struct TxDma <T, U> {
-//    tup : (&'static mut [u8; BUFSIZE],  T,  U),
+//pub struct TxDma <B, T, U> {
+//    buf : B,    //&'static mut [u8; BUFSIZE],
+//    ch  : T,
+//    tx  : U,
 //    }
-//
+
+pub struct RxDma <B, T, U> {
+    tup : (B,  T,  U),
+    }
+
+pub struct TxDma <B, T, U> {
+    tup : (B,  T,  U),
+    }
+
 
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
 
@@ -78,10 +76,11 @@ use stm32f0xx_hal::{prelude::*,
 		    pac::USART1 }; 
     
     #[cfg(feature = "stm32f0xx")]
-    fn setup() ->  ((&'static mut [u8; 15], dma1::C4, Tx<USART1>),
-                    (&'static mut [u8; 15], dma1::C5, Rx<USART1>)) {
-    //fn setup() ->  (Tx<USART1>, RxDma<Rx<USART1>>)  {
-  
+    fn setup() ->  (TxDma<&'static mut [u8; 15], dma1::C4, Tx<USART1>>,
+                    RxDma<&'static mut [u8; 15], dma1::C5, Rx<USART1>>) {
+    
+    //fn setup() ->  (impl WriteDma, impl ReadDma) {
+
         let mut p = Peripherals::take().unwrap();
         let mut rcc = p.RCC.configure().sysclk(48.mhz()).freeze(&mut p.FLASH);
 
@@ -107,8 +106,8 @@ use stm32f0xx_hal::{prelude::*,
        let txbuf = singleton!(: [u8; BUFSIZE] = *b"---- empty ----").unwrap(); //NB. 15 characters
        let rxbuf = singleton!(: [u8; BUFSIZE] = *b"---- empty ----").unwrap(); //NB. 15 characters
 
-       let  send = (txbuf, tx1_ch, tx1);		     // 3-tuple (buf, tx1_ch, tx1)   
-       let  recv = (rxbuf, rx1_ch, rx1);		     // 3-tuple (buf, rx1_ch, rx1)
+       let  send = TxDma{tup: (txbuf,  tx1_ch,  tx1)};  
+       let  recv = RxDma{tup: (rxbuf,  rx1_ch,  rx1)};		      
 
        (send, recv)
        }
@@ -122,12 +121,11 @@ use stm32f1xx_hal::{prelude::*,
 		    device::USART1 }; 
     
     #[cfg(feature = "stm32f1xx")]
-    fn setup() ->  ((&'static mut [u8; 15], dma1::C4, Tx<USART1>),
-                    (&'static mut [u8; 15], dma1::C5, Rx<USART1>))  {
-
-    // fn setup() ->  (TxDma<Tx<USART1>, C4>, RxDma<Rx<USART1>, C5>)  {
+    fn setup() ->  (TxDma<&'static mut [u8; 15], dma1::C4, Tx<USART1>>,
+                    RxDma<&'static mut [u8; 15], dma1::C5, Rx<USART1>>) {
     
-       // with Tx return  Tx<USART1> ; with TxDma return  TxDma<Tx<USART1>, C4>
+    //fn setup() ->  (impl WriteDma, impl ReadDma) {
+    
        let p = Peripherals::take().unwrap();
        let mut rcc = p.RCC.constrain();  
        let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr); 
@@ -156,8 +154,8 @@ use stm32f1xx_hal::{prelude::*,
        let txbuf = singleton!(: [u8; BUFSIZE] = *b"---- empty ----").unwrap(); //NB. 15 characters
        let rxbuf = singleton!(: [u8; BUFSIZE] = *b"---- empty ----").unwrap(); //NB. 15 characters
 
-       let  send = (txbuf, tx1_ch, tx1);		     // 3-tuple (buf, tx1_ch, tx1)   
-       let  recv = (rxbuf, rx1_ch, rx1);		     // 3-tuple (buf, rx1_ch, rx1)
+       let  send = TxDma{tup: (txbuf,  tx1_ch,  tx1)};  
+       let  recv = RxDma{tup: (rxbuf,  rx1_ch,  rx1)};		      
 
        (send, recv)
        }
@@ -173,11 +171,8 @@ use stm32f3xx_hal::{prelude::*,
 		    };
 
     #[cfg(feature = "stm32f3xx")]
-    fn setup() ->  (TxDma<dma1::C4, Tx<USART1>>,  RxDma<dma1::C5, Rx<USART1>>) {
-    //fn setup() ->  ((&'static mut [u8; 15], dma1::C4, Tx<USART1>),
-    //                (&'static mut [u8; 15], dma1::C5, Rx<USART1>))  {
-
-    //fn setup() ->  (TxDma<dma1::C4, Tx<USART1>>,  RxDma<dma1::C5, Rx<USART1>>) {
+    fn setup() ->  (TxDma<&'static mut [u8; 15], dma1::C4, Tx<USART1>>,
+                    RxDma<&'static mut [u8; 15], dma1::C5, Rx<USART1>>) {
     
     //fn setup() ->  (impl WriteDma, impl ReadDma) {
 
@@ -202,36 +197,44 @@ use stm32f3xx_hal::{prelude::*,
        //let (tx2_ch, rx2_ch) = (dma1.ch6, dma1.ch7);
        //let (tx3_ch, rx3_ch) = (dma1.ch3, dma1.ch2);
 
-       let mut txbuf = singleton!(: [u8; BUFSIZE] = *b"---- empty ----").unwrap(); //NB. 15 characters
-       let mut rxbuf = singleton!(: [u8; BUFSIZE] = *b"---- empty ----").unwrap(); //NB. 15 characters
- 
-       //let  send = (txbuf,  tx1_ch,  tx1);  
-       //let  recv = (rxbuf,  rx1_ch,  rx1);		      
- 
-//       let  send = TxDma{tup: (txbuf,  tx1_ch,  tx1)};  
-//       let  recv = RxDma{tup: (rxbuf,  rx1_ch,  rx1)};		      
- 
-       let  send = TxDma{buf: txbuf,  ch: tx1_ch,  tx:tx1};  
-       let  recv = RxDma{buf: rxbuf,  ch: rx1_ch,  rx:rx1};		     
+       let txbuf = singleton!(: [u8; BUFSIZE] = *b"---- empty ----").unwrap(); //NB. 15 characters
+       let rxbuf = singleton!(: [u8; BUFSIZE] = *b"---- empty ----").unwrap(); //NB. 15 characters
 
-//       impl WriteDma for TxDma<dma1::C4,  Tx<USART1>> {
-//           fn write(&self)  -> () {
-//              self.tx.write_all(&self.buf, self.ch).wait();
-//	      }
-//           };
+       let  send = TxDma{tup: (txbuf,  tx1_ch,  tx1)};  
+       let  recv = RxDma{tup: (rxbuf,  rx1_ch,  rx1)};		      
 
-       //impl ReadDma for RxDma<dma1::C5, Rx<USART1>> {
-       //    fn read(&mut self, buf: &'static mut [u8; BUFSIZE])  ->  &'static mut [u8; BUFSIZE] {
-       //       self.rx.read_exact(self.buf, self.ch).wait();
-       //       buf = self.buf;
-	//      buf
-	//      }
-        //   };
-//       impl ReadDma for RxDma<dma1::C5, Rx<USART1>> {
-//           fn read(&mut self)  ->  () {
-//              self.rx.read_exact(self.buf, self.ch).wait();   //result in self.buf
-//	      }
-//           };
+       //impl WriteDma for TxDma<&'static mut [u8; 15], dma1::C4,  Tx<USART1>> {
+       //  fn write(&self)  -> () {
+       //     let tx = self.tup.2;
+       //     tx.write_all(&self.tup.0, self.tup.1).wait();   //sending self buffer tup.0
+       //     //^^^^^^^^^ expected `&mut [u8; 15]`, found `u8`
+       //     //	 ^^^^^^^^^^^ the trait `embedded_dma::Word` is not implemented for `&mut [u8; 15]`
+       //     // ... requirements on the impl of `embedded_dma::ReadTarget` for `&mut [u8; 15]`
+       //     // ... requirements on the impl of `embedded_dma::ReadBuffer` for `&&mut [u8; 15]`
+       //     }
+       //  };
+       //
+       //impl ReadDma for RxDma<&'static mut [u8; 15], dma1::C5, Rx<USART1>> {
+       //  fn read(&mut self)  ->  () {
+       //     let rx = self.tup.2;
+       //     rx.read_exact(self.tup.0, self.tup.1).wait();   //result in self buffer tup.0
+       //     }
+       //  };
+ 
+//       let  send = TxDma{buf: txbuf,  ch: tx1_ch,  tx:tx1};  
+//       let  recv = RxDma{buf: rxbuf,  ch: rx1_ch,  rx:rx1};		     
+
+//       impl WriteDma for TxDma<&'static mut [u8; 15], dma1::C4,  Tx<USART1>> {
+//	   fn write(&self)  -> () {
+//	      self.tx.write_all(&self.buf, self.ch).wait();
+//	    }
+//	   };
+//
+//       impl ReadDma for RxDma<&'static mut [u8; 15], dma1::C5, Rx<USART1>> {
+//	   fn read(&mut self)  ->  () {
+//	      self.rx.read_exact(self.buf, self.ch).wait();   //result in self.buf
+//	    }
+//	   };
 
        (send, recv)
        }
@@ -246,8 +249,10 @@ use stm32f4xx_hal::{prelude::*,
 		    };
 
     #[cfg(feature = "stm32f4xx")]
-    fn setup() ->  ((&'static mut [u8; 15], dma1::C4, Tx<USART1>),
-                    (&'static mut [u8; 15], dma1::C5, Rx<USART1>)) {
+    fn setup() ->  (TxDma<&'static mut [u8; 15], dma1::C4, Tx<USART1>>,
+                    RxDma<&'static mut [u8; 15], dma1::C5, Rx<USART1>>) {
+    
+    //fn setup() ->  (impl WriteDma, impl ReadDma) {
 
        let p = Peripherals::take().unwrap();
        let mut rcc = p.RCC.constrain();  
@@ -271,8 +276,8 @@ use stm32f4xx_hal::{prelude::*,
        let txbuf = singleton!(: [u8; BUFSIZE] = *b"---- empty ----").unwrap(); //NB. 15 characters
        let rxbuf = singleton!(: [u8; BUFSIZE] = *b"---- empty ----").unwrap(); //NB. 15 characters
 
-       let  send = (txbuf, tx1_ch, tx1);		     // 3-tuple (buf, tx1_ch, tx1)   
-       let  recv = (rxbuf, rx1_ch, rx1);		     // 3-tuple (buf, rx1_ch, rx1)
+       let  send = TxDma{tup: (txbuf,  tx1_ch,  tx1)};  
+       let  recv = RxDma{tup: (rxbuf,  rx1_ch,  rx1)};		      
 
        (send, recv)
        }
@@ -287,8 +292,10 @@ use stm32f7xx_hal::{prelude::*,
 		    };
 
     #[cfg(feature = "stm32f7xx")]
-    fn setup() ->  ((&'static mut [u8; 15], dma1::C4, Tx<USART1>),
-                    (&'static mut [u8; 15], dma1::C5, Rx<USART1>)) {
+    fn setup() ->  (TxDma<&'static mut [u8; 15], dma1::C4, Tx<USART1>>,
+                    RxDma<&'static mut [u8; 15], dma1::C5, Rx<USART1>>) {
+    
+    //fn setup() ->  (impl WriteDma, impl ReadDma) {
 
        let p = Peripherals::take().unwrap();
        let mut rcc = p.RCC.constrain();  
@@ -312,8 +319,8 @@ use stm32f7xx_hal::{prelude::*,
        let txbuf = singleton!(: [u8; BUFSIZE] = *b"---- empty ----").unwrap(); //NB. 15 characters
        let rxbuf = singleton!(: [u8; BUFSIZE] = *b"---- empty ----").unwrap(); //NB. 15 characters
 
-       let  send = (txbuf, tx1_ch, tx1);		     // 3-tuple (buf, tx1_ch, tx1)   
-       let  recv = (rxbuf, rx1_ch, rx1);		     // 3-tuple (buf, rx1_ch, rx1)
+       let  send = TxDma{tup: (txbuf,  tx1_ch,  tx1)};  
+       let  recv = RxDma{tup: (rxbuf,  rx1_ch,  rx1)};		      
 
        (send, recv)
        }
@@ -328,8 +335,10 @@ use stm32h7xx_hal::{prelude::*,
 		    };
 
     #[cfg(feature = "stm32h7xx")]
-    fn setup() ->  ((&'static mut [u8; 15], dma1::C4, Tx<USART1>),
-                    (&'static mut [u8; 15], dma1::C5, Rx<USART1>)) {
+    fn setup() ->  (TxDma<&'static mut [u8; 15], dma1::C4, Tx<USART1>>,
+                    RxDma<&'static mut [u8; 15], dma1::C5, Rx<USART1>>) {
+    
+    //fn setup() ->  (impl WriteDma, impl ReadDma) {
 
        let p      = Peripherals::take().unwrap();
        let pwr    = p.PWR.constrain();
@@ -353,8 +362,8 @@ use stm32h7xx_hal::{prelude::*,
        let txbuf = singleton!(: [u8; BUFSIZE] = *b"---- empty ----").unwrap(); //NB. 15 characters
        let rxbuf = singleton!(: [u8; BUFSIZE] = *b"---- empty ----").unwrap(); //NB. 15 characters
 
-       let  send = (txbuf, tx1_ch, tx1);		     // 3-tuple (buf, tx1_ch, tx1)   
-       let  recv = (rxbuf, rx1_ch, rx1);		     // 3-tuple (buf, rx1_ch, rx1)
+       let  send = TxDma{tup: (txbuf,  tx1_ch,  tx1)};  
+       let  recv = RxDma{tup: (rxbuf,  rx1_ch,  rx1)};		      
 
        (send, recv)
        }
@@ -370,8 +379,10 @@ use stm32l0xx_hal::{prelude::*,
 		    };
 
     #[cfg(feature = "stm32l0xx")]
-    fn setup() ->  ((&'static mut [u8; 15], dma1::C4, Tx<USART1>),
-                    (&'static mut [u8; 15], dma1::C5, Rx<USART1>)) {
+    fn setup() ->  (TxDma<&'static mut [u8; 15], dma1::C4, Tx<USART1>>,
+                    RxDma<&'static mut [u8; 15], dma1::C5, Rx<USART1>>) {
+    
+    //fn setup() ->  (impl WriteDma, impl ReadDma) {
 
        let p       = Peripherals::take().unwrap();
        let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
@@ -390,8 +401,8 @@ use stm32l0xx_hal::{prelude::*,
        let txbuf = singleton!(: [u8; BUFSIZE] = *b"---- empty ----").unwrap(); //NB. 15 characters
        let rxbuf = singleton!(: [u8; BUFSIZE] = *b"---- empty ----").unwrap(); //NB. 15 characters
 
-       let  send = (txbuf, tx1_ch, tx1);		     // 3-tuple (buf, tx1_ch, tx1)   
-       let  recv = (rxbuf, rx1_ch, rx1);		     // 3-tuple (buf, rx1_ch, rx1)
+       let  send = TxDma{tup: (txbuf,  tx1_ch,  tx1)};  
+       let  recv = RxDma{tup: (rxbuf,  rx1_ch,  rx1)};		      
 
        (send, recv)
        }
@@ -408,8 +419,10 @@ use stm32l1xx_hal::{prelude::*,
 		    };
 
     #[cfg(feature = "stm32l1xx")]
-    fn setup() ->  ((&'static mut [u8; 15], dma1::C4, Tx<USART1>),
-                    (&'static mut [u8; 15], dma1::C5, Rx<USART1>)) {
+    fn setup() ->  (TxDma<&'static mut [u8; 15], dma1::C4, Tx<USART1>>,
+                    RxDma<&'static mut [u8; 15], dma1::C5, Rx<USART1>>) {
+    
+    //fn setup() ->  (impl WriteDma, impl ReadDma) {
 
        let p = Peripherals::take().unwrap();
        let mut rcc = p.RCC.constrain();  
@@ -432,8 +445,8 @@ use stm32l1xx_hal::{prelude::*,
        let txbuf = singleton!(: [u8; BUFSIZE] = *b"---- empty ----").unwrap(); //NB. 15 characters
        let rxbuf = singleton!(: [u8; BUFSIZE] = *b"---- empty ----").unwrap(); //NB. 15 characters
 
-       let  send = (txbuf, tx1_ch, tx1);		     // 3-tuple (buf, tx1_ch, tx1)   
-       let  recv = (rxbuf, rx1_ch, rx1);		     // 3-tuple (buf, rx1_ch, rx1)
+       let  send = TxDma{tup: (txbuf,  tx1_ch,  tx1)};  
+       let  recv = RxDma{tup: (rxbuf,  rx1_ch,  rx1)};		      
 
        (send, recv)
        }
@@ -450,8 +463,10 @@ use stm32l4xx_hal::{prelude::*,
 		    };
 
     #[cfg(feature = "stm32l4xx")]
-    fn setup() ->  ((&'static mut [u8; 15], dma1::C4, Tx<USART1>),
-                    (&'static mut [u8; 15], dma1::C5, Rx<USART1>)) {
+    fn setup() ->  (TxDma<&'static mut [u8; 15], dma1::C4, Tx<USART1>>,
+                    RxDma<&'static mut [u8; 15], dma1::C5, Rx<USART1>>) {
+    
+    //fn setup() ->  (impl WriteDma, impl ReadDma) {
 
        let p = Peripherals::take().unwrap();
        let mut flash = p.FLASH.constrain();
@@ -478,8 +493,8 @@ use stm32l4xx_hal::{prelude::*,
        let txbuf = singleton!(: [u8; BUFSIZE] = *b"---- empty ----").unwrap(); //NB. 15 characters
        let rxbuf = singleton!(: [u8; BUFSIZE] = *b"---- empty ----").unwrap(); //NB. 15 characters
 
-       let  send = (txbuf, tx1_ch, tx1);		     // 3-tuple (buf, tx1_ch, tx1)   
-       let  recv = (rxbuf, rx1_ch, rx1);		     // 3-tuple (buf, rx1_ch, rx1)
+       let  send = TxDma{tup: (txbuf,  tx1_ch,  tx1)};  
+       let  recv = RxDma{tup: (rxbuf,  rx1_ch,  rx1)};		      
 
        (send, recv)
        }
@@ -496,24 +511,15 @@ fn main() -> ! {
 
     let (mut send,  mut recv) = setup();
     
-//    let mut send = send.tup;
-//    let mut recv = recv.tup;
-
     hprintln!("test write to console ...").unwrap();
-
-//    *send.0 = *b"\r\nSlowly type  ";  //NB. 15 characters    
-//    send = send.2.write_all( send.0, send.1).wait(); 
 
 //    *send.tup.0 = *b"\r\nSlowly type  ";  //NB. 15 characters    
 //    send.tup = send.tup.2.write_all( send.tup.0, send.tup.1).wait(); 
 
-    *send.buf = *b"\r\nSlowly type  ";  //NB. 15 characters    
-    send.buf = send.tx.write_all( send.buf, send.ch).wait(); 
-
-//    *send.buf = *b"\r\nSlowly type  ";  //NB. 15 characters
+//    *send.buf = *b"\r\nSlowly type  ";  //NB. 15 characters    
+//    send.buf = send.tx.write_all( send.buf, send.ch).wait().0; 
 //    send.write(); 
 
-//  let mut  bf = &recv.rx.read_exact(send.buf, recv.ch).wait();   
 
     // Now read from console into  buf and echo back to console
 
@@ -529,16 +535,23 @@ fn main() -> ! {
     
     //each pass in loop waits for input of 15 chars typed in console then echos them
     loop { 
-//       recv = recv.2.read_exact(send.0, recv.1).wait();   
-//       send = send.2.write_all( recv.0, send.1).wait(); 
-//       recv.tup = recv.tup.2.read_exact(send.tup.0, recv.tup.1).wait();   
-//       send.tup = send.tup.2.write_all( recv.tup.0, send.tup.1).wait(); 
-       recv.buf = recv.rx.read_exact(send.buf, recv.ch).wait();   
-       send.buf = send.tx.write_all( recv.buf, send.ch).wait(); 
-//       bf = &recv.rx.read_exact(send.buf, recv.ch).wait();   
+       // using struct  with tuple (buf, ch, tx) builds with stm32f3xx_hal:
+       recv.tup = recv.tup.2.read_exact(send.tup.0, recv.tup.1).wait();   
+       send.tup = send.tup.2.write_all( recv.tup.0, send.tup.1).wait(); 
+       // but this will not work with other hals because .read_exact() and .write_all()
+       // are specific to stm32f3xx_hal. A generic API across hals would be nice. 
+       // Getting traits for read and write to work would as provide a way
+       // to work around the hal differences.
+
+       // using struct with elements buf, ch, tx does not build with stm32f3xx_hal:
+       //  (problems with modified in previous iteration of loop, amoung others)
+//       recv.buf = recv.rx.read_exact(send.buf, recv.ch).wait().0;   
+//       send.buf = send.tx.write_all( recv.buf, send.ch).wait().0; 
+
+       // using traits for read and write does not build with stm32f3xx_hal:
+       // ( cannot seem to get working impl of traits, and then need to move read buf to write)
 //       recv.read(); 
-//       send.buf = recv.buf;  
-//       //send.buf = recv.read(send.buf);   
+//       //send.buf = recv.buf;  
 //       send.write(); 
        }
 }
