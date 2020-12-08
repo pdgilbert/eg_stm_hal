@@ -47,26 +47,26 @@ pub trait WriteDma {
   fn  write(&self)  -> () ;  
 }
 
-//pub struct RxDma <T, U> {
-//    buf : &'static mut [u8; BUFSIZE],
-//    ch  : T,
-//    rx  : U,
-//    }
-//
-//pub struct TxDma <T, U> {
-//    buf : &'static mut [u8; BUFSIZE],
-//    ch  : T,
-//    tx  : U,
-//    }
-
 pub struct RxDma <T, U> {
-    tup : (&'static mut [u8; BUFSIZE],  T,  U),
+    buf : &'static mut [u8; BUFSIZE],
+    ch  : T,
+    rx  : U,
     }
 
 pub struct TxDma <T, U> {
-    tup : (&'static mut [u8; BUFSIZE],  T,  U),
+    buf : &'static mut [u8; BUFSIZE],
+    ch  : T,
+    tx  : U,
     }
 
+//pub struct RxDma <T, U> {
+//    tup : (&'static mut [u8; BUFSIZE],  T,  U),
+//    }
+//
+//pub struct TxDma <T, U> {
+//    tup : (&'static mut [u8; BUFSIZE],  T,  U),
+//    }
+//
 
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
 
@@ -208,11 +208,11 @@ use stm32f3xx_hal::{prelude::*,
        //let  send = (txbuf,  tx1_ch,  tx1);  
        //let  recv = (rxbuf,  rx1_ch,  rx1);		      
  
-       let  send = TxDma{tup: (txbuf,  tx1_ch,  tx1)};  
-       let  recv = RxDma{tup: (rxbuf,  rx1_ch,  rx1)};		      
+//       let  send = TxDma{tup: (txbuf,  tx1_ch,  tx1)};  
+//       let  recv = RxDma{tup: (rxbuf,  rx1_ch,  rx1)};		      
  
-//       let  send = TxDma{buf: txbuf,  ch: tx1_ch,  tx:tx1};  
-//       let  recv = RxDma{buf: rxbuf,  ch: rx1_ch,  rx:rx1};		     
+       let  send = TxDma{buf: txbuf,  ch: tx1_ch,  tx:tx1};  
+       let  recv = RxDma{buf: rxbuf,  ch: rx1_ch,  rx:rx1};		     
 
 //       impl WriteDma for TxDma<dma1::C4,  Tx<USART1>> {
 //           fn write(&self)  -> () {
@@ -504,8 +504,11 @@ fn main() -> ! {
 //    *send.0 = *b"\r\nSlowly type  ";  //NB. 15 characters    
 //    send = send.2.write_all( send.0, send.1).wait(); 
 
-    *send.tup.0 = *b"\r\nSlowly type  ";  //NB. 15 characters    
-    send.tup = send.tup.2.write_all( send.tup.0, send.tup.1).wait(); 
+//    *send.tup.0 = *b"\r\nSlowly type  ";  //NB. 15 characters    
+//    send.tup = send.tup.2.write_all( send.tup.0, send.tup.1).wait(); 
+
+    *send.buf = *b"\r\nSlowly type  ";  //NB. 15 characters    
+    send.buf = send.tx.write_all( send.buf, send.ch).wait(); 
 
 //    *send.buf = *b"\r\nSlowly type  ";  //NB. 15 characters
 //    send.write(); 
@@ -528,8 +531,10 @@ fn main() -> ! {
     loop { 
 //       recv = recv.2.read_exact(send.0, recv.1).wait();   
 //       send = send.2.write_all( recv.0, send.1).wait(); 
-       recv.tup = recv.tup.2.read_exact(send.tup.0, recv.tup.1).wait();   
-       send.tup = send.tup.2.write_all( recv.tup.0, send.tup.1).wait(); 
+//       recv.tup = recv.tup.2.read_exact(send.tup.0, recv.tup.1).wait();   
+//       send.tup = send.tup.2.write_all( recv.tup.0, send.tup.1).wait(); 
+       recv.buf = recv.rx.read_exact(send.buf, recv.ch).wait();   
+       send.buf = send.tx.write_all( recv.buf, send.ch).wait(); 
 //       bf = &recv.rx.read_exact(send.buf, recv.ch).wait();   
 //       recv.read(); 
 //       send.buf = recv.buf;  
