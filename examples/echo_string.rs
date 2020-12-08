@@ -26,13 +26,38 @@ extern crate panic_halt;
 
 use cortex_m::singleton;
 use cortex_m_rt::entry;
-//use core::fmt::Write;  // for writeln, but not supported by stm32f3xx_hal
 use cortex_m_semihosting::hprintln;
 //use nb::block;
 
 //use eg_stm_hal::to_str;
 
+// possibly should be using something from embedded-hal here
+
 const BUFSIZE: usize = 15;
+
+pub trait ReadDma {
+   fn  read(&mut self)  -> () ;
+}
+//pub trait ReadDma {
+//   fn  read(&mut self, buf: &'static mut [u8; BUFSIZE])  -> &'static mut [u8; BUFSIZE] ;
+//}
+
+pub trait WriteDma {
+  // might be nice if this took buf as argument
+  fn  write(&self)  -> () ;  
+}
+
+pub struct RxDma <T, U> {
+    buf : &'static mut [u8; BUFSIZE],
+    ch  : T,
+    rx  : U,
+    }
+
+pub struct TxDma <T, U> {
+    buf : &'static mut [u8; BUFSIZE],
+    ch  : T,
+    tx  : U,
+    }
 
 
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
@@ -143,6 +168,10 @@ use stm32f3xx_hal::{prelude::*,
     fn setup() ->  ((&'static mut [u8; 15], dma1::C4, Tx<USART1>),
                     (&'static mut [u8; 15], dma1::C5, Rx<USART1>))  {
 
+    //fn setup() ->  (TxDma<dma1::C4, Tx<USART1>>,  RxDma<dma1::C5, Rx<USART1>>) {
+    
+    //fn setup() ->  (impl WriteDma, impl ReadDma) {
+
        let p = Peripherals::take().unwrap();
        let mut rcc = p.RCC.constrain();  
        let clocks    = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
@@ -164,11 +193,33 @@ use stm32f3xx_hal::{prelude::*,
        //let (tx2_ch, rx2_ch) = (dma1.ch6, dma1.ch7);
        //let (tx3_ch, rx3_ch) = (dma1.ch3, dma1.ch2);
 
-       let txbuf = singleton!(: [u8; BUFSIZE] = *b"---- empty ----").unwrap(); //NB. 15 characters
-       let rxbuf = singleton!(: [u8; BUFSIZE] = *b"---- empty ----").unwrap(); //NB. 15 characters
+       let mut txbuf = singleton!(: [u8; BUFSIZE] = *b"---- empty ----").unwrap(); //NB. 15 characters
+       let mut rxbuf = singleton!(: [u8; BUFSIZE] = *b"---- empty ----").unwrap(); //NB. 15 characters
+ 
+       let  send = (txbuf,  tx1_ch,  tx1);  
+       let  recv = (rxbuf,  rx1_ch,  rx1);		      
+ 
+//       let  send = TxDma{buf: txbuf,  ch: tx1_ch,  tx:tx1};  
+//       let  recv = RxDma{buf: rxbuf,  ch: rx1_ch,  rx:rx1};		     
 
-       let  send = (txbuf, tx1_ch, tx1);		     // 3-tuple (buf, tx1_ch, tx1)   
-       let  recv = (rxbuf, rx1_ch, rx1);		     // 3-tuple (buf, rx1_ch, rx1)
+//       impl WriteDma for TxDma<dma1::C4,  Tx<USART1>> {
+//           fn write(&self)  -> () {
+//              self.tx.write_all(&self.buf, self.ch).wait();
+//	      }
+//           };
+
+       //impl ReadDma for RxDma<dma1::C5, Rx<USART1>> {
+       //    fn read(&mut self, buf: &'static mut [u8; BUFSIZE])  ->  &'static mut [u8; BUFSIZE] {
+       //       self.rx.read_exact(self.buf, self.ch).wait();
+       //       buf = self.buf;
+	//      buf
+	//      }
+        //   };
+//       impl ReadDma for RxDma<dma1::C5, Rx<USART1>> {
+//           fn read(&mut self)  ->  () {
+//              self.rx.read_exact(self.buf, self.ch).wait();   //result in self.buf
+//	      }
+//           };
 
        (send, recv)
        }
@@ -435,9 +486,13 @@ fn main() -> ! {
 
     hprintln!("test write to console ...").unwrap();
 
-    *send.0 = *b"\r\nSlowly type  ";  //NB. 15 characters
-    
+    *send.0 = *b"\r\nSlowly type  ";  //NB. 15 characters    
     send = send.2.write_all( send.0, send.1).wait(); 
+
+//    *send.buf = *b"\r\nSlowly type  ";  //NB. 15 characters
+//    send.write(); 
+
+//  let mut  bf = &recv.rx.read_exact(send.buf, recv.ch).wait();   
 
     // Now read from console into  buf and echo back to console
 
@@ -455,5 +510,10 @@ fn main() -> ! {
     loop { 
        recv = recv.2.read_exact(send.0, recv.1).wait();   
        send = send.2.write_all( recv.0, send.1).wait(); 
+//       bf = &recv.rx.read_exact(send.buf, recv.ch).wait();   
+//       recv.read(); 
+//       send.buf = recv.buf;  
+//       //send.buf = recv.read(send.buf);   
+//       send.write(); 
        }
 }
