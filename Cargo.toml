@@ -49,10 +49,6 @@ name = "serial_string"
 path = "examples/serial_string.rs"
 
 [[example]]
-name = "gps_rw_by_char"
-path = "examples/gps_rw_by_char.rs"
-
-[[example]]
 name = "gps_rw"
 path = "examples/gps_rw.rs"
 
@@ -258,9 +254,9 @@ stm32l4x2 = ["stm32l4xx-hal/stm32l4x2", "stm32l4xx-hal/rt"]
 default-features = false
 version = "1.0.2"
 
-[dependencies.cast]
-default-features = false
-version = "0.2.2"
+#[dependencies.cast]
+#default-features = false
+#version = "0.2.2"
 
 [dependencies.embedded-hal]
 version = "0.2.4"
@@ -274,30 +270,26 @@ version = "0.7.0"
 [dev-dependencies]
 panic-halt = "0.2.0"
 panic-semihosting = "0.5.2"
-# this causes problem with stm32l0xx_hal:  panic-itm = "0.4.1"
-cortex-m-rtfm = "0.4.3"
 cortex-m-semihosting = "0.3.3"
-enc28j60 = "0.2.1"
 heapless = "0.4.3"
-m = "0.1.1"
-mfrc522 = "0.2.0"
-serde_derive = "1.0.90"
+#m = "0.1.1"
+#serde_derive = "1.0.90"
 
-[dev-dependencies.byteorder]
-default-features = false
-version = "1.3.1"
+#[dev-dependencies.byteorder]
+#default-features = false
+#version = "1.3.1"
 
-[dev-dependencies.cobs]
-default-features = false
-version = "0.1.4"
+#[dev-dependencies.cobs]
+#default-features = false
+#version = "0.1.4"
 
-[dev-dependencies.crc16]
-default-features = false
-version = "0.4.0"
+#[dev-dependencies.crc16]
+#default-features = false
+#version = "0.4.0"
 
-[dev-dependencies.either]
-default-features = false
-version = "1.5.2"
+#[dev-dependencies.either]
+#default-features = false
+#version = "1.5.2"
 
 #[dev-dependencies.jnet]
 #git = "https://github.com/japaric/jnet"
@@ -311,9 +303,9 @@ version = "1.5.2"
 #git = "https://github.com/japaric/mpu9250"
 #rev = "8f9ecad690093cb71c41301ca5e5705706150610"
 
-[dev-dependencies.serde]
-default-features = false
-version = "1.0.90"
+#[dev-dependencies.serde]
+#default-features = false
+#version = "1.0.90"
 
 #[dev-dependencies.serde-json-core]
 #git = "https://github.com/japaric/serde-json-core"
