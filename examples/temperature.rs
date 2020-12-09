@@ -316,7 +316,7 @@ use stm32f3xx_hal::{prelude::*,
                      Some(_ch)  => {hprintln!("panic at Some(ch)").unwrap();
                                     panic!()}, 
                    
-                     None      => {let z = &mut a.ad_1st;
+                     None      => {let _z = &mut a.ad_1st;
                                   //z.read_temp() as i32  NEEDS TO CONNECT USING INTERNAL CHANNEL 16
 				  //let t = read_mcu_temp(&mut dp.ADC1_2, &mut dp.ADC1);
 				  //t as i32
