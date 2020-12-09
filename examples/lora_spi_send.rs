@@ -30,7 +30,8 @@ use cortex_m_rt::entry;
 use cortex_m_semihosting::*;
 
 use embedded_hal::{blocking::delay::DelayMs,
-                   spi::{Mode, Phase, Polarity},
+                   //spi::{Mode, Phase, Polarity},  //these need to be from same version as
+		   //embedded_hal used by stm32*_hal supplying spi, so cannot be imported here
 		   };
 
 //use asm_delay::{ AsmDelay, bitrate, };
@@ -60,10 +61,10 @@ use radio::{Transmit}; // trait needs to be in scope to find  methods start_tran
 
 // lora and radio parameters
 
-pub const MODE: Mode = Mode {		    //  SPI mode for radio
-    phase: Phase::CaptureOnSecondTransition,
-    polarity: Polarity::IdleHigh,
-    };
+//pub const MODE: Mode = Mode {		    //  SPI mode for radio
+//    phase: Phase::CaptureOnSecondTransition,
+//    polarity: Polarity::IdleHigh,
+//    };
 
 const FREQUENCY: u32 = 907_400_000;     // frequency in hertz ch_12: 915_000_000, ch_2: 907_400_000
 
@@ -274,7 +275,7 @@ use stm32f3xx_hal::{prelude::*,
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64 stm32f411, blackpill stm32f411, blackpill stm32f401
 use stm32f4xx_hal::{prelude::*,  
                     pac::Peripherals, 
-                    spi::{Spi, Error},
+                    spi::{Spi, Error, Mode, Phase, Polarity},
                     delay::Delay,
                     time::MegaHertz,
                     //  following would be needed to define exact type 
@@ -299,74 +300,6 @@ use stm32f4xx_hal::{prelude::*,
 //If access to delay in the returned object is not needed ( eg. lora.delay_ms(5000u32); ) then 
 //    fn setup() ->  impl DelayMs<u32> + Transmit<Error=sx127xError<Error, core::convert::Infallible>> {
 // works.
-
-    #[cfg(feature = "stm32f4xx")]
-    fn setup() ->   impl  DelayMs<u32> + Transmit<Error=sx127xError<Error, core::convert::Infallible, Delay>> {
-//                  impl  DelayMs<u32> + Transmit<Error=sx127xError<Error, core::convert::Infallible>> {
-
-//    fn setup() ->   Sx127x<Wrapper<Spi<SPI1,
-//         (PA5<Alternate<AF5>>, PA6<Alternate<AF5>>, PA7<Alternate<AF5>>)>, _, 
-//	  PA1<Output<PushPull>>, PB8<Input<Floating>>, PB9<Input<Floating>>, PA0<Output<PushPull>>,
-//	   _, Delay, _>, _, _, _> {
-
-//                 found struct 
-//		 `radio_sx127x::Sx127x<driver_pal::wrapper::Wrapper<stm32f4xx_hal::spi::Spi<stm32f4::stm32f411::SPI1, 
-//		 (stm32f4xx_hal::gpio::gpioa::PA5<stm32f4xx_hal::gpio::Alternate<stm32f4xx_hal::gpio::AF5>>, 
-//		 stm32f4xx_hal::gpio::gpioa::PA6<stm32f4xx_hal::gpio::Alternate<stm32f4xx_hal::gpio::AF5>>, 
-//		 stm32f4xx_hal::gpio::gpioa::PA7<stm32f4xx_hal::gpio::Alternate<stm32f4xx_hal::gpio::AF5>>)>, _, 
-//		 stm32f4xx_hal::gpio::gpioa::PA1<stm32f4xx_hal::gpio::Output<stm32f4xx_hal::gpio::PushPull>>, 
-//		 stm32f4xx_hal::gpio::gpiob::PB8<stm32f4xx_hal::gpio::Input<stm32f4xx_hal::gpio::Floating>>, 
-//		 stm32f4xx_hal::gpio::gpiob::PB9<stm32f4xx_hal::gpio::Input<stm32f4xx_hal::gpio::Floating>>, 
-//		 stm32f4xx_hal::gpio::gpioa::PA0<stm32f4xx_hal::gpio::Output<stm32f4xx_hal::gpio::PushPull>>, _, 
-//		 stm32f4xx_hal::delay::Delay, _>, _, _, _>`
-
-
-       let cp = cortex_m::Peripherals::take().unwrap();
-       let p  = Peripherals::take().unwrap();
-
-       let rcc   = p.RCC.constrain();
-       let clocks = rcc.cfgr.sysclk(64.mhz()).pclk1(32.mhz()).freeze();
-       
-       let gpioa = p.GPIOA.split();
-       let gpiob = p.GPIOB.split();
-
-       let spi = Spi::spi1(
-           p.SPI1,
-           (gpioa.pa5.into_alternate_af5(),  // sck   on PA5
-            gpioa.pa6.into_alternate_af5(),  // miso  on PA6
-            gpioa.pa7.into_alternate_af5()   // mosi  on PA7
-            ),
-           MODE,
-           MegaHertz(8).into(),
-           clocks,
-           );
-              
-       let delay = Delay::new(cp.SYST, clocks);
-
-       // Create lora radio instance 
-       
-       // open_drain_output is really input and output. BusyPin is just input, but I think this should work
-       //	    gpiob.pb8.into_alternate_open_drain(&mut gpiob.crh),     
-       // however, gives trait bound  ... InputPin` is not satisfied
-    
-       let lora = Sx127x::spi(
-    	    spi,                                                       //Spi
-    	    gpioa.pa1.into_push_pull_output(),                         //CsPin         on PA1
-    	    gpiob.pb8.into_floating_input(),                           //BusyPin  DI00 on PB8
-            gpiob.pb9.into_floating_input(),                           //ReadyPin DI01 on PB9
-    	    gpioa.pa0.into_push_pull_output(),                         //ResetPin      on PA0
-    	    delay,					               //Delay
-    	    &CONFIG_RADIO,					       //&Config
-    	    ).unwrap();      // should handle error
-  
-       //DIO0  triggers RxDone/TxDone status.
-       //DIO1  triggers RxTimeout and other errors status.
-       //D02, D03 ?
-    
-       //lora.lora_configure( config_lora, &config_ch ).unwrap(); # not yet pub, to change something
-
-       lora
-       }
 
 
 #[cfg(feature = "stm32f7xx")] 
@@ -638,8 +571,70 @@ use stm32l4xx_hal::{prelude::*,
 
 #[entry]
 fn main() -> !{
+//    #[cfg(feature = "stm32f4xx")]
+//    fn setup() ->  impl  DelayMs<u32> + Transmit<Error=sx127xError<Error, core::convert::Infallible>> {
+//    fn setup() -> impl  DelayMs<u32> + Transmit<Error=sx127xError<Error, core::convert::Infallible, Delay>> {
+//    fn setup() -> impl  DelayMs<u32> + Transmit<Error=sx127xError<Error, core::convert::Infallible>> {
 
-    let mut lora =  setup();  //delay is available in lora
+//    fn setup() ->   Sx127x<Wrapper<Spi<SPI1,
+//         (PA5<Alternate<AF5>>, PA6<Alternate<AF5>>, PA7<Alternate<AF5>>)>, _, 
+//	  PA1<Output<PushPull>>, PB8<Input<Floating>>, PB9<Input<Floating>>, PA0<Output<PushPull>>,
+//	   _, Delay, _>, _, _, _> {
+
+
+
+       let cp = cortex_m::Peripherals::take().unwrap();
+       let p  = Peripherals::take().unwrap();
+
+       let rcc   = p.RCC.constrain();
+       let clocks = rcc.cfgr.sysclk(64.mhz()).pclk1(32.mhz()).freeze();
+       
+       let gpioa = p.GPIOA.split();
+       let gpiob = p.GPIOB.split();
+
+       let spi = Spi::spi1(
+           p.SPI1,
+           (gpioa.pa5.into_alternate_af5(),  // sck   on PA5
+            gpioa.pa6.into_alternate_af5(),  // miso  on PA6
+            gpioa.pa7.into_alternate_af5()   // mosi  on PA7
+            ),
+           Mode {		      //  SPI mode for radio
+                phase: Phase::CaptureOnSecondTransition,
+                polarity: Polarity::IdleHigh,
+                },
+           MegaHertz(8).into(),
+           clocks,
+           );
+              
+       let delay = Delay::new(cp.SYST, clocks);
+
+       // Create lora radio instance 
+       
+       // open_drain_output is really input and output. BusyPin is just input, but I think this should work
+       //	    gpiob.pb8.into_alternate_open_drain(&mut gpiob.crh),     
+       // however, gives trait bound  ... InputPin` is not satisfied
+    
+       let lora = Sx127x::spi(
+    	    spi,                                                       //Spi
+    	    gpioa.pa1.into_push_pull_output(),                         //CsPin         on PA1
+    	    gpiob.pb8.into_floating_input(),                           //BusyPin  DI00 on PB8
+            gpiob.pb9.into_floating_input(),                           //ReadyPin DI01 on PB9
+    	    gpioa.pa0.into_push_pull_output(),                         //ResetPin      on PA0
+    	    delay,					               //Delay
+    	    &CONFIG_RADIO,					       //&Config
+    	    ).unwrap();      // should handle error
+  
+       //DIO0  triggers RxDone/TxDone status.
+       //DIO1  triggers RxTimeout and other errors status.
+       //D02, D03 ?
+    
+       //lora.lora_configure( config_lora, &config_ch ).unwrap(); # not yet pub, to change something
+
+//       lora
+//       }
+
+
+//    let mut lora =  setup();  //delay is available in lora
 
     
     // print out configuration (for debugging)

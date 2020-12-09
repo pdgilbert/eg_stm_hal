@@ -49,17 +49,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "async-trait"
-version = "0.1.42"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8d3a45e77e34375a7923b1e8febb049bb011f064714a8e17a1a616fef01da13d"
-dependencies = [
- "proc-macro2 1.0.24",
- "quote 1.0.7",
- "syn 1.0.53",
-]
-
-[[package]]
 name = "autocfg"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -130,6 +119,12 @@ name = "cfg-if"
 version = "0.1.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4785bdd1c96b2a846b2bd7cc02e86b6b3dbf14e7e53446c4f54c92a361040822"
+
+[[package]]
+name = "cfg-if"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "chrono"
@@ -482,9 +477,9 @@ dependencies = [
 
 [[package]]
 name = "libc"
-version = "0.2.80"
+version = "0.2.81"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4d58d1b70b004888f764dfbf6a26a3b0342a1632d33968e4a179d8011c760614"
+checksum = "1482821306169ec4d07f6aca392a4681f66c75c9918aa49641a2595db64053cb"
 
 [[package]]
 name = "log"
@@ -492,7 +487,7 @@ version = "0.4.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4fabed175da42fed1fa0746b0ea71f412aa9d35e76e95e59b192c64b9dc2bf8b"
 dependencies = [
- "cfg-if",
+ "cfg-if 0.1.10",
 ]
 
 [[package]]
@@ -679,11 +674,10 @@ dependencies = [
 [[package]]
 name = "radio"
 version = "0.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c2cfe519d23c26c678d169b34bf51e9c5cb0267ae18901f1037fa7caabc70dc5"
+source = "git+https://github.com/ryankurte/rust-radio.git#6f82a79ddd0a7b0bf067df7fe0d5798363b3e85a"
 dependencies = [
- "async-trait",
- "embedded-hal 0.2.4",
+ "chrono",
+ "embedded-hal 1.0.0-alpha.4",
  "log",
  "nb 0.1.3",
 ]
@@ -698,7 +692,7 @@ dependencies = [
  "embedded-hal 1.0.0-alpha.4",
  "libc",
  "log",
- "radio 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "radio 0.7.0 (git+https://github.com/ryankurte/rust-radio.git)",
 ]
 
 [[package]]
@@ -766,15 +760,15 @@ checksum = "388a1df253eca08550bef6c72392cfe7c30914bf41df5269b68cbd6ff8f570a3"
 
 [[package]]
 name = "serde"
-version = "1.0.117"
+version = "1.0.118"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b88fa983de7720629c9387e9f517353ed404164b1e482c970a90c1a4aaf7dc1a"
+checksum = "06c64263859d87aa2eb554587e2d23183398d617427327cf2b3d0ed8c69e4800"
 
 [[package]]
 name = "serde_derive"
-version = "1.0.117"
+version = "1.0.118"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cbd1ae72adb44aab48f325a02444a5fc079349a8d804c1fc922aed3f7454c74e"
+checksum = "c84d3526699cd55261af4b941e4e725444df67aa4f9e6a3564f18030d12672df"
 dependencies = [
  "proc-macro2 1.0.24",
  "quote 1.0.7",
@@ -915,11 +909,10 @@ dependencies = [
 [[package]]
 name = "stm32f3xx-hal"
 version = "0.5.0"
-source = "git+https://github.com/stm32-rs/stm32f3xx-hal#1359ca015921eec608e3a76eb190b75b82fb817f"
+source = "git+https://github.com/stm32-rs/stm32f3xx-hal#835bd85107b13913e9244dd9362863cb5fb16d73"
 dependencies = [
  "bare-metal 0.2.5",
- "cast",
- "cfg-if",
+ "cfg-if 1.0.0",
  "cortex-m 0.6.4",
  "cortex-m-rt",
  "embedded-dma",
@@ -1183,3 +1176,8 @@ checksum = "0d67cb4616d99b940db1d6bd28844ff97108b498a6ca850e5b6191a532063286"
 dependencies = [
  "vcell",
 ]
+
+[[patch.unused]]
+name = "stm32f4xx-hal"
+version = "0.8.3"
+source = "git+https://github.com/maxekman/stm32f4xx-hal?branch=update-to-try-functions#a1316e83dcb1e92fb52cc1d5d04a5bd066f14575"
