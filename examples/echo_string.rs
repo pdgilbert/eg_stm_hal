@@ -536,12 +536,17 @@ fn main() -> ! {
     //each pass in loop waits for input of 15 chars typed in console then echos them
     loop { 
        // using struct  with tuple (buf, ch, tx) builds with stm32f3xx_hal:
+
        recv.tup = recv.tup.2.read_exact(send.tup.0, recv.tup.1).wait();   
        send.tup = send.tup.2.write_all( recv.tup.0, send.tup.1).wait(); 
+
        // but this will not work with other hals because .read_exact() and .write_all()
        // are specific to stm32f3xx_hal. A generic API across hals would be nice. 
        // Getting traits for read and write to work would as provide a way
        // to work around the hal differences.
+
+//       recv.tup = recv.tup.2.read().unwrap();   
+//       send.tup = send.tup.2.write(recv.tup.0).unwrap(); 
 
        // using struct with elements buf, ch, tx does not build with stm32f3xx_hal:
        //  (problems with modified in previous iteration of loop, amoung others)

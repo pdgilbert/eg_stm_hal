@@ -1,6 +1,17 @@
 //! Serial interface read GPS one usart and write on another usart to USB-TTL console (minicom).
-//! This example is similar to gps_rw_by_char but tries to buffer strings of data.
-//! See example is gps_rw_by_char for usart settings and pin connections.
+//!
+//! usart1 connect the Tx pin pa9  to the Rx pin of a serial-usb converter
+//! usart1 connect the Rx pin pa10 to the Tx pin of a serial-usb converter
+//! Set up the serial console (e.g. minicom) with the same settings used here.
+//! (Using 9600bps, could be higher but needs serial console to be the same.)
+//!
+//! GPS uses 9600bps, 8bit, odd parity, 1 stopbit. This can be confirmed by connecting GPS 
+//!  directly to the  USB-TTL and terminal with these settings (minicom 8-N-1) 
+//! The usart and pins for the GPS depend on the board. For specifics see setup() sections below. 
+//! 
+//! See examples/serial_char.rs for notes about connecting usart1 to 
+//!   serial-usb converter on computer for console output.
+//! That file also has for more notes regarding setup below.
 
 #![deny(unsafe_code)]
 #![no_main]
@@ -300,13 +311,12 @@ use stm32l1xx_hal::{prelude::*,
                     serial::{Config, SerialExt, Tx, Rx},
 		    stm32::{USART1, USART2} };
 
-/*
-The Heltec lora_node 151 uses USART2 and USART3 pins for on board LoRa connections and power detection.
-See https://resource.heltec.cn/download/LoRa_Node_151/LoRa_Node_151_Pinout_Diagram.pdf.
-So only USART1 is available and this example cannot work on Heltec lora_node 151 as it needs 2 USARTs. 
-USART1 is used for the GPS as oled_gps and lora_gps examples might work. 
-For simplicity of this example the same setup is used on the Discovery kit stm32l100.
-*/
+// The Heltec lora_node 151 uses USART2 and USART3 pins for on board LoRa connections and power 
+// detection. See 
+// https://resource.heltec.cn/download/LoRa_Node_151/LoRa_Node_151_Pinout_Diagram.pdf.
+// So only USART1 is available and this example cannot work on Heltec lora_node 151 as 
+// it needs 2 USARTs. USART1 is used for the GPS as oled_gps and lora_gps examples might work. 
+// For simplicity of this example the same setup is used on the Discovery kit stm32l100.
 
     #[cfg(feature = "stm32l1xx")]
     fn setup() ->  (Tx<USART2>, Rx<USART2>, Tx<USART1>, Rx<USART1> )  {
@@ -377,8 +387,6 @@ use stm32l4xx_hal::{prelude::*,
 // End of hal/MCU specific setup. Following should be generic code.
 
 
-//use heapless::{consts, Vec};
-
 #[entry]
 
 fn main() -> ! {
@@ -401,6 +409,8 @@ fn main() -> ! {
 
 //    while (i < r.len()) && !buffer.push(r[i]).is_err() {
     hprintln!("going into write/read loop ^C to exit ...").unwrap();
+
+    // note that putting hprintln! in loop slows it too much and loses data.
     let e: u8 = 9;
     let mut good = false;
     loop {
