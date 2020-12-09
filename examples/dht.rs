@@ -272,6 +272,8 @@ use stm32l4xx_hal::{prelude::*,
 		    delay::Delay, 
 		    gpio::{gpioa::PA8, OpenDrain,  Output, },
 		    };
+//#[cfg(feature = "stm32l4xx")]
+//use embedded_hal::digital::v2::{InputPin, OutputPin};
 
     #[cfg(feature = "stm32l4xx")]        
     fn setup() -> (PA8<Output<OpenDrain>>,  Delay) {

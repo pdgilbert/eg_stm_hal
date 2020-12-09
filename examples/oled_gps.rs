@@ -422,14 +422,16 @@ use stm32l4xx_hal::{prelude::*,
 		    pac::{USART2}, 
                     delay::Delay,
 		    i2c::{I2c, },  
-		    gpio::{gpiob::{PB8, PB9}, Alternate, AF4, Output, OpenDrain},
+		    //gpio::{gpiob::{PB8, PB9}, Alternate, AF4, Output, OpenDrain},
+		    gpio::{gpioa::{PA9, PA10}, Alternate, AF4, Output, OpenDrain},
                     pac::I2C1,
 		    };
 
     #[cfg(feature = "stm32l4xx")]
     fn setup() ->  (Tx<USART2>, Rx<USART2>,
-                    I2c<I2C1, (PB8<Alternate<AF4, Output<OpenDrain>>>, PB9<Alternate<AF4, Output<OpenDrain>>>)>, 
+                    I2c<I2C1, (PA9<Alternate<AF4, Output<OpenDrain>>>, PA10<Alternate<AF4, Output<OpenDrain>>>)>, 
                     Delay ) {
+      //           I2c<I2C1, (PB8<Alternate<AF4, Output<OpenDrain>>>, PB9<Alternate<AF4, Output<OpenDrain>>>)>, 
 
        let cp     = cortex_m::Peripherals::take().unwrap();
        let p      = Peripherals::take().unwrap();
@@ -440,6 +442,7 @@ use stm32l4xx_hal::{prelude::*,
                              .pclk2(80.mhz()) .freeze(&mut flash.acr, &mut pwr);
 
        let mut gpioa = p.GPIOA.split(&mut rcc.ahb2);
+//	 let mut gpiob  = p.GPIOB.split(&mut rcc.ahb2);
 
        let (tx2, rx2) = Serial::usart2(
           p.USART2,
@@ -450,21 +453,30 @@ use stm32l4xx_hal::{prelude::*,
           &mut rcc.apb1r1,
           ).split();
 
-       let mut gpiob  = p.GPIOB.split(&mut rcc.ahb2);
-       
        // following github.com/stm32-rs/stm32l4xx-hal/blob/master/examples/i2c_write.rs
-       let mut scl = gpiob.pb8.into_open_drain_output(&mut gpiob.moder, &mut gpiob.otyper);  // scl on PB8
-       scl.internal_pull_up(&mut gpiob.pupdr, true);
-       let scl = scl.into_af4(&mut gpiob.moder, &mut gpiob.afrh);
+//	 
+//	 let mut scl = gpiob.pb8.into_open_drain_output(&mut gpiob.moder, &mut gpiob.otyper);  // scl on PB8
+//	 scl.internal_pull_up(&mut gpiob.pupdr, true);
+//	 let scl = scl.into_af4(&mut gpiob.moder, &mut gpiob.afrh);
+//
+//	 let mut sda = gpiob.pb9.into_open_drain_output(&mut gpiob.moder, &mut gpiob.otyper);  // sda on PB9
+//	 sda.internal_pull_up(&mut gpiob.pupdr, true);
+//	 let sda = sda.into_af4(&mut gpiob.moder, &mut gpiob.afrh);
 
-       let mut sda = gpiob.pb9.into_open_drain_output(&mut gpiob.moder, &mut gpiob.otyper);  // sda on PB9
-       sda.internal_pull_up(&mut gpiob.pupdr, true);
-       let sda = sda.into_af4(&mut gpiob.moder, &mut gpiob.afrh);
+
+    let mut scl = gpioa.pa9.into_open_drain_output(&mut gpioa.moder, &mut gpioa.otyper);   // scl on PA9
+    scl.internal_pull_up(&mut gpioa.pupdr, true);
+    let scl = scl.into_af4(&mut gpioa.moder, &mut gpioa.afrh);
+
+    let mut sda = gpioa.pa10.into_open_drain_output(&mut gpioa.moder, &mut gpioa.otyper);  // sda on PA10
+    sda.internal_pull_up(&mut gpioa.pupdr, true);
+    let sda = sda.into_af4(&mut gpioa.moder, &mut gpioa.afrh);
 
        (tx2, rx2,   
-	I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks, &mut rcc.apb1r1 ), // i2c
-        Delay::new(cp.SYST, clocks))
+        I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks, &mut rcc.apb1r1 ), // i2c
+	Delay::new(cp.SYST, clocks))
        }
+
 
     // End of hal/MCU specific setup. Following should be generic code.
 
