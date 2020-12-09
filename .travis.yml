@@ -87,7 +87,6 @@ script:
   - checkExample  echo_string
   - checkExample  serial_char
   - checkExample  serial_string
-  - checkExample  gps_rw_by_char
   - checkExample  gps_rw
 
   - checkExample  temperature

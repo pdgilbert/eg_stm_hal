@@ -1,4 +1,3 @@
-//  I2c::i2c1(  works with stm32f1xx, stm32f3xx, trait problem with stm32f4xx
     
 //    ads1015-display.rs   builds with stm32f1xx, stm32f3xx, ...
 //
@@ -52,7 +51,7 @@ use stm32f0xx_hal::{prelude::*,
 
        let mut gpiob = dp.GPIOB.split(&mut rcc.apb2);  // for i2c scl and sda 
 
-       let i2c = BlockingI2c::i2c1(  
+       let i2c = BlockingI2c::new(  
    	   dp.I2C1,
    	   
 	   (gpiob.pb8.into_alternate_open_drain(&mut gpiob.crh),    // i2c scl on pb8
@@ -104,7 +103,7 @@ use stm32f1xx_hal::{prelude::*,
 
        let mut gpiob = dp.GPIOB.split(&mut rcc.apb2);  // for i2c scl and sda 
 
-       let i2c = BlockingI2c::i2c1(  
+       let i2c = BlockingI2c::new(  
    	   dp.I2C1,
    	   
 	   (gpiob.pb8.into_alternate_open_drain(&mut gpiob.crh),    // i2c scl on pb8
@@ -153,7 +152,7 @@ use stm32f3xx_hal::{prelude::*,
       
        let mut gpiob = dp.GPIOB.split(&mut rcc.ahb);   // for i2c
 
-       let i2c = I2c::i2c1(
+       let i2c = I2c::new(
           dp.I2C1, 
 
 	  (gpiob.pb6.into_af4(&mut gpiob.moder, &mut gpiob.afrl),     // i2c scl on pb6, 

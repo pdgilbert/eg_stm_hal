@@ -113,8 +113,7 @@ See [Running Examples](#running-examples) for more details.
 | echo_string          |       | Read 15 chars input from console, output to semihost, repeat   |
 | serial_char          |       | Single char between usarts 2 and 3, console and semihost output|
 | serial_string        |       | String writes between usarts 2 and 3, console and semihost output|
-| gps_rw_by_char       |       | Read by char from GPS with echo to console + semihost output   |
-| gps_rw               |   3   | Read a line  from GPS with echo to console + semihost output   |
+| gps_rw               |   3   | Read from GPS on USART echo to console + semihost output       |
 | temperature          |       | Read temperature of MCU and external TMP35 * semihost output   |
 
 
