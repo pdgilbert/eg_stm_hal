@@ -4,6 +4,8 @@
  	 https://docs.rs/stm32f4xx-hal/0.8.3/stm32f4xx_hal/adc/struct.Adc.html
      http://ctms.engin.umich.edu/CTMS/Content/Activities/TMP35_36_37.pdf
      TMP36   analog temperature sensor
+     Setup() functions return (mcutemp, tmp36, adcs) and set methods for ...
+     CHECK METHODS ARE ALL ON RIGHT CHANNELS
 
       Notes of Interest:  
       -I don't understand the details of setting  ADC or ADC clocks. If you know what you are
@@ -52,7 +54,7 @@ pub trait ReadTempC {  // for reading channel temperature in degrees C on channe
    #[cfg(feature = "stm32f7xx")]  
    fn read_tempC (&mut self, adcs: &mut Adcs<Adc<ADC1>, Adc<ADC2>> ) -> i32;      
    #[cfg(feature = "stm32h7xx")]  
-   fn read_tempC (&mut self, adcs: &mut Adcs<Adc<ADC1, Enabled>, Adc<ADC2, Enabled>> ) -> i32;      
+   fn read_tempC (&mut self, adcs: &mut Adcs<Adc<ADC1, Enabled>, Adc<ADC3, Enabled>> ) -> i32;      
    #[cfg(feature = "stm32l0xx")]  
    fn read_tempC (&mut self, adcs: &mut Adcs<Adc<ADC>> ) -> i32;      
    #[cfg(feature = "stm32l1xx")]  
@@ -73,7 +75,7 @@ pub trait ReadMV {     // for reading channel millivolts on channel (self.ch)
    #[cfg(feature = "stm32f7xx")]  
    fn read_mv(&mut self, adcs: &mut Adcs<Adc<ADC1>, Adc<ADC2>> )    -> u32;    
    #[cfg(feature = "stm32h7xx")]  
-   fn read_mv(&mut self, adcs: &mut Adcs<Adc<ADC1, Enabled>, Adc<ADC2, Enabled>> )    -> u32;    
+   fn read_mv(&mut self, adcs: &mut Adcs<Adc<ADC1, Enabled>, Adc<ADC3, Enabled>> )    -> u32;    
    #[cfg(feature = "stm32l0xx")] 
    fn read_mv(&mut self, adcs: &mut Adcs<Adc<ADC>> )    -> u32;    
    #[cfg(feature = "stm32l1xx")] 
@@ -84,9 +86,11 @@ pub trait ReadMV {     // for reading channel millivolts on channel (self.ch)
 
 
 
-pub struct Sensor <U> {    // when no channel used (internal temp), ch will be None
-   ch  : Option<U>,
+pub struct Sensor <U> {    // when no channel used (internal temp), ch may be None
+   ch  : U,
+   //ch  : Option<U>,
    }
+
 
 
 #[cfg(any(feature = "stm32f1xx", feature = "stm32f3xx", feature = "stm32f7xx", feature = "stm32h7xx"))]  
@@ -134,16 +138,15 @@ use stm32f0xx_hal::{prelude::*,
 
        let mcutemp: Sensor<Option<PB1<Analog>>> = Sensor{ ch: None,   };                           // no channel
 
-       let tmp36: Sensor<PB1<Analog>> = Sensor{ch: Some(gpiob.pb1.into_analog(&mut gpiob)), }; //channel pb1
+       let tmp36:   Sensor<Option<PB1<Analog>>> = Sensor{ ch: Some(gpiob.pb1.into_analog(&mut gpiob)), }; //channel pb1
    
 
        impl ReadTempC for  Sensor<Option<PB1<Analog>>> {                    
            fn read_tempC(&mut self, a: &mut Adcs<Adc>) -> i32 {
                  match &mut self.ch {
-                     // it should be possible to call next method here  read_tempC(ch) on Sensor<PB1<Analog>>
-                     // but doesn't seem to get to this impl when there is Some(ch)?
-                     Some(_ch)  => {hprintln!("panic at Some(ch)").unwrap();
-                                    panic!()}, 
+                     Some(ch)  => {let v:  f32 = a.ad_1st.read(ch).unwrap();
+                                   (v / 12.412122 ) as i32 - 50 as i32
+                                   },
                    
                      None      => {let z = &mut a.ad_1st;
                                   //adc::VTemp::read(&mut shared.adc, None)  see stm32f0xx-hal/examples/adc_values.rs
@@ -154,20 +157,8 @@ use stm32f0xx_hal::{prelude::*,
                   }
             };
 
-       impl ReadTempC for  Sensor<PB1<Analog>> {                    
-           fn read_tempC(&mut self, a: &mut Adcs<Adc>) -> i32 {
-                 match &mut self.ch {
-                     Some(ch)  => {let v:  f32 = a.ad_1st.read(ch).unwrap();
-                                   (v / 12.412122 ) as i32 - 50 as i32
-                                   },
-                   
-                     None      => panic!(), 
-                     }
-                  }
-            };
 
-
-       impl ReadMV for Sensor<PB1<Analog>> {   // TMP36 on PB1 using ADC2
+       impl ReadMV for Sensor<Option<PB1<Analog>>> {   // TMP36 on PB1 using ADC2
            fn read_mv(&mut self, a: &mut Adcs<Adc>) -> u32 { 
                  match &mut self.ch {
                    Some(ch)  => a.ad_1st.read(ch).unwrap(),
@@ -219,17 +210,16 @@ use stm32f1xx_hal::{prelude::*,
 
        let mcutemp: Sensor<Option<PB1<Analog>>> = Sensor{ ch: None,   };                           // no channel
 
-       let tmp36: Sensor<PB1<Analog>> = Sensor{ch: Some(gpiob.pb1.into_analog(&mut gpiob.crl)), }; //channel pb1
+       let tmp36: Sensor<Option<PB1<Analog>>> = Sensor{ch: Some(gpiob.pb1.into_analog(&mut gpiob.crl)), }; //channel pb1
    
 
        impl ReadTempC for  Sensor<Option<PB1<Analog>>> {                    
            fn read_tempC(&mut self, a: &mut Adcs<Adc<ADC1>, Adc<ADC2>>) -> i32 {
                  match &mut self.ch {
-                     // it should be possible to call next method here  read_tempC(ch) on Sensor<PB1<Analog>>
-                     // but doesn't seem to get to this impl when there is Some(ch)?
-                     Some(_ch)  => {hprintln!("panic at Some(ch)").unwrap();
-                                    panic!()}, 
-                   
+                     Some(ch)  => {let v:  f32 = a.ad_2nd.read(ch).unwrap();
+                                   (v / 12.412122 ) as i32 - 50 as i32
+                                   },
+                  
                      None      => {let z = &mut a.ad_1st;
                                   z.read_temp() as i32
                                   }
@@ -237,20 +227,8 @@ use stm32f1xx_hal::{prelude::*,
                   }
             };
 
-       impl ReadTempC for  Sensor<PB1<Analog>> {                    
-           fn read_tempC(&mut self, a: &mut Adcs<Adc<ADC1>, Adc<ADC2>>) -> i32 {
-                 match &mut self.ch {
-                     Some(ch)  => {let v:  f32 = a.ad_2nd.read(ch).unwrap();
-                                   (v / 12.412122 ) as i32 - 50 as i32
-                                   },
-                   
-                     None      => panic!(), 
-                     }
-                  }
-            };
 
-
-       impl ReadMV for Sensor<PB1<Analog>> {   // TMP36 on PB1 using ADC2
+       impl ReadMV for Sensor<Option<PB1<Analog>>> {   // TMP36 on PB1 using ADC2
            fn read_mv(&mut self, a: &mut Adcs<Adc<ADC1>, Adc<ADC2>>) -> u32 { 
                  match &mut self.ch {
                    Some(ch)  => a.ad_2nd.read(ch).unwrap(),
@@ -305,17 +283,16 @@ use stm32f3xx_hal::{prelude::*,
 
        let mcutemp: Sensor<Option<PB1<Analog>>> = Sensor{ ch: None,   };                           // no channel
 
-       let tmp36: Sensor<PB1<Analog>> = Sensor{ch: Some(gpiob.pb1.into_analog(&mut gpiob.moder, &mut gpiob.pupdr)), }; //channel pb1
-   
+       let tmp36:   Sensor<Option<PB1<Analog>>> = Sensor{ ch: Some(gpiob.pb1.into_analog(&mut gpiob.moder, &mut gpiob.pupdr)), }; //channel pb1
+ 
 
        impl ReadTempC for  Sensor<Option<PB1<Analog>>> {                    
            fn read_tempC(&mut self, a: &mut Adcs<Adc<ADC1>, Adc<ADC3>>) -> i32 {
                  match &mut self.ch {
-                     // it should be possible to call next method here  read_tempC(ch) on Sensor<PB1<Analog>>
-                     // but doesn't seem to get to this impl when there is Some(ch)?
-                     Some(_ch)  => {hprintln!("panic at Some(ch)").unwrap();
-                                    panic!()}, 
-                   
+                     Some(ch)  => {let v:  f32 = a.ad_2nd.read(ch).unwrap();
+                                   (v / 12.412122 ) as i32 - 50 as i32
+                                   },
+                                      
                      None      => {let _z = &mut a.ad_1st;
                                   //z.read_temp() as i32  NEEDS TO CONNECT USING INTERNAL CHANNEL 16
 				  //let t = read_mcu_temp(&mut dp.ADC1_2, &mut dp.ADC1);
@@ -326,24 +303,13 @@ use stm32f3xx_hal::{prelude::*,
                   }
             };
 
-       impl ReadTempC for  Sensor<PB1<Analog>> {                    
-           fn read_tempC(&mut self, a: &mut Adcs<Adc<ADC1>, Adc<ADC3>>) -> i32 {
-                 match &mut self.ch {
-                     Some(ch)  => {let v:  f32 = a.ad_2nd.read(ch).unwrap();
-                                   (v / 12.412122 ) as i32 - 50 as i32
-                                   },
-                   
-                     None      => panic!(), 
-                     }
-                  }
-            };
 
 
-       impl ReadMV for Sensor<PB1<Analog>> {   // TMP36 on PB1 using ADC2
+       impl ReadMV for Sensor<Option<PB1<Analog>>> {   // TMP36 on PB1 using ADC2
            fn read_mv(&mut self, a: &mut Adcs<Adc<ADC1>, Adc<ADC3>>) -> u32 { 
                  match &mut self.ch {
                    Some(ch)  => a.ad_2nd.read(ch).unwrap(),
-                   None => panic!(),
+                   None      => panic!(),
                    }
                  }
            };
@@ -389,20 +355,20 @@ use stm32f4xx_hal::{prelude::*,
        
 
        // no channel  one-shot conversion
-        
        //The MCU temperature sensor is internally connected to input channel 18
-       let mcutemp: Sensor<Option<PB1<Analog>>> = Sensor{ ch: None,   };            // internal, no channel
+       // THERE IS NO CHANNEL FOR mcutemp. REALLY SHOULD NOT NEED TO SPECIFY <PB1<Analog>>???
 
-       let tmp36: Sensor<PB1<Analog>> = Sensor{ch: Some(gpiob.pb1.into_analog()), }; // TMP36 on pb1 using ADC1
-   
+       let mcutemp: Sensor<Option<PB1<Analog>>> = Sensor{ ch: None,   };                     // internal, no channel
+
+       let tmp36  : Sensor<Option<PB1<Analog>>> = Sensor{ ch: Some(gpiob.pb1.into_analog())}; // TMP36 on pb1 using ADC1
+  
 
        impl ReadTempC for  Sensor<Option<PB1<Analog>>> {                    
            fn read_tempC(&mut self, a: &mut Adcs<Adc<ADC1>>) -> i32 {
                  match &mut self.ch {
-                     // it should be possible to call next method here  read_tempC(ch) on Sensor<PB1<Analog>>
-                     // but doesn't seem to get to this impl when there is Some(ch)?
-                     Some(_ch)  => {hprintln!("panic at Some(ch)").unwrap();
-                                    panic!()}, 
+                     Some(ch)  => {let v:  f32 = a.ad_1st.read(ch).unwrap().into(); //into converts u16 to f32
+                                   (v / 12.412122 ) as i32 - 50 as i32
+                                   },
                    
                      None      => {let z = &mut a.ad_1st;
                                   z.read(&mut Temperature).unwrap() as i32
@@ -411,20 +377,8 @@ use stm32f4xx_hal::{prelude::*,
                   }
             };
 
-       impl ReadTempC for  Sensor<PB1<Analog>> {                    
-           fn read_tempC(&mut self, a: &mut Adcs<Adc<ADC1>>) -> i32 {
-                 match &mut self.ch {
-                     Some(ch)  => {let v:  f32 = a.ad_1st.read(ch).unwrap().into(); //into converts u16 to f32
-                                   (v / 12.412122 ) as i32 - 50 as i32
-                                   },
-                   
-                     None      => panic!(), 
-                     }
-                  }
-            };
 
-
-       impl ReadMV for Sensor<PB1<Analog>> {   // TMP36 on PB1 using ADC1
+       impl ReadMV for Sensor<Option<PB1<Analog>>> {   // TMP36 on PB1 using ad_1st
            fn read_mv(&mut self, a: &mut Adcs<Adc<ADC1>>) -> u32 { 
                  match &mut self.ch {
                    Some(ch)  => a.ad_1st.read(ch).unwrap().into(),   //into converts u16 to u32
@@ -446,6 +400,8 @@ use stm32f7xx_hal::{prelude::*,
 		    gpio::{gpiob::{PB1}, Analog},
 		    stm32::{ADC1, ADC2},          
                     };
+
+    // WAITING ON ADC SUPPORT IN stm32f7xx_hal
 
     #[cfg(feature = "stm32f7xx")]
     fn setup() ->  (impl ReadTempC,  impl ReadTempC+ReadMV,   Adcs<Adc<ADC1>, Adc<ADC2>> ) {
@@ -518,21 +474,21 @@ use stm32f7xx_hal::{prelude::*,
 #[cfg(feature = "stm32h7xx")] 
 use stm32h7xx_hal::{prelude::*,   
                     pac::Peripherals, 
-		    rcc,
-                    adc::{Adc, Temperature, Enabled, Disabled, }, 
+		    rcc::rec::AdcClkSel,
+                    adc,                         // for adc::Resolution::SIXTEENBIT
+		    adc::{Adc, Temperature, Enabled, Disabled, }, 
 		    gpio::{gpiob::{PB1}, Analog},
-		    stm32::{ADC1, ADC2},
-		    delay,          
+		    stm32::{ADC1, ADC3},
+		    delay::Delay,          
                     };
 
     //#[cfg(feature = "stm32h7xx")] 
     //use embedded_hal::digital::v2::OutputPin;
 
     #[cfg(feature = "stm32h7xx")]
-    fn setup() ->  (impl ReadTempC,  impl ReadTempC+ReadMV,   Adcs<Adc<ADC1, Enabled>, Adc<ADC2, Enabled>> ) {
+    fn setup() ->  (impl ReadTempC,  impl ReadTempC+ReadMV,   Adcs<Adc<ADC1, Enabled>, Adc<ADC3, Enabled>> ) {
        
-       // stm32h742 has 3 ADCs.  ADC2 or ADC3 can use Temperature  SO NOT ADC1 ???
-
+       let cp     = cortex_m::Peripherals::take().unwrap();
        let p      = Peripherals::take().unwrap();
        let pwr    = p.PWR.constrain();
        let vos    = pwr.freeze();
@@ -540,40 +496,56 @@ use stm32h7xx_hal::{prelude::*,
        let ccdr   = rcc.sys_ck(160.mhz()).freeze(vos, &p.SYSCFG);
        let clocks = ccdr.clocks;
        let gpiob  = p.GPIOB.split(ccdr.peripheral.GPIOB);
-                  
-       let adcs: Adcs<Adc<ADC1, Disabled>, Adc<ADC2,Disabled>> = Adcs{    // WANT THIS Enabled
-                      ad_1st : Adc::adc1(p.ADC1, &mut delay::Delay{}, rcc::rec::Adc12{}, rcc::core_clocks::CoreClocks{}),
-                      ad_2nd : Adc::adc2(p.ADC2, &mut delay::Delay{}, rcc::rec::Adc12{}, rcc::core_clocks::CoreClocks{}),
+       
+       let mut delay = Delay::new(cp.SYST, clocks);
+          
+       // To use adc1 and adc2 they have to be done together because ADC12 is consummed.
+       //let (adc1, adc2) = adc12(p.ADC1, p.ADC2, &mut delay, ccdr.peripheral.ADC12, &ccdr.clocks, );
+       // but this example uses adc1 and adc3.
+
+       let mut adc1 = Adc::adc1(p.ADC1, &mut delay, ccdr.peripheral.ADC12, &ccdr.clocks, );
+       adc1.set_resolution(adc::Resolution::SIXTEENBIT);
+       let mut adc1 = adc1.enable();
+       
+       // A temperature sensor is internally connected to ADC3_IN18 so no channel needs to be specified. 
+       //   https://www.st.com/resource/en/datasheet/stm32h743bi.pdf
+       // See also https://github.com/stm32-rs/stm32h7xx-hal/blob/master/examples/temperature.rs
+
+       let mut adc3 = Adc::adc3(p.ADC3, &mut delay, ccdr.peripheral.ADC3, &ccdr.clocks);
+       adc3.set_resolution(adc::Resolution::SIXTEENBIT);
+
+       let mut ch_mcu = Temperature::new();
+       ch_mcu.enable(&adc3);
+       let mut adc3 = adc3.enable();
+   
+       let adcs: Adcs<Adc<ADC1, Enabled>, Adc<ADC3, Enabled>> = Adcs{
+                      ad_1st : adc1,    // tmp36 temp and mv
+                      ad_2nd : adc3,    // mcu temp
                       };
-       
-       
-       //The MCU temperature sensor is internally connected to the ADC12_IN16 input channel
-       // so no channel needs to be specified here.
 
-       let mcutemp: Sensor<Option<PB1<Analog>>> = Sensor{ ch: None,   };                           // no channel
+       let mcutemp  = Sensor{ ch: Some(ch_mcu) };         // internal temperature channel
 
-       let tmp36: Sensor<PB1<Analog>> = Sensor{ch: Some(gpiob.pb1.into_analog()), }; //channel pb1
+       let tmp36:   Sensor<Option<PB1<Analog>>> = Sensor{ ch: Some(gpiob.pb1.into_analog()), };   // TMP36 on pb1 using ADC3
    
 
        impl ReadTempC for  Sensor<Option<PB1<Analog>>> {                    
-           fn read_tempC(&mut self, a: &mut Adcs<Adc<ADC1, Enabled>, Adc<ADC2, Enabled>>) -> i32 {
+           fn read_tempC(&mut self, a: &mut Adcs<Adc<ADC1, Enabled>, Adc<ADC3, Enabled>>) -> i32 {
                  match &mut self.ch {
-                     // it should be possible to call next method here  read_tempC(ch) on Sensor<PB1<Analog>>
-                     // but doesn't seem to get to this impl when there is Some(ch)?
-                     Some(_ch)  => {hprintln!("panic at Some(ch)").unwrap();
-                                    panic!()}, 
+                     Some(ch)  => {let z = &mut a.ad_2nd;
+                                   z.read(&mut ch).unwrap() as i32
+                                   }, 
                    
-                     None      => {let z = &mut a.ad_1st;
-                                  z.read(&mut Temperature) as i32
-                                  }
+                     None      => {hprintln!("panic at ch None)").unwrap();
+                                   panic!()
+                                   }
                      }
                   }
             };
 
-       impl ReadTempC for  Sensor<PB1<Analog>> {                    
-           fn read_tempC(&mut self, a: &mut Adcs<Adc<ADC1, Enabled>, Adc<ADC2, Enabled>>) -> i32 {
+       impl ReadTempC for  Sensor<Option<adc::Temperature>> {            
+           fn read_tempC(&mut self, a: &mut Adcs<Adc<ADC1, Enabled>, Adc<ADC3, Enabled>>) -> i32 {
                  match &mut self.ch {
-                     Some(ch)  => {let v : u32 = a.ad_2nd.read(ch).unwrap();
+                     Some(ch)  => {let v : u32 = a.ad_1st.read(ch).unwrap();
                                    (v as f32 / 12.412122 ) as i32 - 50 as i32
                                    },
                    
@@ -583,10 +555,10 @@ use stm32h7xx_hal::{prelude::*,
             };
 
 
-       impl ReadMV for Sensor<PB1<Analog>> {   // TMP36 on PB1 using ADC2
-           fn read_mv(&mut self, a: &mut Adcs<Adc<ADC1, Enabled>, Adc<ADC2, Enabled>>) -> u32 { 
+       impl ReadMV for Sensor<Option<PB1<Analog>>> {   // TMP36 on PB1 using ADC1
+           fn read_mv(&mut self, a: &mut Adcs<Adc<ADC1, Enabled>, Adc<ADC3, Enabled>>) -> u32 { 
                  match &mut self.ch {
-                   Some(ch)  => a.ad_2nd.read(ch).unwrap(),
+                   Some(ch)  => a.ad_1st.read(ch).unwrap(),
                    None => panic!(),
                    }
                  }
@@ -625,18 +597,18 @@ use stm32l0xx_hal::{prelude::*,
        //The MCU temperature sensor is internally connected to the ADC12_IN16 input channel
        // so no channel needs to be specified here.
 
-       let mcutemp: Sensor<Option<PB1<Analog>>> = Sensor{ ch: None,   };                           // no channel
+       let mcutemp: Sensor<Option<PB1<Analog>>> = Sensor{ ch: None,   };                        // no channel
 
-       let tmp36: Sensor<PB1<Analog>> = Sensor{ch: Some(gpiob.pb1.into_analog()), }; //channel pb1
+       let tmp36:   Sensor<Option<PB1<Analog>>> = Sensor{ ch: Some(gpiob.pb1.into_analog()), }; //channel pb1
    
 
        impl ReadTempC for  Sensor<Option<PB1<Analog>>> {                    
            fn read_tempC(&mut self, a: &mut Adcs<Adc<ADC>>) -> i32 {
                  match &mut self.ch {
-                     // it should be possible to call next method here  read_tempC(ch) on Sensor<PB1<Analog>>
-                     // but doesn't seem to get to this impl when there is Some(ch)?
-                     Some(_ch)  => {hprintln!("panic at Some(ch)").unwrap();
-                                    panic!()}, 
+                     Some(ch)  => {let v:  f32 = a.ad_1st.read(ch).unwrap();
+                                   (v / 12.412122 ) as i32 - 50 as i32
+                                   },
+                      
                    
                      None      => {let z = &mut a.ad_1st;
                                   z.read_temp() as i32
@@ -645,20 +617,8 @@ use stm32l0xx_hal::{prelude::*,
                   }
             };
 
-       impl ReadTempC for  Sensor<PB1<Analog>> {                    
-           fn read_tempC(&mut self, a: &mut Adcs<Adc<ADC>>) -> i32 {
-                 match &mut self.ch {
-                     Some(ch)  => {let v:  f32 = a.ad_1st.read(ch).unwrap();
-                                   (v / 12.412122 ) as i32 - 50 as i32
-                                   },
-                   
-                     None      => panic!(), 
-                     }
-                  }
-            };
 
-
-       impl ReadMV for Sensor<PB1<Analog>> {   // TMP36 on PB1 using ADC2
+       impl ReadMV for Sensor<Option<PB1<Analog>>> {   // TMP36 on PB1 using ADC2
            fn read_mv(&mut self, a: &mut Adcs<Adc<ADC>>) -> u32 { 
                  match &mut self.ch {
                    Some(ch)  => a.ad_1st.read(ch).unwrap(),
@@ -676,7 +636,7 @@ use stm32l0xx_hal::{prelude::*,
 use stm32l1xx_hal::{prelude::*, 
                     stm32::Peripherals, 
 		    rcc,   // for ::Config but note name conflict with serial
-                    adc::Adc,
+                    adc::{Adc, Precision, Vref},
 		    gpio::{gpiob::{PB1}, Analog},  
 		    stm32::{ADC},
                     };
@@ -689,29 +649,30 @@ use stm32l1xx_hal::{prelude::*,
        //let clocks  = rcc.cfgr.freeze();
 
        let gpiob   = p.GPIOB.split();
+       //  see https://github.com/stm32-rs/stm32l1xx-hal/blob/master/examples/adc.rs
 
+       let mut adc = p.ADC.adc(&mut rcc);
+       adc.set_precision(Precision::B_12);       
            
        let adcs: Adcs<Adc<ADC>> = Adcs{ 
-                         ad_1st : Adc::adc(p.ADC, true, AdcConfig::default()), 
+                         ad_1st : adc, 
                          };
-       
 
        // no channel  one-shot conversion
         
        //The MCU temperature sensor is internally connected to input channel 18
        let mcutemp: Sensor<Option<PB1<Analog>>> = Sensor{ ch: None,   };            // internal, no channel
 
-       let tmp36: Sensor<PB1<Analog>> = Sensor{ch: Some(gpiob.pb1.into_analog()), }; // TMP36 on pb1 using ADC1
+       let tmp36:   Sensor<Option<PB1<Analog>>> = Sensor{ ch: Some(gpiob.pb1.into_analog()), }; // TMP36 on pb1 using ADC1
    
 
        impl ReadTempC for  Sensor<Option<PB1<Analog>>> {                    
            fn read_tempC(&mut self, a: &mut Adcs<Adc<ADC>>) -> i32 {
                  match &mut self.ch {
-                     // it should be possible to call next method here  read_tempC(ch) on Sensor<PB1<Analog>>
-                     // but doesn't seem to get to this impl when there is Some(ch)?
-                     Some(_ch)  => {hprintln!("panic at Some(ch)").unwrap();
-                                    panic!()}, 
-                   
+                     Some(ch)  => {let v:  f32 = a.ad_1st.read(ch).unwrap().into(); //into converts u16 to f32
+                                   (v / 12.412122 ) as i32 - 50 as i32
+                                   },
+                  
                      None      => {let z = &mut a.ad_1st;
                                   z.read(&mut Temperature).unwrap() as i32
                                   }
@@ -719,20 +680,8 @@ use stm32l1xx_hal::{prelude::*,
                   }
             };
 
-       impl ReadTempC for  Sensor<PB1<Analog>> {                    
-           fn read_tempC(&mut self, a: &mut Adcs<Adc<ADC>>) -> i32 {
-                 match &mut self.ch {
-                     Some(ch)  => {let v:  f32 = a.ad_1st.read(ch).unwrap().into(); //into converts u16 to f32
-                                   (v / 12.412122 ) as i32 - 50 as i32
-                                   },
-                   
-                     None      => panic!(), 
-                     }
-                  }
-            };
 
-
-       impl ReadMV for Sensor<PB1<Analog>> {   // TMP36 on PB1 using ADC
+       impl ReadMV for Sensor<Option<PB1<Analog>>> {   // TMP36 on PB1 using ADC
            fn read_mv(&mut self, a: &mut Adcs<Adc<ADC>>) -> u32 { 
                  match &mut self.ch {
                    Some(ch)  => a.ad_1st.read(ch).unwrap().into(),   //into converts u16 to u32
@@ -781,16 +730,15 @@ use stm32l4xx_hal::{prelude::*,
 
        let mcutemp: Sensor<Option<PB1<Analog>>> = Sensor{ ch: None,   };                           // no channel
 
-       let tmp36: Sensor<PB1<Analog>> = Sensor{ch: Some(gpiob.pb1.into_analog(&mut gpiob.crl)), }; //channel pb1
+       let tmp36:   Sensor<Option<PB1<Analog>>> = Sensor{ ch: Some(gpiob.pb1.into_analog(&mut gpiob.crl)), }; //channel pb1
    
 
        impl ReadTempC for  Sensor<Option<PB1<Analog>>> {                    
            fn read_tempC(&mut self, a: &mut Adcs<Adc<ADC1>>) -> i32 {
                  match &mut self.ch {
-                     // it should be possible to call next method here  read_tempC(ch) on Sensor<PB1<Analog>>
-                     // but doesn't seem to get to this impl when there is Some(ch)?
-                     Some(_ch)  => {hprintln!("panic at Some(ch)").unwrap();
-                                    panic!()}, 
+                     Some(ch)  => {let v:  f32 = a.ad_1st.read(ch).unwrap();
+                                   (v / 12.412122 ) as i32 - 50 as i32
+                                   },
                    
                      None      => {let z = &mut a.ad_1st;
                                   z.read(VTemp) as i32
@@ -799,20 +747,8 @@ use stm32l4xx_hal::{prelude::*,
                   }
             };
 
-       impl ReadTempC for  Sensor<PB1<Analog>> {                    
-           fn read_tempC(&mut self, a: &mut Adcs<Adc<ADC1>>) -> i32 {
-                 match &mut self.ch {
-                     Some(ch)  => {let v:  f32 = a.ad_1st.read(ch).unwrap();
-                                   (v / 12.412122 ) as i32 - 50 as i32
-                                   },
-                   
-                     None      => panic!(), 
-                     }
-                  }
-            };
 
-
-       impl ReadMV for Sensor<PB1<Analog>> {   // TMP36 on PB1 using ADC
+       impl ReadMV for Sensor<Option<PB1<Analog>>> {   // TMP36 on PB1 using ADC
            fn read_mv(&mut self, a: &mut Adcs<Adc<ADC1>>) -> u32 { 
                  match &mut self.ch {
                    Some(ch)  => a.ad_1st.read(ch).unwrap(),
