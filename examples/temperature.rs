@@ -125,7 +125,9 @@ use stm32f0xx_hal::{prelude::*,
        // On stm32f030xc a temperature sensor is internally connected to the single adc. 
        // No channel is specified for the mcutemp because it uses an internal channel. 
        // NOT YET BUILDING
- 
+       // Hal adc use looks very different for other hals. MAKE SURE HAL IS UP-TO-DATE RE ADC.
+       // see  https://github.com/stm32-rs/stm32f0xx-hal/blob/master/examples/adc_values.rs
+
        let mut p = Peripherals::take().unwrap();
        let mut rcc = p.RCC.configure().sysclk(48.mhz()).freeze(&mut p.FLASH);
 
@@ -135,7 +137,7 @@ use stm32f0xx_hal::{prelude::*,
             // let adc = hal::adc::Adc::new(p.ADC, &mut rcc);
            
        let adcs: Adcs<Adc> = Adcs{ 
-                         ad_1st : Adc::adc(p.ADC, &mut rcc, clocks), 
+                         ad_1st : Adc::new(p.ADC, &mut rcc), 
                          };
 
        let mcutemp: Sensor<Option<PB1<Analog>>> = Sensor{ ch: None,   };                           // no channel
@@ -414,14 +416,14 @@ use stm32f7xx_hal::{prelude::*,
 		    stm32::{ADC1, ADC2},          
                     };
 
-    // WAITING ON ADC SUPPORT IN stm32f7xx_hal
-
     #[cfg(feature = "stm32f7xx")]
     fn setup() ->  (impl ReadTempC,  impl ReadTempC+ReadMV,   Adcs<Adc<ADC1>, Adc<ADC2>> ) {
        
        // On stm32f722 a temperature sensor is internally connected to ???.
        // Two adc's are used but no channel is specified for the mcutemp on adc3 because it uses an internal channel. 
        // NOT YET BUILDING
+
+    // WAITING ON ADC SUPPORT IN stm32f7xx_hal
  
         // stm32f722 has 3 ADCs
  
@@ -684,8 +686,6 @@ use stm32l1xx_hal::{prelude::*,
 
        // On stm32L100 there seems to be no internal temperature sensor. \
        // MCU temperature set as zero.
-       // NOT YET BUILDING
-
 
        let p       = Peripherals::take().unwrap();
        let mut rcc = p.RCC.freeze(rcc::Config::hsi());
@@ -756,9 +756,11 @@ use stm32l4xx_hal::{prelude::*,
     #[cfg(feature = "stm32l4xx")]
     fn setup() ->  (impl ReadTempC,  impl ReadTempC+ReadMV,   Adcs<Adc<ADC1>> ) {
 
-       // On stm32L4X2 a temperature sensor is internally connected to the single adc. CHECK !!! 
-       // No channel is specified for the mcutemp because it uses an internal channel. 
+       // On stm32L4X2 a temperature sensor is internally connected to the single adc.
+       // No channel is specified for the mcutemp because it uses an internal channel ADC1_IN17. 
        // NOT YET BUILDING
+
+    // WAITING ON ADC SUPPORT IN stm32l4xx_hal
 
        let p         = Peripherals::take().unwrap();
        let mut flash = p.FLASH.constrain();
@@ -805,7 +807,7 @@ use stm32l4xx_hal::{prelude::*,
            fn read_mv(&mut self, a: &mut Adcs<Adc<ADC1>>) -> u32 { 
                  match &mut self.ch {
                    Some(ch)  => a.ad_1st.read(ch).unwrap(),
-                   None => panic!(),
+                   None      => panic!(),
                    }
                  }
            };
