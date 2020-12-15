@@ -18,7 +18,7 @@ use dht_sensor::*;
 
 //use crate::hal::{delay, gpio, prelude::*, stm32};
 
-use embedded_hal::blocking::delay::{DelayMs,};
+//use embedded_hal::blocking::delay::{DelayMs,};
 
 
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.

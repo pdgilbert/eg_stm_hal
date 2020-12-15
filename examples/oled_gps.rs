@@ -26,7 +26,7 @@ use cortex_m_semihosting::hprintln;
 //use core::ascii;
 use nb::block;
 
-use embedded_hal::blocking::delay::DelayMs;
+//use embedded_hal::blocking::delay::DelayMs;
 
 //use cortex_m::asm;  //for breakpoint
 
