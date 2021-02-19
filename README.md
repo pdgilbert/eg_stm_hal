@@ -280,7 +280,7 @@ Typical specifications for a bluepill development board and ST-Link dongle would
   export INTERFACE=stlink-v2    PROC=stm32f1x  #cheap  dongle and blue pill
   export INTERFACE=stlink-v2-1  PROC=stm32f1x  #better dongle and blue pill
 ```
-Many development boads have an ST-Link built onto the board, in which case you need to determine
+Many development boards have an ST-Link built onto the board, in which case you need to determine
 the version, and that is not always clear. My discovery-stm32f303 (Discovery kit STM32F303)
 says STlink V2-B but that 
 seems to mean v2-1. One symptom of an incorrect setting is that the openocd command start up 
@@ -295,14 +295,18 @@ Info : stm32f1x.cpu: hardware has 6 breakpoints, 4 watchpoints
 ```
 
 Some of the other causes for the `in procedure 'ocd_bouncer'` can be that the board is not 
-properly powered up, or has some other boot loader pre-burned into it. (In the later case
+properly powered up (check for lose wires, lose usb connector, peripherals using too much power), 
+or the board has some other boot loader pre-burned into it. In the later case
 try booting once in "System Memory" mode, see 
-https://www.electronicshub.org/getting-started-with-stm32f103c8t6-blue-pill/.)
-The message `Warn : UNEXPECTED idcode: 0x...` seems to require editing the openocd cfg
-file which gets installed in various places, possibly 
+https://www.electronicshub.org/getting-started-with-stm32f103c8t6-blue-pill/.
+
+The message `Warn : UNEXPECTED idcode: 0x...` seems to require editing an openocd cfg
+file (for bluepill `target/stm32f1x.cfg`) which gets installed in various places, possibly 
 `/usr/share/openocd/scripts/target/stm32f1x.cfg`. Changing the CPUTAPID or change the
 line `swj_newdap ... -expected-id $_CPUTAPID` to `swj_newdap ... -expected-id 0` so that
 CPUTAID is ignored.
+Also be sure to edit the file in the correct directory when multiple openocd versions are installed.
+Check `which openocd` and `locate stlink.cfg`.
 
 Some development boards pop up a a window with Mbed.htm which I dismiss and then run `openocd`.
 

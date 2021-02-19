@@ -164,7 +164,10 @@ version = ">=0.6.0" #  "0.4.4" # "0.4.9"  "0.6.2"
 
 [dependencies.dht-sensor]
 git = "https://github.com/michaelbeaumont/dht-sensor"
+#rev = "bcbcf8146f98b15b62dba4f5e2ce9f74a243e6d9"
+# something weird here. If rev is not specified then cargo update reverts from 0.2.0 to 0.1.1
 #version = "0.1.1"
+#version = "^0.2.0"
 #optional = true
 
 # for example digi_pot
