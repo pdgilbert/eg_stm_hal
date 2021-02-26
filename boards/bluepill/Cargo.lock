@@ -252,8 +252,9 @@ checksum = "812b30ff14930407c86a23e256ac050b8e6913f597adcc88e29d40517f7a16de"
 
 [[package]]
 name = "dht-sensor"
-version = "0.1.1"
-source = "git+https://github.com/michaelbeaumont/dht-sensor#fa44876720ff54a3631651895d1cd80595849d8f"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "74d643854f324f02daea7153ebbfec5cfcc2f395faf1c7011be65e543570de28"
 dependencies = [
  "embedded-hal 0.2.4",
 ]
@@ -922,10 +923,11 @@ dependencies = [
 [[package]]
 name = "stm32f7xx-hal"
 version = "0.2.0"
-source = "git+https://github.com/stm32-rs/stm32f7xx-hal#a7a34a9149ebe58a8206b6912800d1c6b3e5032e"
+source = "git+https://github.com/stm32-rs/stm32f7xx-hal#e293dc3fe6f84af072414a9a5f6fa4004d7b8b2b"
 dependencies = [
  "as-slice",
  "bare-metal 0.2.5",
+ "bxcan",
  "cast",
  "cortex-m 0.6.7",
  "cortex-m-rt",
@@ -940,12 +942,12 @@ dependencies = [
 
 [[package]]
 name = "stm32h7"
-version = "0.12.1"
+version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7571f17d1ed7d67957d0004de6c52bd1ef5e736ed5ddc2bcecf001512269f77c"
+checksum = "8b672c837e0ee8158ecc7fce0f9a948dd0693a9c588338e728d14b73307a0b7d"
 dependencies = [
  "bare-metal 0.2.5",
- "cortex-m 0.6.7",
+ "cortex-m 0.7.1",
  "cortex-m-rt",
  "vcell",
 ]
@@ -953,11 +955,11 @@ dependencies = [
 [[package]]
 name = "stm32h7xx-hal"
 version = "0.8.0"
-source = "git+https://github.com/stm32-rs/stm32h7xx-hal#f0cbed9415fcbac3d37e56f1757f92e372d8a6c0"
+source = "git+https://github.com/stm32-rs/stm32h7xx-hal#4ca09fa94af0fed8084633c142767cf6515ed8de"
 dependencies = [
  "bare-metal 1.0.0",
  "cast",
- "cortex-m 0.6.7",
+ "cortex-m 0.7.1",
  "cortex-m-rt",
  "embedded-dma",
  "embedded-hal 0.2.4",
@@ -982,7 +984,7 @@ dependencies = [
 [[package]]
 name = "stm32l0xx-hal"
 version = "0.6.2"
-source = "git+https://github.com/stm32-rs/stm32l0xx-hal#22aeb3a05b45be429f56a0b0748bcabc7fdce636"
+source = "git+https://github.com/stm32-rs/stm32l0xx-hal#d53ec21dc02348ecc8351f0578ec4eee08a447cf"
 dependencies = [
  "as-slice",
  "cast",
