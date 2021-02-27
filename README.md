@@ -148,10 +148,10 @@ The code must be compiled with `--release`  to run or it is not fast enough to r
 sensor and an `Error Timeout` occurs. Run tests indicated the sensor values are approximately 
 correct at room temperature, but the sensors have not been calibrated or tested at other temperatures.
 
-- dht11 uses crate [dht11](https://github.com/plorefice/dht11-rs). It compiles but I have not managed to 
+- `dht11` uses crate [dht11](https://github.com/plorefice/dht11-rs). It compiles but I have not managed to 
 get it running correctly.
 
-- text_i2c uses crate [ssd1306](https://github.com/jamwaffles/ssd1306).
+- `text_i2c` uses crate [ssd1306](https://github.com/jamwaffles/ssd1306).
 
 - `oled_gps` uses crate `embedded-graphics`.
 
