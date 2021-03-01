@@ -125,9 +125,16 @@ use stm32f3xx_hal::{prelude::*,
            fn  off(&mut self)  -> () { self.set_low().unwrap() }
            };
 
+       
+       // the hal delay function panics if the delay time is set at 2098ms or above.
+       // see https://github.com/stm32-rs/stm32f3xx-hal/issues/203
+       //let delay = Delay::new(cp.SYST, clocks);                      // panics
+       let mut delay = AsmDelay::new(bitrate::U32BitrateExt::mhz(16)); //works
+       
+       
        // return tuple  (led, delay)
        (gpioe.pe15.into_push_pull_output(&mut gpioe.moder, &mut gpioe.otyper),  // led on pe15 with on/off
-        AsmDelay::new(bitrate::U32BitrateExt::mhz(16)) )                        // delay
+        delay )                       
        }
 
 
