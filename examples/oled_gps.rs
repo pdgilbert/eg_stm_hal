@@ -93,7 +93,7 @@ use stm32f1xx_hal::{prelude::*,
 		    device::{USART2},  
                     delay::Delay,
 		    i2c::{BlockingI2c, DutyCycle, Mode},
-		    gpio::{gpioa::{PA2, PA3}, Alternate,
+		    gpio::{Alternate,   //gpioa::{PA2, PA3},
 		           gpiob::{PB10, PB11}, OpenDrain, },
 		    device::I2C2,
 		    }; 
