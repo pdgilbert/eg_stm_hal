@@ -390,7 +390,7 @@ use stm32f7xx_hal::{prelude::*,
        //   somewhere 8.mhz needs to be set in spi
 
        let spi = Spi::new(p.SPI1, (sck, miso, mosi)).enable::<u8>(
-          &mut rcc,
+          &mut rcc.apb2,
           ClockDivider::DIV32,
           MODE,
           );
