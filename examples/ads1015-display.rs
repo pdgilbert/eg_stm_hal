@@ -1,4 +1,3 @@
-    
 //    ads1015-display.rs   builds with stm32f1xx, stm32f3xx, ...
 //
 //  See https://blog.eldruin.com/ads1x1x-analog-to-digital-converter-driver-in-rust/
@@ -20,206 +19,225 @@ use core::fmt::Write;
 use cortex_m_rt::entry;
 use embedded_graphics::{fonts::Font6x8, prelude::*};
 
-
 use nb::block;
 use panic_semihosting as _;
 use ssd1306::{prelude::*, Builder};
 
-
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
 
-#[cfg(feature = "stm32f0xx")]  //  eg blue pill stm32f103
-use stm32f0xx_hal::{prelude::*,   
-                    pac::Peripherals, 
-                    i2c::{BlockingI2c, DutyCycle, Mode},   
-    	            delay::Delay,
-		    gpio::{gpiob::{PB8, PB9}, Alternate, OpenDrain,  gpioc::PC13, Output, PushPull,},
-		    device::I2C1,
-		    }; 
+#[cfg(feature = "stm32f0xx")] //  eg blue pill stm32f103
+use stm32f0xx_hal::{
+    delay::Delay,
+    device::I2C1,
+    gpio::{
+        gpiob::{PB8, PB9},
+        gpioc::PC13,
+        Alternate, OpenDrain, Output, PushPull,
+    },
+    i2c::{BlockingI2c, DutyCycle, Mode},
+    pac::Peripherals,
+    prelude::*,
+};
 //#[cfg(feature = "stm32f0xx")]  //  eg blue pill stm32f103
 //use embedded_hal::digital::v2::OutputPin;
 
-    #[cfg(feature = "stm32f0xx")]
-    fn setup() ->  (BlockingI2c<I2C1,  (PB8<Alternate<OpenDrain>>, PB9<Alternate<OpenDrain>>) >,
-                        PC13<Output<PushPull>>, Delay) {
-       
-       let cp = cortex_m::Peripherals::take().unwrap();
-       let dp = Peripherals::take().unwrap();
-       
-       let mut rcc   = dp.RCC.constrain();
-       let clocks    = rcc.cfgr.freeze(&mut dp.FLASH.constrain().acr);
+#[cfg(feature = "stm32f0xx")]
+fn setup() -> (
+    BlockingI2c<I2C1, (PB8<Alternate<OpenDrain>>, PB9<Alternate<OpenDrain>>)>,
+    PC13<Output<PushPull>>,
+    Delay,
+) {
+    let cp = cortex_m::Peripherals::take().unwrap();
+    let dp = Peripherals::take().unwrap();
 
-       let mut gpiob = dp.GPIOB.split(&mut rcc.apb2);  // for i2c scl and sda 
+    let mut rcc = dp.RCC.constrain();
+    let clocks = rcc.cfgr.freeze(&mut dp.FLASH.constrain().acr);
 
-       let i2c = BlockingI2c::new(  
-   	   dp.I2C1,
-   	   
-	   (gpiob.pb8.into_alternate_open_drain(&mut gpiob.crh),    // i2c scl on pb8
-	    gpiob.pb9.into_alternate_open_drain(&mut gpiob.crh)),   // i2c sda on pb9
-   	   
-	   &mut dp.AFIO.constrain(&mut rcc.apb2).mapr,
+    let mut gpiob = dp.GPIOB.split(&mut rcc.apb2); // for i2c scl and sda
 
-   	   Mode::Fast {
-   	       frequency: 100_000.hz(),
-   	       duty_cycle: DutyCycle::Ratio2to1,
-   	       },
-   	   clocks,
-   	   &mut rcc.apb1,
-   	   1000,
-   	   10,
-   	   1000,
-   	   1000,
-   	   );
+    let i2c = BlockingI2c::new(
+        dp.I2C1,
+        (
+            gpiob.pb8.into_alternate_open_drain(&mut gpiob.crh), // i2c scl on pb8
+            gpiob.pb9.into_alternate_open_drain(&mut gpiob.crh),
+        ), // i2c sda on pb9
+        &mut dp.AFIO.constrain(&mut rcc.apb2).mapr,
+        Mode::Fast {
+            frequency: 100_000.hz(),
+            duty_cycle: DutyCycle::Ratio2to1,
+        },
+        clocks,
+        &mut rcc.apb1,
+        1000,
+        10,
+        1000,
+        1000,
+    );
 
-       // led
-       let mut gpioc = dp.GPIOC.split(&mut rcc.apb2);
-       let led = gpioc.pc13.into_push_pull_output(&mut gpioc.crh);   // led on pc13
+    // led
+    let mut gpioc = dp.GPIOC.split(&mut rcc.apb2);
+    let led = gpioc.pc13.into_push_pull_output(&mut gpioc.crh); // led on pc13
 
-       (i2c, led,  Delay::new(cp.SYST, clocks))   // return tuple (i2c, led, delay)
-       }
+    (i2c, led, Delay::new(cp.SYST, clocks)) // return tuple (i2c, led, delay)
+}
 
-
-
-#[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
-use stm32f1xx_hal::{prelude::*,   
-                    pac::Peripherals, 
-                    i2c::{BlockingI2c, DutyCycle, Mode},   
-    	            delay::Delay,
-		    gpio::{gpiob::{PB8, PB9}, Alternate, OpenDrain,  gpioc::PC13, Output, PushPull,},
-		    device::I2C1,
-		    }; 
+#[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
+use stm32f1xx_hal::{
+    delay::Delay,
+    device::I2C1,
+    gpio::{
+        gpiob::{PB8, PB9},
+        gpioc::PC13,
+        Alternate, OpenDrain, Output, PushPull,
+    },
+    i2c::{BlockingI2c, DutyCycle, Mode},
+    pac::Peripherals,
+    prelude::*,
+};
 //#[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
 //use embedded_hal::digital::v2::OutputPin;
 
-    #[cfg(feature = "stm32f1xx")]
-    fn setup() ->  (BlockingI2c<I2C1,  (PB8<Alternate<OpenDrain>>, PB9<Alternate<OpenDrain>>) >,
-                        PC13<Output<PushPull>>, Delay) {
-       
-       let cp = cortex_m::Peripherals::take().unwrap();
-       let dp = Peripherals::take().unwrap();
-       
-       let mut rcc   = dp.RCC.constrain();
-       let clocks    = rcc.cfgr.freeze(&mut dp.FLASH.constrain().acr);
+#[cfg(feature = "stm32f1xx")]
+fn setup() -> (
+    BlockingI2c<I2C1, (PB8<Alternate<OpenDrain>>, PB9<Alternate<OpenDrain>>)>,
+    PC13<Output<PushPull>>,
+    Delay,
+) {
+    let cp = cortex_m::Peripherals::take().unwrap();
+    let dp = Peripherals::take().unwrap();
 
-       let mut gpiob = dp.GPIOB.split(&mut rcc.apb2);  // for i2c scl and sda 
+    let mut rcc = dp.RCC.constrain();
+    let clocks = rcc.cfgr.freeze(&mut dp.FLASH.constrain().acr);
 
-       let i2c = BlockingI2c::new(  
-   	   dp.I2C1,
-   	   
-	   (gpiob.pb8.into_alternate_open_drain(&mut gpiob.crh),    // i2c scl on pb8
-	    gpiob.pb9.into_alternate_open_drain(&mut gpiob.crh)),   // i2c sda on pb9
-   	   
-	   &mut dp.AFIO.constrain(&mut rcc.apb2).mapr,
+    let mut gpiob = dp.GPIOB.split(&mut rcc.apb2); // for i2c scl and sda
 
-   	   Mode::Fast {
-   	       frequency: 100_000.hz(),
-   	       duty_cycle: DutyCycle::Ratio2to1,
-   	       },
-   	   clocks,
-   	   &mut rcc.apb1,
-   	   1000,
-   	   10,
-   	   1000,
-   	   1000,
-   	   );
+    let i2c = BlockingI2c::new(
+        dp.I2C1,
+        (
+            gpiob.pb8.into_alternate_open_drain(&mut gpiob.crh), // i2c scl on pb8
+            gpiob.pb9.into_alternate_open_drain(&mut gpiob.crh),
+        ), // i2c sda on pb9
+        &mut dp.AFIO.constrain(&mut rcc.apb2).mapr,
+        Mode::Fast {
+            frequency: 100_000.hz(),
+            duty_cycle: DutyCycle::Ratio2to1,
+        },
+        clocks,
+        &mut rcc.apb1,
+        1000,
+        10,
+        1000,
+        1000,
+    );
 
-       // led
-       let mut gpioc = dp.GPIOC.split(&mut rcc.apb2);
-       let led = gpioc.pc13.into_push_pull_output(&mut gpioc.crh);   // led on pc13
+    // led
+    let mut gpioc = dp.GPIOC.split(&mut rcc.apb2);
+    let led = gpioc.pc13.into_push_pull_output(&mut gpioc.crh); // led on pc13
 
-       (i2c, led,  Delay::new(cp.SYST, clocks))   // return tuple (i2c, led, delay)
-       }
+    (i2c, led, Delay::new(cp.SYST, clocks)) // return tuple (i2c, led, delay)
+}
 
+#[cfg(feature = "stm32f3xx")] //  eg Discovery-stm32f303
+use stm32f3xx_hal::{
+    delay::Delay,
+    gpio::{
+        gpiob::{PB6, PB7},
+        gpioe::PE9,
+        Output, PushPull, AF4,
+    },
+    i2c::I2c,
+    prelude::*,
+    stm32::Peripherals,
+    stm32::I2C1,
+};
 
+#[cfg(feature = "stm32f3xx")]
+fn setup() -> (
+    I2c<I2C1, (PB6<AF4>, PB7<AF4>)>,
+    PE9<Output<PushPull>>,
+    Delay,
+) {
+    let cp = cortex_m::Peripherals::take().unwrap();
+    let dp = Peripherals::take().unwrap();
 
-#[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
-use stm32f3xx_hal::{prelude::*, 
-                    stm32::Peripherals,
-                    i2c::I2c,  
-    	            delay::Delay,
-		    gpio::{gpiob::{PB6, PB7}, AF4,   gpioe::PE9, Output, PushPull,  },
-		    stm32::I2C1,
-		    };
-	   
-    #[cfg(feature = "stm32f3xx")]
-    fn setup() ->  (I2c<I2C1, (PB6<AF4>, PB7<AF4>)>,  PE9<Output<PushPull>>, Delay) {
+    let mut rcc = dp.RCC.constrain();
+    let clocks = rcc.cfgr.freeze(&mut dp.FLASH.constrain().acr);
 
-       let cp = cortex_m::Peripherals::take().unwrap();
-       let dp = Peripherals::take().unwrap();
+    let mut gpiob = dp.GPIOB.split(&mut rcc.ahb); // for i2c
 
-       let mut rcc   = dp.RCC.constrain();
-       let clocks = rcc.cfgr.freeze(&mut dp.FLASH.constrain().acr);
-      
-       let mut gpiob = dp.GPIOB.split(&mut rcc.ahb);   // for i2c
+    let i2c = I2c::new(
+        dp.I2C1,
+        (
+            gpiob.pb6.into_af4(&mut gpiob.moder, &mut gpiob.afrl), // i2c scl on pb6,
+            gpiob.pb7.into_af4(&mut gpiob.moder, &mut gpiob.afrl),
+        ), // i2c sda on pb7),
+        100.khz(),
+        clocks,
+        &mut rcc.apb1,
+    );
 
-       let i2c = I2c::new(
-          dp.I2C1, 
+    // led
+    let mut gpioe = dp.GPIOE.split(&mut rcc.ahb);
+    let led = gpioe
+        .pe9
+        .into_push_pull_output(&mut gpioe.moder, &mut gpioe.otyper); // led on pe9
+                                                                     //.into()  ??
 
-	  (gpiob.pb6.into_af4(&mut gpiob.moder, &mut gpiob.afrl),     // i2c scl on pb6, 
-	   gpiob.pb7.into_af4(&mut gpiob.moder, &mut gpiob.afrl) ),   // i2c sda on pb7), 
-
-	  100.khz(), 
-	  clocks, 
-	  &mut rcc.apb1
-	  );
-
-       // led
-       let mut gpioe = dp.GPIOE.split(&mut rcc.ahb);
-       let led = gpioe.pe9.into_push_pull_output(&mut gpioe.moder, &mut gpioe.otyper);  // led on pe9
-             //.into()  ?? 
-
-       (i2c, led,  Delay::new(cp.SYST, clocks) )  // return tuple (i2c, led, delay)
-       }
-
+    (i2c, led, Delay::new(cp.SYST, clocks)) // return tuple (i2c, led, delay)
+}
 
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
-use stm32f4xx_hal::{prelude::*,  
-                    pac::Peripherals, 
-                    i2c::I2c,  
-    	            delay::Delay,
-		    gpio::{gpiob::{PB8, PB7}, Alternate, AF4,  gpioe::PE9, Output, PushPull,  },
-                    pac::I2C1,
-		    }; 
+use stm32f4xx_hal::{
+    delay::Delay,
+    gpio::{
+        gpiob::{PB7, PB8},
+        gpioe::PE9,
+        Alternate, Output, PushPull, AF4,
+    },
+    i2c::I2c,
+    pac::Peripherals,
+    pac::I2C1,
+    prelude::*,
+};
 //#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
 //use embedded_hal::digital::v2::OutputPin;
-	   
-    #[cfg(feature = "stm32f4xx")]
-    fn setup() ->  (I2c<I2C1, (PB8<Alternate<AF4>>, PB7<Alternate<AF4>>)>,
-                              PE9<Output<PushPull>>, Delay) {
 
-       let cp = cortex_m::Peripherals::take().unwrap();
-       let dp = Peripherals::take().unwrap();
+#[cfg(feature = "stm32f4xx")]
+fn setup() -> (
+    I2c<I2C1, (PB8<Alternate<AF4>>, PB7<Alternate<AF4>>)>,
+    PE9<Output<PushPull>>,
+    Delay,
+) {
+    let cp = cortex_m::Peripherals::take().unwrap();
+    let dp = Peripherals::take().unwrap();
 
-       let mut rcc   = dp.RCC.constrain();
-       let clocks = rcc.cfgr.freeze();
-      
-       let mut gpiob = dp.GPIOB.split();   // for i2c
+    let mut rcc = dp.RCC.constrain();
+    let clocks = rcc.cfgr.freeze();
 
-       let i2c = I2c::i2c1(
-          dp.I2C1, 
+    let mut gpiob = dp.GPIOB.split(); // for i2c
 
-	  (gpiob.pb8.into_alternate_af4(),                    // i2c scl on pb8, 
-	   gpiob.pb7.into_alternate_af4() ),                  // i2c sda on pb7), 
+    let i2c = I2c::i2c1(
+        dp.I2C1,
+        (
+            gpiob.pb8.into_alternate_af4(), // i2c scl on pb8,
+            gpiob.pb7.into_alternate_af4(),
+        ), // i2c sda on pb7),
+        100.khz(),
+        clocks,
+    );
 
-	  100.khz(), 
-	  clocks, 
-	  );
+    // led
+    let mut gpioe = dp.GPIOE.split();
+    let led = gpioe.pe9.into_push_pull_output(); // led on pe9
+                                                 //let led = gpiob.pb13.into_push_pull_output();          // external led on pb13
 
-       // led
-       let mut gpioe = dp.GPIOE.split();
-       let led = gpioe.pe9.into_push_pull_output();           // led on pe9
-       //let led = gpiob.pb13.into_push_pull_output();          // external led on pb13
+    (i2c, led, Delay::new(cp.SYST, clocks)) // return tuple (i2c, led, delay)
+}
 
-       (i2c, led,  Delay::new(cp.SYST, clocks) )     // return tuple (i2c, led, delay)
-       }
-
-
-    // End of hal/MCU specific setup. Following should be generic code.
-
+// End of hal/MCU specific setup. Following should be generic code.
 
 #[entry]
 fn main() -> ! {
-
     let (i2c, mut led, mut delay) = setup();
 
     let manager = shared_bus::BusManager::<cortex_m::interrupt::Mutex<_>, _>::new(i2c);

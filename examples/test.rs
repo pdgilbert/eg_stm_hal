@@ -17,18 +17,29 @@
 //use core::str;
 //use nb::block;
 
-#[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
-use stm32f1xx_hal::{prelude::*,   pac::Peripherals, serial::{Config, Serial, StopBits}, };
+#[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
+use stm32f1xx_hal::{
+    pac::Peripherals,
+    prelude::*,
+    serial::{Config, Serial, StopBits},
+};
 
-#[cfg(feature = "stm32f3xx")]  //  eg Discovery-stm32f303
-use stm32f3xx_hal::{prelude::*, stm32::Peripherals, serial::{ Serial}, };
+#[cfg(feature = "stm32f3xx")] //  eg Discovery-stm32f303
+use stm32f3xx_hal::{prelude::*, serial::Serial, stm32::Peripherals};
 
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
-use stm32f4xx_hal::{prelude::*, pac::Peripherals, serial::{config::Config, Serial }};
+use stm32f4xx_hal::{
+    pac::Peripherals,
+    prelude::*,
+    serial::{config::Config, Serial},
+};
 
-#[cfg(feature = "stm32l1xx") ] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
-use stm32l1xx_hal::{prelude::*, stm32::Peripherals, serial::{config::Config, Serial }};
-
+#[cfg(feature = "stm32l1xx")] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
+use stm32l1xx_hal::{
+    prelude::*,
+    serial::{config::Config, Serial},
+    stm32::Peripherals,
+};
 
 //#[entry]
 //fn main() -> ! {
@@ -58,7 +69,6 @@ fn main() {
 
     println!("{}", (Foo::new(|a| a + 1).foo)(42));
 }
-
 
 //    loop {}
 //}
