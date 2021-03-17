@@ -198,7 +198,7 @@ fn setup() -> (
             gpioa.pa9.into_af7(&mut gpioa.moder, &mut gpioa.afrh),
             gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh),
         ),
-        9600.bps(),
+        9600.Bd(),
         clocks,
         &mut rcc.apb2,
     );

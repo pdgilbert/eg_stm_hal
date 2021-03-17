@@ -273,8 +273,8 @@ fn setup() -> (
     let mut rcc = p.RCC.constrain();
     let clocks = rcc
         .cfgr
-        .sysclk(64.mhz())
-        .pclk1(32.mhz())
+        .sysclk(64_i32.mhz())
+        .pclk1(32_i32.mhz())
         .freeze(&mut p.FLASH.constrain().acr);
 
     let mut gpioa = p.GPIOA.split(&mut rcc.ahb);
@@ -286,7 +286,7 @@ fn setup() -> (
             gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl), //tx pa2  for GPS rx
             gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl),
         ), //rx pa3  for GPS tx
-        9600.bps(), // 115_200.bps(),
+        9600.Bd(), // 115_200.bps(),
         clocks,
         &mut rcc.apb1,
     )
@@ -300,7 +300,7 @@ fn setup() -> (
             gpioa.pa7.into_af5(&mut gpioa.moder, &mut gpioa.afrl), // mosi  on PA7
         ),
         MODE,
-        8.mhz(),
+        8_i32.mhz(),
         clocks,
         &mut rcc.apb2,
     );

@@ -144,7 +144,7 @@ fn setup() -> (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>) {
             gpioa.pa9.into_af7(&mut gpioa.moder, &mut gpioa.afrh), //tx pa9   for console
             gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh),
         ), //tx pb10  for console
-        9600.bps(),
+        9600.Bd(),
         clocks,
         &mut rcc.apb2,
     )
@@ -156,7 +156,7 @@ fn setup() -> (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>) {
             gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl), //tx pa2  for GPS
             gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl),
         ), //rx pa3  for GPS
-        9600.bps(), // 115_200.bps(),
+        9600.Bd(), // 115_200.bps(),
         clocks,
         &mut rcc.apb1,
     )

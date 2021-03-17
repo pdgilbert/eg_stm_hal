@@ -193,7 +193,7 @@ fn setup() -> (
             gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl), //tx pa2  for GPS rx
             gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl),
         ), //rx pa3  for GPS tx
-        9600.bps(), // 115_200.bps(),
+        9600.Bd(), // 115_200.bps(),
         clocks,
         &mut rcc.apb1,
     )
@@ -207,7 +207,7 @@ fn setup() -> (
     (
         tx2,
         rx2,
-        I2c::new(p.I2C1, (scl, sda), 400_000.hz(), clocks, &mut rcc.apb1), // i2c
+        I2c::new(p.I2C1, (scl, sda), 400_000.Hz(), clocks, &mut rcc.apb1), // i2c
         Delay::new(cp.SYST, clocks),
     )
 }
