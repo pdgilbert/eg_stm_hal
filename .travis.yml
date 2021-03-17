@@ -92,16 +92,12 @@ script:
   - checkExample  temperature
 
   - checkExample  dht
-  - checkExample  dht11
   - checkExample  text_i2c
   - checkExample  oled_gps
   #- checkExample  ads1015-display
   - checkExample  lora_spi_send
   - checkExample  lora_spi_receive
   - checkExample  lora_spi_gps
-  #- checkExample  lora_send
-  #- checkExample  lora_receive
-  #- checkExample  lora_gps
 
   - echo  PWD= ${PWD}
   # next also ensure there is something new to commit, so commit does not fail
