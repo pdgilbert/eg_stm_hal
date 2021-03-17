@@ -225,7 +225,7 @@ fn setup() -> (
     //     let tx = self.tup.2;
     //     tx.write_all(&self.tup.0, self.tup.1).wait();   //sending self buffer tup.0
     //     //^^^^^^^^^ expected `&mut [u8; 15]`, found `u8`
-    //     //	 ^^^^^^^^^^^ the trait `embedded_dma::Word` is not implemented for `&mut [u8; 15]`
+    //     //         ^^^^^^^^^^^ the trait `embedded_dma::Word` is not implemented for `&mut [u8; 15]`
     //     // ... requirements on the impl of `embedded_dma::ReadTarget` for `&mut [u8; 15]`
     //     // ... requirements on the impl of `embedded_dma::ReadBuffer` for `&&mut [u8; 15]`
     //     }
@@ -242,16 +242,16 @@ fn setup() -> (
     //       let  recv = RxDma{buf: rxbuf,  ch: rx1_ch,  rx:rx1};
 
     //       impl WriteDma for TxDma<&'static mut [u8; 15], dma1::C4,  Tx<USART1>> {
-    //	   fn write(&self)  -> () {
-    //	      self.tx.write_all(&self.buf, self.ch).wait();
-    //	    }
-    //	   };
+    //           fn write(&self)  -> () {
+    //              self.tx.write_all(&self.buf, self.ch).wait();
+    //            }
+    //           };
     //
     //       impl ReadDma for RxDma<&'static mut [u8; 15], dma1::C5, Rx<USART1>> {
-    //	   fn read(&mut self)  ->  () {
-    //	      self.rx.read_exact(self.buf, self.ch).wait();   //result in self.buf
-    //	    }
-    //	   };
+    //           fn read(&mut self)  ->  () {
+    //              self.rx.read_exact(self.buf, self.ch).wait();   //result in self.buf
+    //            }
+    //           };
 
     (send, recv)
 }

@@ -371,11 +371,11 @@ fn main() -> ! {
     //
     //let r = Reading::read(&mut delay, &mut dht_data);
     //match r {
-    //	Ok(Reading {
-    //	    temperature,
-    //	    relative_humidity,
-    //	}) => hprintln!("{} deg C, {}% RH", temperature, relative_humidity).unwrap(),
-    //	Err(e) => hprintln!("Error {:?}", e).unwrap(),
+    //        Ok(Reading {
+    //            temperature,
+    //            relative_humidity,
+    //        }) => hprintln!("{} deg C, {}% RH", temperature, relative_humidity).unwrap(),
+    //        Err(e) => hprintln!("Error {:?}", e).unwrap(),
     //}
 
     loop {

@@ -113,7 +113,7 @@ fn setup() -> (
 ) {
     //fn setup() ->  (Tx<USART3>, Rx<USART3>,
     //                BlockingI2c<I2C2,  (PB10<Alternate<OpenDrain>>, PB11<Alternate<OpenDrain>>) >,
-    //		    Delay )  {
+    //                    Delay )  {
 
     let cp = cortex_m::Peripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -530,7 +530,7 @@ fn setup() -> (
         .freeze(&mut flash.acr, &mut pwr);
 
     let mut gpioa = p.GPIOA.split(&mut rcc.ahb2);
-    //	 let mut gpiob  = p.GPIOB.split(&mut rcc.ahb2);
+    //         let mut gpiob  = p.GPIOB.split(&mut rcc.ahb2);
 
     let (tx2, rx2) = Serial::usart2(
         p.USART2,
@@ -546,13 +546,13 @@ fn setup() -> (
 
     // following github.com/stm32-rs/stm32l4xx-hal/blob/master/examples/i2c_write.rs
     //
-    //	 let mut scl = gpiob.pb8.into_open_drain_output(&mut gpiob.moder, &mut gpiob.otyper);  // scl on PB8
-    //	 scl.internal_pull_up(&mut gpiob.pupdr, true);
-    //	 let scl = scl.into_af4(&mut gpiob.moder, &mut gpiob.afrh);
+    //         let mut scl = gpiob.pb8.into_open_drain_output(&mut gpiob.moder, &mut gpiob.otyper);  // scl on PB8
+    //         scl.internal_pull_up(&mut gpiob.pupdr, true);
+    //         let scl = scl.into_af4(&mut gpiob.moder, &mut gpiob.afrh);
     //
-    //	 let mut sda = gpiob.pb9.into_open_drain_output(&mut gpiob.moder, &mut gpiob.otyper);  // sda on PB9
-    //	 sda.internal_pull_up(&mut gpiob.pupdr, true);
-    //	 let sda = sda.into_af4(&mut gpiob.moder, &mut gpiob.afrh);
+    //         let mut sda = gpiob.pb9.into_open_drain_output(&mut gpiob.moder, &mut gpiob.otyper);  // sda on PB9
+    //         sda.internal_pull_up(&mut gpiob.pupdr, true);
+    //         let sda = sda.into_af4(&mut gpiob.moder, &mut gpiob.afrh);
 
     let mut scl = gpioa
         .pa9

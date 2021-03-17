@@ -145,12 +145,12 @@ fn setup() -> (
                 gpioa.pa5.into_alternate_af0(cs), //   sck   on PA5
                 gpioa.pa6.into_alternate_af0(cs), //   miso  on PA6
                 gpioa.pa7.into_alternate_af0(cs), //   mosi  on PA7
-                //gpioa.pa1.into_push_pull_output(cs),	  //   cs            on PA1
+                //gpioa.pa1.into_push_pull_output(cs),          //   cs            on PA1
                 gpiob.pb1.into_push_pull_output(cs), //   reset         on PB1
-                gpioa.pa1.into_push_pull_output(cs), //   CsPin	     on PA1
+                gpioa.pa1.into_push_pull_output(cs), //   CsPin             on PA1
                 gpiob.pb8.into_floating_input(cs),   //   BusyPin  DIO0 on PB8
                 gpiob.pb9.into_floating_input(cs),   //   ReadyPin DIO1 on PB9
-                gpioa.pa0.into_push_pull_output(cs), //   ResetPin	      on PA0
+                gpioa.pa0.into_push_pull_output(cs), //   ResetPin              on PA0
             )
         });
 
@@ -314,7 +314,7 @@ fn setup() -> (
         gpioa
             .pa1
             .into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper)
-            .compat(), //CsPin	    on PA1
+            .compat(), //CsPin            on PA1
         gpiob
             .pb8
             .into_floating_input(&mut gpiob.moder, &mut gpiob.pupdr)
@@ -391,7 +391,7 @@ fn setup() -> (
     // Create lora radio instance
 
     // open_drain_output is really input and output. BusyPin is just input, but I think this should work
-    //	    gpiob.pb8.into_alternate_open_drain(&mut gpiob.crh),
+    //            gpiob.pb8.into_alternate_open_drain(&mut gpiob.crh),
     // however, gives trait bound  ... InputPin` is not satisfied
 
     let lora = Sx127x::spi(
@@ -749,7 +749,7 @@ fn setup() -> (
         gpioa
             .pa1
             .into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper)
-            .compat(), //CsPin	     on PA1
+            .compat(), //CsPin             on PA1
         gpiob
             .pb8
             .into_floating_input(&mut gpiob.moder, &mut gpiob.pupdr)

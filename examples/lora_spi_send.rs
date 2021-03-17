@@ -336,7 +336,7 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible
     // Create lora radio instance
 
     // open_drain_output is really input and output. BusyPin is just input, but I think this should work
-    //	    gpiob.pb8.into_alternate_open_drain(&mut gpiob.crh),
+    //            gpiob.pb8.into_alternate_open_drain(&mut gpiob.crh),
     // however, gives trait bound  ... InputPin` is not satisfied
 
     let lora = Sx127x::spi(
@@ -625,16 +625,16 @@ fn main() -> ! {
     //    let v = lora.lora_get_config();
     //    hprintln!("configuration {}", v).unwrap();
 
-    //    hprintln!("chammel	  {}", lora.get_chammel()).unwrap();
+    //    hprintln!("chammel          {}", lora.get_chammel()).unwrap();
 
-    //hprintln!("mode		  {}", lora.get_mode()).unwrap();
-    //hprintln!("mode		  {}", lora.read_register(Register::RegOpMode.addr())).unwrap();
-    //hprintln!("bandwidth	  {:?}", lora.get_signal_bandwidth()).unwrap();
-    //hprintln!("coding_rate	  {:?}",  lora.get_coding_rate_4()).unwrap();
+    //hprintln!("mode                  {}", lora.get_mode()).unwrap();
+    //hprintln!("mode                  {}", lora.read_register(Register::RegOpMode.addr())).unwrap();
+    //hprintln!("bandwidth          {:?}", lora.get_signal_bandwidth()).unwrap();
+    //hprintln!("coding_rate          {:?}",  lora.get_coding_rate_4()).unwrap();
     //hprintln!("spreading_factor {:?}",  lora.get_spreading_factor()).unwrap();
     //hprintln!("spreading_factor {:?}",
-    //hprintln!("invert_iq	  {:?}",  lora.get_invert_iq()).unwrap();
-    //hprintln!("tx_power	  {:?}",  lora.get_tx_power()).unwrap();
+    //hprintln!("invert_iq          {:?}",  lora.get_invert_iq()).unwrap();
+    //hprintln!("tx_power          {:?}",  lora.get_tx_power()).unwrap();
 
     // transmit something
 
@@ -644,8 +644,8 @@ fn main() -> ! {
 
     //let mut buffer = [0;100];      //Nov 2020 limit data.len() < 255 in radio_sx127x  .start_transmit
     //for (i,c) in message.chars().enumerate() {
-    //	buffer[i] = c as u8;
-    //	}
+    //        buffer[i] = c as u8;
+    //        }
 
     loop {
         lora.start_transmit(message).unwrap(); // should handle error

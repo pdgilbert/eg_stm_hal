@@ -167,7 +167,7 @@ fn setup() -> (
     )
     .split();
 
-    //let tx1  = tx1.with_dma(channels.4);		// console
+    //let tx1  = tx1.with_dma(channels.4);                // console
     //let rx1  = rx1.with_dma(channels.5);
     //let tx2  = tx2.with_dma(channels.7);
     //let rx2  = rx2.with_dma(channels.6);
