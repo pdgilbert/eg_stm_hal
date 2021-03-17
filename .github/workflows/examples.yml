@@ -89,13 +89,13 @@ jobs:
           profile: minimal
           toolchain: stable
       - name: Build
-        working-directory: boards/${{ matrix.brd }}
+        run: cd boards/${{ matrix.brd }}
         uses: actions-rs/cargo@v1
         with:
           command: build
           args:  --no-default-features --release --target ${{ matrix.trg }} --features ${{ matrix.mcu }}
       - name: eg 
-        working-directory:  boards/${{ matrix.brd }}
+        run: cd boards/${{ matrix.brd }}
         uses: actions-rs/cargo@v1
         with:
           command: build
