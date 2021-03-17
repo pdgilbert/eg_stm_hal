@@ -5,6 +5,7 @@
 - [code repository](https://github.com/pdgilbert/eg_stm_hal) 
 - [main documentation](https://github.com/pdgilbert/eg_stm_hal#examples-using-embedded-rust)
 - [Travis CI](https://travis-ci.org/pdgilbert/eg_stm_hal)
+- [Github workflow CI](https://github.com/pdgilbert/eg_stm_hal/action)
 - [Table of Core Examples Status](#table-of-core-examples-status)
 - [Table of Additional Examples Status](#table-of-additional-examples-status)
 
@@ -143,8 +144,7 @@ so, only USART1 is available. This means that examples using more than one USART
 Additional examples are as follows.
 - `dht` uses crate [dht-sensor](https://github.com/michaelbeaumont/dht-sensor). Run tests were done with 
 both DHT11 and DHT22 sensors. DHT22 is specified by adding feature `dht22`. DHT11 is used if nothing is 
-specified. (Specifying `dht11` causes confusion with the other crate example.) 
-The code must be compiled with `--release`  to run or it is not fast enough to read the 
+specified. The code must be compiled with `--release`  to run or it is not fast enough to read the 
 sensor and an `Error Timeout` occurs. Run tests indicated the sensor values are approximately 
 correct at room temperature, but the sensors have not been calibrated or tested at other temperatures.
 
@@ -156,10 +156,10 @@ correct at room temperature, but the sensors have not been calibrated or tested 
 The crate uses `embedded-hal 1.0.0 alpha`. It works with hal crates built with older embedded-hal by using a `compat()` shim
 to satisfy traits. It builds but may not be showing correctly in this table because the tests for the table are using  `embedded-hal 0.2.4`.
 
-- Previously there was an example using [dht11](https://github.com/plorefice/dht11-rs) but I did not get it to run.
+- Previously there was an example using [dht11](https://github.com/plorefice/dht11-rs) but I couls not get it to run.
 
-- Previously there were examples using [mr-git](https://github.com/mr-glt/sx127x_lora) or forks
-which compiled but I did not get them to run.
+- Previously there were examples using [sx127x_lora](https://github.com/mr-glt/sx127x_lora) or forks
+which compiled but I could not get them to run.
 
 
 |    hal      | board   |                {{dht}}                      |                {{text_i2c}}                      |                {{oled_gps}}                      |                   {{lora_spi_send}}                          |                {{lora_spi_receive}}               |                {{lora_spi_gps}}                      |
