@@ -89,16 +89,24 @@ jobs:
           profile: minimal
           toolchain: stable
       - name: Build
-        run: cd boards/${{ matrix.brd }}
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args:  --no-default-features --release --target ${{ matrix.trg }} --features ${{ matrix.mcu }}
+        use-cross: true
+        run: |
+           cd boards/${{ matrix.brd }}
+           cargo build --no-default-features --release --target ${{ matrix.trg }} --features ${{ matrix.mcu }}
+        # possibly uses in place of run, but need working-directory: 
+        #uses: actions-rs/cargo@v1 
+        #with:
+        #  command: build
+        #  args:       --no-default-features --release --target ${{ matrix.trg }} --features ${{ matrix.mcu }}
+        #  use-cross: true
       - name: eg 
-        run: cd boards/${{ matrix.brd }}
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args:  --no-default-features --release --target ${{ matrix.trg }} --features ${{ matrix.hal }},${{ matrix.mcu }} --example ${{ matrix.eg }}
-          use-cross: true
+        use-cross: true
+        run: |
+           cd boards/${{ matrix.brd }}
+           cargo build --no-default-features --release --target ${{ matrix.trg }} --features ${{ matrix.hal }},${{ matrix.mcu }} --example ${{ matrix.eg }}
+        #uses: actions-rs/cargo@v1
+        #with:
+        #  command: build
+        #  args:       --no-default-features --release --target ${{ matrix.trg }} --features ${{ matrix.hal }},${{ matrix.mcu }} --example ${{ matrix.eg }}
+        #  use-cross: true
 
