@@ -56,7 +56,6 @@ path = "examples/gps_rw.rs"
 name = "temperature"
 path = "examples/temperature.rs"
 
-
 [[example]]
 name = "dht"
 path = "examples/dht.rs"
@@ -88,8 +87,7 @@ path = "examples/lora_spi_gps.rs"
 
 
 [dependencies]
-cortex-m = ">=0.6.0"
-#cortex-m = "=0.6.4"  #may need. see https://github.com/rust-lang/rust/issues/73284
+cortex-m = ">=0.7.1" 
 nb = ">=0.1.2"
 cortex-m-rt = ">=0.6.8"
 panic-halt = ">=0.2.0"
@@ -107,11 +105,6 @@ ads1x1x = "0.2"
 f3 = ">=0.6.1"
 
 embedded-spi = { version = "0.6", default-features = false }
-
-#stm32f1 = ">=0.11.0"
-#stm32f3 = ">=0.11"
-#stm32f4 = ">=0.11"
-#stm32l1 = ">=0.5.0"
 
 embedded-hal = { version = "0.2.4" }
 
