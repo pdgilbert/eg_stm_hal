@@ -89,26 +89,24 @@ jobs:
           profile: minimal
           toolchain: stable
       - name: Build
-        env:
-           BRD: ${{ matrix.brd }}
-           TRG: ${{ matrix.trg }}
-           MCU: ${{ matrix.mcu }}
-        run: |
-           cd boards/$BRD
-           cargo build --no-default-features --release --target $TRG --features $MCU
+        #env:
+         #  BRD: ${{ matrix.brd }}
+         #  TRG: ${{ matrix.trg }}
+        #   MCU: ${{ matrix.mcu }}
+        #run: |
+        #   cd boards/${BRD}
+        #   cargo build --no-default-features --release --target ${TRG} --features ${MCU}
         # possibly uses in place of run, but need to set working-directory: 
-        #uses: actions-rs/cargo@v1 
-        #with:
-        #  command: build
-        #  args:       --no-default-features --release --target ${{ matrix.trg }} --features ${{ matrix.mcu }}
-        #  use-cross: true
+        # following https://github.com/actions-rs/cargo/issues/6  add --manifest-path 
+        uses: actions-rs/cargo@v1 
+        with:
+          command: build
+          args:  --manifest-path boards/${{ matrix.brd }} --no-default-features --release --target ${{ matrix.trg }} --features ${{ matrix.mcu }}
+          use-cross: true
       - name: Build example 
-        run: |
-           cd boards/${{ matrix.brd }}
-           cargo build --no-default-features --release --target ${{ matrix.trg }} --features ${{ matrix.hal }},${{ matrix.mcu }} --example ${{ matrix.eg }}
-        #uses: actions-rs/cargo@v1
-        #with:
-        #  command: build
-        #  args:       --no-default-features --release --target ${{ matrix.trg }} --features ${{ matrix.hal }},${{ matrix.mcu }} --example ${{ matrix.eg }}
-        #  use-cross: true
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args:  --manifest-path boards/${{ matrix.brd }} --no-default-features --release --target ${{ matrix.trg }} --features ${{ matrix.hal }},${{ matrix.mcu }} --example ${{ matrix.eg }}
+          use-cross: true
 
