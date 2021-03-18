@@ -24,7 +24,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: fmt
-          args: --all -- --check
+          args: --all --manifest-path boards/bluepill/Cargo.toml -- --check
 
   test_examples:
     name: eg
@@ -88,13 +88,18 @@ jobs:
         with:
           profile: minimal
           toolchain: stable
+      - name: Build example 
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args:  --manifest-path boards/${{ matrix.brd }}/Cargo.toml --no-default-features --release --target ${{ matrix.trg }} --features ${{ matrix.hal }},${{ matrix.mcu }} --example ${{ matrix.eg }}
+          use-cross: true
       - name: Build
         uses: actions-rs/cargo@v1 
         with:
           command: build
-          args:  --no-default-features --release --target ${{ matrix.trg }} --features ${{ matrix.mcu }}
+          args:  --manifest-path boards/${{ matrix.brd }}/Cargo.toml --no-default-features --release --target ${{ matrix.trg }} --features ${{ matrix.mcu }}
           use-cross: true
-          #args:  --manifest-path boards/${{ matrix.brd }} --no-default-features --release --target ${{ matrix.trg }} --features ${{ matrix.mcu }}
         #env:
          #  BRD: ${{ matrix.brd }}
          #  TRG: ${{ matrix.trg }}
@@ -104,10 +109,4 @@ jobs:
         #   cargo build --no-default-features --release --target ${TRG} --features ${MCU}
         # possibly uses in place of run, but need to set working-directory: 
         # following https://github.com/actions-rs/cargo/issues/6  add --manifest-path 
-      - name: Build example 
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args:  --manifest-path boards/${{ matrix.brd }} --no-default-features --release --target ${{ matrix.trg }} --features ${{ matrix.hal }},${{ matrix.mcu }} --example ${{ matrix.eg }}
-          use-cross: true
 
