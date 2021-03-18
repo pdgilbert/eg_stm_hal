@@ -1,4 +1,3 @@
-#  ROUGH SKETCH. THIS NEEDS WORK
 name: Examples
 
 on:
@@ -32,10 +31,13 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        mcu: [stm32f030xc, stm32f100, stm32f101, stm32f103, stm32f303xc, ]
-              #stm32f401, stm32f411,   stm32h742, stm32l0x2, stm32l100, stm32l151, stm32l4x2, ]
-        eg:  [blink, dht, lora_spi_send, ]
-        #eg:  [blink, dht, lora_spi_send, lora_spi_receive, lora_spi_gps ]
+        mcu: [stm32f030xc, stm32f100, stm32f101, stm32f103, stm32f303xc, 
+              stm32f401, stm32f411,   stm32h742, stm32l0x2, stm32l100, stm32l151, stm32l4x2, ]
+        
+        eg:  [blink,blink3, echo_by_char, echo_string, serial_char, serial_string, gps_rw, temperature,
+              dht, text_i2c, oled_gps, lora_spi_send, ]
+        #  lora_spi_receive, lora_spi_gps ]
+        
         include:
            #- mcu:  stm32f042  NB commented out sections need mcu removed from mcu: or matrix is messed up
            #  hal: "stm32f0xx"
@@ -61,28 +63,28 @@ jobs:
              hal: "stm32f3xx"
              trg: "thumbv7em-none-eabihf"
              brd: "discovery-stm32f303"
-           #- mcu:  stm32f401
-           #  hal: "stm32f4xx"
-           #  trg: "thumbv7em-none-eabihf"
-           #  brd: 
-           #- mcu:  stm32f411
-           #  hal: "stm32f4xx"
-           #  trg: "thumbv7em-none-eabihf"
-           #- mcu:  stm32h742             
-           #  hal: "stm32h7xx"
-           #  trg: "thumbv7em-none-eabihf"
-           #- mcu:  stm32l0x2
-           #  hal: "stm32l0xx"
-           #  trg: "thumbv6m-none-eabi"
-           #- mcu:  stm32l100
-           #  hal: "stm32l1xx"
-           #  trg: "thumbv7m-none-eabi"
-           #- mcu:  stm32l151
-           #  hal: "stm32l1xx"
-           #  trg: "thumbv7m-none-eabi"
-           #- mcu:  stm32l4x2
-           #  hal: "stm32l4xx"
-           #  trg: "thumbv7em-none-eabi"
+           - mcu:  stm32f401
+             hal: "stm32f4xx"
+             trg: "thumbv7em-none-eabihf"
+             brd: 
+           - mcu:  stm32f411
+             hal: "stm32f4xx"
+             trg: "thumbv7em-none-eabihf"
+           - mcu:  stm32h742             
+             hal: "stm32h7xx"
+             trg: "thumbv7em-none-eabihf"
+           - mcu:  stm32l0x2
+             hal: "stm32l0xx"
+             trg: "thumbv6m-none-eabi"
+           - mcu:  stm32l100
+             hal: "stm32l1xx"
+             trg: "thumbv7m-none-eabi"
+           - mcu:  stm32l151
+             hal: "stm32l1xx"
+             trg: "thumbv7m-none-eabi"
+           - mcu:  stm32l4x2
+             hal: "stm32l4xx"
+             trg: "thumbv7em-none-eabi"
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
