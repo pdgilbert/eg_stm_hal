@@ -40,8 +40,8 @@ use embedded_hal_compat::eh1_0::blocking::delay::DelayMs as _;
 use embedded_hal_compat::IntoCompat;
 
 // MODE needs the old version as it is passed to the device hal crates
-//use embedded_hal::{spi::{Mode, Phase, Polarity}, };
-use old_e_h::spi::{Mode, Phase, Polarity};
+use embedded_hal::{spi::{Mode, Phase, Polarity}, };
+//use old_e_h::spi::{Mode, Phase, Polarity};
 
 //use asm_delay::{ AsmDelay, bitrate, };
 
@@ -229,15 +229,16 @@ use stm32f3xx_hal::{
 };
 
 #[cfg(feature = "stm32f3xx")]
-fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
+fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible>> {
+//fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
     let cp = cortex_m::Peripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
     let mut rcc = p.RCC.constrain();
     let clocks = rcc
         .cfgr
-        .sysclk(64.mhz())
-        .pclk1(32.mhz())
+        .sysclk(64.mHz())
+        .pclk1(32.mHz())
         .freeze(&mut p.FLASH.constrain().acr);
 
     let mut gpioa = p.GPIOA.split(&mut rcc.ahb);
@@ -251,7 +252,7 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible
             gpioa.pa7.into_af5(&mut gpioa.moder, &mut gpioa.afrl), // mosi  on PA7
         ),
         MODE,
-        8.mhz(),
+        8.mHz(),
         clocks,
         &mut rcc.apb2,
     );
@@ -664,7 +665,8 @@ fn main() -> ! {
             }
         };
 
-        match lora.try_delay_ms(5000u32) {
+        //match lora.try_delay_ms(5000u32) {
+        match lora.delay_ms(5000u32) {
             Ok(b) => b, // b is ()
             Err(_err) => {
                 hprintln!("Error returned from lora.try_delay_ms().").unwrap();

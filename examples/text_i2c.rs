@@ -129,7 +129,7 @@ fn setup() -> I2c<I2C1, (PB8<AF4>, PB9<AF4>)> {
     let sda = gpiob.pb9.into_af4(&mut gpiob.moder, &mut gpiob.afrh); // sda on PB9
 
     // return i2c
-    I2c::new(p.I2C1, (scl, sda), 400_000.hz(), clocks, &mut rcc.apb1)
+    I2c::new(p.I2C1, (scl, sda), 400_000.Hz(), clocks, &mut rcc.apb1)
 }
 
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64, blackpills stm32f401 and stm32f411

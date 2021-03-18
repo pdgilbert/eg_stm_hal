@@ -89,7 +89,6 @@ jobs:
           profile: minimal
           toolchain: stable
       - name: Build
-        use-cross: true
         run: |
            cd boards/${{ matrix.brd }}
            cargo build --no-default-features --release --target ${{ matrix.trg }} --features ${{ matrix.mcu }}
@@ -100,7 +99,6 @@ jobs:
         #  args:       --no-default-features --release --target ${{ matrix.trg }} --features ${{ matrix.mcu }}
         #  use-cross: true
       - name: eg 
-        use-cross: true
         run: |
            cd boards/${{ matrix.brd }}
            cargo build --no-default-features --release --target ${{ matrix.trg }} --features ${{ matrix.hal }},${{ matrix.mcu }} --example ${{ matrix.eg }}
