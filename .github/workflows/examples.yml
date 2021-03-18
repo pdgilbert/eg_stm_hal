@@ -27,7 +27,7 @@ jobs:
           args: --all -- --check
 
   test_examples:
-    name: Test examples
+    name: eg
     runs-on: ubuntu-latest
     continue-on-error: true
     strategy:
@@ -89,16 +89,20 @@ jobs:
           profile: minimal
           toolchain: stable
       - name: Build
+        env:
+           BRD: ${{ matrix.brd }}
+           TRG: ${{ matrix.trg }}
+           MCU: ${{ matrix.mcu }}
         run: |
-           cd boards/${{ matrix.brd }}
-           cargo build --no-default-features --release --target ${{ matrix.trg }} --features ${{ matrix.mcu }}
-        # possibly uses in place of run, but need working-directory: 
+           cd boards/$BRD
+           cargo build --no-default-features --release --target $TRG --features $MCU
+        # possibly uses in place of run, but need to set working-directory: 
         #uses: actions-rs/cargo@v1 
         #with:
         #  command: build
         #  args:       --no-default-features --release --target ${{ matrix.trg }} --features ${{ matrix.mcu }}
         #  use-cross: true
-      - name: eg 
+      - name: Build example 
         run: |
            cd boards/${{ matrix.brd }}
            cargo build --no-default-features --release --target ${{ matrix.trg }} --features ${{ matrix.hal }},${{ matrix.mcu }} --example ${{ matrix.eg }}

@@ -6,7 +6,7 @@ version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0c9ccf501f61a710a83cfc5a6fb2df0013454c3215aeeeb20ebe4b21e2917501"
 dependencies = [
- "embedded-hal",
+ "embedded-hal 0.2.4",
  "nb 0.1.3",
 ]
 
@@ -45,7 +45,7 @@ checksum = "b8b7c70ec6ea4def14d530d75900bbf8909ed49dafeb1448c3ee7122543964f6"
 dependencies = [
  "bitrate",
  "cortex-m 0.7.1",
- "embedded-hal",
+ "embedded-hal 0.2.4",
 ]
 
 [[package]]
@@ -79,12 +79,6 @@ name = "bare-metal"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f8fe8f5a8a398345e52358e18ff07cc17a568fbca5c6f73873d3a62056309603"
-
-[[package]]
-name = "bit_field"
-version = "0.10.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dcb6dd1c2376d2e096796e234a70e17e94cc2d5d54ff8ce42b28cef1d0d359a4"
 
 [[package]]
 name = "bitfield"
@@ -187,7 +181,7 @@ checksum = "a0b756a8bffc56025de45218a48ff9b801180440c0ee49a722b32d49dcebc771"
 dependencies = [
  "bare-metal 0.2.5",
  "bitfield",
- "embedded-hal",
+ "embedded-hal 0.2.4",
  "volatile-register",
 ]
 
@@ -256,16 +250,7 @@ version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "74d643854f324f02daea7153ebbfec5cfcc2f395faf1c7011be65e543570de28"
 dependencies = [
- "embedded-hal",
-]
-
-[[package]]
-name = "dht11"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fa82acd8985622297d3feb1e2bf1ce177aaa1d6518df69524110410d08c7fb06"
-dependencies = [
- "embedded-hal",
+ "embedded-hal 0.2.4",
 ]
 
 [[package]]
@@ -281,7 +266,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4895cd4e54e5536ef370d7f1eec787aad8275dd8ad15815aebfa71dd847b4ebf"
 dependencies = [
  "display-interface",
- "embedded-hal",
+ "embedded-hal 0.2.4",
 ]
 
 [[package]]
@@ -292,7 +277,17 @@ checksum = "94d08c3a1682b166cbcbb4fe009a31a1834ba46c16599bf7a9b3cc7bc31b38b0"
 dependencies = [
  "byte-slice-cast",
  "display-interface",
- "embedded-hal",
+ "embedded-hal 0.2.4",
+]
+
+[[package]]
+name = "driver-pal"
+version = "0.8.0-alpha.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1c37eb49917b491b205271207996ac5b0d491312a4e8acd5014906280d16df31"
+dependencies = [
+ "embedded-hal 1.0.0-alpha.4",
+ "log",
 ]
 
 [[package]]
@@ -305,10 +300,11 @@ dependencies = [
  "cortex-m-rt",
  "cortex-m-semihosting",
  "dht-sensor",
- "dht11",
+ "driver-pal",
  "embedded-graphics",
- "embedded-hal",
- "embedded-spi",
+ "embedded-hal 0.2.4",
+ "embedded-hal-compat",
+ "embedded-spi 0.6.2",
  "f3",
  "heapless 0.6.1",
  "mcp4x",
@@ -316,23 +312,18 @@ dependencies = [
  "panic-halt",
  "panic-reset",
  "panic-semihosting",
- "radio",
+ "radio 0.8.1",
  "radio-sx127x",
  "ssd1306",
  "stm32f0xx-hal",
- "stm32f1 0.13.0",
  "stm32f1xx-hal",
- "stm32f3 0.13.0",
  "stm32f3xx-hal",
- "stm32f4 0.13.0",
  "stm32f4xx-hal",
  "stm32f7xx-hal",
  "stm32h7xx-hal",
  "stm32l0xx-hal",
- "stm32l1 0.13.0",
  "stm32l1xx-hal",
  "stm32l4xx-hal",
- "sx127x_lora",
  "void",
 ]
 
@@ -374,12 +365,41 @@ dependencies = [
 ]
 
 [[package]]
+name = "embedded-hal"
+version = "1.0.0-alpha.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f2260cabeacf4bda1df1a8d54f67047a9aadf02fe14cfab07649f2cec6a4693b"
+dependencies = [
+ "nb 1.0.0",
+]
+
+[[package]]
+name = "embedded-hal-compat"
+version = "0.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a2afb504e8ae78ede52799ea060abb3836fe2f7a24e8ac1cacb9086c5cfcabf7"
+dependencies = [
+ "embedded-hal 0.2.4",
+ "embedded-hal 1.0.0-alpha.4",
+]
+
+[[package]]
+name = "embedded-spi"
+version = "0.5.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "92300e6f3223a4ba21d6a07e5f4571f881000d291161f9f6c8df6377b2e35c07"
+dependencies = [
+ "embedded-hal 0.2.4",
+ "log",
+]
+
+[[package]]
 name = "embedded-spi"
 version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b5571fd6dcf36d58537276ea736c97e7358cfad9da9d48fc0a001b302e78933f"
 dependencies = [
- "embedded-hal",
+ "embedded-hal 0.2.4",
  "log",
 ]
 
@@ -470,7 +490,7 @@ version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f3da4a9711f4c14fc5cdf6631189de01c58536a00e5a370c071dcbd10b5b96ec"
 dependencies = [
- "embedded-hal",
+ "embedded-hal 0.2.4",
  "generic-array 0.11.2",
 ]
 
@@ -496,7 +516,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9e5d1a5c290951321d1b0d4a40edd828537de9889134a0e67c5146542ae57706"
 dependencies = [
  "cast",
- "embedded-hal",
+ "embedded-hal 0.2.4",
  "generic-array 0.11.2",
 ]
 
@@ -505,7 +525,7 @@ name = "mcp4x"
 version = "0.1.0"
 source = "git+https://github.com/eldruin/mcp4x-rs#da0b047ed2d54fdadc46f41dfed8f4feb550ab24"
 dependencies = [
- "embedded-hal",
+ "embedded-hal 0.2.4",
 ]
 
 [[package]]
@@ -614,27 +634,39 @@ checksum = "e2a38df5b15c8d5c7e8654189744d8e396bddc18ad48041a500ce52d6948941f"
 
 [[package]]
 name = "radio"
-version = "0.7.0"
+version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c2cfe519d23c26c678d169b34bf51e9c5cb0267ae18901f1037fa7caabc70dc5"
+checksum = "f4c88cce9f0fece1b9a7b22fa19f02ec07a74e972d6d235c8d5c96c10eb5cacc"
 dependencies = [
  "async-trait",
- "embedded-hal",
+ "embedded-hal 0.2.4",
  "log",
  "nb 0.1.3",
 ]
 
 [[package]]
+name = "radio"
+version = "0.8.1"
+source = "git+https://github.com/ryankurte/rust-radio.git?branch=master#b2383d559d0178f039d570189ed34593549ad66a"
+dependencies = [
+ "chrono",
+ "embedded-hal 1.0.0-alpha.4",
+ "log",
+ "nb 1.0.0",
+]
+
+[[package]]
 name = "radio-sx127x"
 version = "0.10.1"
-source = "git+https://github.com/rust-iot/rust-radio-sx127x?rev=2285c1ca9f527ab464a27f6a43af3b0a93130d2f#2285c1ca9f527ab464a27f6a43af3b0a93130d2f"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "673964edb0526002a1c85442c99177ab6e2e24b350c3b12f031bfa9777f012ec"
 dependencies = [
  "bitflags",
- "embedded-hal",
- "embedded-spi",
+ "embedded-hal 0.2.4",
+ "embedded-spi 0.5.8",
  "libc",
  "log",
- "radio",
+ "radio 0.4.4",
 ]
 
 [[package]]
@@ -703,7 +735,7 @@ dependencies = [
  "display-interface-i2c",
  "display-interface-spi",
  "embedded-graphics",
- "embedded-hal",
+ "embedded-hal 0.2.4",
  "generic-array 0.14.4",
 ]
 
@@ -745,7 +777,7 @@ dependencies = [
  "bxcan",
  "cast",
  "cortex-m 0.6.7",
- "embedded-hal",
+ "embedded-hal 0.2.4",
  "nb 1.0.0",
  "stm32f0",
  "void",
@@ -764,17 +796,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "stm32f1"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1a5d60e08442f040010c641c438d681ef8c5c135e74b147aee30556604d86be2"
-dependencies = [
- "bare-metal 0.2.5",
- "cortex-m 0.7.1",
- "vcell",
-]
-
-[[package]]
 name = "stm32f1xx-hal"
 version = "0.7.0"
 source = "git+https://github.com/stm32-rs/stm32f1xx-hal#0f367e600fd088eb0b5e1204a02556b0b352d090"
@@ -784,9 +805,9 @@ dependencies = [
  "cortex-m 0.6.7",
  "cortex-m-rt",
  "embedded-dma",
- "embedded-hal",
+ "embedded-hal 0.2.4",
  "nb 0.1.3",
- "stm32f1 0.11.0",
+ "stm32f1",
  "void",
 ]
 
@@ -799,17 +820,6 @@ dependencies = [
  "bare-metal 0.2.5",
  "cortex-m 0.6.7",
  "cortex-m-rt",
- "vcell",
-]
-
-[[package]]
-name = "stm32f3"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0e212ebc31a11c94edb709de8bb6cb93b96eeb687283855ba814d4a2596bd70d"
-dependencies = [
- "bare-metal 0.2.5",
- "cortex-m 0.7.1",
  "vcell",
 ]
 
@@ -832,7 +842,7 @@ checksum = "6b413661b50595f7b34f66612b1f793a1ff687dad7daf5a5544663ed2fd7482c"
 dependencies = [
  "cast",
  "cortex-m 0.5.11",
- "embedded-hal",
+ "embedded-hal 0.2.4",
  "nb 0.1.3",
  "stm32f30x",
  "void",
@@ -848,12 +858,12 @@ dependencies = [
  "cortex-m 0.6.7",
  "cortex-m-rt",
  "embedded-dma",
- "embedded-hal",
+ "embedded-hal 0.2.4",
  "nb 0.1.3",
  "paste",
  "rtcc",
  "stm32-usbd",
- "stm32f3 0.12.1",
+ "stm32f3",
  "void",
 ]
 
@@ -870,17 +880,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "stm32f4"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "da3d56009c8f32e4f208dbea17df72484154d1040a8969b75d8c73eb7b18fe8f"
-dependencies = [
- "bare-metal 0.2.5",
- "cortex-m 0.7.1",
- "vcell",
-]
-
-[[package]]
 name = "stm32f4xx-hal"
 version = "0.8.3"
 source = "git+https://github.com/stm32-rs/stm32f4xx-hal#f4598baac3636842548ae1de0e1a0639bc3a0817"
@@ -890,11 +889,11 @@ dependencies = [
  "cortex-m 0.6.7",
  "cortex-m-rt",
  "embedded-dma",
- "embedded-hal",
+ "embedded-hal 0.2.4",
  "nb 0.1.3",
  "rand_core",
  "rtcc",
- "stm32f4 0.11.0",
+ "stm32f4",
  "void",
 ]
 
@@ -921,7 +920,7 @@ dependencies = [
  "cast",
  "cortex-m 0.6.7",
  "cortex-m-rt",
- "embedded-hal",
+ "embedded-hal 0.2.4",
  "micromath",
  "nb 0.1.3",
  "rand_core",
@@ -952,7 +951,7 @@ dependencies = [
  "cortex-m 0.7.1",
  "cortex-m-rt",
  "embedded-dma",
- "embedded-hal",
+ "embedded-hal 0.2.4",
  "nb 1.0.0",
  "paste",
  "stm32h7",
@@ -981,7 +980,7 @@ dependencies = [
  "cortex-m 0.6.7",
  "cortex-m-rt",
  "cortex-m-semihosting",
- "embedded-hal",
+ "embedded-hal 0.2.4",
  "nb 0.1.3",
  "stm32l0",
  "void",
@@ -1000,17 +999,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "stm32l1"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3565529e31a0d9706ff1f0ad4a2062668f089278e3d5d8e15bf790c059baf501"
-dependencies = [
- "bare-metal 0.2.5",
- "cortex-m 0.7.1",
- "vcell",
-]
-
-[[package]]
 name = "stm32l1xx-hal"
 version = "0.1.0"
 source = "git+https://github.com/stm32-rs/stm32l1xx-hal#b5bfb4ff069889233baf5bfda75eea4cbb5ce5f8"
@@ -1018,9 +1006,9 @@ dependencies = [
  "bare-metal 0.2.5",
  "cast",
  "cortex-m 0.5.11",
- "embedded-hal",
+ "embedded-hal 0.2.4",
  "nb 0.1.3",
- "stm32l1 0.5.0",
+ "stm32l1",
  "void",
 ]
 
@@ -1044,21 +1032,12 @@ dependencies = [
  "as-slice",
  "cast",
  "cortex-m 0.6.7",
- "embedded-hal",
+ "embedded-hal 0.2.4",
  "generic-array 0.13.3",
  "nb 0.1.3",
  "stable_deref_trait",
  "stm32l4",
  "void",
-]
-
-[[package]]
-name = "sx127x_lora"
-version = "0.3.1"
-source = "git+https://github.com/hdoordt/sx127x_lora#69548a73c86706974b1b0fcd54b1b385fb1b62ed"
-dependencies = [
- "bit_field",
- "embedded-hal",
 ]
 
 [[package]]

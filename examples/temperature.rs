@@ -440,11 +440,11 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<Adc<ADC1>>) {
 
 #[cfg(feature = "stm32f7xx")]
 use stm32f7xx_hal::{
-    adc::{config::AdcConfig, Adc, Temperature},
+    device::adc1::{config::AdcConfig, Adc, Temperature},
     gpio::{gpiob::PB1, Analog},
     pac::Peripherals,
     prelude::*,
-    stm32::{ADC1, ADC2},
+    device::{ADC1, ADC2},
 };
 
 #[cfg(feature = "stm32f7xx")]
@@ -462,7 +462,8 @@ fn setup() -> (
     // stm32f722 has 3 ADCs
 
     let p = Peripherals::take().unwrap();
-    let clocks = p.RCC.constrain().cfgr.sysclk(216.mhz()).freeze();
+    let rcc = p.RCC.constrain();
+    let clocks = rcc.cfgr.sysclk(216.mhz()).freeze();
 
     let mut gpiob = p.GPIOB.split();
 
@@ -477,7 +478,7 @@ fn setup() -> (
     let mcutemp: Sensor<Option<PB1<Analog>>> = Sensor { ch: None }; // no channel
 
     let tmp36: Sensor<PB1<Analog>> = Sensor {
-        ch: Some(gpiob.pb1.into_analog(&mut gpiob.crl)),
+        ch: Some(gpiob.pb1.into_analog()),
     }; //channel pb1
 
     impl ReadTempC for Sensor<Option<PB1<Analog>>> {

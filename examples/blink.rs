@@ -136,7 +136,7 @@ fn setup() -> (PE15<Output<PushPull>>, AsmDelay) {
     // the hal delay function panics if the delay time is set at 2098ms or above.
     // see https://github.com/stm32-rs/stm32f3xx-hal/issues/203
     //let delay = Delay::new(cp.SYST, clocks);                      // panics
-    let delay = AsmDelay::new(bitrate::U32BitrateExt::mhz(16));     //works
+    let delay = AsmDelay::new(bitrate::U32BitrateExt::mhz(16)); //works
 
     // return tuple  (led, delay)
     (

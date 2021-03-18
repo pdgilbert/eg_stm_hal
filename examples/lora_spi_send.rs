@@ -40,7 +40,7 @@ use embedded_hal_compat::eh1_0::blocking::delay::DelayMs as _;
 use embedded_hal_compat::IntoCompat;
 
 // MODE needs the old version as it is passed to the device hal crates
-use embedded_hal::{spi::{Mode, Phase, Polarity}, };
+use embedded_hal::spi::{Mode, Phase, Polarity};
 //use old_e_h::spi::{Mode, Phase, Polarity};
 
 //use asm_delay::{ AsmDelay, bitrate, };
@@ -230,7 +230,7 @@ use stm32f3xx_hal::{
 
 #[cfg(feature = "stm32f3xx")]
 fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible>> {
-//fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
+    //fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
     let cp = cortex_m::Peripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
