@@ -89,6 +89,12 @@ jobs:
           profile: minimal
           toolchain: stable
       - name: Build
+        uses: actions-rs/cargo@v1 
+        with:
+          command: build
+          args:  --no-default-features --release --target ${{ matrix.trg }} --features ${{ matrix.mcu }}
+          use-cross: true
+          #args:  --manifest-path boards/${{ matrix.brd }} --no-default-features --release --target ${{ matrix.trg }} --features ${{ matrix.mcu }}
         #env:
          #  BRD: ${{ matrix.brd }}
          #  TRG: ${{ matrix.trg }}
@@ -98,11 +104,6 @@ jobs:
         #   cargo build --no-default-features --release --target ${TRG} --features ${MCU}
         # possibly uses in place of run, but need to set working-directory: 
         # following https://github.com/actions-rs/cargo/issues/6  add --manifest-path 
-        uses: actions-rs/cargo@v1 
-        with:
-          command: build
-          args:  --manifest-path boards/${{ matrix.brd }} --no-default-features --release --target ${{ matrix.trg }} --features ${{ matrix.mcu }}
-          use-cross: true
       - name: Build example 
         uses: actions-rs/cargo@v1
         with:
