@@ -2,9 +2,9 @@ name: Examples
 
 on:
   push:
-    branches: [ master]
+    branches: [ e-h-1.0.0alpha-compat ]
   pull_request:
-    branches: [ master ]
+    branches: [ e-h-1.0.0alpha-compat ]
 
 env:
   CARGO_TERM_COLOR: always

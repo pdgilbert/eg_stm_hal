@@ -40,8 +40,8 @@ use embedded_hal_compat::eh1_0::blocking::delay::DelayMs as _;
 use embedded_hal_compat::IntoCompat;
 
 // MODE needs the old version as it is passed to the device hal crates
-use embedded_hal::spi::{Mode, Phase, Polarity};
-//use old_e_h::spi::{Mode, Phase, Polarity};
+//use embedded_hal::spi::{Mode, Phase, Polarity};
+use old_e_h::spi::{Mode, Phase, Polarity};
 
 //use asm_delay::{ AsmDelay, bitrate, };
 
@@ -665,8 +665,7 @@ fn main() -> ! {
             }
         };
 
-        //match lora.try_delay_ms(5000u32) {
-        match lora.delay_ms(5000u32) {
+        match lora.try_delay_ms(5000u32) {
             Ok(b) => b, // b is ()
             Err(_err) => {
                 hprintln!("Error returned from lora.try_delay_ms().").unwrap();
