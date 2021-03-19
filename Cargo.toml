@@ -87,7 +87,8 @@ path = "examples/lora_spi_gps.rs"
 
 
 [dependencies]
-cortex-m = ">=0.7.1"
+#cortex-m = ">=0.7.1"
+cortex-m = ">=0.6.4"
 #cortex-m = "=0.6.4"  #as of March 2021 needed for stm32h742,  stm32l0x2, stm32l4x2 but breaks others
 nb = ">=0.1.2"
 cortex-m-rt = ">=0.6.8"
