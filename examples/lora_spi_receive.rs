@@ -351,7 +351,7 @@ fn setup(
 #[cfg(feature = "stm32f7xx")]
 use stm32f7xx_hal::{
     delay::Delay,
-    device::Peripherals, // note non-standard  device vs pac
+    pac::Peripherals,
     prelude::*,
     spi::{ClockDivider, Error, Spi},
 };
