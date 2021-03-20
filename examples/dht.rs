@@ -20,7 +20,6 @@ extern crate panic_halt;
 //use cortex_m::asm;  //for breakpoint
 //asm::bkpt();
 
-//use cortex_m;
 use cortex_m_rt::entry;
 use cortex_m_semihosting::hprintln;
 
@@ -31,11 +30,6 @@ use dht_sensor::dht11::Reading;
 use dht_sensor::dht22::Reading;
 use dht_sensor::*;
 
-//use crate::hal::{delay, gpio, prelude::*, stm32};
-
-use embedded_hal::blocking::delay::DelayMs;
-
-use embedded_hal::digital::v2::OutputPin; // for  set_high().ok()
 
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
 

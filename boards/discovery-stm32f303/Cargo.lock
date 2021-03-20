@@ -49,17 +49,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "async-trait"
-version = "0.1.48"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "36ea56748e10732c49404c153638a15ec3d6211ec5ff35d9bb20e13b93576adf"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
 name = "autocfg"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -303,8 +292,9 @@ dependencies = [
  "driver-pal",
  "embedded-graphics",
  "embedded-hal 0.2.4",
- "embedded-hal-compat",
- "embedded-spi 0.6.2",
+ "embedded-hal 1.0.0-alpha.4",
+ "embedded-hal-compat 0.1.3",
+ "embedded-spi",
  "f3",
  "heapless 0.6.1",
  "mcp4x",
@@ -312,7 +302,7 @@ dependencies = [
  "panic-halt",
  "panic-reset",
  "panic-semihosting",
- "radio 0.8.1",
+ "radio",
  "radio-sx127x",
  "ssd1306",
  "stm32f0xx-hal",
@@ -375,22 +365,21 @@ dependencies = [
 
 [[package]]
 name = "embedded-hal-compat"
-version = "0.1.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a2afb504e8ae78ede52799ea060abb3836fe2f7a24e8ac1cacb9086c5cfcabf7"
+version = "0.1.2"
+source = "git+https://github.com/ryankurte/embedded-hal-compat.git?branch=main#e58fd8ff563adee9609cdf891de61a03f7075666"
 dependencies = [
  "embedded-hal 0.2.4",
  "embedded-hal 1.0.0-alpha.4",
 ]
 
 [[package]]
-name = "embedded-spi"
-version = "0.5.8"
+name = "embedded-hal-compat"
+version = "0.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "92300e6f3223a4ba21d6a07e5f4571f881000d291161f9f6c8df6377b2e35c07"
+checksum = "a2afb504e8ae78ede52799ea060abb3836fe2f7a24e8ac1cacb9086c5cfcabf7"
 dependencies = [
  "embedded-hal 0.2.4",
- "log",
+ "embedded-hal 1.0.0-alpha.4",
 ]
 
 [[package]]
@@ -687,18 +676,6 @@ checksum = "e2a38df5b15c8d5c7e8654189744d8e396bddc18ad48041a500ce52d6948941f"
 
 [[package]]
 name = "radio"
-version = "0.4.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f4c88cce9f0fece1b9a7b22fa19f02ec07a74e972d6d235c8d5c96c10eb5cacc"
-dependencies = [
- "async-trait",
- "embedded-hal 0.2.4",
- "log",
- "nb 0.1.3",
-]
-
-[[package]]
-name = "radio"
 version = "0.8.1"
 source = "git+https://github.com/ryankurte/rust-radio.git?branch=master#b2383d559d0178f039d570189ed34593549ad66a"
 dependencies = [
@@ -711,15 +688,18 @@ dependencies = [
 [[package]]
 name = "radio-sx127x"
 version = "0.10.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "673964edb0526002a1c85442c99177ab6e2e24b350c3b12f031bfa9777f012ec"
+source = "git+https://github.com/pdgilbert/rust-radio-sx127x#fabd2df821edb5a59e33f36bf1d27a0e8f2e7fb0"
 dependencies = [
  "bitflags",
+ "driver-pal",
  "embedded-hal 0.2.4",
- "embedded-spi 0.5.8",
+ "embedded-hal 1.0.0-alpha.4",
+ "embedded-hal-compat 0.1.2",
+ "embedded-spi",
  "libc",
  "log",
- "radio 0.4.4",
+ "radio",
+ "void",
 ]
 
 [[package]]

@@ -36,7 +36,7 @@ use embedded_hal::blocking::delay::DelayMs;
 // When passing the older hal crate objects to the newer rust-radio-sx127x methods
 // the objects are appended with .compat().
 
-use embedded_hal_compat::eh1_0::blocking::delay::DelayMs as _;
+//use embedded_hal_compat::eh1_0::blocking::delay::DelayMs as _;
 use embedded_hal_compat::IntoCompat;
 
 // MODE needs the old version as it is passed to the device hal crates
@@ -229,16 +229,15 @@ use stm32f3xx_hal::{
 };
 
 #[cfg(feature = "stm32f3xx")]
-fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible>> {
-    //fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
+fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
     let cp = cortex_m::Peripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
     let mut rcc = p.RCC.constrain();
     let clocks = rcc
         .cfgr
-        .sysclk(64.mHz())
-        .pclk1(32.mHz())
+        .sysclk(64.MHz())
+        .pclk1(32.MHz())
         .freeze(&mut p.FLASH.constrain().acr);
 
     let mut gpioa = p.GPIOA.split(&mut rcc.ahb);
@@ -252,7 +251,7 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible
             gpioa.pa7.into_af5(&mut gpioa.moder, &mut gpioa.afrl), // mosi  on PA7
         ),
         MODE,
-        8.mHz(),
+        8_000_000.Hz(),
         clocks,
         &mut rcc.apb2,
     );

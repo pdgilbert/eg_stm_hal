@@ -87,7 +87,7 @@ use stm32f1xx_hal::{
 };
 
 #[cfg(feature = "stm32f1xx")]
-use embedded_hal::digital::v2::OutputPin;
+//use embedded_hal::digital::v2::OutputPin;
 
 #[cfg(feature = "stm32f1xx")]
 fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
@@ -97,10 +97,10 @@ fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
 
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_low().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_high().unwrap()
         }
     };
 
@@ -219,7 +219,7 @@ use stm32h7xx_hal::{
 };
 
 #[cfg(feature = "stm32h7xx")]
-use embedded_hal::digital::v2::OutputPin;
+use embedded_hal::digital::OutputPin;
 
 #[cfg(feature = "stm32h7xx")]
 fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {

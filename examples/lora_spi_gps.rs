@@ -35,7 +35,7 @@ use heapless::{consts, Vec};
 
 use embedded_hal::blocking::delay::DelayMs;
 
-use embedded_hal_compat::eh1_0::blocking::delay::DelayMs as _;
+//use embedded_hal_compat::eh1_0::blocking::delay::DelayMs as _;
 use embedded_hal_compat::IntoCompat;
 
 // MODE needs the old version as it is passed to the device hal crates
@@ -273,8 +273,8 @@ fn setup() -> (
     let mut rcc = p.RCC.constrain();
     let clocks = rcc
         .cfgr
-        .sysclk(64_i32.mhz())
-        .pclk1(32_i32.mhz())
+        .sysclk(64.MHz())
+        .pclk1(32.MHz())
         .freeze(&mut p.FLASH.constrain().acr);
 
     let mut gpioa = p.GPIOA.split(&mut rcc.ahb);
@@ -300,7 +300,7 @@ fn setup() -> (
             gpioa.pa7.into_af5(&mut gpioa.moder, &mut gpioa.afrl), // mosi  on PA7
         ),
         MODE,
-        8_i32.mhz(),
+        8_000_000.Hz(),
         clocks,
         &mut rcc.apb2,
     );
