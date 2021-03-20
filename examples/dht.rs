@@ -105,24 +105,22 @@ fn setup() -> (PA8<Output<OpenDrain>>, Delay) {
 
 #[cfg(feature = "stm32f3xx")]
 use stm32f3xx_hal::{
-    //delay::Delay ,
+    delay::Delay ,
     gpio::{gpioa::PA8, OpenDrain, Output},
     prelude::*,
-    stm32::Peripherals, //CorePeripherals},
+    stm32::{Peripherals, CorePeripherals},
 };
 
-#[cfg(feature = "stm32f3xx")]
-use asm_delay::{bitrate, AsmDelay};
+// delay fixed https://github.com/stm32-rs/stm32f3xx-hal/pull/208};
 
 #[cfg(feature = "stm32f3xx")]
-fn setup() -> (PA8<Output<OpenDrain>>, asm_delay::AsmDelay) {
-    //fn setup() -> (PA8<Output<OpenDrain>>,  Delay) {
+fn setup() -> (PA8<Output<OpenDrain>>,  Delay) {
 
-    //let cp = CorePeripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
     let mut rcc = p.RCC.constrain();
-    //let clocks    = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
+    let clocks    = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
     let mut gpioa = p.GPIOA.split(&mut rcc.ahb);
     let mut pa8 = gpioa
         .pa8
@@ -132,8 +130,7 @@ fn setup() -> (PA8<Output<OpenDrain>>, asm_delay::AsmDelay) {
     pa8.set_high().ok();
 
     // delay is used by `dht-sensor` to wait for signals
-    //let mut delay = Delay::new(cp.SYST, clocks);   //SysTick: System Timer
-    let mut delay = AsmDelay::new(bitrate::U32BitrateExt::mhz(16));
+    let mut delay = Delay::new(cp.SYST, clocks);   //SysTick: System Timer
 
     //  1 second delay (for DHT11 setup?) Wait on  sensor initialization?
     delay.delay_ms(1000_u16);
