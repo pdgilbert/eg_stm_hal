@@ -88,7 +88,6 @@ use stm32f1xx_hal::{
 
 #[cfg(feature = "stm32f1xx")]
 //use embedded_hal::digital::v2::OutputPin;
-
 #[cfg(feature = "stm32f1xx")]
 fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
     let dp = Peripherals::take().unwrap();
