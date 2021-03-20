@@ -215,6 +215,7 @@ use stm32h7xx_hal::{
     delay::Delay,
     gpio::{gpioa::PA8, OpenDrain, Output},
     pac::{CorePeripherals, Peripherals},
+    hal::digital::v2::OutputPin,
     prelude::*,
 };
 
