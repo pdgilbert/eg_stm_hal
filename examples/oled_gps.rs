@@ -111,10 +111,6 @@ fn setup() -> (
     BlockingI2c<I2C2, (PB10<Alternate<OpenDrain>>, PB11<Alternate<OpenDrain>>)>,
     Delay,
 ) {
-    //fn setup() ->  (Tx<USART3>, Rx<USART3>,
-    //                BlockingI2c<I2C2,  (PB10<Alternate<OpenDrain>>, PB11<Alternate<OpenDrain>>) >,
-    //                    Delay )  {
-
     let cp = cortex_m::Peripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.constrain();
@@ -128,8 +124,8 @@ fn setup() -> (
         p.USART2,
         (
             gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl), //tx pa2  for GPS
-            gpioa.pa3,
-        ), //rx pa3  for GPS
+            gpioa.pa3,                                          //rx pa3  for GPS
+        ), 
         &mut afio.mapr,
         Config::default().baudrate(9_600.bps()),
         clocks,
@@ -141,8 +137,8 @@ fn setup() -> (
         p.I2C2,
         (
             gpiob.pb10.into_alternate_open_drain(&mut gpiob.crh), // scl on PB8 10
-            gpiob.pb11.into_alternate_open_drain(&mut gpiob.crh),
-        ), // sda on PB9 11
+            gpiob.pb11.into_alternate_open_drain(&mut gpiob.crh), // sda on PB9 11
+        ),
         //&mut afio.mapr,  need this for i2c1 but not i2c2
         Mode::Fast {
             frequency: 400_000.hz(),
@@ -611,7 +607,7 @@ fn main() -> ! {
     line2.into_styled(text_style).draw(&mut disp).unwrap();
     disp.flush().unwrap();
 
-    delay.delay_ms(2000_u16);
+    delay.try_delay_ms(2000_u16);
 
     // Would this approach in loop give smaller code? or faster?
     // Need to avoid  mutable/immutable borrow.
@@ -620,7 +616,7 @@ fn main() -> ! {
     line2.text = "zzzz";
     line2.into_styled(text_style).draw(&mut disp).unwrap();
     disp.flush().unwrap();
-    delay.delay_ms(1000_u16);
+    delay.try_delay_ms(1000_u16);
 
     // byte buffer length 80
     let mut buffer: Vec<u8, consts::U80> = Vec::new();
@@ -634,7 +630,7 @@ fn main() -> ! {
     //asm::bkpt();
 
     loop {
-        let byte = match block!(rx_gps.read()) {
+        let byte = match block!(rx_gps.try_read()) {
             Ok(byt) => byt,
             Err(_error) => e,
         };
@@ -678,8 +674,8 @@ fn main() -> ! {
 
                 buffer.clear();
                 good = false;
-                //delay.delay(4000.ms());
-                delay.delay_ms(4000_u16);
+                //delay.try_delay(4000.ms());
+                delay.try_delay_ms(4000_u16);
             };
         };
     }

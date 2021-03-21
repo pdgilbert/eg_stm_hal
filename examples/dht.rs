@@ -17,6 +17,8 @@ extern crate panic_semihosting;
 #[cfg(not(debug_assertions))]
 extern crate panic_halt;
 
+use embedded_hal::blocking::delay::DelayMs;
+
 //use cortex_m::asm;  //for breakpoint
 //asm::bkpt();
 
@@ -79,7 +81,8 @@ use stm32f1xx_hal::{
 // open_drain_output is really input and output
 
 #[cfg(feature = "stm32f1xx")]
-fn setup() -> (PA8<Output<OpenDrain>>, Delay) {
+fn setup() -> (PA8<Output<OpenDrain>>, impl DelayMs<u16>) {
+//fn setup() -> (PA8<Output<OpenDrain>>, Delay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
@@ -94,10 +97,10 @@ fn setup() -> (PA8<Output<OpenDrain>>, Delay) {
     //let mut pa8 = cortex_m::interrupt::free(|cs| pa8.into_open_drain_output(cs));
 
     // Pulling the pin high to avoid confusing the sensor when initializing.
-    pa8.set_high().ok();
+    pa8.try_set_high().ok();
 
     //  1 second delay (for DHT11 setup?) Wait on  sensor initialization?
-    delay.delay_ms(1000_u16);
+    delay.try_delay_ms(1000_u16);
 
     (pa8, delay) //DHT data will be on A8
 }
@@ -379,6 +382,6 @@ fn main() -> ! {
 
         // (Delay at least 500ms before re-polling, 1 second or more advised)
         // Delay 5 seconds
-        delay.delay_ms(5000_u16);
+        delay.try_delay_ms(5000_u16);
     }
 }

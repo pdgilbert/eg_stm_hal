@@ -459,7 +459,7 @@ fn main() -> ! {
 
     //writeln!(tx_con, "\r\nconsole connect check.\r\n").unwrap();
     for byte in b"\r\nconsole connect check.\r\n" {
-        block!(tx_con.write(*byte)).ok();
+        block!(tx_con.try_write(*byte)).ok();
     }
 
     // read gps on usart2
@@ -477,11 +477,11 @@ fn main() -> ! {
     let e: u8 = 9;
     let mut good = false;
     loop {
-        let byte = match block!(rx_gps.read()) {
+        let byte = match block!(rx_gps.try_read()) {
             Ok(byt) => byt,
             Err(_error) => e,
         };
-        block!(tx_con.write(byte)).ok();
+        block!(tx_con.try_write(byte)).ok();
         if byte == 36 {
             //  $ is 36. start of a line
             buffer.clear();
@@ -492,7 +492,7 @@ fn main() -> ! {
                 //  \r is 13, \n is 10
                 //writeln!(tx_con, "{}", to_str(&buffer)).unwrap();
                 for byte in &buffer {
-                    block!(tx_con.write(*byte)).ok();
+                    block!(tx_con.try_write(*byte)).ok();
                 }
                 //hprintln!("buffer at {} of {}", buffer.len(), buffer.capacity()).unwrap();
                 buffer.clear();

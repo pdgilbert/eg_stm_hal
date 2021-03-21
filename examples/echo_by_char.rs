@@ -312,19 +312,19 @@ fn main() -> ! {
     hprintln!("test write to console ...").unwrap();
 
     for byte in b"\r\nconsole connect check.\r\n" {
-        block!(tx1.write(*byte)).ok();
+        block!(tx1.try_write(*byte)).ok();
     }
 
     hprintln!("test read and write by char. Please type into the console ...").unwrap();
     //writeln!(tx1, "\r\nPlease type (slowly) into the console below:\r\n").unwrap();
     for byte in b"\r\nType (slowly) below:\r\n" {
-        block!(tx1.write(*byte)).ok();
+        block!(tx1.try_write(*byte)).ok();
     }
 
     loop {
         // Read a byte and write
-        let received = block!(rx1.read()).unwrap();
-        block!(tx1.write(received)).ok();
+        let received = block!(rx1.try_read()).unwrap();
+        block!(tx1.try_write(received)).ok();
         hprintln!("{}", from_utf8(&[received]).unwrap()).unwrap();
     }
 }

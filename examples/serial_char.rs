@@ -651,7 +651,7 @@ fn main() -> ! {
 
     hprintln!("test write to console ...").unwrap();
     for byte in b"\r\nconsole connect check.\r\n" {
-        block!(tx1.write(*byte)).ok();
+        block!(tx1.try_write(*byte)).ok();
     }
 
     hprintln!("testing  tx2 to rx3").unwrap();
@@ -660,12 +660,12 @@ fn main() -> ! {
     let send = b'X';
 
     // Write `X` and wait until the write is successful
-    block!(tx2.write(send)).ok();
+    block!(tx2.try_write(send)).ok();
 
     hprintln!("   receiving on rx3 ...").unwrap();
 
     // Read the byte that was just send. Blocks until the read is complete
-    let received = block!(rx3.read()).unwrap();
+    let received = block!(rx3.try_read()).unwrap();
 
     hprintln!(
         "   checking tx2 to rx3 received = send,  {} = {} byte",
@@ -698,12 +698,12 @@ fn main() -> ! {
 
     for byte in b"\r\ntx2 to rx3 with X\r\n" {
         // iterator fails if string is too long
-        block!(tx1.write(*byte)).unwrap();
+        block!(tx1.try_write(*byte)).unwrap();
     }
-    //block!(tx1.write(received)).unwrap();
-    block!(tx1.write(received)).ok();
+    //block!(tx1.try_write(received)).unwrap();
+    block!(tx1.try_write(received)).ok();
     for byte in b"\r\n" {
-        block!(tx1.write(*byte)).unwrap();
+        block!(tx1.try_write(*byte)).unwrap();
     }
 
     // Trigger a breakpoint
@@ -715,12 +715,12 @@ fn main() -> ! {
     let send = b'Y';
 
     // Write `Y` and wait until the write is successful
-    block!(tx3.write(send)).ok();
+    block!(tx3.try_write(send)).ok();
 
     hprintln!("   receiving on rx2 ...").unwrap();
 
     // Read the byte that was just send. Blocks until the read is complete
-    let received = block!(rx2.read()).unwrap();
+    let received = block!(rx2.try_read()).unwrap();
 
     hprintln!(
         "    checking tx3 to rx2  received = send,  {} = {} byte",
@@ -743,12 +743,12 @@ fn main() -> ! {
 
     for byte in b"tx3 to rx2 test with Y\r\n" {
         // iterator fails if string is too long
-        block!(tx1.write(*byte)).unwrap();
+        block!(tx1.try_write(*byte)).unwrap();
     }
     //block!(tx1.write(received)).unwrap();
-    block!(tx1.write(received)).ok();
+    block!(tx1.try_write(received)).ok();
     for byte in b"\r\n" {
-        block!(tx1.write(*byte)).unwrap();
+        block!(tx1.try_write(*byte)).unwrap();
     }
 
     // Trigger a breakpoint to inspect the values

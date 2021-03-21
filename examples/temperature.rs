@@ -235,13 +235,13 @@ fn setup() -> (
         fn read_tempC(&mut self, a: &mut Adcs<Adc<ADC1>, Adc<ADC2>>) -> i32 {
             match &mut self.ch {
                 Some(ch) => {
-                    let v: f32 = a.ad_2nd.read(ch).unwrap();
+                    let v: f32 = a.ad_2nd.try_read(ch).unwrap();
                     (v / 12.412122) as i32 - 50 as i32
                 }
 
                 None => {
                     let z = &mut a.ad_1st;
-                    z.read_temp() as i32
+                    z.read_temp() as i32      // NB not try_ !
                 }
             }
         }
@@ -251,7 +251,7 @@ fn setup() -> (
         // TMP36 on PB1 using ADC2
         fn read_mv(&mut self, a: &mut Adcs<Adc<ADC1>, Adc<ADC2>>) -> u32 {
             match &mut self.ch {
-                Some(ch) => a.ad_2nd.read(ch).unwrap(),
+                Some(ch) => a.ad_2nd.try_read(ch).unwrap(),
                 None => panic!(),
             }
         }

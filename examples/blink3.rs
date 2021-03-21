@@ -110,10 +110,10 @@ fn setup() -> (
     Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
-    let dp = Peripherals::take().unwrap();
-    let mut rcc = dp.RCC.constrain();
+    let  p = Peripherals::take().unwrap();
+    let mut rcc =  p.RCC.constrain();
     let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
-    let mut gpiob = dp.GPIOB.split(&mut rcc.apb2);
+    let mut gpiob =  p.GPIOB.split(&mut rcc.apb2);
 
     //this would work for delay on bluepill but not others
     //use stm32f1xx_hal::timer::Timer;
@@ -502,7 +502,7 @@ fn setup() -> (
     Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
-    let p = Peripherals::take().unwrap();
+    let  p = Peripherals::take().unwrap();
     let rcc = p.RCC.freeze(rcc::Config::hsi());
 
     let gpiob = p.GPIOB.split();
@@ -642,6 +642,6 @@ fn main() -> ! {
         let _r = led1.off();
         let _r = led2.off();
         let _r = led3.off();
-        delay.delay_ms(off);
+        delay.try_delay_ms(off);
     }
 }

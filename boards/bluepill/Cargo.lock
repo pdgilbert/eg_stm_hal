@@ -108,9 +108,9 @@ checksum = "b0a5e3906bcbf133e33c1d4d95afc664ad37fbdb9f6568d8043e7ea8c27d93d3"
 
 [[package]]
 name = "byteorder"
-version = "1.4.2"
+version = "1.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ae44d1a3d5a19df61dd0c8beb138458ac2a53a7ac09eba97d55592540004306b"
+checksum = "14c189c53d098945499cdfa7ecc63567cf3886b3332b312a5b4585d8d3a6a610"
 
 [[package]]
 name = "cast"
@@ -393,6 +393,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "embedded-time"
+version = "0.10.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f85ab0d224a6c70f11426a9f04d5f26d250605b80df8fbed197e49d4454f58d7"
+dependencies = [
+ "num",
+]
+
+[[package]]
 name = "f3"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -485,9 +494,9 @@ dependencies = [
 
 [[package]]
 name = "libc"
-version = "0.2.88"
+version = "0.2.90"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "03b07a082330a35e43f63177cc01689da34fbffa0105e1246cf0311472cac73a"
+checksum = "ba4aede83fc3617411dc6993bc8c70919750c1c257c6ca6a502aed6e0e2394ae"
 
 [[package]]
 name = "log"
@@ -539,12 +548,56 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "546c37ac5d9e56f55e73b677106873d9d9f5190605e41a856503623648488cae"
 
 [[package]]
+name = "num"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8b7a8e9be5e039e2ff869df49155f1c06bd01ade2117ec783e56ab0932b67a8f"
+dependencies = [
+ "num-complex",
+ "num-integer",
+ "num-iter",
+ "num-rational",
+ "num-traits",
+]
+
+[[package]]
+name = "num-complex"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "747d632c0c558b87dbabbe6a82f3b4ae03720d0646ac5b7b4dae89394be5f2c5"
+dependencies = [
+ "num-traits",
+]
+
+[[package]]
 name = "num-integer"
 version = "0.1.44"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d2cc698a63b549a70bc047073d2949cce27cd1c7b0a4a862d08a8031bc2801db"
 dependencies = [
  "autocfg",
+ "num-traits",
+]
+
+[[package]]
+name = "num-iter"
+version = "0.1.42"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b2021c8337a54d21aca0d59a92577a029af9431cb59b909b03252b9c164fad59"
+dependencies = [
+ "autocfg",
+ "num-integer",
+ "num-traits",
+]
+
+[[package]]
+name = "num-rational"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "12ac428b1cb17fce6f731001d307d351ec70a6d202fc2e60f7d4c5e42d8f4f07"
+dependencies = [
+ "autocfg",
+ "num-integer",
  "num-traits",
 ]
 
@@ -584,9 +637,9 @@ dependencies = [
 
 [[package]]
 name = "paste"
-version = "1.0.4"
+version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c5d65c4d95931acda4498f675e332fcbdc9a06705cd07086c510e9b6009cd1c1"
+checksum = "acbf547ad0c65e31259204bd90935776d1c693cec2f4ff7abb7a1bbbd40dfe58"
 
 [[package]]
 name = "pest"
@@ -732,17 +785,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3"
 
 [[package]]
-name = "stm32-usbd"
-version = "0.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "70d13eca735cae37df697f599777b000cc0ee924df8452f2b4bfaa6798ab0338"
-dependencies = [
- "cortex-m 0.6.7",
- "usb-device",
- "vcell",
-]
-
-[[package]]
 name = "stm32f0"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -784,27 +826,26 @@ dependencies = [
 [[package]]
 name = "stm32f1xx-hal"
 version = "0.7.0"
-source = "git+https://github.com/stm32-rs/stm32f1xx-hal#01482efb3eae6db8048a50ad79f59cf86083e4f8"
+source = "git+https://github.com/eldruin/stm32f1xx-hal?branch=embedded-hal-1.0.0-alpha.4#7cb3c53d3badab55d9128dc2418a06d0f719eacd"
 dependencies = [
- "bxcan",
  "cast",
  "cortex-m 0.6.7",
  "cortex-m-rt",
  "embedded-dma",
- "embedded-hal 0.2.4",
- "nb 0.1.3",
+ "embedded-hal 1.0.0-alpha.4",
+ "nb 1.0.0",
  "stm32f1",
  "void",
 ]
 
 [[package]]
 name = "stm32f3"
-version = "0.12.1"
+version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "636387c2c5af11075c8ed3ef203c01460204be3a479397c2380622cbd61a673f"
+checksum = "0e212ebc31a11c94edb709de8bb6cb93b96eeb687283855ba814d4a2596bd70d"
 dependencies = [
  "bare-metal 0.2.5",
- "cortex-m 0.6.7",
+ "cortex-m 0.7.2",
  "cortex-m-rt",
  "vcell",
 ]
@@ -837,18 +878,18 @@ dependencies = [
 [[package]]
 name = "stm32f3xx-hal"
 version = "0.6.1"
-source = "git+https://github.com/stm32-rs/stm32f3xx-hal#9e29ec6b1dba461eb1001ea6eee2bcf255fda59f"
+source = "git+https://github.com/stm32-rs/stm32f3xx-hal#f8eb2926a38c9a40c41ba53de60839ac25d78f6e"
 dependencies = [
- "bare-metal 0.2.5",
+ "bare-metal 1.0.0",
  "cfg-if",
- "cortex-m 0.6.7",
+ "cortex-m 0.7.2",
  "cortex-m-rt",
  "embedded-dma",
  "embedded-hal 0.2.4",
- "nb 0.1.3",
+ "embedded-time",
+ "nb 1.0.0",
  "paste",
  "rtcc",
- "stm32-usbd",
  "stm32f3",
  "void",
 ]
@@ -868,7 +909,7 @@ dependencies = [
 [[package]]
 name = "stm32f4xx-hal"
 version = "0.8.3"
-source = "git+https://github.com/stm32-rs/stm32f4xx-hal#8217e0265db7e2291c6cab88e3c7603130f80856"
+source = "git+https://github.com/stm32-rs/stm32f4xx-hal#7cec6ff0c38866956582fab2e739d09ebe725240"
 dependencies = [
  "bare-metal 0.2.5",
  "cast",
@@ -929,8 +970,8 @@ dependencies = [
 
 [[package]]
 name = "stm32h7xx-hal"
-version = "0.8.0"
-source = "git+https://github.com/stm32-rs/stm32h7xx-hal#5c0544023ed7c60210d879e7e32e19ca6b3c0982"
+version = "0.9.0"
+source = "git+https://github.com/stm32-rs/stm32h7xx-hal#443eacdc040b24191a4878d94d578f7016d50256"
 dependencies = [
  "bare-metal 1.0.0",
  "cast",
@@ -958,8 +999,8 @@ dependencies = [
 
 [[package]]
 name = "stm32l0xx-hal"
-version = "0.6.2"
-source = "git+https://github.com/stm32-rs/stm32l0xx-hal#3128f902188708de874c43969aa510173906918c"
+version = "0.7.0"
+source = "git+https://github.com/stm32-rs/stm32l0xx-hal#8bb5d3c989dc55a82cc7ef746cf0c27a4cf1bbe8"
 dependencies = [
  "as-slice",
  "cast",
@@ -1013,7 +1054,7 @@ dependencies = [
 [[package]]
 name = "stm32l4xx-hal"
 version = "0.6.0"
-source = "git+https://github.com/stm32-rs/stm32l4xx-hal#616b77061df80d204d87f8730324d9023301e659"
+source = "git+https://github.com/stm32-rs/stm32l4xx-hal#3b076a624e9eba81f1898c34f94e6fe79dc615da"
 dependencies = [
  "as-slice",
  "cast",
@@ -1029,9 +1070,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "1.0.62"
+version = "1.0.64"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "123a78a3596b24fee53a6464ce52d8ecbf62241e6294c7e7fe12086cd161f512"
+checksum = "3fd9d1e9976102a03c542daa2eff1b43f9d72306342f3f8b3ed5fb8908195d6f"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1040,9 +1081,9 @@ dependencies = [
 
 [[package]]
 name = "typenum"
-version = "1.12.0"
+version = "1.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "373c8a200f9e67a0c95e62a4f52fbf80c23b4381c05a17845531982fa99e6b33"
+checksum = "879f6906492a7cd215bfa4cf595b600146ccfac0c79bcbd1f3000162af5e8b06"
 
 [[package]]
 name = "ucd-trie"
@@ -1057,12 +1098,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f7fe0bb3479651439c9112f72b6c505038574c9fbb575ed1bf3b797fa39dd564"
 
 [[package]]
-name = "usb-device"
-version = "0.2.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "849eed9b4dc61a1f17ba1d7a5078ceb095b9410caa38a506eb281ed5eff12fbd"
-
-[[package]]
 name = "vcell"
 version = "0.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1070,9 +1105,9 @@ checksum = "77439c1b53d2303b20d9459b1ade71a83c716e3f9c34f3228c00e6f185d6c002"
 
 [[package]]
 name = "version_check"
-version = "0.9.2"
+version = "0.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b5a972e5669d67ba988ce3dc826706fb0a8b01471c088cb0b6110b805cc36aed"
+checksum = "5fecdca9a5291cc2b8dcf7dc02453fee791a280f3743cb0905f8822ae463b3fe"
 
 [[package]]
 name = "void"
