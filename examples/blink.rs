@@ -76,23 +76,23 @@ fn setup() -> (PC13<Output<PushPull>>, Delay) {
 #[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
 use stm32f1xx_hal::{
     delay::Delay,
-    gpio::{gpioc::PC13, Output, PushPull, OutputPin},
+    gpio::{gpioc::PC13, Output, OutputPin, PushPull},
     pac::{CorePeripherals, Peripherals},
     prelude::*,
 };
 
+use core::convert::Infallible;
 #[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
 use embedded_hal::digital::OutputPin;
-use core::convert::Infallible;
 
 #[cfg(feature = "stm32f1xx")]
 fn setup() -> (dyn OutputPin<Error = Infallible>, Delay) {
-//fn setup() -> (PC13<Output<PushPull>>, Delay) {
+    //fn setup() -> (PC13<Output<PushPull>>, Delay) {
     let cp = CorePeripherals::take().unwrap();
-    let  p = Peripherals::take().unwrap();
-    let mut rcc =  p.RCC.constrain();
+    let p = Peripherals::take().unwrap();
+    let mut rcc = p.RCC.constrain();
     let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
-    let mut gpioc =  p.GPIOC.split(&mut rcc.apb2);
+    let mut gpioc = p.GPIOC.split(&mut rcc.apb2);
 
     impl LED for dyn OutputPin<Error = Infallible> {
         fn on(&mut self) -> () {
@@ -308,10 +308,10 @@ use embedded_hal::digital::v2::OutputPin;
 #[cfg(feature = "stm32l1xx")]
 fn setup() -> (PB6<Output<PushPull>>, Delay) {
     let cp = CorePeripherals::take().unwrap();
-    let  p = Peripherals::take().unwrap();
+    let p = Peripherals::take().unwrap();
     let rcc = p.RCC.freeze(rcc::Config::hsi());
 
-    let gpiob =  p.GPIOB.split();
+    let gpiob = p.GPIOB.split();
 
     impl LED for PB6<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -340,7 +340,7 @@ use stm32l4xx_hal::{
 #[cfg(feature = "stm32l4xx")]
 fn setup() -> (PC13<Output<PushPull>>, Delay) {
     let cp = CorePeripherals::take().unwrap();
-    let  p = Peripherals::take().unwrap();
+    let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.constrain();
     let mut pwr = p.PWR.constrain(&mut rcc.apb1r1);
     let clocks = rcc

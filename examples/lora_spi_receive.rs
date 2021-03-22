@@ -34,8 +34,7 @@ use cortex_m_semihosting::*;
 
 use embedded_hal::blocking::delay::DelayMs;
 
-
-use embedded_hal::{spi::{Mode, Phase, Polarity}, };
+use embedded_hal::spi::{Mode, Phase, Polarity};
 
 //use asm_delay::{ AsmDelay, bitrate, };
 
@@ -108,7 +107,7 @@ const CONFIG_RADIO: radio_sx127x::device::Config = radio_sx127x::device::Config 
 #[cfg(feature = "stm32f0xx")] //  eg stm32f030xc
 use stm32f0xx_hal::{
     delay::Delay,
-    pac::Peripherals,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     spi::{Error, Spi},
 };
@@ -117,7 +116,7 @@ use stm32f0xx_hal::{
 fn setup(
 ) -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>
 {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let mut p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.configure().freeze(&mut p.FLASH);
 
@@ -144,16 +143,7 @@ fn setup(
 
     // Create lora radio instance
 
-    let lora = Sx127x::spi(
-        spi,
-        pa1,
-        pb8,
-        pb9,
-        pa0,
-        delay,
-        &CONFIG_RADIO,
-    )
-    .unwrap(); // should handle error
+    let lora = Sx127x::spi(spi, pa1, pb8, pb9, pa0, delay, &CONFIG_RADIO).unwrap(); // should handle error
 
     lora
 }
@@ -161,7 +151,7 @@ fn setup(
 #[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
 use stm32f1xx_hal::{
     delay::Delay,
-    pac::Peripherals,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     spi::{Error, Spi},
 };
@@ -170,7 +160,7 @@ use stm32f1xx_hal::{
 fn setup(
 ) -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>
 {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
     let mut rcc = p.RCC.constrain();
@@ -209,7 +199,7 @@ fn setup(
         gpiob.pb9.into_floating_input(&mut gpiob.crh),   //ReadyPin DIO1 on PB9
         gpioa.pa0.into_push_pull_output(&mut gpioa.crl), //ResetPin      on PA0
         delay,                                           //Delay
-        &CONFIG_RADIO,                                            //&Config
+        &CONFIG_RADIO,                                   //&Config
     )
     .unwrap(); // should handle error
 
@@ -228,7 +218,7 @@ use stm32f3xx_hal::{
 fn setup(
 ) -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>
 {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
     let mut rcc = p.RCC.constrain();
@@ -262,20 +252,16 @@ fn setup(
         spi, //Spi
         gpioa
             .pa1
-            .into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper)
-            , //CsPin            on PA1
+            .into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper), //CsPin            on PA1
         gpiob
             .pb8
-            .into_floating_input(&mut gpiob.moder, &mut gpiob.pupdr)
-            , //BusyPin  DIO0 on PB8
+            .into_floating_input(&mut gpiob.moder, &mut gpiob.pupdr), //BusyPin  DIO0 on PB8
         gpiob
             .pb9
-            .into_floating_input(&mut gpiob.moder, &mut gpiob.pupdr)
-            , //ReadyPin DIO1 on PB9
+            .into_floating_input(&mut gpiob.moder, &mut gpiob.pupdr), //ReadyPin DIO1 on PB9
         gpioa
             .pa0
-            .into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper)
-            , //ResetPin      on PA0
+            .into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper), //ResetPin      on PA0
         delay, //Delay
         &CONFIG_RADIO, //&Config
     )
@@ -298,7 +284,7 @@ use stm32f4xx_hal::{
 fn setup(
 ) -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>
 {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
     let rcc = p.RCC.constrain();
@@ -330,7 +316,7 @@ fn setup(
         gpiob.pb9.into_floating_input(),   //ReadyPin DI01 on PB9
         gpioa.pa0.into_push_pull_output(), //ResetPin      on PA0
         delay,                             //Delay
-        &CONFIG_RADIO,                              //&Config
+        &CONFIG_RADIO,                     //&Config
     )
     .unwrap(); // should handle error
 
@@ -347,7 +333,7 @@ fn setup(
 #[cfg(feature = "stm32f7xx")]
 use stm32f7xx_hal::{
     delay::Delay,
-    pac::Peripherals,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     spi::{ClockDivider, Error, Spi},
 };
@@ -356,7 +342,7 @@ use stm32f7xx_hal::{
 fn setup(
 ) -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>
 {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
     let mut rcc = p.RCC.constrain();
@@ -386,7 +372,7 @@ fn setup(
         gpiob.pb9.into_floating_input(),   //ReadyPin DIO1 on PB9
         gpioa.pa0.into_push_pull_output(), //ResetPin      on PA0
         delay,                             //Delay
-        &CONFIG_RADIO,                              //&Config
+        &CONFIG_RADIO,                     //&Config
     )
     .unwrap(); // should handle error
 
@@ -394,12 +380,17 @@ fn setup(
 }
 
 #[cfg(feature = "stm32h7xx")]
-use stm32h7xx_hal::{delay::Delay, pac::Peripherals, prelude::*, spi::Error};
+use stm32h7xx_hal::{
+    delay::Delay,
+    pac::{CorePeripherals, Peripherals},
+    prelude::*,
+    spi::Error,
+};
 
 #[cfg(feature = "stm32h7xx")]
 fn setup() -> impl DelayMs<u32>
        + Receive<Info = PacketInfo, Error = sx127xError<Error, stm32h7xx_hal::Never, Infallible>> {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let pwr = p.PWR.constrain();
     let vos = pwr.freeze();
@@ -434,7 +425,7 @@ fn setup() -> impl DelayMs<u32>
         gpiob.pb9.into_floating_input(),   //ReadyPin DIO1 on PB9
         gpioa.pa0.into_push_pull_output(), //ResetPin      on PA0
         delay,                             //Delay
-        &CONFIG_RADIO,                              //&Config
+        &CONFIG_RADIO,                     //&Config
     )
     .unwrap(); // should handle error
 
@@ -443,7 +434,7 @@ fn setup() -> impl DelayMs<u32>
 
 #[cfg(feature = "stm32l0xx")]
 use stm32l0xx_hal::{
-    pac::Peripherals,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
     spi::Error,
@@ -456,7 +447,7 @@ use void;
 fn setup(
 ) -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, void::Void, Infallible>>
 {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
     let gpioa = p.GPIOA.split(&mut rcc);
@@ -485,7 +476,7 @@ fn setup(
         gpiob.pb9.into_floating_input(),   //ReadyPin DIO1 on PB9
         gpioa.pa0.into_push_pull_output(), //ResetPin      on PA0
         delay,                             //Delay
-        &CONFIG_RADIO,                              //&Config
+        &CONFIG_RADIO,                     //&Config
     )
     .unwrap(); // should handle error
 
@@ -504,7 +495,7 @@ use stm32l1xx_hal::{
 fn setup(
 ) -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>
 {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi());
 
@@ -533,7 +524,7 @@ fn setup(
         gpiob.pb10.into_floating_input(),  //ReadyPin DIO1 on PB10 in board on Heltec
         gpioa.pa3.into_push_pull_output(), //ResetPin      on PA3  in board on Heltec
         delay,                             //Delay
-        &CONFIG_RADIO,                              //&Config
+        &CONFIG_RADIO,                     //&Config
     )
     .unwrap(); // should handle error
 
@@ -543,7 +534,7 @@ fn setup(
 #[cfg(feature = "stm32l4xx")]
 use stm32l4xx_hal::{
     delay::Delay,
-    pac::Peripherals,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     spi::{Error, Spi},
 };
@@ -552,7 +543,7 @@ use stm32l4xx_hal::{
 fn setup(
 ) -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>
 {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut flash = p.FLASH.constrain();
     let mut rcc = p.RCC.constrain();
@@ -588,20 +579,16 @@ fn setup(
         spi, //Spi
         gpioa
             .pa1
-            .into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper)
-            , //CsPin             on PA1
+            .into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper), //CsPin             on PA1
         gpiob
             .pb8
-            .into_floating_input(&mut gpiob.moder, &mut gpiob.pupdr)
-            , //BusyPin  DIO0 on PB8
+            .into_floating_input(&mut gpiob.moder, &mut gpiob.pupdr), //BusyPin  DIO0 on PB8
         gpiob
             .pb9
-            .into_floating_input(&mut gpiob.moder, &mut gpiob.pupdr)
-            , //ReadyPin DIO1 on PB9
+            .into_floating_input(&mut gpiob.moder, &mut gpiob.pupdr), //ReadyPin DIO1 on PB9
         gpioa
             .pa0
-            .into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper)
-            , //ResetPin on PA0
+            .into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper), //ResetPin on PA0
         delay, //Delay
         &CONFIG_RADIO, //&Config
     )

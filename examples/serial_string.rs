@@ -699,10 +699,10 @@ fn main() -> ! {
 
     //this is 3-tuple send structure (buf1, tx1_ch, tx1)
     let buf1 = singleton!(: [u8; BUF_SIZE] = *b"\r\ncheck console...\r\n").unwrap();
-    let mut send1 = tx1.try_write(buf1, tx1_ch);   //.wait();   ??        // CHECK DMA METHOD
+    let mut send1 = tx1.try_write(buf1, tx1_ch); //.wait();   ??        // CHECK DMA METHOD
 
     *send1.0 = *b"Display on console\r\n"; // BUF_SIZE characters
-    send1 = send1.2.try_write(send1.0, send1.1).wait();                   // CHECK DMA METHOD
+    send1 = send1.2.try_write(send1.0, send1.1).wait(); // CHECK DMA METHOD
 
     hprintln!("testing  tx2 to rx3").unwrap();
 
@@ -710,11 +710,11 @@ fn main() -> ! {
 
     //send1 using recv3 requires buf3 has same size as buf1
     let buf3 = singleton!(: [u8; BUF_SIZE] = [0; BUF_SIZE]).unwrap();
-    let mut rx = rx3.try_read(buf3, rx3_ch);                              // CHECK DMA METHOD
+    let mut rx = rx3.try_read(buf3, rx3_ch); // CHECK DMA METHOD
 
     //CHECK IF buf2 REALLY NEED TO BE SAME SIZE?
     let buf2 = singleton!(: [u8; BUF_SIZE] = [b' '; BUF_SIZE]).unwrap();
-    let tx = tx2.try_write(buf2, tx2_ch);                                 // CHECK DMA METHOD
+    let tx = tx2.try_write(buf2, tx2_ch); // CHECK DMA METHOD
 
     let mut send2 = tx.wait(); //when tx is complete return 3-tuple send structure (buf2, tx2_ch, tx2)
     let mut recv3 = rx.wait(); //when rx is complete return 3-tuple recv structure (buf3, rx3_ch, rx3)

@@ -241,7 +241,7 @@ fn setup() -> (
 
                 None => {
                     let z = &mut a.ad_1st;
-                    z.read_temp() as i32      // NB not try_ !
+                    z.read_temp() as i32 // NB not try_ !
                 }
             }
         }

@@ -15,6 +15,12 @@
 #![no_std]
 #![no_main]
 
+#[cfg(debug_assertions)]
+use panic_semihosting;
+
+#[cfg(not(debug_assertions))]
+use panic_halt;
+
 use cortex_m_rt::{entry, exception, ExceptionFrame};
 
 //builtin include Font6x6, Font6x8, Font6x12, Font8x16, Font12x16, Font24x32
@@ -24,7 +30,6 @@ use embedded_graphics::{
     prelude::*,
     style::TextStyleBuilder,
 };
-use panic_halt as _;
 
 use ssd1306::{prelude::*, Builder, I2CDIBuilder};
 

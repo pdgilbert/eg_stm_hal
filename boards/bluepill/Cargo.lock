@@ -38,17 +38,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "asm-delay"
-version = "0.7.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b8b7c70ec6ea4def14d530d75900bbf8909ed49dafeb1448c3ee7122543964f6"
-dependencies = [
- "bitrate",
- "cortex-m 0.7.2",
- "embedded-hal 0.2.4",
-]
-
-[[package]]
 name = "autocfg"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -80,12 +69,6 @@ name = "bitflags"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf1de2fe8c75bc145a2f577add951f8134889b4795d47466a54a5c846d691693"
-
-[[package]]
-name = "bitrate"
-version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c147d86912d04bef727828fda769a76ca81629a46d8ba311a8d58a26aa91473d"
 
 [[package]]
 name = "bxcan"
@@ -284,7 +267,6 @@ name = "eg_stm_hal"
 version = "0.1.0"
 dependencies = [
  "ads1x1x",
- "asm-delay",
  "cortex-m 0.7.2",
  "cortex-m-rt",
  "cortex-m-semihosting",
@@ -292,7 +274,6 @@ dependencies = [
  "driver-pal",
  "embedded-graphics",
  "embedded-hal 1.0.0-alpha.4",
- "embedded-spi",
  "f3",
  "heapless 0.6.1",
  "mcp4x",
@@ -359,15 +340,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f2260cabeacf4bda1df1a8d54f67047a9aadf02fe14cfab07649f2cec6a4693b"
 dependencies = [
  "nb 1.0.0",
-]
-
-[[package]]
-name = "embedded-hal-compat"
-version = "0.1.2"
-source = "git+https://github.com/ryankurte/embedded-hal-compat.git?branch=main#e58fd8ff563adee9609cdf891de61a03f7075666"
-dependencies = [
- "embedded-hal 0.2.4",
- "embedded-hal 1.0.0-alpha.4",
 ]
 
 [[package]]
@@ -676,13 +648,12 @@ dependencies = [
 [[package]]
 name = "radio-sx127x"
 version = "0.10.1"
-source = "git+https://github.com/pdgilbert/rust-radio-sx127x#fabd2df821edb5a59e33f36bf1d27a0e8f2e7fb0"
+source = "git+https://github.com/pdgilbert/rust-radio-sx127x#27d56e16bf5c0b557143c06273ac6176ed720695"
 dependencies = [
  "bitflags",
  "driver-pal",
  "embedded-hal 0.2.4",
  "embedded-hal 1.0.0-alpha.4",
- "embedded-hal-compat",
  "embedded-spi",
  "libc",
  "log",
@@ -897,7 +868,7 @@ dependencies = [
 [[package]]
 name = "stm32f4xx-hal"
 version = "0.8.3"
-source = "git+https://github.com/stm32-rs/stm32f4xx-hal#7cec6ff0c38866956582fab2e739d09ebe725240"
+source = "git+https://github.com/stm32-rs/stm32f4xx-hal#e9ef4ed01000c76a2af81d4eafa3afaccd1eed26"
 dependencies = [
  "bare-metal 0.2.5",
  "cast",

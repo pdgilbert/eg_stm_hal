@@ -82,7 +82,7 @@ use stm32f1xx_hal::{
 
 #[cfg(feature = "stm32f1xx")]
 fn setup() -> (PA8<Output<OpenDrain>>, impl DelayMs<u16>) {
-//fn setup() -> (PA8<Output<OpenDrain>>, Delay) {
+    //fn setup() -> (PA8<Output<OpenDrain>>, Delay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
