@@ -1,4 +1,5 @@
 name: Examples
+# run examples that use .compat to bridge embedded-hal 0.2.4 to 1.0.0-alpha
 
 on:
   push:
@@ -34,8 +35,9 @@ jobs:
         mcu: [stm32f030xc, stm32f100, stm32f101, stm32f103, stm32f303xc, stm32f401, stm32f411, stm32f722,
               stm32h742, stm32l0x2, stm32l100, stm32l151, stm32l4x2, ]
         
-        eg:  [blink,blink3, echo_by_char, serial_char, gps_rw, temperature,
-              dht, text_i2c, oled_gps, lora_spi_send, lora_spi_receive, lora_spi_gps ]
+        eg:  [ lora_spi_send, lora_spi_receive, lora_spi_gps ]
+        #blink,blink3, echo_by_char, serial_char, gps_rw, temperature,
+        #      dht, text_i2c, oled_gps, lora_spi_send, lora_spi_receive, lora_spi_gps ]
         #  echo_string, serial_string]
         
         include:
