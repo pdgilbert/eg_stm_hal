@@ -28,6 +28,7 @@ use ssd1306::{prelude::*, Builder};
 #[cfg(feature = "stm32f0xx")] //  eg blue pill stm32f103
 use stm32f0xx_hal::{
     delay::Delay,
+    pac::{CorePeripherals, Peripherals}
     device::I2C1,
     gpio::{
         gpiob::{PB8, PB9},
@@ -35,7 +36,6 @@ use stm32f0xx_hal::{
         Alternate, OpenDrain, Output, PushPull,
     },
     i2c::{BlockingI2c, DutyCycle, Mode},
-    pac::Peripherals,
     prelude::*,
 };
 //#[cfg(feature = "stm32f0xx")]  //  eg blue pill stm32f103
@@ -47,7 +47,7 @@ fn setup() -> (
     PC13<Output<PushPull>>,
     Delay,
 ) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let dp = Peripherals::take().unwrap();
 
     let mut rcc = dp.RCC.constrain();
@@ -103,7 +103,7 @@ fn setup() -> (
     PC13<Output<PushPull>>,
     Delay,
 ) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let dp = Peripherals::take().unwrap();
 
     let mut rcc = dp.RCC.constrain();
@@ -140,6 +140,7 @@ fn setup() -> (
 #[cfg(feature = "stm32f3xx")] //  eg Discovery-stm32f303
 use stm32f3xx_hal::{
     delay::Delay,
+    pac::{CorePeripherals, Peripherals, I2C1,}
     gpio::{
         gpiob::{PB6, PB7},
         gpioe::PE9,
@@ -147,8 +148,6 @@ use stm32f3xx_hal::{
     },
     i2c::I2c,
     prelude::*,
-    stm32::Peripherals,
-    stm32::I2C1,
 };
 
 #[cfg(feature = "stm32f3xx")]
@@ -157,7 +156,7 @@ fn setup() -> (
     PE9<Output<PushPull>>,
     Delay,
 ) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let dp = Peripherals::take().unwrap();
 
     let mut rcc = dp.RCC.constrain();
@@ -189,14 +188,13 @@ fn setup() -> (
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
 use stm32f4xx_hal::{
     delay::Delay,
+    pac::{CorePeripherals, Peripherals, I2C1,}
     gpio::{
         gpiob::{PB7, PB8},
         gpioe::PE9,
         Alternate, Output, PushPull, AF4,
     },
     i2c::I2c,
-    pac::Peripherals,
-    pac::I2C1,
     prelude::*,
 };
 //#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
@@ -208,7 +206,7 @@ fn setup() -> (
     PE9<Output<PushPull>>,
     Delay,
 ) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let dp = Peripherals::take().unwrap();
 
     let mut rcc = dp.RCC.constrain();
