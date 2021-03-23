@@ -28,7 +28,6 @@ use ssd1306::{prelude::*, Builder};
 #[cfg(feature = "stm32f0xx")] //  eg blue pill stm32f103
 use stm32f0xx_hal::{
     delay::Delay,
-    pac::{CorePeripherals, Peripherals}
     device::I2C1,
     gpio::{
         gpiob::{PB8, PB9},
@@ -36,6 +35,7 @@ use stm32f0xx_hal::{
         Alternate, OpenDrain, Output, PushPull,
     },
     i2c::{BlockingI2c, DutyCycle, Mode},
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
 };
 //#[cfg(feature = "stm32f0xx")]  //  eg blue pill stm32f103
@@ -140,13 +140,13 @@ fn setup() -> (
 #[cfg(feature = "stm32f3xx")] //  eg Discovery-stm32f303
 use stm32f3xx_hal::{
     delay::Delay,
-    pac::{CorePeripherals, Peripherals, I2C1,}
     gpio::{
         gpiob::{PB6, PB7},
         gpioe::PE9,
         Output, PushPull, AF4,
     },
     i2c::I2c,
+    pac::{CorePeripherals, Peripherals, I2C1},
     prelude::*,
 };
 
@@ -188,13 +188,13 @@ fn setup() -> (
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
 use stm32f4xx_hal::{
     delay::Delay,
-    pac::{CorePeripherals, Peripherals, I2C1,}
     gpio::{
         gpiob::{PB7, PB8},
         gpioe::PE9,
         Alternate, Output, PushPull, AF4,
     },
     i2c::I2c,
+    pac::{CorePeripherals, Peripherals, I2C1},
     prelude::*,
 };
 //#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
