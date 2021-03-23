@@ -47,7 +47,7 @@ fn setup() -> (
     PC13<Output<PushPull>>,
     Delay,
 ) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let dp = Peripherals::take().unwrap();
 
     let mut rcc = dp.RCC.constrain();
@@ -103,7 +103,7 @@ fn setup() -> (
     PC13<Output<PushPull>>,
     Delay,
 ) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let dp = Peripherals::take().unwrap();
 
     let mut rcc = dp.RCC.constrain();
@@ -157,7 +157,7 @@ fn setup() -> (
     PE9<Output<PushPull>>,
     Delay,
 ) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let dp = Peripherals::take().unwrap();
 
     let mut rcc = dp.RCC.constrain();
@@ -208,7 +208,7 @@ fn setup() -> (
     PE9<Output<PushPull>>,
     Delay,
 ) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let dp = Peripherals::take().unwrap();
 
     let mut rcc = dp.RCC.constrain();

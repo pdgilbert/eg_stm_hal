@@ -241,7 +241,7 @@ fn setup() -> (
 
                 None => {
                     let z = &mut a.ad_1st;
-                    z.read_temp() as i32      // NB not try_ !
+                    z.read_temp() as i32 // NB not try_ !
                 }
             }
         }
@@ -551,7 +551,7 @@ fn setup() -> (
     // BUILDS BUT CHECK https://github.com/stm32-rs/stm32h7xx-hal/blob/master/examples/temperature.rs
     // REGARDING CALIBRATION
 
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let pwr = p.PWR.constrain();
     let vos = pwr.freeze();

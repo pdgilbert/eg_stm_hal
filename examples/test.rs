@@ -5,10 +5,10 @@
 //#![no_std]
 
 //#[cfg(debug_assertions)]
-//extern crate panic_semihosting;
+//use panic_semihosting;
 //
 //#[cfg(not(debug_assertions))]
-//extern crate panic_halt;
+//use panic_halt;
 
 //use cortex_m::asm;
 //use cortex_m_rt::entry;

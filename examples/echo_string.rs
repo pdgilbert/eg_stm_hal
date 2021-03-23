@@ -19,10 +19,10 @@
 #![no_std]
 
 #[cfg(debug_assertions)]
-extern crate panic_semihosting;
+use panic_semihosting;
 
 #[cfg(not(debug_assertions))]
-extern crate panic_halt;
+use panic_halt;
 
 use cortex_m::singleton;
 use cortex_m_rt::entry;
@@ -598,8 +598,8 @@ fn main() -> ! {
     loop {
         // using struct  with tuple (buf, ch, tx) builds with stm32f3xx_hal:
 
-        recv.tup = recv.tup.2.try_read(send.tup.0, recv.tup.1).wait();    // CHECK DMA METHOD
-        send.tup = send.tup.2.try_write(recv.tup.0, send.tup.1).wait();   // CHECK DMA METHOD
+        recv.tup = recv.tup.2.try_read(send.tup.0, recv.tup.1).wait(); // CHECK DMA METHOD
+        send.tup = send.tup.2.try_write(recv.tup.0, send.tup.1).wait(); // CHECK DMA METHOD
 
         // but this will not work with other hals because .read_exact() and .write_all()
         // are specific to stm32f3xx_hal. A generic API across hals would be nice.

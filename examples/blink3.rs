@@ -6,15 +6,15 @@
 #![no_main]
 
 #[cfg(debug_assertions)]
-extern crate panic_semihosting;
+use panic_semihosting;
 
 #[cfg(not(debug_assertions))]
-extern crate panic_halt;
+use panic_halt;
 
-// extern crate panic_halt;  // put a breakpoint on `rust_begin_unwind` to catch panics
-// extern crate panic_abort; // may still require nightly?
-// extern crate panic_itm;   // logs messages over ITM; requires ITM support
-// extern crate panic_semihosting; // logs messages to the host stderr; requires a debugger
+// use panic_halt;  // put a breakpoint on `rust_begin_unwind` to catch panics
+// use panic_abort; // may still require nightly?
+// use panic_itm;   // logs messages over ITM; requires ITM support
+// use panic_semihosting; // logs messages to the host stderr; requires a debugger
 
 // use nb::block;
 use cortex_m_rt::entry;
@@ -110,10 +110,10 @@ fn setup() -> (
     Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
-    let  p = Peripherals::take().unwrap();
-    let mut rcc =  p.RCC.constrain();
+    let p = Peripherals::take().unwrap();
+    let mut rcc = p.RCC.constrain();
     let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
-    let mut gpiob =  p.GPIOB.split(&mut rcc.apb2);
+    let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
 
     //this would work for delay on bluepill but not others
     //use stm32f1xx_hal::timer::Timer;
@@ -502,7 +502,7 @@ fn setup() -> (
     Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
-    let  p = Peripherals::take().unwrap();
+    let p = Peripherals::take().unwrap();
     let rcc = p.RCC.freeze(rcc::Config::hsi());
 
     let gpiob = p.GPIOB.split();

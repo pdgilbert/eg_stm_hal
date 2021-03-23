@@ -19,11 +19,11 @@
 #![no_main]
 
 #[cfg(debug_assertions)]
-extern crate panic_semihosting;
+use panic_semihosting;
 
 #[cfg(not(debug_assertions))]
-extern crate panic_halt;
-//extern crate panic_reset;
+use panic_halt;
+//use panic_reset;
 
 use core::convert::Infallible;
 
@@ -126,7 +126,7 @@ fn setup() -> (
     Rx<USART2>,
     impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>>,
 ) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let mut p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.configure().freeze(&mut p.FLASH);
 
@@ -192,7 +192,7 @@ fn setup() -> (
     Rx<USART2>,
     impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>>,
 ) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
     let mut rcc = p.RCC.constrain();
@@ -267,7 +267,7 @@ fn setup() -> (
     Rx<USART2>,
     impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>>,
 ) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
     let mut rcc = p.RCC.constrain();
@@ -353,7 +353,7 @@ fn setup() -> (
     Rx<USART2>,
     impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>>,
 ) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
     let rcc = p.RCC.constrain();
@@ -430,7 +430,7 @@ fn setup() -> (
     Rx<USART2>,
     impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>>,
 ) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
     let mut rcc = p.RCC.constrain();
@@ -500,7 +500,7 @@ fn setup() -> (
     Rx<USART2>,
     impl DelayMs<u32> + Transmit<Error = sx127xError<Error, stm32h7xx_hal::Never, Infallible>>,
 ) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let pwr = p.PWR.constrain();
     let vos = pwr.freeze();
@@ -572,7 +572,7 @@ fn setup() -> (
     Rx<USART2>,
     impl DelayMs<u32> + Transmit<Error = sx127xError<Error, void::Void, Infallible>>,
 ) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
     let gpioa = p.GPIOA.split(&mut rcc);
@@ -635,7 +635,7 @@ fn setup() -> (
     Rx<USART1>,
     impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>>,
 ) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi());
 
@@ -700,7 +700,7 @@ fn setup() -> (
     Rx<USART2>,
     impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>>,
 ) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut flash = p.FLASH.constrain();
     let mut rcc = p.RCC.constrain();
