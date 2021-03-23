@@ -114,7 +114,7 @@ const CONFIG_RADIO: radio_sx127x::device::Config = radio_sx127x::device::Config 
 #[cfg(feature = "stm32f0xx")] //  eg stm32f030xc
 use stm32f0xx_hal::{
     delay::Delay,
-    pac::Peripherals,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     spi::{Error, Spi},
 };
@@ -167,7 +167,7 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible
 #[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
 use stm32f1xx_hal::{
     delay::Delay,
-    pac::Peripherals,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     spi::{Error, Spi},
 };
@@ -223,9 +223,9 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible
 #[cfg(feature = "stm32f3xx")] //  eg Discovery-stm32f303
 use stm32f3xx_hal::{
     delay::Delay,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     spi::{Error, Spi},
-    stm32::Peripherals,
 };
 
 #[cfg(feature = "stm32f3xx")]
@@ -290,7 +290,7 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible
 // eg Nucleo-64 stm32f411, blackpill stm32f411, blackpill stm32f401
 use stm32f4xx_hal::{
     delay::Delay,
-    pac::Peripherals,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     spi::{Error, Spi},
     time::MegaHertz,
@@ -362,7 +362,7 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible
 #[cfg(feature = "stm32f7xx")]
 use stm32f7xx_hal::{
     delay::Delay,
-    pac::Peripherals,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     spi::{ClockDivider, Error, Spi},
 };
@@ -407,7 +407,13 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible
 }
 
 #[cfg(feature = "stm32h7xx")]
-use stm32h7xx_hal::{delay::Delay, pac::Peripherals, prelude::*, spi::Error, Never};
+use stm32h7xx_hal::{
+    delay::Delay,
+    pac::{CorePeripherals, Peripherals},
+    prelude::*,
+    spi::Error,
+    Never,
+};
 
 #[cfg(feature = "stm32h7xx")]
 fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Never, Infallible>> {
@@ -455,7 +461,7 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Never, Inf
 
 #[cfg(feature = "stm32l0xx")]
 use stm32l0xx_hal::{
-    pac::Peripherals,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
     spi::Error,
@@ -501,10 +507,10 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, void::Void
 
 #[cfg(feature = "stm32l1xx")] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
     spi::Error,
-    stm32::Peripherals,
 };
 
 #[cfg(feature = "stm32l1xx")]
@@ -549,7 +555,7 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible
 #[cfg(feature = "stm32l4xx")]
 use stm32l4xx_hal::{
     delay::Delay,
-    pac::Peripherals,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     spi::{Error, Spi},
 };
