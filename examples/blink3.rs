@@ -6,15 +6,15 @@
 #![no_main]
 
 #[cfg(debug_assertions)]
-extern crate panic_semihosting;
+use panic_semihosting;
 
 #[cfg(not(debug_assertions))]
-extern crate panic_halt;
+use panic_halt;
 
-// extern crate panic_halt;  // put a breakpoint on `rust_begin_unwind` to catch panics
-// extern crate panic_abort; // may still require nightly?
-// extern crate panic_itm;   // logs messages over ITM; requires ITM support
-// extern crate panic_semihosting; // logs messages to the host stderr; requires a debugger
+// use panic_halt;  // put a breakpoint on `rust_begin_unwind` to catch panics
+// use panic_abort; // may still require nightly?
+// use panic_itm;   // logs messages over ITM; requires ITM support
+// use panic_semihosting; // logs messages to the host stderr; requires a debugger
 
 // use nb::block;
 use cortex_m_rt::entry;

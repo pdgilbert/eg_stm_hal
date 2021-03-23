@@ -19,11 +19,11 @@
 #![no_main]
 
 #[cfg(debug_assertions)]
-extern crate panic_semihosting;
+use panic_semihosting;
 
 #[cfg(not(debug_assertions))]
-extern crate panic_halt;
-//extern crate panic_reset;
+use panic_halt;
+//use panic_reset;
 
 use core::convert::Infallible;
 

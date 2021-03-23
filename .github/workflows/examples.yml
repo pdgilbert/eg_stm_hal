@@ -32,7 +32,7 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        mcu: [stm32f100,  ]
+        mcu: [stm32f103,  ]
         #mcu: [stm32f030xc, stm32f100, stm32f101, stm32f103, stm32f303xc, stm32f401, stm32f411, stm32f722,
         #      stm32h742, stm32l0x2, stm32l100, stm32l151, stm32l4x2, ]
         
@@ -49,18 +49,18 @@ jobs:
            #  hal: "stm32f0xx"
            #  trg: "thumbv6m-none-eabi"   
            #  brd: "none-stm32f030"
-           - mcu:  stm32f100
-             hal: "stm32f1xx"
-             trg: "thumbv7m-none-eabi"
-             brd: "none-stm32f100"
+           #- mcu:  stm32f100
+           #  hal: "stm32f1xx"
+           #  trg: "thumbv7m-none-eabi"
+           #  brd: "none-stm32f100"
            #- mcu:  stm32f101
            #  hal: "stm32f1xx"
            #  trg: "thumbv7m-none-eabi"
            #  brd: "none-stm32f101"
-           #- mcu:  stm32f103
-           #  hal: "stm32f1xx"
-           #  trg: "thumbv7m-none-eabi"
-           #  brd: "bluepill"
+           - mcu:  stm32f103
+             hal: "stm32f1xx"
+             trg: "thumbv7m-none-eabi"
+             brd: "bluepill"
            #- mcu:  stm32f303xc
            #  hal: "stm32f3xx"
            #  trg: "thumbv7em-none-eabihf"
