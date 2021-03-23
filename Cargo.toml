@@ -108,7 +108,7 @@ ads1x1x =  { version = "0.2", optional = true }
 # mcp4x = "0.1"
 f3 = { version = ">=0.6.1", optional = true }
 
-#embedded-spi = { version = "0.6", default-features = false, optional = true }
+embedded-spi = { version = "0.6", default-features = false }
 
 # for radio-sx127x which uses embedded-hal 1.0.0-alpha while device crates still use 0.2.4
 embedded-hal = { version = "1.0.0-alpha.4" }

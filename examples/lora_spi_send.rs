@@ -148,13 +148,24 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible
 #[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
 use stm32f1xx_hal::{
     delay::Delay,
-    pac::{CorePeripherals, Peripherals},
+    pac::{CorePeripherals, Peripherals, SPI1, },
+    gpio::{Input, Output, PushPull, Floating, Alternate,
+           gpioa::{PA0, PA1, PA5, PA6, PA7}, 
+           gpiob::{PB8, PB9}, },
     prelude::*,
-    spi::{Error, Spi},
+    spi::{Error, Spi, Spi1NoRemap},
 };
+
+use embedded_spi::wrapper::Wrapper;
+
+type LoraType = Sx127x<Wrapper<Spi<SPI1, Spi1NoRemap,
+           (PA5<Alternate<PushPull>>,    PA6<Alternate<Floating>>,   PA7<Alternate<PushPull>>),  u8>, Error,
+         PA1<Output<PushPull>>,  PB8<Input<Floating>>,  PB9<Input<Floating>>,  PA0<Output<PushPull>>,
+               Infallible,  Delay>,  Error, Infallible, Infallible>;
 
 #[cfg(feature = "stm32f1xx")]
 fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
+//fn setup() -> LoraType {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 

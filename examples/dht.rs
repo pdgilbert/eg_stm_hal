@@ -77,12 +77,14 @@ use stm32f1xx_hal::{
     pac::{CorePeripherals, Peripherals},
     prelude::*,
 };
+use embedded_hal::digital::OutputPin;
+use embedded_hal::digital::InputPin;
 
 // open_drain_output is really input and output
 
 #[cfg(feature = "stm32f1xx")]
-fn setup() -> (PA8<Output<OpenDrain>>, impl DelayMs<u16>) {
-    //fn setup() -> (PA8<Output<OpenDrain>>, Delay) {
+fn setup() -> (PA8<Output<OpenDrain>>, Delay) {
+//fn setup() -> (PA8<Output<OpenDrain>>, impl DelayMs<u16>) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 

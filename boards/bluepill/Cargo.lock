@@ -274,6 +274,7 @@ dependencies = [
  "driver-pal",
  "embedded-graphics",
  "embedded-hal 1.0.0-alpha.4",
+ "embedded-spi",
  "f3",
  "heapless 0.6.1",
  "mcp4x",
