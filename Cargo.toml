@@ -126,7 +126,7 @@ driver-pal    = { version = "0.8.0-alpha.0", default-features = false, optional 
 ssd1306   = { git = "https://github.com/jamwaffles/ssd1306" }  #version = "0.3.1" # "0.2.6" "0.3.1" 
 embedded-graphics   = { version = ">=0.6.0"}                   #version = ">=0.6.0" #  "0.4.4" # "0.4.9"  "0.6.2" 
 
-dht-sensor   = { version =  "^0.2.1", optional = true }
+dht-sensor   = { version =  "^0.2.1" }
 #git = "https://github.com/michaelbeaumont/dht-sensor", branch = "main", rev = "bcbcf8146f98b15b62dba4f5e2ce9f74a243e6d9"
 
 # for example digi_pot
