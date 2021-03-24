@@ -132,9 +132,7 @@ mcp4x   = { git = "https://github.com/eldruin/mcp4x-rs" }
 # version = "0.1",  optional = true
 
 stm32f0xx-hal = { git = "https://github.com/stm32-rs/stm32f0xx-hal", optional = true }
-#stm32f1xx-hal = { git = "https://github.com/stm32-rs/stm32f1xx-hal", optional = true }
-stm32f1xx-hal = { git = "https://github.com/eldruin/stm32f1xx-hal", branch = "embedded-hal-1.0.0-alpha.4", optional = true }  
-#   rev = "7cb3c53d3badab55d9128dc2418a06d0f719eacd"
+stm32f1xx-hal = { git = "https://github.com/stm32-rs/stm32f1xx-hal", optional = true }
 stm32f3xx-hal = { git = "https://github.com/stm32-rs/stm32f3xx-hal", optional = true }
 stm32f4xx-hal = { git = "https://github.com/stm32-rs/stm32f4xx-hal", optional = true }
 stm32f7xx-hal = { git = "https://github.com/stm32-rs/stm32f7xx-hal", optional = true }

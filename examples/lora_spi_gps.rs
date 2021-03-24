@@ -483,8 +483,7 @@ fn setup() -> (
 #[cfg(feature = "stm32h7xx")]
 use stm32h7xx_hal::{
     delay::Delay,
-    pac::Peripherals,
-    pac::USART2,
+    pac::{CorePeripherals, Peripherals, USART2},
     prelude::*,
     serial::{Rx, Tx},
     spi::Error,
@@ -617,12 +616,12 @@ fn setup() -> (
 
 #[cfg(feature = "stm32l1xx")] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{
-    delay::Delay,
-    pac::{CorePeripherals, Peripherals, USART2},
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
     serial::{Config, Rx, SerialExt, Tx},
     spi::Error,
+    //delay::Delay,
+    stm32::{CorePeripherals, Peripherals, USART1},
 };
 
 #[cfg(feature = "stm32l1xx")]
