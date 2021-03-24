@@ -112,6 +112,7 @@ fn setup() -> (
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.constrain();
+    let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
     let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
 
     //this would work for delay on bluepill but not others
@@ -488,7 +489,8 @@ use stm32l1xx_hal::{
         Output, PushPull,
     },
     prelude::*,
-    stm32::Peripherals,
+    rcc, // for ::Config but note name conflict with serial
+    stm32::{CorePeripherals, Peripherals},
 };
 
 #[cfg(feature = "stm32l1xx")] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
@@ -540,7 +542,7 @@ fn setup() -> (
         gpiob.pb13.into_push_pull_output(), // led on pb13
         gpiob.pb14.into_push_pull_output(), // led on pb14
         gpiob.pb15.into_push_pull_output(), // led on pb15
-        Delay::new(cp.SYST, clocks),        // delay
+        Delay::new(cp.SYST, rcc.clocks),    // delay
     )
 }
 
@@ -564,7 +566,16 @@ fn setup() -> (
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
+    let mut flash = p.FLASH.constrain();
     let mut rcc = p.RCC.constrain();
+    let mut pwr = p.PWR.constrain(&mut rcc.apb1r1);
+    let clocks = rcc
+        .cfgr
+        .sysclk(80.mhz())
+        .pclk1(80.mhz())
+        .pclk2(80.mhz())
+        .freeze(&mut flash.acr, &mut pwr);
+
     let mut gpiob = p.GPIOB.split(&mut rcc.ahb2);
 
     // all leds wire with pin as source, cathode connect to ground though a resistor.
@@ -606,7 +617,7 @@ fn setup() -> (
         gpiob
             .pb15
             .into_push_pull_output(&mut gpiob.moder, &mut gpiob.otyper), // led on pb15
-        cp.SYST.delay(rcc.clocks),
+        Delay::new(cp.SYST, clocks),
     )
 }
 
