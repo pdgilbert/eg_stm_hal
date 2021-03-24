@@ -94,9 +94,9 @@ use embedded_hal::digital::v2::OutputPin;
 #[cfg(feature = "stm32f1xx")]
 fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
     let cp = CorePeripherals::take().unwrap();
-    let dp = Peripherals::take().unwrap();
-    let mut rcc = dp.RCC.constrain();
-    let mut gpioc = dp.GPIOC.split(&mut rcc.apb2);
+    let p = Peripherals::take().unwrap();
+    let mut rcc = d.RCC.constrain();
+    let mut gpioc = d.GPIOC.split(&mut rcc.apb2);
 
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -125,9 +125,9 @@ use stm32f3xx_hal::{
 #[cfg(feature = "stm32f3xx")]
 fn setup() -> (PE15<Output<PushPull>>, AsmDelay) {
     let cp = CorePeripherals::take().unwrap();
-    let dp = Peripherals::take().unwrap();
-    let mut rcc = dp.RCC.constrain();
-    let mut gpioe = dp.GPIOE.split(&mut rcc.ahb);
+    let p = Peripherals::take().unwrap();
+    let mut rcc = d.RCC.constrain();
+    let mut gpioe = d.GPIOE.split(&mut rcc.ahb);
 
     impl LED for PE15<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -169,8 +169,8 @@ fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
     //(PA5<Output<PushPull>>, AsmDelay) {
 
     let cp = CorePeripherals::take().unwrap();
-    let dp = Peripherals::take().unwrap();
-    let gpioc = dp.GPIOC.split();
+    let p = Peripherals::take().unwrap();
+    let gpioc = d.GPIOC.split();
 
     // Note that blackpill with stm32f411 and nucleo-64 with stm32f411 have onboard led wired
     // differently, so this is reversed (in addition to PA5 vs PC13).
@@ -201,8 +201,8 @@ use stm32f7xx_hal::{
 #[cfg(feature = "stm32f7xx")]
 fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
     let cp = CorePeripherals::take().unwrap();
-    let dp = Peripherals::take().unwrap();
-    let gpioc = dp.GPIOC.split();
+    let p = Peripherals::take().unwrap();
+    let gpioc = d.GPIOC.split();
 
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -235,12 +235,12 @@ use embedded_hal::digital::v2::OutputPin;
 fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
     // see https://github.com/stm32-rs/stm32h7xx-hal/blob/master/examples/blinky.rs
     let cp = CorePeripherals::take().unwrap();
-    let dp = Peripherals::take().unwrap();
-    let pwr = dp.PWR.constrain();
+    let p = Peripherals::take().unwrap();
+    let pwr = d.PWR.constrain();
     let vos = pwr.freeze();
-    let rcc = dp.RCC.constrain();
-    let ccdr = rcc.sys_ck(100.mhz()).freeze(vos, &dp.SYSCFG);
-    let gpioc = dp.GPIOC.split(ccdr.peripheral.GPIOC);
+    let rcc = d.RCC.constrain();
+    let ccdr = rcc.sys_ck(100.mhz()).freeze(vos, &d.SYSCFG);
+    let gpioc = d.GPIOC.split(ccdr.peripheral.GPIOC);
 
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -270,9 +270,9 @@ use stm32l0xx_hal::{
 #[cfg(feature = "stm32l0xx")]
 fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
     let cp = CorePeripherals::take().unwrap();
-    let dp = Peripherals::take().unwrap();
-    let mut rcc = dp.RCC.freeze(rcc::Config::hsi16());
-    let gpioc = dp.GPIOC.split(&mut rcc);
+    let p = Peripherals::take().unwrap();
+    let mut rcc = d.RCC.freeze(rcc::Config::hsi16());
+    let gpioc = d.GPIOC.split(&mut rcc);
 
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -304,8 +304,8 @@ use embedded_hal::digital::v2::OutputPin;
 #[cfg(feature = "stm32l1xx")]
 fn setup() -> (PB6<Output<PushPull>>, AsmDelay) {
     let cp = CorePeripherals::take().unwrap();
-    let dp = Peripherals::take().unwrap();
-    let gpiob = dp.GPIOB.split();
+    let p = Peripherals::take().unwrap();
+    let gpiob = d.GPIOB.split();
 
     impl LED for PB6<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -334,9 +334,9 @@ use stm32l4xx_hal::{
 #[cfg(feature = "stm32l4xx")]
 fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
     let cp = CorePeripherals::take().unwrap();
-    let dp = Peripherals::take().unwrap();
-    let mut rcc = dp.RCC.constrain();
-    let mut gpioc = dp.GPIOC.split(&mut rcc.ahb2);
+    let p = Peripherals::take().unwrap();
+    let mut rcc = d.RCC.constrain();
+    let mut gpioc = d.GPIOC.split(&mut rcc.ahb2);
 
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {

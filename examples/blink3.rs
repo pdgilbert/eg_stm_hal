@@ -116,9 +116,9 @@ fn setup() -> (
     Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
-    let dp = Peripherals::take().unwrap();
-    let mut rcc = dp.RCC.constrain();
-    let mut gpiob = dp.GPIOB.split(&mut rcc.apb2);
+    let p = Peripherals::take().unwrap();
+    let mut rcc = d.RCC.constrain();
+    let mut gpiob = d.GPIOB.split(&mut rcc.apb2);
 
     //this would work for delay on bluepill but not others
     //use stm32f1xx_hal::timer::Timer;
@@ -182,9 +182,9 @@ fn setup() -> (
     Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
-    let dp = Peripherals::take().unwrap();
-    let mut rcc = dp.RCC.constrain();
-    let mut gpiob = dp.GPIOB.split(&mut rcc.ahb);
+    let p = Peripherals::take().unwrap();
+    let mut rcc = d.RCC.constrain();
+    let mut gpiob = d.GPIOB.split(&mut rcc.ahb);
 
     // all leds wire with pin as source, cathode connect to ground though a resistor.
     impl LED for PB13<Output<PushPull>> {
@@ -251,8 +251,8 @@ fn setup() -> (
     Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
-    let dp = Peripherals::take().unwrap();
-    let gpiob = dp.GPIOB.split();
+    let p = Peripherals::take().unwrap();
+    let gpiob = d.GPIOB.split();
 
     // all leds wire with pin as source, cathode connect to ground though a resistor.
     impl LED for PB13<Output<PushPull>> {
@@ -310,8 +310,8 @@ fn setup() -> (
     Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
-    let dp = Peripherals::take().unwrap();
-    let gpiob = dp.GPIOB.split();
+    let p = Peripherals::take().unwrap();
+    let gpiob = d.GPIOB.split();
 
     // all leds wire with pin as source, cathode connect to ground though a resistor.
     impl LED for PB13<Output<PushPull>> {
@@ -373,12 +373,12 @@ fn setup() -> (
 ) {
     // see https://github.com/stm32-rs/stm32h7xx-hal/blob/master/examples/blinky.rs
     let cp = CorePeripherals::take().unwrap();
-    let dp = Peripherals::take().unwrap();
-    let pwr = dp.PWR.constrain();
+    let p = Peripherals::take().unwrap();
+    let pwr = d.PWR.constrain();
     let vos = pwr.freeze();
-    let rcc = dp.RCC.constrain();
-    let ccdr = rcc.sys_ck(100.mhz()).freeze(vos, &dp.SYSCFG);
-    let gpiob = dp.GPIOB.split(ccdr.peripheral.GPIOB);
+    let rcc = d.RCC.constrain();
+    let ccdr = rcc.sys_ck(100.mhz()).freeze(vos, &d.SYSCFG);
+    let gpiob = d.GPIOB.split(ccdr.peripheral.GPIOB);
 
     // all leds wire with pin as source, cathode connect to ground though a resistor.
     impl LED for PB13<Output<PushPull>> {
@@ -437,9 +437,9 @@ fn setup() -> (
     Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
-    let dp = Peripherals::take().unwrap();
-    let mut rcc = dp.RCC.freeze(rcc::Config::hsi16());
-    let gpiob = dp.GPIOB.split(&mut rcc);
+    let p = Peripherals::take().unwrap();
+    let mut rcc = d.RCC.freeze(rcc::Config::hsi16());
+    let gpiob = d.GPIOB.split(&mut rcc);
 
     // all leds wire with pin as source, cathode connect to ground though a resistor.
     impl LED for PB13<Output<PushPull>> {
@@ -500,8 +500,8 @@ fn setup() -> (
     Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
-    let dp = Peripherals::take().unwrap();
-    let gpiob = dp.GPIOB.split();
+    let p = Peripherals::take().unwrap();
+    let gpiob = d.GPIOB.split();
 
     // all leds wire with pin as source, cathode connect to ground though a resistor.
     impl LED for PB13<Output<PushPull>> {
@@ -559,9 +559,9 @@ fn setup() -> (
     Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
-    let dp = Peripherals::take().unwrap();
-    let mut rcc = dp.RCC.constrain();
-    let mut gpiob = dp.GPIOB.split(&mut rcc.ahb2);
+    let p = Peripherals::take().unwrap();
+    let mut rcc = d.RCC.constrain();
+    let mut gpiob = d.GPIOB.split(&mut rcc.ahb2);
 
     // all leds wire with pin as source, cathode connect to ground though a resistor.
     impl LED for PB13<Output<PushPull>> {

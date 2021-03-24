@@ -48,20 +48,20 @@ fn setup() -> (
     Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
-    let dp = Peripherals::take().unwrap();
+    let p = Peripherals::take().unwrap();
 
-    let mut rcc = dp.RCC.constrain();
-    let clocks = rcc.cfgr.freeze(&mut dp.FLASH.constrain().acr);
+    let mut rcc = d.RCC.constrain();
+    let clocks = rcc.cfgr.freeze(&mut d.FLASH.constrain().acr);
 
-    let mut gpiob = dp.GPIOB.split(&mut rcc.apb2); // for i2c scl and sda
+    let mut gpiob = d.GPIOB.split(&mut rcc.apb2); // for i2c scl and sda
 
     let i2c = BlockingI2c::new(
-        dp.I2C1,
+        d.I2C1,
         (
             gpiob.pb8.into_alternate_open_drain(&mut gpiob.crh), // i2c scl on pb8
             gpiob.pb9.into_alternate_open_drain(&mut gpiob.crh),
         ), // i2c sda on pb9
-        &mut dp.AFIO.constrain(&mut rcc.apb2).mapr,
+        &mut d.AFIO.constrain(&mut rcc.apb2).mapr,
         Mode::Fast {
             frequency: 100_000.hz(),
             duty_cycle: DutyCycle::Ratio2to1,
@@ -75,7 +75,7 @@ fn setup() -> (
     );
 
     // led
-    let mut gpioc = dp.GPIOC.split(&mut rcc.apb2);
+    let mut gpioc = d.GPIOC.split(&mut rcc.apb2);
     let led = gpioc.pc13.into_push_pull_output(&mut gpioc.crh); // led on pc13
 
     (i2c, led, Delay::new(cp.SYST, clocks)) // return tuple (i2c, led, delay)
@@ -104,20 +104,20 @@ fn setup() -> (
     Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
-    let dp = Peripherals::take().unwrap();
+    let p = Peripherals::take().unwrap();
 
-    let mut rcc = dp.RCC.constrain();
-    let clocks = rcc.cfgr.freeze(&mut dp.FLASH.constrain().acr);
+    let mut rcc = d.RCC.constrain();
+    let clocks = rcc.cfgr.freeze(&mut d.FLASH.constrain().acr);
 
-    let mut gpiob = dp.GPIOB.split(&mut rcc.apb2); // for i2c scl and sda
+    let mut gpiob = d.GPIOB.split(&mut rcc.apb2); // for i2c scl and sda
 
     let i2c = BlockingI2c::new(
-        dp.I2C1,
+        d.I2C1,
         (
             gpiob.pb8.into_alternate_open_drain(&mut gpiob.crh), // i2c scl on pb8
             gpiob.pb9.into_alternate_open_drain(&mut gpiob.crh),
         ), // i2c sda on pb9
-        &mut dp.AFIO.constrain(&mut rcc.apb2).mapr,
+        &mut d.AFIO.constrain(&mut rcc.apb2).mapr,
         Mode::Fast {
             frequency: 100_000.hz(),
             duty_cycle: DutyCycle::Ratio2to1,
@@ -131,7 +131,7 @@ fn setup() -> (
     );
 
     // led
-    let mut gpioc = dp.GPIOC.split(&mut rcc.apb2);
+    let mut gpioc = d.GPIOC.split(&mut rcc.apb2);
     let led = gpioc.pc13.into_push_pull_output(&mut gpioc.crh); // led on pc13
 
     (i2c, led, Delay::new(cp.SYST, clocks)) // return tuple (i2c, led, delay)
@@ -158,15 +158,15 @@ fn setup() -> (
     Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
-    let dp = Peripherals::take().unwrap();
+    let p = Peripherals::take().unwrap();
 
-    let mut rcc = dp.RCC.constrain();
-    let clocks = rcc.cfgr.freeze(&mut dp.FLASH.constrain().acr);
+    let mut rcc = d.RCC.constrain();
+    let clocks = rcc.cfgr.freeze(&mut d.FLASH.constrain().acr);
 
-    let mut gpiob = dp.GPIOB.split(&mut rcc.ahb); // for i2c
+    let mut gpiob = d.GPIOB.split(&mut rcc.ahb); // for i2c
 
     let i2c = I2c::new(
-        dp.I2C1,
+        d.I2C1,
         (
             gpiob.pb6.into_af4(&mut gpiob.moder, &mut gpiob.afrl), // i2c scl on pb6,
             gpiob.pb7.into_af4(&mut gpiob.moder, &mut gpiob.afrl),
@@ -177,7 +177,7 @@ fn setup() -> (
     );
 
     // led
-    let mut gpioe = dp.GPIOE.split(&mut rcc.ahb);
+    let mut gpioe = d.GPIOE.split(&mut rcc.ahb);
     let led = gpioe
         .pe9
         .into_push_pull_output(&mut gpioe.moder, &mut gpioe.otyper); // led on pe9
@@ -209,15 +209,15 @@ fn setup() -> (
     Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
-    let dp = Peripherals::take().unwrap();
+    let p = Peripherals::take().unwrap();
 
-    let mut rcc = dp.RCC.constrain();
+    let mut rcc = d.RCC.constrain();
     let clocks = rcc.cfgr.freeze();
 
-    let mut gpiob = dp.GPIOB.split(); // for i2c
+    let mut gpiob = d.GPIOB.split(); // for i2c
 
     let i2c = I2c::i2c1(
-        dp.I2C1,
+        d.I2C1,
         (
             gpiob.pb8.into_alternate_af4(), // i2c scl on pb8,
             gpiob.pb7.into_alternate_af4(),
@@ -227,7 +227,7 @@ fn setup() -> (
     );
 
     // led
-    let mut gpioe = dp.GPIOE.split();
+    let mut gpioe = d.GPIOE.split();
     let led = gpioe.pe9.into_push_pull_output(); // led on pe9
                                                  //let led = gpiob.pb13.into_push_pull_output();          // external led on pb13
 
