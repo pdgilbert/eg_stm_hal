@@ -375,12 +375,12 @@ fn setup() -> (
 ) {
     // see https://github.com/stm32-rs/stm32h7xx-hal/blob/master/examples/blinky.rs
     let cp = CorePeripherals::take().unwrap();
-    let  p = Peripherals::take().unwrap();
-    let pwr =  p.PWR.constrain();
+    let p = Peripherals::take().unwrap();
+    let pwr = p.PWR.constrain();
     let vos = pwr.freeze();
-    let rcc =  p.RCC.constrain();
-    let ccdr = rcc.sys_ck(100.mhz()).freeze(vos, & p.SYSCFG);
-    let gpiob =  p.GPIOB.split(ccdr.peripheral.GPIOB);
+    let rcc = p.RCC.constrain();
+    let ccdr = rcc.sys_ck(100.mhz()).freeze(vos, &p.SYSCFG);
+    let gpiob = p.GPIOB.split(ccdr.peripheral.GPIOB);
 
     // all leds wire with pin as source, cathode connect to ground though a resistor.
     impl LED for PB13<Output<PushPull>> {
@@ -439,9 +439,9 @@ fn setup() -> (
     Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
-    let  p = Peripherals::take().unwrap();
-    let mut rcc =  p.RCC.freeze(rcc::Config::hsi16());
-    let gpiob =  p.GPIOB.split(&mut rcc);
+    let p = Peripherals::take().unwrap();
+    let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
+    let gpiob = p.GPIOB.split(&mut rcc);
 
     // all leds wire with pin as source, cathode connect to ground though a resistor.
     impl LED for PB13<Output<PushPull>> {

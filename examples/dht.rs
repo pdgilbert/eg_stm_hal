@@ -70,6 +70,8 @@ fn setup() -> (PA8<Output<OpenDrain>>, Delay) {
     (pa8, delay) //DHT data will be on A8
 }
 
+use embedded_hal::digital::InputPin;
+use embedded_hal::digital::OutputPin;
 #[cfg(feature = "stm32f1xx")]
 use stm32f1xx_hal::{
     delay::Delay,
@@ -77,14 +79,12 @@ use stm32f1xx_hal::{
     pac::{CorePeripherals, Peripherals},
     prelude::*,
 };
-use embedded_hal::digital::OutputPin;
-use embedded_hal::digital::InputPin;
 
 // open_drain_output is really input and output
 
 #[cfg(feature = "stm32f1xx")]
 fn setup() -> (PA8<Output<OpenDrain>>, Delay) {
-//fn setup() -> (PA8<Output<OpenDrain>>, impl DelayMs<u16>) {
+    //fn setup() -> (PA8<Output<OpenDrain>>, impl DelayMs<u16>) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
