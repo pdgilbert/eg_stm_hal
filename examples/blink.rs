@@ -32,7 +32,7 @@ use panic_halt;
 // use panic_semihosting; // logs messages to the host stderr; requires a debugger
 
 // use nb::block;
-use asm_delay::{bitrate, AsmDelay};
+//use asm_delay::{bitrate, AsmDelay};
 use cortex_m_rt::entry;
 
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
@@ -45,15 +45,12 @@ use cortex_m_rt::entry;
 use stm32f0xx_hal::{
     delay::Delay,
     gpio::{gpioc::PC13, Output, PushPull},
-    pac::Peripherals,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
 };
 
-//#[cfg(feature = "stm32f0xx")]
-//use embedded_hal::digital::v2::OutputPin;
-
 #[cfg(feature = "stm32f0xx")]
-fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
+fn setup() -> (PC13<Output<PushPull>>, Delay) {
     let cp = CorePeripherals::take().unwrap();
     let mut p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.configure().sysclk(8.mhz()).freeze(&mut p.FLASH);
@@ -72,12 +69,10 @@ fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
     // led on pc13 with on/off
     let led = cortex_m::interrupt::free(move |cs| gpioc.pc13.into_push_pull_output(cs));
 
-    // led on pc13 with on/off
-    let delay = AsmDelay::new(bitrate::U32BitrateExt::mhz(16));
-    //let delay = Delay::new(cp.SYST, &rcc);
+    //let delay = AsmDelay::new(bitrate::U32BitrateExt::mhz(16));
 
     // return tuple  (led, delay)
-    (led, delay)
+    (led, Delay::new(cp.SYST, &rcc))
 }
 
 #[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
@@ -95,8 +90,9 @@ use embedded_hal::digital::v2::OutputPin;
 fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
-    let mut rcc = d.RCC.constrain();
-    let mut gpioc = d.GPIOC.split(&mut rcc.apb2);
+    let mut rcc = p.RCC.constrain();
+    let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
+    let mut gpioc = p.GPIOC.split(&mut rcc.apb2);
 
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -119,15 +115,16 @@ use stm32f3xx_hal::{
     delay::Delay,
     gpio::{gpioe::PE15, Output, PushPull},
     prelude::*,
-    stm32::Peripherals,
+    stm32::{CorePeripherals, Peripherals},
 };
 
 #[cfg(feature = "stm32f3xx")]
 fn setup() -> (PE15<Output<PushPull>>, AsmDelay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
-    let mut rcc = d.RCC.constrain();
-    let mut gpioe = d.GPIOE.split(&mut rcc.ahb);
+    let mut rcc = p.RCC.constrain();
+    let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
+    let mut gpioe = p.GPIOE.split(&mut rcc.ahb);
 
     impl LED for PE15<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -138,17 +135,16 @@ fn setup() -> (PE15<Output<PushPull>>, AsmDelay) {
         }
     };
 
-    // the hal delay function panics if the delay time is set at 2098ms or above.
+    // the hal delay function paniced if the delay time was set at 2098ms or above.
     // see https://github.com/stm32-rs/stm32f3xx-hal/issues/203
-    //let delay = Delay::new(cp.SYST, clocks);                      // panics
-    let delay = AsmDelay::new(bitrate::U32BitrateExt::mhz(16)); //works
+    // delay fixed https://github.com/stm32-rs/stm32f3xx-hal/pull/208};
 
     // return tuple  (led, delay)
     (
         gpioe
             .pe15
             .into_push_pull_output(&mut gpioe.moder, &mut gpioe.otyper), // led on pe15 with on/off
-        delay,
+        Delay::new(cp.SYST, clocks),
     )
 }
 
@@ -157,20 +153,26 @@ use stm32f4xx_hal::{
     delay::Delay,
     gpio::{gpioc::PC13, Output, PushPull},
     //gpio::{gpioa::PA5, Output, PushPull,},
-    pac::Peripherals,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
 };
 
-//#[cfg(feature = "stm32f4xx")]
-//use embedded_hal::digital::v2::OutputPin;
-
 #[cfg(feature = "stm32f4xx")]
-fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
-    //(PA5<Output<PushPull>>, AsmDelay) {
+fn setup() -> (PC13<Output<PushPull>>, Delay) {
+    //(PA5<Output<PushPull>>, Delay) {
 
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
-    let gpioc = d.GPIOC.split();
+    let rcc = p.RCC.constrain();
+    let clocks = rcc
+        .cfgr
+        .hclk(48.mhz())
+        .sysclk(48.mhz())
+        .pclk1(24.mhz())
+        .pclk2(24.mhz())
+        .freeze();
+
+    let gpioc = p.GPIOC.split();
 
     // Note that blackpill with stm32f411 and nucleo-64 with stm32f411 have onboard led wired
     // differently, so this is reversed (in addition to PA5 vs PC13).
@@ -186,8 +188,8 @@ fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
     // return tuple  (led, delay)
     (
         gpioc.pc13.into_push_pull_output(), // led on pc13 with on/off
-        AsmDelay::new(bitrate::U32BitrateExt::mhz(32)),
-    ) // delay
+        Delay::new(cp.SYST, clocks),
+    )
 }
 
 #[cfg(feature = "stm32f7xx")]
@@ -202,7 +204,9 @@ use stm32f7xx_hal::{
 fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
-    let gpioc = d.GPIOC.split();
+    let clocks = p.RCC.constrain().cfgr.sysclk(216.mhz()).freeze();
+
+    let gpioc = p.GPIOC.split();
 
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -254,21 +258,21 @@ fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
     // return tuple  (led, delay)
     (
         gpioc.pc13.into_push_pull_output(), // led on pc13 with on/off
-        AsmDelay::new(bitrate::U32BitrateExt::mhz(32)),
-    ) // delay
+        Delay::new(cp.SYST, ccdr.clocks),   //SysTick: System Timer  delay
+    )
 }
 
 #[cfg(feature = "stm32l0xx")]
 use stm32l0xx_hal::{
     delay::Delay,
     gpio::{gpioc::PC13, Output, PushPull},
-    pac::Peripherals,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
 };
 
 #[cfg(feature = "stm32l0xx")]
-fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
+fn setup() -> (PC13<Output<PushPull>>, Delay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = d.RCC.freeze(rcc::Config::hsi16());
@@ -286,8 +290,8 @@ fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
     // return tuple  (led, delay)
     (
         gpioc.pc13.into_push_pull_output(), // led on pc13 with on/off
-        AsmDelay::new(bitrate::U32BitrateExt::mhz(32)),
-    ) // delay
+        Delay::new(cp.SYST, clocks),
+    )
 }
 
 #[cfg(feature = "stm32l1xx")] // eg  Discovery STM32L100 and Heltec lora_node STM32L151CCU6
@@ -295,7 +299,7 @@ use stm32l1xx_hal::{
     delay::Delay,
     gpio::{gpiob::PB6, Output, PushPull},
     prelude::*,
-    stm32::Peripherals,
+    stm32::{CorePeripherals, Peripherals},
 };
 
 #[cfg(feature = "stm32l1xx")]
@@ -305,7 +309,9 @@ use embedded_hal::digital::v2::OutputPin;
 fn setup() -> (PB6<Output<PushPull>>, AsmDelay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
-    let gpiob = d.GPIOB.split();
+    let rcc = p.RCC.freeze(rcc::Config::hsi());
+
+    let gpiob = p.GPIOB.split();
 
     impl LED for PB6<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -319,24 +325,32 @@ fn setup() -> (PB6<Output<PushPull>>, AsmDelay) {
     // return tuple  (led, delay)
     (
         gpiob.pb6.into_push_pull_output(), // led on pb6 with on/off
-        AsmDelay::new(bitrate::U32BitrateExt::mhz(4)),
-    ) // delay
+        cp.SYST.delay(rcc.clocks),
+    )
 }
 
 #[cfg(feature = "stm32l4xx")]
 use stm32l4xx_hal::{
     delay::Delay,
     gpio::{gpioc::PC13, Output, PushPull},
-    pac::Peripherals,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
 };
 
 #[cfg(feature = "stm32l4xx")]
-fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
+fn setup() -> (PC13<Output<PushPull>>, Delay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
-    let mut rcc = d.RCC.constrain();
-    let mut gpioc = d.GPIOC.split(&mut rcc.ahb2);
+    let mut rcc = p.RCC.constrain();
+    let mut pwr = p.PWR.constrain(&mut rcc.apb1r1);
+    let clocks = rcc
+        .cfgr
+        .sysclk(80.mhz())
+        .pclk1(80.mhz())
+        .pclk2(80.mhz())
+        .freeze(&mut flash.acr, &mut pwr);
+
+    let mut gpioc = p.GPIOC.split(&mut rcc.ahb2);
 
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -352,8 +366,8 @@ fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
         gpioc
             .pc13
             .into_push_pull_output(&mut gpioc.moder, &mut gpioc.otyper), // led on pc13 with on/off
-        AsmDelay::new(bitrate::U32BitrateExt::mhz(32)),
-    ) // delay
+        Delay::new(cp.SYST, clocks),
+    )
 }
 
 // End of hal/MCU specific setup. Following should be generic code.
