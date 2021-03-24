@@ -35,7 +35,7 @@ use stm32f0xx_hal::{
         Alternate, OpenDrain, Output, PushPull,
     },
     i2c::{BlockingI2c, DutyCycle, Mode},
-    pac::Peripherals,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
 };
 //#[cfg(feature = "stm32f0xx")]  //  eg blue pill stm32f103
@@ -47,7 +47,7 @@ fn setup() -> (
     PC13<Output<PushPull>>,
     Delay,
 ) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let dp = Peripherals::take().unwrap();
 
     let mut rcc = dp.RCC.constrain();
@@ -91,7 +91,7 @@ use stm32f1xx_hal::{
         Alternate, OpenDrain, Output, PushPull,
     },
     i2c::{BlockingI2c, DutyCycle, Mode},
-    pac::Peripherals,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
 };
 //#[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
@@ -103,7 +103,7 @@ fn setup() -> (
     PC13<Output<PushPull>>,
     Delay,
 ) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let dp = Peripherals::take().unwrap();
 
     let mut rcc = dp.RCC.constrain();
@@ -157,7 +157,7 @@ fn setup() -> (
     PE9<Output<PushPull>>,
     Delay,
 ) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let dp = Peripherals::take().unwrap();
 
     let mut rcc = dp.RCC.constrain();
@@ -195,8 +195,8 @@ use stm32f4xx_hal::{
         Alternate, Output, PushPull, AF4,
     },
     i2c::I2c,
-    pac::Peripherals,
     pac::I2C1,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
 };
 //#[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
@@ -208,7 +208,7 @@ fn setup() -> (
     PE9<Output<PushPull>>,
     Delay,
 ) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let dp = Peripherals::take().unwrap();
 
     let mut rcc = dp.RCC.constrain();

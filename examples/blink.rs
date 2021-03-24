@@ -21,15 +21,15 @@
 #![no_main]
 
 #[cfg(debug_assertions)]
-extern crate panic_semihosting;
+use panic_semihosting;
 
 #[cfg(not(debug_assertions))]
-extern crate panic_halt;
+use panic_halt;
 
-// extern crate panic_halt;  // put a breakpoint on `rust_begin_unwind` to catch panics
-// extern crate panic_abort; // may still require nightly?
-// extern crate panic_itm;   // logs messages over ITM; requires ITM support
-// extern crate panic_semihosting; // logs messages to the host stderr; requires a debugger
+// use panic_halt;  // put a breakpoint on `rust_begin_unwind` to catch panics
+// use panic_abort; // may still require nightly?
+// use panic_itm;   // logs messages over ITM; requires ITM support
+// use panic_semihosting; // logs messages to the host stderr; requires a debugger
 
 // use nb::block;
 use asm_delay::{bitrate, AsmDelay};
@@ -43,6 +43,7 @@ use cortex_m_rt::entry;
 
 #[cfg(feature = "stm32f0xx")] //  eg  stm32f303x4
 use stm32f0xx_hal::{
+    delay::Delay,
     gpio::{gpioc::PC13, Output, PushPull},
     pac::Peripherals,
     prelude::*,
@@ -53,7 +54,7 @@ use stm32f0xx_hal::{
 
 #[cfg(feature = "stm32f0xx")]
 fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
-    //let mut cp  = cortex_m::peripheral::Peripherals::take()
+    let cp = CorePeripherals::take().unwrap();
     let mut p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.configure().sysclk(8.mhz()).freeze(&mut p.FLASH);
 
@@ -81,6 +82,7 @@ fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
 
 #[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
 use stm32f1xx_hal::{
+    delay::Delay,
     gpio::{gpioc::PC13, Output, PushPull},
     pac::Peripherals,
     prelude::*,
@@ -91,6 +93,7 @@ use embedded_hal::digital::v2::OutputPin;
 
 #[cfg(feature = "stm32f1xx")]
 fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
+    let cp = CorePeripherals::take().unwrap();
     let dp = Peripherals::take().unwrap();
     let mut rcc = dp.RCC.constrain();
     let mut gpioc = dp.GPIOC.split(&mut rcc.apb2);
@@ -113,6 +116,7 @@ fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
 
 #[cfg(feature = "stm32f3xx")] //  eg Discovery-stm32f303
 use stm32f3xx_hal::{
+    delay::Delay,
     gpio::{gpioe::PE15, Output, PushPull},
     prelude::*,
     stm32::Peripherals,
@@ -120,6 +124,7 @@ use stm32f3xx_hal::{
 
 #[cfg(feature = "stm32f3xx")]
 fn setup() -> (PE15<Output<PushPull>>, AsmDelay) {
+    let cp = CorePeripherals::take().unwrap();
     let dp = Peripherals::take().unwrap();
     let mut rcc = dp.RCC.constrain();
     let mut gpioe = dp.GPIOE.split(&mut rcc.ahb);
@@ -149,6 +154,7 @@ fn setup() -> (PE15<Output<PushPull>>, AsmDelay) {
 
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
 use stm32f4xx_hal::{
+    delay::Delay,
     gpio::{gpioc::PC13, Output, PushPull},
     //gpio::{gpioa::PA5, Output, PushPull,},
     pac::Peripherals,
@@ -162,6 +168,7 @@ use stm32f4xx_hal::{
 fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
     //(PA5<Output<PushPull>>, AsmDelay) {
 
+    let cp = CorePeripherals::take().unwrap();
     let dp = Peripherals::take().unwrap();
     let gpioc = dp.GPIOC.split();
 
@@ -185,6 +192,7 @@ fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
 
 #[cfg(feature = "stm32f7xx")]
 use stm32f7xx_hal::{
+    delay::Delay,
     gpio::{gpioc::PC13, Output, PushPull},
     pac::Peripherals,
     prelude::*,
@@ -192,6 +200,7 @@ use stm32f7xx_hal::{
 
 #[cfg(feature = "stm32f7xx")]
 fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
+    let cp = CorePeripherals::take().unwrap();
     let dp = Peripherals::take().unwrap();
     let gpioc = dp.GPIOC.split();
 
@@ -213,6 +222,7 @@ fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
 
 #[cfg(feature = "stm32h7xx")]
 use stm32h7xx_hal::{
+    delay::Delay,
     gpio::{gpioc::PC13, Output, PushPull},
     pac::Peripherals,
     prelude::*,
@@ -224,6 +234,7 @@ use embedded_hal::digital::v2::OutputPin;
 #[cfg(feature = "stm32h7xx")]
 fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
     // see https://github.com/stm32-rs/stm32h7xx-hal/blob/master/examples/blinky.rs
+    let cp = CorePeripherals::take().unwrap();
     let dp = Peripherals::take().unwrap();
     let pwr = dp.PWR.constrain();
     let vos = pwr.freeze();
@@ -249,6 +260,7 @@ fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
 
 #[cfg(feature = "stm32l0xx")]
 use stm32l0xx_hal::{
+    delay::Delay,
     gpio::{gpioc::PC13, Output, PushPull},
     pac::Peripherals,
     prelude::*,
@@ -257,6 +269,7 @@ use stm32l0xx_hal::{
 
 #[cfg(feature = "stm32l0xx")]
 fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
+    let cp = CorePeripherals::take().unwrap();
     let dp = Peripherals::take().unwrap();
     let mut rcc = dp.RCC.freeze(rcc::Config::hsi16());
     let gpioc = dp.GPIOC.split(&mut rcc);
@@ -279,6 +292,7 @@ fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
 
 #[cfg(feature = "stm32l1xx")] // eg  Discovery STM32L100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{
+    delay::Delay,
     gpio::{gpiob::PB6, Output, PushPull},
     prelude::*,
     stm32::Peripherals,
@@ -289,6 +303,7 @@ use embedded_hal::digital::v2::OutputPin;
 
 #[cfg(feature = "stm32l1xx")]
 fn setup() -> (PB6<Output<PushPull>>, AsmDelay) {
+    let cp = CorePeripherals::take().unwrap();
     let dp = Peripherals::take().unwrap();
     let gpiob = dp.GPIOB.split();
 
@@ -310,6 +325,7 @@ fn setup() -> (PB6<Output<PushPull>>, AsmDelay) {
 
 #[cfg(feature = "stm32l4xx")]
 use stm32l4xx_hal::{
+    delay::Delay,
     gpio::{gpioc::PC13, Output, PushPull},
     pac::Peripherals,
     prelude::*,
@@ -317,6 +333,7 @@ use stm32l4xx_hal::{
 
 #[cfg(feature = "stm32l4xx")]
 fn setup() -> (PC13<Output<PushPull>>, AsmDelay) {
+    let cp = CorePeripherals::take().unwrap();
     let dp = Peripherals::take().unwrap();
     let mut rcc = dp.RCC.constrain();
     let mut gpioc = dp.GPIOC.split(&mut rcc.ahb2);

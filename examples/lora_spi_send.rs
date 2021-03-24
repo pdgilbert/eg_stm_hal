@@ -18,10 +18,10 @@
 #![no_main]
 
 #[cfg(debug_assertions)]
-extern crate panic_semihosting;
+use panic_semihosting;
 
 #[cfg(not(debug_assertions))]
-extern crate panic_halt;
+use panic_halt;
 
 use core::convert::Infallible;
 
@@ -43,7 +43,7 @@ use embedded_hal_compat::IntoCompat;
 use embedded_hal::spi::{Mode, Phase, Polarity};
 //use old_e_h::spi::{Mode, Phase, Polarity};
 
-//use asm_delay::{ AsmDelay, bitrate, };
+//use asm_delay::{ Delay, bitrate, };
 
 //use cortex_m::asm;  //for breakpoint
 
@@ -114,7 +114,7 @@ const CONFIG_RADIO: radio_sx127x::device::Config = radio_sx127x::device::Config 
 #[cfg(feature = "stm32f0xx")] //  eg stm32f030xc
 use stm32f0xx_hal::{
     delay::Delay,
-    pac::Peripherals,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     spi::{Error, Spi},
 };
@@ -123,7 +123,7 @@ use stm32f0xx_hal::{
 fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
     //  Infallible, Infallible   reflect the error type on the spi and gpio traits.
 
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let mut p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.configure().freeze(&mut p.FLASH);
 
@@ -167,14 +167,14 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible
 #[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
 use stm32f1xx_hal::{
     delay::Delay,
-    pac::Peripherals,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     spi::{Error, Spi},
 };
 
 #[cfg(feature = "stm32f1xx")]
 fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
     let mut rcc = p.RCC.constrain();
@@ -231,7 +231,7 @@ use stm32f3xx_hal::{
 #[cfg(feature = "stm32f3xx")]
 fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible>> {
     //fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
     let mut rcc = p.RCC.constrain();
@@ -291,7 +291,7 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible
 // eg Nucleo-64 stm32f411, blackpill stm32f411, blackpill stm32f401
 use stm32f4xx_hal::{
     delay::Delay,
-    pac::Peripherals,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     spi::{Error, Spi},
     time::MegaHertz,
@@ -311,7 +311,7 @@ use stm32f4xx_hal::{
 
 #[cfg(feature = "stm32f4xx")]
 fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
     let rcc = p.RCC.constrain();
@@ -363,14 +363,14 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible
 #[cfg(feature = "stm32f7xx")]
 use stm32f7xx_hal::{
     delay::Delay,
-    pac::Peripherals,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     spi::{ClockDivider, Error, Spi},
 };
 
 #[cfg(feature = "stm32f7xx")]
 fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
     let mut rcc = p.RCC.constrain();
@@ -408,11 +408,17 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible
 }
 
 #[cfg(feature = "stm32h7xx")]
-use stm32h7xx_hal::{delay::Delay, pac::Peripherals, prelude::*, spi::Error, Never};
+use stm32h7xx_hal::{
+    delay::Delay,
+    pac::{CorePeripherals, Peripherals},
+    prelude::*,
+    spi::Error,
+    Never,
+};
 
 #[cfg(feature = "stm32h7xx")]
 fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Never, Infallible>> {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let pwr = p.PWR.constrain();
     let vos = pwr.freeze();
@@ -456,7 +462,7 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Never, Inf
 
 #[cfg(feature = "stm32l0xx")]
 use stm32l0xx_hal::{
-    pac::Peripherals,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
     spi::Error,
@@ -464,7 +470,7 @@ use stm32l0xx_hal::{
 
 #[cfg(feature = "stm32l0xx")]
 fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, void::Void, Infallible>> {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
     let gpioa = p.GPIOA.split(&mut rcc);
@@ -510,7 +516,7 @@ use stm32l1xx_hal::{
 
 #[cfg(feature = "stm32l1xx")]
 fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi());
 
@@ -550,14 +556,14 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible
 #[cfg(feature = "stm32l4xx")]
 use stm32l4xx_hal::{
     delay::Delay,
-    pac::Peripherals,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     spi::{Error, Spi},
 };
 
 #[cfg(feature = "stm32l4xx")]
 fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut flash = p.FLASH.constrain();
     let mut rcc = p.RCC.constrain();

@@ -9,10 +9,10 @@
 #![no_std]
 
 #[cfg(debug_assertions)]
-extern crate panic_semihosting;
+use panic_semihosting;
 
 #[cfg(not(debug_assertions))]
-extern crate panic_halt;
+use panic_halt;
 
 //use cortex_m::asm;
 
@@ -52,9 +52,9 @@ use stm32f0xx_hal::{
         Alternate, AF1,
     },
     i2c::I2c,
-    pac::Peripherals,
     pac::I2C1,
     pac::USART3,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     serial::{Rx, Serial, Tx},
 };
@@ -66,7 +66,7 @@ fn setup() -> (
     I2c<I2C1, PB8<Alternate<AF1>>, PB7<Alternate<AF1>>>,
     Delay,
 ) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let mut p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.configure().sysclk(48.mhz()).freeze(&mut p.FLASH);
 
@@ -99,7 +99,7 @@ use stm32f1xx_hal::{
         OpenDrain,
     },
     i2c::{BlockingI2c, DutyCycle, Mode},
-    pac::Peripherals,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     serial::{Config, Rx, Serial, Tx}, //, StopBits
 };
@@ -115,7 +115,7 @@ fn setup() -> (
     //                BlockingI2c<I2C2,  (PB10<Alternate<OpenDrain>>, PB11<Alternate<OpenDrain>>) >,
     //                    Delay )  {
 
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.constrain();
     let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
@@ -181,7 +181,7 @@ fn setup() -> (
     I2c<I2C1, (PB8<AF4>, PB9<AF4>)>,
     Delay,
 ) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.constrain();
     let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
@@ -220,9 +220,9 @@ use stm32f4xx_hal::{
         AlternateOD, AF4, AF9,
     },
     i2c::I2c,
-    pac::Peripherals,
     pac::I2C2,
     pac::USART2,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     serial::{config::Config, Rx, Serial, Tx},
 };
@@ -234,7 +234,7 @@ fn setup() -> (
     I2c<I2C2, (PB10<AlternateOD<AF4>>, PB3<AlternateOD<AF9>>)>,
     Delay,
 ) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let clocks = p.RCC.constrain().cfgr.freeze();
     let gpioa = p.GPIOA.split();
@@ -272,9 +272,9 @@ fn setup() -> (
 use stm32f7xx_hal::{
     delay::Delay,
     i2c::{BlockingI2c, Mode, PinScl, PinSda},
-    pac::Peripherals,
     pac::I2C1,
     pac::USART2,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     serial::{Config, Oversampling, Rx, Serial, Tx},
 };
@@ -286,7 +286,7 @@ fn setup() -> (
     BlockingI2c<I2C1, impl PinScl<I2C1>, impl PinSda<I2C1>>,
     Delay,
 ) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.constrain();
     let clocks = rcc.cfgr.sysclk(216.mhz()).freeze();
@@ -332,17 +332,17 @@ fn setup() -> (
 use stm32h7xx_hal::{
     delay::Delay,
     i2c::I2c,
-    pac::Peripherals,
     //gpio::{gpiob::{PB8, PB9}, Alternate, AF4, },
     pac::I2C1,
     pac::USART2,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     serial::{Rx, Tx},
 };
 
 #[cfg(feature = "stm32h7xx")]
 fn setup() -> (Tx<USART2>, Rx<USART2>, I2c<I2C1>, Delay) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let pwr = p.PWR.constrain();
     let vos = pwr.freeze();
@@ -388,9 +388,9 @@ use stm32l0xx_hal::{
         OpenDrain, Output,
     },
     i2c::I2c,
-    pac::Peripherals,
     pac::I2C1,
     pac::USART2,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
     serial::{Config, Rx, Serial2Ext, Tx},
@@ -403,7 +403,7 @@ fn setup() -> (
     I2c<I2C1, PB9<Output<OpenDrain>>, PB8<Output<OpenDrain>>>,
     Delay,
 ) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
 
@@ -454,7 +454,7 @@ For simplicity of this example the same setup is used on the Discovery kit stm32
 
 #[cfg(feature = "stm32l1xx")]
 fn setup() -> (Tx<USART1>, Rx<USART1>, I2c<I2C1, impl Pins<I2C1>>, Delay) {
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi());
 
@@ -495,9 +495,9 @@ use stm32l4xx_hal::{
         Alternate, OpenDrain, Output, AF4,
     },
     i2c::I2c,
-    pac::Peripherals,
     pac::I2C1,
     pac::USART2,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     serial::{Config, Rx, Serial, Tx},
 };
@@ -517,7 +517,7 @@ fn setup() -> (
 ) {
     //           I2c<I2C1, (PB8<Alternate<AF4, Output<OpenDrain>>>, PB9<Alternate<AF4, Output<OpenDrain>>>)>,
 
-    let cp = cortex_m::Peripherals::take().unwrap();
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut flash = p.FLASH.constrain();
     let mut rcc = p.RCC.constrain();

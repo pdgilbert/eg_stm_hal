@@ -12,10 +12,10 @@
 #![no_std]
 
 #[cfg(debug_assertions)]
-extern crate panic_semihosting;
+use panic_semihosting;
 
 #[cfg(not(debug_assertions))]
-extern crate panic_halt;
+use panic_halt;
 
 //use cortex_m::asm;  //for breakpoint
 //asm::bkpt();
@@ -118,10 +118,10 @@ use stm32f3xx_hal::{
 };
 
 #[cfg(feature = "stm32f3xx")]
-use asm_delay::{bitrate, AsmDelay};
+use asm_delay::{bitrate, Delay};
 
 #[cfg(feature = "stm32f3xx")]
-fn setup() -> (PA8<Output<OpenDrain>>, asm_delay::AsmDelay) {
+fn setup() -> (PA8<Output<OpenDrain>>, asm_delay::Delay) {
     //fn setup() -> (PA8<Output<OpenDrain>>,  Delay) {
 
     //let cp = CorePeripherals::take().unwrap();
@@ -139,7 +139,7 @@ fn setup() -> (PA8<Output<OpenDrain>>, asm_delay::AsmDelay) {
 
     // delay is used by `dht-sensor` to wait for signals
     //let mut delay = Delay::new(cp.SYST, clocks);   //SysTick: System Timer
-    let mut delay = AsmDelay::new(bitrate::U32BitrateExt::mhz(16));
+    let mut delay = Delay::new(cp.SYST, clocks);
 
     //  1 second delay (for DHT11 setup?) Wait on  sensor initialization?
     delay.delay_ms(1000_u16);
