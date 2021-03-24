@@ -150,16 +150,7 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible
 
     // Create lora radio instance
 
-    let lora = Sx127x::spi(
-        spi,
-        pa1,
-        pb8,
-        pb9,
-        pa0,
-        delay,
-        &CONFIG_RADIO,
-    )
-    .unwrap(); // should handle error
+    let lora = Sx127x::spi(spi, pa1, pb8, pb9, pa0, delay, &CONFIG_RADIO).unwrap(); // should handle error
 
     lora
 }
@@ -167,19 +158,40 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible
 #[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
 use stm32f1xx_hal::{
     delay::Delay,
+    gpio::{
+        gpioa::{PA0, PA1, PA5, PA6, PA7},
+        gpiob::{PB8, PB9},
+        Alternate, Floating, Input, Output, PushPull,
+    },
     pac::{CorePeripherals, Peripherals},
     prelude::*,
     spi::{Error, Spi},
-    gpio::{Input, Output, Alternate, PushPull, Floating,
-           gpioa::{PA0, PA5, PA6, PA7, PA1}, 
-           gpiob::{PB8, PB9} },
 };
 
 #[cfg(feature = "stm32f1xx")]
-fn setup() ->  Sx127x<Wrapper<Spi<SPI1, Spi1NoRemap,
-                    (PA5<Alternate<PushPull>>,  PA6<Input<Floating>>, PA7<Alternate<PushPull>>), u8>, Error, 
-               PA1<Output<PushPull>>,  PB8<Input<Floating>>,  PB9<Input<Floating>>,  PA0<Output<PushPull>>, 
-               Infallible,  Delay>, Error, Infallible> {
+fn setup() -> Sx127x<
+    Wrapper<
+        Spi<
+            SPI1,
+            Spi1NoRemap,
+            (
+                PA5<Alternate<PushPull>>,
+                PA6<Input<Floating>>,
+                PA7<Alternate<PushPull>>,
+            ),
+            u8,
+        >,
+        Error,
+        PA1<Output<PushPull>>,
+        PB8<Input<Floating>>,
+        PB9<Input<Floating>>,
+        PA0<Output<PushPull>>,
+        Infallible,
+        Delay,
+    >,
+    Error,
+    Infallible,
+> {
     //fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible>> {
     //fn setup() ->  impl DelayMs<u32> + Transmit<Error=sx127xError<Error, core::convert::Infallible>> {
 
@@ -222,7 +234,7 @@ fn setup() ->  Sx127x<Wrapper<Spi<SPI1, Spi1NoRemap,
         gpiob.pb9.into_floating_input(&mut gpiob.crh),   //ReadyPin DIO1 on PB9
         gpioa.pa0.into_push_pull_output(&mut gpioa.crl), //ResetPin      on PA0
         delay,                                           //Delay
-        &CONFIG_RADIO,                                            //&Config
+        &CONFIG_RADIO,                                   //&Config
     )
     .unwrap(); // should handle error
 
@@ -274,20 +286,16 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible
         spi, //Spi
         gpioa
             .pa1
-            .into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper)
-            , //CsPin   on PA1
+            .into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper), //CsPin   on PA1
         gpiob
             .pb8
-            .into_floating_input(&mut gpiob.moder, &mut gpiob.pupdr)
-            , //BusyPin  DIO0 on PB8
+            .into_floating_input(&mut gpiob.moder, &mut gpiob.pupdr), //BusyPin  DIO0 on PB8
         gpiob
             .pb9
-            .into_floating_input(&mut gpiob.moder, &mut gpiob.pupdr)
-            , //ReadyPin DIO1 on PB9
+            .into_floating_input(&mut gpiob.moder, &mut gpiob.pupdr), //ReadyPin DIO1 on PB9
         gpioa
             .pa0
-            .into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper)
-            , //ResetPin      on PA0
+            .into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper), //ResetPin      on PA0
         delay, //Delay
         &CONFIG_RADIO, //&Config
     )
@@ -356,7 +364,7 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible
         gpiob.pb9.into_floating_input(),   //ReadyPin DI01 on PB9
         gpioa.pa0.into_push_pull_output(), //ResetPin      on PA0
         delay,                             //Delay
-        &CONFIG_RADIO,                              //&Config
+        &CONFIG_RADIO,                     //&Config
     )
     .unwrap(); // should handle error
 
@@ -409,7 +417,7 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible
         gpiob.pb9.into_floating_input(),   //ReadyPin DIO1 on PB9
         gpioa.pa0.into_push_pull_output(), //ResetPin      on PA0
         delay,                             //Delay
-        &CONFIG_RADIO,                              //&Config
+        &CONFIG_RADIO,                     //&Config
     )
     .unwrap(); // should handle error
 
@@ -462,7 +470,7 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Never, Inf
         gpiob.pb9.into_floating_input(),   //ReadyPin DIO1 on PB9
         gpioa.pa0.into_push_pull_output(), //ResetPin      on PA0
         delay,                             //Delay
-        &CONFIG_RADIO,                              //&Config
+        &CONFIG_RADIO,                     //&Config
     )
     .unwrap(); // should handle error
 
@@ -508,7 +516,7 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, void::Void
         gpiob.pb9.into_floating_input(),   //ReadyPin DIO1 on PB9
         gpioa.pa0.into_push_pull_output(), //ResetPin      on PA0
         delay,                             //Delay
-        &CONFIG_RADIO,                              //&Config
+        &CONFIG_RADIO,                     //&Config
     )
     .unwrap(); // should handle error
 
@@ -555,7 +563,7 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible
         gpiob.pb10.into_floating_input(),  //ReadyPin DIO1 on PB10 in board on Heltec
         gpioa.pa3.into_push_pull_output(), //ResetPin      on PA3  in board on Heltec
         delay,                             //Delay
-        &CONFIG_RADIO,                              //&Config
+        &CONFIG_RADIO,                     //&Config
     )
     .unwrap(); // should handle error
 
@@ -608,20 +616,16 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible
         spi, //Spi
         gpioa
             .pa1
-            .into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper)
-            , //CsPin   on PA1
+            .into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper), //CsPin   on PA1
         gpiob
             .pb8
-            .into_floating_input(&mut gpiob.moder, &mut gpiob.pupdr)
-            , //BusyPin  DIO0 on PB8
+            .into_floating_input(&mut gpiob.moder, &mut gpiob.pupdr), //BusyPin  DIO0 on PB8
         gpiob
             .pb9
-            .into_floating_input(&mut gpiob.moder, &mut gpiob.pupdr)
-            , //ReadyPin DIO1 on PB9
+            .into_floating_input(&mut gpiob.moder, &mut gpiob.pupdr), //ReadyPin DIO1 on PB9
         gpioa
             .pa0
-            .into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper)
-            , //ResetPin      on PA0
+            .into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper), //ResetPin      on PA0
         delay, //Delay
         &CONFIG_RADIO, //&Config
     )

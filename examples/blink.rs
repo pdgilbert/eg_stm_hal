@@ -113,8 +113,8 @@ fn setup() -> (PC13<Output<PushPull>>, Delay) {
 use stm32f3xx_hal::{
     delay::Delay,
     gpio::{gpioe::PE15, Output, PushPull},
-    prelude::*,
     pac::{CorePeripherals, Peripherals},
+    prelude::*,
 };
 
 #[cfg(feature = "stm32f3xx")]
