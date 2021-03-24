@@ -94,8 +94,6 @@ use stm32f1xx_hal::{
     pac::{CorePeripherals, Peripherals},
     prelude::*,
 };
-//#[cfg(feature = "stm32f1xx")]  //  eg blue pill stm32f103
-//use embedded_hal::digital::v2::OutputPin;
 
 #[cfg(feature = "stm32f1xx")]
 fn setup() -> (
@@ -146,9 +144,8 @@ use stm32f3xx_hal::{
         Output, PushPull, AF4,
     },
     i2c::I2c,
+    pac::{CorePeripherals, Peripherals, I2C1},
     prelude::*,
-    stm32::Peripherals,
-    stm32::I2C1,
 };
 
 #[cfg(feature = "stm32f3xx")]

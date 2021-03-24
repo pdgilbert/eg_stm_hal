@@ -18,9 +18,6 @@ use panic_halt;
 
 // use nb::block;
 use cortex_m_rt::entry;
-//cortex_m::asm::delay(500_000); this is in clock cycles
-
-use asm_delay::{bitrate, Delay};
 
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
 
@@ -34,9 +31,6 @@ use stm32f0xx_hal::{
     pac::{CorePeripherals, Peripherals},
     prelude::*,
 };
-
-//#[cfg(feature = "stm32f0xx")]
-//use embedded_hal::digital::v2::OutputPin;
 
 #[cfg(feature = "stm32f0xx")]
 fn setup() -> (
@@ -91,7 +85,7 @@ fn setup() -> (
     });
 
     // return (led1, led2, led3, delay)
-    (led1, led2, led3, Delay::new(cp.SYST, clocks)) // delay
+    (led1, led2, led3, Delay::new(cp.SYST, &rcc))
 }
 
 #[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
@@ -160,7 +154,7 @@ fn setup() -> (
         gpiob.pb14.into_push_pull_output(&mut gpiob.crh), // led on pb14
         gpiob.pb15.into_push_pull_output(&mut gpiob.crh), // led on pb15
         Delay::new(cp.SYST, clocks),
-    ) // delay
+    )
 }
 
 #[cfg(feature = "stm32f3xx")] //  eg Discovery-stm32f303
@@ -170,8 +164,8 @@ use stm32f3xx_hal::{
         gpiob::{PB13, PB14, PB15},
         Output, PushPull,
     },
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
-    stm32::Peripherals,
 };
 
 #[cfg(feature = "stm32f3xx")]
@@ -184,6 +178,7 @@ fn setup() -> (
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.constrain();
+    let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
     let mut gpiob = p.GPIOB.split(&mut rcc.ahb);
 
     // all leds wire with pin as source, cathode connect to ground though a resistor.
@@ -226,7 +221,7 @@ fn setup() -> (
             .pb15
             .into_push_pull_output(&mut gpiob.moder, &mut gpiob.otyper), //led on pb15
         Delay::new(cp.SYST, clocks),
-    ) // delay
+    )
 }
 
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
@@ -240,9 +235,6 @@ use stm32f4xx_hal::{
     prelude::*,
 };
 
-//#[cfg(feature = "stm32f4xx")]  //  eg Nucleo-64  stm32f411
-//use embedded_hal::digital::v2::OutputPin;
-
 #[cfg(feature = "stm32f4xx")]
 fn setup() -> (
     PB13<Output<PushPull>>,
@@ -252,6 +244,15 @@ fn setup() -> (
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
+    let rcc = p.RCC.constrain();
+    let clocks = rcc
+        .cfgr
+        .hclk(48.mhz())
+        .sysclk(48.mhz())
+        .pclk1(24.mhz())
+        .pclk2(24.mhz())
+        .freeze();
+
     let gpiob = p.GPIOB.split();
 
     // all leds wire with pin as source, cathode connect to ground though a resistor.
@@ -287,8 +288,9 @@ fn setup() -> (
         gpiob.pb13.into_push_pull_output(), // led on pb13
         gpiob.pb14.into_push_pull_output(), // led on pb14
         gpiob.pb15.into_push_pull_output(), // led on pb15
-        Delay::new(bitrate::U32BitrateExt::mhz(32)),
-    ) // delay
+        //AsmDelay::new(bitrate::U32BitrateExt::mhz(32)),
+        Delay::new(cp.SYST, clocks),
+    )
 }
 
 #[cfg(feature = "stm32f7xx")]
@@ -311,6 +313,8 @@ fn setup() -> (
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
+    let clocks = p.RCC.constrain().cfgr.sysclk(216.mhz()).freeze();
+
     let gpiob = p.GPIOB.split();
 
     // all leds wire with pin as source, cathode connect to ground though a resistor.
@@ -346,8 +350,8 @@ fn setup() -> (
         gpiob.pb13.into_push_pull_output(), // led on pb13
         gpiob.pb14.into_push_pull_output(), // led on pb14
         gpiob.pb15.into_push_pull_output(), // led on pb15
-        Delay::new(bitrate::U32BitrateExt::mhz(32)),
-    ) // delay
+        Delay::new(cp.SYST, clocks),
+    )
 }
 
 #[cfg(feature = "stm32h7xx")]
@@ -357,12 +361,10 @@ use stm32h7xx_hal::{
         gpiob::{PB13, PB14, PB15},
         Output, PushPull,
     },
+    hal::digital::v2::OutputPin,
     pac::{CorePeripherals, Peripherals},
     prelude::*,
 };
-
-#[cfg(feature = "stm32h7xx")]
-use embedded_hal::digital::v2::OutputPin;
 
 #[cfg(feature = "stm32h7xx")]
 fn setup() -> (
@@ -377,7 +379,7 @@ fn setup() -> (
     let pwr = p.PWR.constrain();
     let vos = pwr.freeze();
     let rcc = p.RCC.constrain();
-    let ccdr = rcc.sys_ck(100.mhz()).freeze(vos, &d.SYSCFG);
+    let ccdr = rcc.sys_ck(100.mhz()).freeze(vos, &p.SYSCFG);
     let gpiob = p.GPIOB.split(ccdr.peripheral.GPIOB);
 
     // all leds wire with pin as source, cathode connect to ground though a resistor.
@@ -413,8 +415,8 @@ fn setup() -> (
         gpiob.pb13.into_push_pull_output(), // led on pb13
         gpiob.pb14.into_push_pull_output(), // led on pb14
         gpiob.pb15.into_push_pull_output(), // led on pb15
-        Delay::new(bitrate::U32BitrateExt::mhz(32)),
-    ) // delay
+        Delay::new(cp.SYST, ccdr.clocks),
+    )
 }
 
 #[cfg(feature = "stm32l0xx")]
@@ -474,8 +476,8 @@ fn setup() -> (
         gpiob.pb13.into_push_pull_output(), // led on pb13
         gpiob.pb14.into_push_pull_output(), // led on pb14
         gpiob.pb15.into_push_pull_output(), // led on pb15
-        Delay::new(bitrate::U32BitrateExt::mhz(32)),
-    ) // delay
+        cp.SYST.delay(rcc.clocks),
+    )
 }
 
 #[cfg(feature = "stm32l1xx")] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
@@ -501,6 +503,8 @@ fn setup() -> (
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
+    let rcc = p.RCC.freeze(rcc::Config::hsi());
+
     let gpiob = p.GPIOB.split();
 
     // all leds wire with pin as source, cathode connect to ground though a resistor.
@@ -602,8 +606,8 @@ fn setup() -> (
         gpiob
             .pb15
             .into_push_pull_output(&mut gpiob.moder, &mut gpiob.otyper), // led on pb15
-        Delay::new(bitrate::U32BitrateExt::mhz(32)),
-    ) // delay
+        cp.SYST.delay(rcc.clocks),
+    )
 }
 
 // End of hal/MCU specific setup. Following should be generic code.

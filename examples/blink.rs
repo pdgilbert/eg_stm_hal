@@ -32,7 +32,7 @@ use panic_halt;
 // use panic_semihosting; // logs messages to the host stderr; requires a debugger
 
 // use nb::block;
-//use asm_delay::{bitrate, Delay};
+//use asm_delay::{bitrate, AsmDelay};
 use cortex_m_rt::entry;
 
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
@@ -69,8 +69,6 @@ fn setup() -> (PC13<Output<PushPull>>, Delay) {
     // led on pc13 with on/off
     let led = cortex_m::interrupt::free(move |cs| gpioc.pc13.into_push_pull_output(cs));
 
-    //let delay = Delay::new(bitrate::U32BitrateExt::mhz(16));
-
     // return tuple  (led, delay)
     (led, Delay::new(cp.SYST, &rcc))
 }
@@ -78,12 +76,12 @@ fn setup() -> (PC13<Output<PushPull>>, Delay) {
 #[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
 use stm32f1xx_hal::{
     delay::Delay,
-    gpio::{gpioc::PC13, Output, PushPull},
-    pac::Peripherals,
+    gpio::{gpioc::PC13, Output, OutputPin, PushPull},
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
 };
 
-#[cfg(feature = "stm32f1xx")]
+#[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
 use embedded_hal::digital::v2::OutputPin;
 
 #[cfg(feature = "stm32f1xx")]
@@ -106,8 +104,9 @@ fn setup() -> (PC13<Output<PushPull>>, Delay) {
     // return tuple  (led, delay)
     (
         gpioc.pc13.into_push_pull_output(&mut gpioc.crh), // led on pc13 with on/off
-        Delay::new(bitrate::U32BitrateExt::mhz(16)),
-    ) // delay
+        //AsmDelay::new(bitrate::U32BitrateExt::mhz(16)),
+        Delay::new(cp.SYST, clocks),
+    )
 }
 
 #[cfg(feature = "stm32f3xx")] //  eg Discovery-stm32f303
@@ -196,7 +195,7 @@ fn setup() -> (PC13<Output<PushPull>>, Delay) {
 use stm32f7xx_hal::{
     delay::Delay,
     gpio::{gpioc::PC13, Output, PushPull},
-    pac::Peripherals,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
 };
 
@@ -220,8 +219,8 @@ fn setup() -> (PC13<Output<PushPull>>, Delay) {
     // return tuple  (led, delay)
     (
         gpioc.pc13.into_push_pull_output(), // led on pc13 with on/off
-        Delay::new(bitrate::U32BitrateExt::mhz(32)),
-    ) // delay
+        Delay::new(cp.SYST, clocks),
+    )
 }
 
 #[cfg(feature = "stm32h7xx")]
@@ -243,7 +242,7 @@ fn setup() -> (PC13<Output<PushPull>>, Delay) {
     let pwr = p.PWR.constrain();
     let vos = pwr.freeze();
     let rcc = p.RCC.constrain();
-    let ccdr = rcc.sys_ck(100.mhz()).freeze(vos, &d.SYSCFG);
+    let ccdr = rcc.sys_ck(100.mhz()).freeze(vos, &d.SYSCFG); // calibrate for correct blink rate
     let gpioc = p.GPIOC.split(ccdr.peripheral.GPIOC);
 
     impl LED for PC13<Output<PushPull>> {
