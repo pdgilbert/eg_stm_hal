@@ -237,12 +237,12 @@ use stm32h7xx_hal::{
 fn setup() -> (PC13<Output<PushPull>>, Delay) {
     // see https://github.com/stm32-rs/stm32h7xx-hal/blob/master/examples/blinky.rs
     let cp = CorePeripherals::take().unwrap();
-    let dp = Peripherals::take().unwrap();
-    let pwr = dp.PWR.constrain();
+    let  p = Peripherals::take().unwrap();
+    let pwr =  p.PWR.constrain();
     let vos = pwr.freeze();
-    let rcc = dp.RCC.constrain();
-    let ccdr = rcc.sys_ck(100.mhz()).freeze(vos, &dp.SYSCFG); // calibrate for correct blink rate
-    let gpioc = dp.GPIOC.split(ccdr.peripheral.GPIOC);
+    let rcc =  p.RCC.constrain();
+    let ccdr = rcc.sys_ck(100.mhz()).freeze(vos, & p.SYSCFG); // calibrate for correct blink rate
+    let gpioc =  p.GPIOC.split(ccdr.peripheral.GPIOC);
 
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -274,9 +274,9 @@ use stm32l0xx_hal::{
 #[cfg(feature = "stm32l0xx")]
 fn setup() -> (PC13<Output<PushPull>>, Delay) {
     let cp = CorePeripherals::take().unwrap();
-    let dp = Peripherals::take().unwrap();
-    let mut rcc = dp.RCC.freeze(rcc::Config::hsi16());
-    let gpioc = dp.GPIOC.split(&mut rcc);
+    let  p = Peripherals::take().unwrap();
+    let mut rcc =  p.RCC.freeze(rcc::Config::hsi16());
+    let gpioc =  p.GPIOC.split(&mut rcc);
 
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
