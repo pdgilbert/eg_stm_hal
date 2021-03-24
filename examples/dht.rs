@@ -17,10 +17,11 @@ use panic_semihosting;
 #[cfg(not(debug_assertions))]
 use panic_halt;
 
+use embedded_hal::blocking::delay::DelayMs;
+
 //use cortex_m::asm;  //for breakpoint
 //asm::bkpt();
 
-//use cortex_m;
 use cortex_m_rt::entry;
 use cortex_m_semihosting::hprintln;
 
@@ -30,10 +31,6 @@ use dht_sensor::dht11::Reading;
 #[cfg(feature = "dht22")]
 use dht_sensor::dht22::Reading;
 use dht_sensor::*;
-
-//use crate::hal::{delay, gpio, prelude::*, stm32};
-
-use embedded_hal::blocking::delay::DelayMs;
 
 use embedded_hal::digital::v2::OutputPin; // for  set_high().ok()
 
@@ -111,24 +108,22 @@ fn setup() -> (PA8<Output<OpenDrain>>, Delay) {
 
 #[cfg(feature = "stm32f3xx")]
 use stm32f3xx_hal::{
-    //delay::Delay ,
+    delay::Delay ,
     gpio::{gpioa::PA8, OpenDrain, Output},
     prelude::*,
-    stm32::Peripherals, //CorePeripherals},
+    pac::{Peripherals, CorePeripherals},
 };
 
-#[cfg(feature = "stm32f3xx")]
-use asm_delay::{bitrate, Delay};
+//#[cfg(feature = "stm32f3xx")]
+//use asm_delay::{bitrate, Delay};
 
 #[cfg(feature = "stm32f3xx")]
-fn setup() -> (PA8<Output<OpenDrain>>, asm_delay::Delay) {
-    //fn setup() -> (PA8<Output<OpenDrain>>,  Delay) {
-
-    //let cp = CorePeripherals::take().unwrap();
+fn setup() -> (PA8<Output<OpenDrain>>,  Delay) {
+    let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
     let mut rcc = p.RCC.constrain();
-    //let clocks    = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
+    let clocks    = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
     let mut gpioa = p.GPIOA.split(&mut rcc.ahb);
     let mut pa8 = gpioa
         .pa8
@@ -138,8 +133,7 @@ fn setup() -> (PA8<Output<OpenDrain>>, asm_delay::Delay) {
     pa8.set_high().ok();
 
     // delay is used by `dht-sensor` to wait for signals
-    //let mut delay = Delay::new(cp.SYST, clocks);   //SysTick: System Timer
-    let mut delay = Delay::new(cp.SYST, clocks);
+    let mut delay = Delay::new(cp.SYST, clocks);   //SysTick: System Timer
 
     //  1 second delay (for DHT11 setup?) Wait on  sensor initialization?
     delay.delay_ms(1000_u16);

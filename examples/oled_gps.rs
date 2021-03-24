@@ -167,11 +167,9 @@ use stm32f3xx_hal::{
         AF4,
     },
     i2c::I2c,
-    pac::I2C1,
     prelude::*,
     serial::{Rx, Serial, Tx},
-    stm32::Peripherals,
-    stm32::USART2,
+    pac::{Peripherals, CorePeripherals, USART2, I2C1,},
 };
 
 #[cfg(feature = "stm32f3xx")]
@@ -439,10 +437,8 @@ use stm32l1xx_hal::{
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
     serial::{Config, Rx, SerialExt, Tx},
-    stm32::Peripherals,
+    stm32::{CorePeripherals, Peripherals, USART1, I2C1,},
     //gpio::{gpiob::{PB8, PB9}, Output, OpenDrain, },
-    stm32::I2C1,
-    stm32::USART1,
 };
 
 /*
@@ -495,9 +491,7 @@ use stm32l4xx_hal::{
         Alternate, OpenDrain, Output, AF4,
     },
     i2c::I2c,
-    pac::I2C1,
-    pac::USART2,
-    pac::{CorePeripherals, Peripherals},
+    pac::{CorePeripherals, Peripherals, USART2, I2C1,},
     prelude::*,
     serial::{Config, Rx, Serial, Tx},
 };

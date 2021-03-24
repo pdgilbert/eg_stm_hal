@@ -114,7 +114,7 @@ use stm32f3xx_hal::{
     delay::Delay,
     gpio::{gpioe::PE15, Output, PushPull},
     prelude::*,
-    stm32::{CorePeripherals, Peripherals},
+    pac::{CorePeripherals, Peripherals},
 };
 
 #[cfg(feature = "stm32f3xx")]
@@ -227,12 +227,10 @@ fn setup() -> (PC13<Output<PushPull>>, Delay) {
 use stm32h7xx_hal::{
     delay::Delay,
     gpio::{gpioc::PC13, Output, PushPull},
-    pac::Peripherals,
+    hal::digital::v2::OutputPin,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
 };
-
-#[cfg(feature = "stm32h7xx")]
-use embedded_hal::digital::v2::OutputPin;
 
 #[cfg(feature = "stm32h7xx")]
 fn setup() -> (PC13<Output<PushPull>>, Delay) {
@@ -242,7 +240,7 @@ fn setup() -> (PC13<Output<PushPull>>, Delay) {
     let pwr = p.PWR.constrain();
     let vos = pwr.freeze();
     let rcc = p.RCC.constrain();
-    let ccdr = rcc.sys_ck(100.mhz()).freeze(vos, &d.SYSCFG); // calibrate for correct blink rate
+    let ccdr = rcc.sys_ck(100.mhz()).freeze(vos, &p.SYSCFG); // calibrate for correct blink rate
     let gpioc = p.GPIOC.split(ccdr.peripheral.GPIOC);
 
     impl LED for PC13<Output<PushPull>> {
@@ -289,7 +287,7 @@ fn setup() -> (PC13<Output<PushPull>>, Delay) {
     // return tuple  (led, delay)
     (
         gpioc.pc13.into_push_pull_output(), // led on pc13 with on/off
-        Delay::new(cp.SYST, clocks),
+        Delay::new(cp.SYST, rcc.clocks),
     )
 }
 
