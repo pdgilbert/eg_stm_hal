@@ -115,8 +115,6 @@ use stm32f3xx_hal::{
     prelude::*,
 };
 
-// delay fixed https://github.com/stm32-rs/stm32f3xx-hal/pull/208};
-
 #[cfg(feature = "stm32f3xx")]
 fn setup() -> (PA8<Output<OpenDrain>>, Delay) {
     let cp = CorePeripherals::take().unwrap();

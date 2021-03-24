@@ -89,8 +89,6 @@ fn setup() -> (
 #[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
 use stm32f1xx_hal::{
     delay::Delay,
-    //device::I2C2,
-    //device::USART2,
     gpio::{
         gpiob::{PB10, PB11},
         Alternate, //gpioa::{PA2, PA3},
@@ -213,9 +211,7 @@ use stm32f4xx_hal::{
         AlternateOD, AF4, AF9,
     },
     i2c::I2c,
-    pac::I2C2,
-    pac::USART2,
-    pac::{CorePeripherals, Peripherals, I2C1, USART2},
+    pac::{CorePeripherals, Peripherals, I2C2, USART2},
     prelude::*,
     serial::{config::Config, Rx, Serial, Tx},
 };
@@ -324,8 +320,6 @@ use stm32h7xx_hal::{
     delay::Delay,
     i2c::I2c,
     //gpio::{gpiob::{PB8, PB9}, Alternate, AF4, },
-    pac::I2C1,
-    pac::USART2,
     pac::{CorePeripherals, Peripherals, I2C1, USART2},
     prelude::*,
     serial::{Rx, Tx},

@@ -37,8 +37,6 @@ use embedded_hal::blocking::delay::DelayMs;
 
 use embedded_hal::spi::{Mode, Phase, Polarity};
 
-//use asm_delay::{ AsmDelay, bitrate, };
-
 //use cortex_m::asm;  //for breakpoint
 
 use radio_sx127x::Error as sx127xError; // Error name conflict with hals
@@ -599,13 +597,11 @@ fn setup() -> (
 
 #[cfg(feature = "stm32l1xx")] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{
-    pac::{CorePeripherals, Peripherals, USART2},
+    pac::{CorePeripherals, Peripherals, USART1},
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
     serial::{Config, Rx, SerialExt, Tx},
     spi::Error,
-    stm32::Peripherals,
-    stm32::USART1,
 };
 
 #[cfg(feature = "stm32l1xx")]

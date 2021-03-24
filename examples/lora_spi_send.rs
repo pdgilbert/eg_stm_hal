@@ -33,8 +33,6 @@ use embedded_hal::blocking::delay::DelayMs;
 
 use embedded_hal::spi::{Mode, Phase, Polarity};
 
-//use asm_delay::{ AsmDelay, bitrate, };
-
 //use cortex_m::asm;  //for breakpoint
 
 use radio_sx127x::Error as sx127xError; // Error name conflict with hals
@@ -167,7 +165,7 @@ type LoraType = Sx127x<
             Spi1NoRemap,
             (
                 PA5<Alternate<PushPull>>,
-                PA6<Alternate<Floating>>,
+                PA6<Input<Floating>>,
                 PA7<Alternate<PushPull>>,
             ),
             u8,
@@ -520,7 +518,7 @@ use stm32l1xx_hal::{
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
     spi::Error,
-    stm32::Peripherals,
+    stm32::{CorePeripherals, Peripherals},
 };
 
 #[cfg(feature = "stm32l1xx")]

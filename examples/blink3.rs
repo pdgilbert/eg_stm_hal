@@ -540,7 +540,7 @@ fn setup() -> (
         gpiob.pb13.into_push_pull_output(), // led on pb13
         gpiob.pb14.into_push_pull_output(), // led on pb14
         gpiob.pb15.into_push_pull_output(), // led on pb15
-        cp.SYST.delay(rcc.clocks),
+        Delay::new(cp.SYST, rcc.clocks),    // delay
     )
 }
 
@@ -564,6 +564,7 @@ fn setup() -> (
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
+    let mut flash = p.FLASH.constrain();
     let mut rcc = p.RCC.constrain();
     let mut pwr = p.PWR.constrain(&mut rcc.apb1r1);
     let clocks = rcc

@@ -76,7 +76,7 @@ fn setup() -> (PC13<Output<PushPull>>, Delay) {
 #[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
 use stm32f1xx_hal::{
     delay::Delay,
-    gpio::{gpioc::PC13, Output, OutputPin, PushPull},
+    gpio::{gpioc::PC13, Output, PushPull},
     pac::{CorePeripherals, Peripherals},
     prelude::*,
 };
@@ -86,15 +86,16 @@ use core::convert::Infallible;
 use embedded_hal::digital::OutputPin;
 
 #[cfg(feature = "stm32f1xx")]
-fn setup() -> (dyn OutputPin<Error = Infallible>, Delay) {
-    //fn setup() -> (PC13<Output<PushPull>>, Delay) {
+fn setup() -> (PC13<Output<PushPull>>, Delay) {
+    //fn setup() -> (dyn OutputPin<Error = Infallible>, Delay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.constrain();
     let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
     let mut gpioc = p.GPIOC.split(&mut rcc.apb2);
 
-    impl LED for dyn OutputPin<Error = Infallible> {
+    impl LED for PC13<Output<PushPull>> {
+        //impl LED for dyn OutputPin<Error = Infallible> {
         fn on(&mut self) -> () {
             self.try_set_low().unwrap()
         }
@@ -114,8 +115,8 @@ fn setup() -> (dyn OutputPin<Error = Infallible>, Delay) {
 use stm32f3xx_hal::{
     delay::Delay,
     gpio::{gpioe::PE15, Output, PushPull},
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
-    stm32::{CorePeripherals, Peripherals},
 };
 
 #[cfg(feature = "stm32f3xx")]
@@ -231,8 +232,6 @@ use stm32h7xx_hal::{
     prelude::*,
 };
 
-//use asm_delay::{bitrate, AsmDelay};
-
 #[cfg(feature = "stm32h7xx")]
 fn setup() -> (PC13<Output<PushPull>>, Delay) {
     // see https://github.com/stm32-rs/stm32h7xx-hal/blob/master/examples/blinky.rs
@@ -290,7 +289,7 @@ fn setup() -> (PC13<Output<PushPull>>, Delay) {
     // return tuple  (led, delay)
     (
         gpioc.pc13.into_push_pull_output(), // led on pc13 with on/off
-        Delay::new(cp.SYST, clocks),
+        Delay::new(cp.SYST, rcc.clocks),
     )
 }
 
@@ -299,6 +298,7 @@ use stm32l1xx_hal::{
     delay::Delay,
     gpio::{gpiob::PB6, Output, PushPull},
     prelude::*,
+    rcc, // for ::Config but note name conflict with serial
     stm32::{CorePeripherals, Peripherals},
 };
 
@@ -341,6 +341,7 @@ use stm32l4xx_hal::{
 fn setup() -> (PC13<Output<PushPull>>, Delay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
+    let mut flash = p.FLASH.constrain();
     let mut rcc = p.RCC.constrain();
     let mut pwr = p.PWR.constrain(&mut rcc.apb1r1);
     let clocks = rcc
