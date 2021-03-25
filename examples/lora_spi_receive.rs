@@ -329,7 +329,7 @@ fn setup() -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError
 #[cfg(feature = "stm32f7xx")]
 use stm32f7xx_hal::{
     delay::Delay,
-    device::Peripherals, // note non-standard  device vs pac
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     spi::{ClockDivider, Error, Spi},
 };
@@ -383,8 +383,9 @@ use stm32h7xx_hal::{
 };
 
 #[cfg(feature = "stm32h7xx")]
-fn setup() -> impl DelayMs<u32>
-       + Receive<Info = PacketInfo, Error = sx127xError<Error, stm32h7xx_hal::Never, Infallible>> {
+fn setup(
+) -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, stm32h7xx_hal::Never>>
+{
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let pwr = p.PWR.constrain();

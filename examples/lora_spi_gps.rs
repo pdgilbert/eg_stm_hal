@@ -475,7 +475,7 @@ use stm32h7xx_hal::{
 fn setup() -> (
     Tx<USART2>,
     Rx<USART2>,
-    impl DelayMs<u32> + Transmit<Error = sx127xError<Error, stm32h7xx_hal::Never, Infallible>>,
+    impl DelayMs<u32> + Transmit<Error = sx127xError<Error, stm32h7xx_hal::Never>>,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();

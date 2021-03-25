@@ -404,7 +404,7 @@ use stm32h7xx_hal::{
 };
 
 #[cfg(feature = "stm32h7xx")]
-fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Never, Infallible>> {
+fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Never>> {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let pwr = p.PWR.constrain();
