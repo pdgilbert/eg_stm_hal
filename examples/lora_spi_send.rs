@@ -184,8 +184,8 @@ type LoraType = Sx127x<
 >;
 
 #[cfg(feature = "stm32f1xx")]
-fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
-    //fn setup() -> LoraType {
+fn setup() -> LoraType {
+//fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 

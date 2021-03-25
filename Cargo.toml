@@ -87,15 +87,13 @@ path = "examples/lora_spi_gps.rs"
 
 
 [dependencies]
-#cortex-m            = { version = ">=0.7.1", optional = true }
-cortex-m             = { version = ">=0.6.4", optional = true }
-#cortex-m            = { version = "=0.6.4",  optional = true }  #as of March 2021 needed for stm32h742,  stm32l0x2, stm32l4x2 but others need >=0.7.0
+#cortex-m            = { version = ">=0.7.1" }
+cortex-m             = { version = ">=0.6.4" }
+#cortex-m            = { version = "=0.6.4" }  #as of March 2021 needed for stm32h742,  stm32l0x2, stm32l4x2 but others need >=0.7.0
 nb                   = { version = ">=0.1.2" }
 cortex-m-rt          = { version = ">=0.6.8" }
-cortex-m-semihosting = { version = ">=0.3.3" }
 panic-halt           = { version = ">=0.2.0" }
 panic-reset          = { version = ">=0.1.0" }
-panic-semihosting    = { version = ">=0.5.2" }
 
 # for example  ads1015-display
 #dht11 = "0.3.1"
@@ -110,10 +108,8 @@ f3 = { version = ">=0.6.1", optional = true }
 
 embedded-spi = { version = "0.6", default-features = false }
 
-# for radio-sx127x which uses embedded-hal 1.0.0-alpha while device crates still use 0.2.4
+# for radio-sx127x 
 embedded-hal = { version = "1.0.0-alpha.4" }
-#old-e-h      = { version = "0.2.4", package = "embedded-hal" }
-#embedded-hal-compat = "0.1.3" 
 
 # for  lora_spi_*
 #radio-sx127x  = { version = "0.10.1",        default-features = false }
@@ -123,18 +119,17 @@ radio         = { version = "0.8.1" }
 driver-pal    = { version = "0.8.0-alpha.0", default-features = false, optional = true }
 
 # for  text_i2c which uses ssd1306, ads1015-display example.    need rust 1.40.0 for #[non_exhaustive]
-ssd1306   = { git = "https://github.com/jamwaffles/ssd1306" }  #version = "0.3.1" # "0.2.6" "0.3.1" 
-embedded-graphics   = { version = ">=0.6.0"}                   #version = ">=0.6.0" #  "0.4.4" # "0.4.9"  "0.6.2" 
+ssd1306   = { git = "https://github.com/jamwaffles/ssd1306"  }  #version = "0.3.1" # "0.2.6" "0.3.1"
+embedded-graphics   = { version = ">=0.6.0"}                    #version = ">=0.6.0" #  "0.4.4" # "0.4.9"  "0.6.2"
 
 dht-sensor   = { version =  "^0.2.1" }
 #git = "https://github.com/michaelbeaumont/dht-sensor", branch = "main", rev = "bcbcf8146f98b15b62dba4f5e2ce9f74a243e6d9"
 
 # for example digi_pot
-mcp4x   = { git = "https://github.com/eldruin/mcp4x-rs" , optional = true}
+mcp4x   = { git = "https://github.com/eldruin/mcp4x-rs" }
 # version = "0.1",  optional = true
 
 stm32f0xx-hal = { git = "https://github.com/stm32-rs/stm32f0xx-hal", optional = true }
-#stm32f1xx-hal = { git = "https://github.com/stm32-rs/stm32f1xx-hal", optional = true }
 stm32f1xx-hal = { git = "https://github.com/eldruin/stm32f1xx-hal", branch = "embedded-hal-1.0.0-alpha.4", optional = true }  
 #   rev = "7cb3c53d3badab55d9128dc2418a06d0f719eacd"
 stm32f3xx-hal = { git = "https://github.com/stm32-rs/stm32f3xx-hal", optional = true }
@@ -146,8 +141,7 @@ stm32l1xx-hal = { git = "https://github.com/stm32-rs/stm32l1xx-hal", optional = 
 stm32l4xx-hal = { git = "https://github.com/stm32-rs/stm32l4xx-hal", optional = true }
 
 # for bugs and unusual return values in some hals
-void          = { version = ">=1.0.2", default-features = false, optional = true }
-#asm-delay     = { version = "0.7.0" }
+void          = { version = ">=1.0.2", default-features = false }
 
 [patch.crates-io]
 # Patch for radio-hal to update embedded-hal version
@@ -186,10 +180,12 @@ stm32l4x2 = ["stm32l4xx-hal/stm32l4x2", "stm32l4xx-hal/rt"]
 
 
 # features passed through to dht example
-#dht11 = []
+dht11 = []
 dht22 = []
 
 [dev-dependencies]
+cortex-m-semihosting = { version = ">=0.3.3" }
+panic-semihosting    = { version = ">=0.5.2" }
 heapless = ">=0.4.3"
 
 ## Devices with 64 or 128 Kb ROM

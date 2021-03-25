@@ -272,9 +272,9 @@ fn setup(
 #[cfg(feature = "stm32f4xx")]
 use stm32f4xx_hal::{
     delay::Delay,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     spi::{Error, Spi},
-    stm32::Peripherals,
     time::MegaHertz,
 };
 

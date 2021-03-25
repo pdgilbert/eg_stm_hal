@@ -1014,7 +1014,7 @@ dependencies = [
 [[package]]
 name = "stm32l4xx-hal"
 version = "0.6.0"
-source = "git+https://github.com/stm32-rs/stm32l4xx-hal#3b076a624e9eba81f1898c34f94e6fe79dc615da"
+source = "git+https://github.com/stm32-rs/stm32l4xx-hal#266e62f71d4d59e87925675802b8617f9ade6afc"
 dependencies = [
  "as-slice",
  "cast",

@@ -597,6 +597,7 @@ fn setup() -> (
 
 #[cfg(feature = "stm32l1xx")] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{
+    delay::Delay,
     pac::{CorePeripherals, Peripherals, USART1},
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
