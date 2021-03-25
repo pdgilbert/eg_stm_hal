@@ -294,7 +294,7 @@ dependencies = [
  "panic-halt",
  "panic-reset",
  "panic-semihosting",
- "radio 0.8.1",
+ "radio",
  "radio-sx127x",
  "ssd1306",
  "stm32f0xx-hal",
@@ -617,17 +617,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "radio"
-version = "0.8.1"
-source = "git+https://github.com/ryankurte/rust-radio.git?branch=master#b2383d559d0178f039d570189ed34593549ad66a"
-dependencies = [
- "chrono",
- "embedded-hal 1.0.0-alpha.4",
- "log",
- "nb 1.0.0",
-]
-
-[[package]]
 name = "radio-sx127x"
 version = "0.10.1"
 source = "git+https://github.com/rust-iot/rust-radio-sx127x?rev=2285c1ca9f527ab464a27f6a43af3b0a93130d2f#2285c1ca9f527ab464a27f6a43af3b0a93130d2f"
@@ -637,7 +626,7 @@ dependencies = [
  "embedded-spi",
  "libc",
  "log",
- "radio 0.7.0",
+ "radio",
 ]
 
 [[package]]

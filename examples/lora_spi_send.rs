@@ -120,7 +120,7 @@ use stm32f0xx_hal::{
 };
 
 #[cfg(feature = "stm32f0xx")]
-fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
+fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible>> {
     //  Infallible, Infallible   reflect the error type on the spi and gpio traits.
 
     let cp = CorePeripherals::take().unwrap();
@@ -158,43 +158,13 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible
 #[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
 use stm32f1xx_hal::{
     delay::Delay,
-    gpio::{
-        gpioa::{PA0, PA1, PA5, PA6, PA7},
-        gpiob::{PB8, PB9},
-        Alternate, Floating, Input, Output, PushPull,
-    },
     pac::{CorePeripherals, Peripherals},
     prelude::*,
     spi::{Error, Spi},
 };
 
 #[cfg(feature = "stm32f1xx")]
-fn setup() -> Sx127x<
-    Wrapper<
-        Spi<
-            SPI1,
-            Spi1NoRemap,
-            (
-                PA5<Alternate<PushPull>>,
-                PA6<Input<Floating>>,
-                PA7<Alternate<PushPull>>,
-            ),
-            u8,
-        >,
-        Error,
-        PA1<Output<PushPull>>,
-        PB8<Input<Floating>>,
-        PB9<Input<Floating>>,
-        PA0<Output<PushPull>>,
-        Infallible,
-        Delay,
-    >,
-    Error,
-    Infallible,
-> {
-    //fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible>> {
-    //fn setup() ->  impl DelayMs<u32> + Transmit<Error=sx127xError<Error, core::convert::Infallible>> {
-
+fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible>> {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
@@ -244,22 +214,22 @@ fn setup() -> Sx127x<
 #[cfg(feature = "stm32f3xx")] //  eg Discovery-stm32f303
 use stm32f3xx_hal::{
     delay::Delay,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     spi::{Error, Spi},
-    stm32::Peripherals,
 };
 
 #[cfg(feature = "stm32f3xx")]
 fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible>> {
-    //fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
+    //fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible>> {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
     let mut rcc = p.RCC.constrain();
     let clocks = rcc
         .cfgr
-        .sysclk(64.mHz())
-        .pclk1(32.mHz())
+        .sysclk(64.MHz())
+        .pclk1(32.MHz())
         .freeze(&mut p.FLASH.constrain().acr);
 
     let mut gpioa = p.GPIOA.split(&mut rcc.ahb);
@@ -273,7 +243,7 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible
             gpioa.pa7.into_af5(&mut gpioa.moder, &mut gpioa.afrl), // mosi  on PA7
         ),
         MODE,
-        8.mHz(),
+        8_000_000.Hz(),
         clocks,
         &mut rcc.apb2,
     );
@@ -327,7 +297,7 @@ use stm32f4xx_hal::{
 //    fn setup() ->  LoraType {
 
 #[cfg(feature = "stm32f4xx")]
-fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
+fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible>> {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
@@ -386,7 +356,7 @@ use stm32f7xx_hal::{
 };
 
 #[cfg(feature = "stm32f7xx")]
-fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
+fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible>> {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
@@ -579,7 +549,7 @@ use stm32l4xx_hal::{
 };
 
 #[cfg(feature = "stm32l4xx")]
-fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
+fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible>> {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut flash = p.FLASH.constrain();
@@ -684,13 +654,6 @@ fn main() -> ! {
             }
         };
 
-        //match lora.try_delay_ms(5000u32) {
-        match lora.delay_ms(5000u32) {
-            Ok(b) => b, // b is ()
-            Err(_err) => {
-                hprintln!("Error returned from lora.try_delay_ms().").unwrap();
-                panic!("should reset in release mode.");
-            }
-        };
+        lora.delay_ms(5000u32); //omit pending fix
     }
 }

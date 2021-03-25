@@ -108,8 +108,7 @@ const CONFIG_RADIO: radio_sx127x::device::Config = radio_sx127x::device::Config 
 #[cfg(feature = "stm32f0xx")] //  eg stm32f030xc
 use stm32f0xx_hal::{
     delay::Delay,
-    pac::USART2,
-    pac::{CorePeripherals, Peripherals},
+    pac::{CorePeripherals, Peripherals, USART2},
     prelude::*,
     serial::{Rx, Serial, Tx},
     spi::{Error, Spi},
@@ -119,7 +118,7 @@ use stm32f0xx_hal::{
 fn setup() -> (
     Tx<USART2>,
     Rx<USART2>,
-    impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>>,
+    impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible>>,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let mut p = Peripherals::take().unwrap();
@@ -176,7 +175,7 @@ use stm32f1xx_hal::{
 fn setup() -> (
     Tx<USART2>,
     Rx<USART2>,
-    impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>>,
+    impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible>>,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -240,18 +239,17 @@ fn setup() -> (
 #[cfg(feature = "stm32f3xx")] //  eg Discovery-stm32f303
 use stm32f3xx_hal::{
     delay::Delay,
+    pac::{CorePeripherals, Peripherals, USART2},
     prelude::*,
     serial::{Rx, Serial, Tx},
     spi::{Error, Spi},
-    stm32::Peripherals,
-    stm32::USART2,
 };
 
 #[cfg(feature = "stm32f3xx")]
 fn setup() -> (
     Tx<USART2>,
     Rx<USART2>,
-    impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>>,
+    impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible>>,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -259,8 +257,8 @@ fn setup() -> (
     let mut rcc = p.RCC.constrain();
     let clocks = rcc
         .cfgr
-        .sysclk(64_i32.mhz())
-        .pclk1(32_i32.mhz())
+        .sysclk(64.MHz())
+        .pclk1(32.MHz())
         .freeze(&mut p.FLASH.constrain().acr);
 
     let mut gpioa = p.GPIOA.split(&mut rcc.ahb);
@@ -286,7 +284,7 @@ fn setup() -> (
             gpioa.pa7.into_af5(&mut gpioa.moder, &mut gpioa.afrl), // mosi  on PA7
         ),
         MODE,
-        8_i32.mhz(),
+        8_000_000.Hz(),
         clocks,
         &mut rcc.apb2,
     );
@@ -321,8 +319,7 @@ fn setup() -> (
 // eg Nucleo-64 stm32f411, blackpill stm32f411, blackpill stm32f401
 use stm32f4xx_hal::{
     delay::Delay,
-    pac::USART2,
-    pac::{CorePeripherals, Peripherals},
+    pac::{CorePeripherals, Peripherals, USART2},
     prelude::*,
     serial::{config::Config, Rx, Serial, Tx},
     spi::{Error, Spi},
@@ -333,7 +330,7 @@ use stm32f4xx_hal::{
 fn setup() -> (
     Tx<USART2>,
     Rx<USART2>,
-    impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>>,
+    impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible>>,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -399,8 +396,7 @@ fn setup() -> (
 #[cfg(feature = "stm32f7xx")]
 use stm32f7xx_hal::{
     delay::Delay,
-    pac::USART2,
-    pac::{CorePeripherals, Peripherals},
+    pac::{CorePeripherals, Peripherals, USART2},
     prelude::*,
     serial::{Config, Oversampling, Rx, Serial, Tx},
     spi::{ClockDivider, Error, Spi},
@@ -410,7 +406,7 @@ use stm32f7xx_hal::{
 fn setup() -> (
     Tx<USART2>,
     Rx<USART2>,
-    impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>>,
+    impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible>>,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -469,8 +465,7 @@ fn setup() -> (
 #[cfg(feature = "stm32h7xx")]
 use stm32h7xx_hal::{
     delay::Delay,
-    pac::USART2,
-    pac::{CorePeripherals, Peripherals},
+    pac::{CorePeripherals, Peripherals, USART2},
     prelude::*,
     serial::{Rx, Tx},
     spi::Error,
@@ -540,8 +535,8 @@ fn setup() -> (
 
 #[cfg(feature = "stm32l0xx")]
 use stm32l0xx_hal::{
-    pac::USART2,
-    pac::{CorePeripherals, Peripherals},
+    delay::Delay,
+    pac::{CorePeripherals, Peripherals, USART2},
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
     serial::{Config, Rx, Serial2Ext, Tx},
@@ -603,6 +598,7 @@ fn setup() -> (
 
 #[cfg(feature = "stm32l1xx")] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{
+    delay::Delay,
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
     serial::{Config, Rx, SerialExt, Tx},
@@ -668,8 +664,7 @@ fn setup() -> (
 #[cfg(feature = "stm32l4xx")]
 use stm32l4xx_hal::{
     delay::Delay,
-    pac::USART2,
-    pac::{CorePeripherals, Peripherals},
+    pac::{CorePeripherals, Peripherals, USART2},
     prelude::*,
     serial::{Config, Rx, Serial, Tx},
     spi::{Error, Spi},
@@ -679,7 +674,7 @@ use stm32l4xx_hal::{
 fn setup() -> (
     Tx<USART2>,
     Rx<USART2>,
-    impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>>,
+    impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible>>,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -851,13 +846,7 @@ fn main() -> ! {
                 buffer.clear();
                 buf2.clear();
                 good = false;
-                match lora.delay_ms(5000u32) {
-                    Ok(b) => b, // b is ()
-                    Err(_err) => {
-                        hprintln!("Error returned from lora.try_delay_ms().").unwrap();
-                        panic!("should reset in release mode.");
-                    }
-                };
+                lora.delay_ms(5000u32)
             };
         };
     }

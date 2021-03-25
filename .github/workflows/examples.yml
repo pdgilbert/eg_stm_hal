@@ -35,8 +35,8 @@ jobs:
               stm32h742, stm32l0x2, stm32l100, stm32l151, stm32l4x2, ]
         
         eg:  [blink,blink3, echo_by_char, serial_char, gps_rw, temperature,
-              dht, text_i2c, oled_gps, lora_spi_send, ]
-        #  echo_string, serial_string, lora_spi_receive, lora_spi_gps ]
+              dht, text_i2c, oled_gps, lora_spi_send, lora_spi_receive, lora_spi_gps ]
+        #  echo_string, serial_string, ]
         
         include:
            #- mcu:  stm32f042  NB commented out sections need mcu removed from mcu: or matrix is messed up
