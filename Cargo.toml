@@ -88,12 +88,12 @@ path = "examples/lora_spi_gps.rs"
 
 [dependencies]
 #cortex-m            = { version = ">=0.7.1" }
-cortex-m             = { version = ">=0.6.4" }
-#cortex-m            = { version = "=0.6.4" }  #as of March 2021 needed for stm32h742,  stm32l0x2, stm32l4x2 but others need >=0.7.0
+cortex-m             = { version = ">=0.6.4" } # optional breaks blink for stm32f0xx
+#cortex-m            = { version = "=0.6.4"  }  #as of March 2021 needed for stm32h742,  stm32l0x2, stm32l4x2 but others need >=0.7.0
 nb                   = { version = ">=0.1.2" }
 cortex-m-rt          = { version = ">=0.6.8" }
-panic-halt           = { version = ">=0.2.0" }
 panic-reset          = { version = ">=0.1.0" }
+panic-halt           = { version = ">=0.2.0" }
 
 # for example  ads1015-display
 #dht11 = "0.3.1"
@@ -115,8 +115,9 @@ embedded-hal = { version = "1.0.0-alpha.4" }
 #radio-sx127x  = { version = "0.10.1",        default-features = false }
 #radio-sx127x  = {  git = "https://github.com/rust-iot/rust-radio-sx127x", default-features = false }
 radio-sx127x  = {  git = "https://github.com/pdgilbert/rust-radio-sx127x", default-features = false }
+
 radio         = { version = "0.8.1" }
-driver-pal    = { version = "0.8.0-alpha.0", default-features = false, optional = true }
+driver-pal    = { version = "0.8.0-alpha.0", default-features = false }
 
 # for  text_i2c which uses ssd1306, ads1015-display example.    need rust 1.40.0 for #[non_exhaustive]
 ssd1306   = { git = "https://github.com/jamwaffles/ssd1306"  }  #version = "0.3.1" # "0.2.6" "0.3.1"
