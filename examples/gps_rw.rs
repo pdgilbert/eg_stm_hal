@@ -18,10 +18,10 @@
 #![no_std]
 
 #[cfg(debug_assertions)]
-use panic_semihosting;
+use panic_semihosting as _;
 
 #[cfg(not(debug_assertions))]
-use panic_halt;
+use panic_halt as _;
 
 //use cortex_m::asm;
 
