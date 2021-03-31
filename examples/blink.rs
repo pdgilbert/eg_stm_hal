@@ -21,15 +21,15 @@
 #![no_main]
 
 #[cfg(debug_assertions)]
-use panic_semihosting;
+use panic_semihosting as _;
 
 #[cfg(not(debug_assertions))]
-use panic_halt;
+use panic_halt as _;
 
-// use panic_halt;  // put a breakpoint on `rust_begin_unwind` to catch panics
+// use panic_halt as _;  // put a breakpoint on `rust_begin_unwind` to catch panics
 // use panic_abort; // may still require nightly?
 // use panic_itm;   // logs messages over ITM; requires ITM support
-// use panic_semihosting; // logs messages to the host stderr; requires a debugger
+// use panic_semihosting as _; // logs messages to the host stderr; requires a debugger
 
 // use nb::block;
 //use asm_delay::{bitrate, AsmDelay};
