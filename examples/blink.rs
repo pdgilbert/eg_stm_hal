@@ -64,7 +64,7 @@ fn setup() -> (PC13<Output<PushPull>>, Delay) {
         fn off(&mut self) -> () {
             self.set_high().unwrap()
         }
-    };
+    }
 
     // led on pc13 with on/off
     let led = cortex_m::interrupt::free(move |cs| gpioc.pc13.into_push_pull_output(cs));
@@ -99,7 +99,7 @@ fn setup() -> (PC13<Output<PushPull>>, Delay) {
         fn off(&mut self) -> () {
             self.set_high().unwrap()
         }
-    };
+    }
 
     // return tuple  (led, delay)
     (
@@ -132,7 +132,7 @@ fn setup() -> (PE15<Output<PushPull>>, Delay) {
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     // the hal delay function paniced if the delay time was set at 2098ms or above.
     // see https://github.com/stm32-rs/stm32f3xx-hal/issues/203
@@ -182,7 +182,7 @@ fn setup() -> (PC13<Output<PushPull>>, Delay) {
         fn off(&mut self) -> () {
             self.set_high().unwrap()
         }
-    };
+    }
 
     // return tuple  (led, delay)
     (
@@ -214,7 +214,7 @@ fn setup() -> (PC13<Output<PushPull>>, Delay) {
         fn off(&mut self) -> () {
             self.set_high().unwrap()
         }
-    };
+    }
 
     // return tuple  (led, delay)
     (
@@ -250,7 +250,7 @@ fn setup() -> (PC13<Output<PushPull>>, Delay) {
         fn off(&mut self) -> () {
             self.set_high().unwrap()
         }
-    };
+    }
 
     // return tuple  (led, delay)
     (
@@ -282,7 +282,7 @@ fn setup() -> (PC13<Output<PushPull>>, Delay) {
         fn off(&mut self) -> () {
             self.set_high().unwrap()
         }
-    };
+    }
 
     // return tuple  (led, delay)
     (
@@ -318,7 +318,7 @@ fn setup() -> (PB6<Output<PushPull>>, Delay) {
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     // return tuple  (led, delay)
     (
@@ -358,7 +358,7 @@ fn setup() -> (PC13<Output<PushPull>>, Delay) {
         fn off(&mut self) -> () {
             self.set_high().unwrap()
         }
-    };
+    }
 
     // return tuple  (led, delay)
     (

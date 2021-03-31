@@ -170,7 +170,7 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<Adc>) {
                 }
             }
         }
-    };
+    }
 
     impl ReadMV for Sensor<Option<PB1<Analog>>> {
         // TMP36 on PB1 using ADC2
@@ -180,7 +180,7 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<Adc>) {
                 None => panic!(),
             }
         }
-    };
+    }
 
     (mcutemp, tmp36, adcs)
 }
@@ -245,7 +245,7 @@ fn setup() -> (
                 }
             }
         }
-    };
+    }
 
     impl ReadMV for Sensor<Option<PB1<Analog>>> {
         // TMP36 on PB1 using ADC2
@@ -255,7 +255,7 @@ fn setup() -> (
                 None => panic!(),
             }
         }
-    };
+    }
 
     (mcutemp, tmp36, adcs)
 }
@@ -342,7 +342,7 @@ fn setup() -> (
                 }
             }
         }
-    };
+    }
 
     impl ReadMV for Sensor<Option<PB1<Analog>>> {
         // TMP36 on PB1 using ADC2
@@ -352,7 +352,7 @@ fn setup() -> (
                 None => panic!(),
             }
         }
-    };
+    }
 
     (mcutemp, tmp36, adcs)
 }
@@ -423,7 +423,7 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<Adc<ADC1>>) {
                 }
             }
         }
-    };
+    }
 
     impl ReadMV for Sensor<Option<PB1<Analog>>> {
         // TMP36 on PB1 using ad_1st
@@ -433,7 +433,7 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<Adc<ADC1>>) {
                 None => panic!(),
             }
         }
-    };
+    }
 
     (mcutemp, tmp36, adcs)
 }
@@ -497,7 +497,7 @@ fn setup() -> (
                 }
             }
         }
-    };
+    }
 
     impl ReadTempC for Sensor<PB1<Analog>> {
         fn read_tempC(&mut self, a: &mut Adcs<Adc<ADC1>, Adc<ADC2>>) -> i32 {
@@ -510,7 +510,7 @@ fn setup() -> (
                 None => panic!(),
             }
         }
-    };
+    }
 
     impl ReadMV for Sensor<PB1<Analog>> {
         // TMP36 on PB1 using ADC2
@@ -609,7 +609,7 @@ fn setup() -> (
                 }
             }
         }
-    };
+    }
 
     impl ReadTempC for Sensor<Option<adc::Temperature>> {
         fn read_tempC(&mut self, a: &mut Adcs<Adc<ADC1, Enabled>, Adc<ADC3, Enabled>>) -> i32 {
@@ -627,7 +627,7 @@ fn setup() -> (
                 }
             }
         }
-    };
+    }
 
     impl ReadMV for Sensor<Option<PB1<Analog>>> {
         // TMP36 on PB1 using ADC1
@@ -693,7 +693,7 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<Adc<ADC>>) {
                 }
             }
         }
-    };
+    }
 
     impl ReadMV for Sensor<Option<PB1<Analog>>> {
         // TMP36 on PB1 using ADC2
@@ -703,7 +703,7 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<Adc<ADC>>) {
                 None => panic!(),
             }
         }
-    };
+    }
 
     (mcutemp, tmp36, adcs)
 }
@@ -758,7 +758,7 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<Adc>) {
                 }
             }
         }
-    };
+    }
 
     impl ReadMV for Sensor<Option<PB1<Analog>>> {
         // TMP36 on PB1 using ADC
@@ -774,7 +774,7 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<Adc>) {
                 None => panic!(),
             }
         }
-    };
+    }
 
     (mcutemp, tmp36, adcs)
 }
@@ -840,7 +840,7 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<Adc<ADC1>>) {
                 }
             }
         }
-    };
+    }
 
     impl ReadMV for Sensor<Option<PB1<Analog>>> {
         // TMP36 on PB1 using ADC
@@ -850,7 +850,7 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<Adc<ADC1>>) {
                 None => panic!(),
             }
         }
-    };
+    }
 
     (mcutemp, tmp36, adcs)
 }
