@@ -188,9 +188,9 @@ fn setup() -> (
     let (tx1, rx1) = Serial::usart1(
         p.USART1,
         (
-            gpioa.pa9.into_af7(&mut gpioa.moder, &mut gpioa.afrh), //tx pa9
-            gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh),
-        ), //rx pb10
+            gpioa .pa9.into_af7_push_pull(&mut gpioa.moder, &mut gpioa.otyper, &mut gpioa.afrh), //tx pa9
+            gpioa.pa10.into_af7_push_pull(&mut gpioa.moder, &mut gpioa.otyper, &mut gpioa.afrh), //rx pa10
+        ),
         9600.Bd(),
         clocks,
         &mut rcc.apb2,
@@ -200,9 +200,9 @@ fn setup() -> (
     let (tx2, rx2) = Serial::usart2(
         p.USART2,
         (
-            gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl), //tx pa2
-            gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl),
-        ), //rx pa3
+            gpioa.pa2.into_af7_push_pull(&mut gpioa.moder, &mut gpioa.otyper, &mut gpioa.afrl), //tx pa2
+            gpioa.pa3.into_af7_push_pull(&mut gpioa.moder, &mut gpioa.otyper, &mut gpioa.afrl), //rx pa3
+        ),
         115_200.Bd(), // 9600.bps(),
         clocks,
         &mut rcc.apb1,
@@ -214,9 +214,9 @@ fn setup() -> (
     let (tx3, rx3) = Serial::usart3(
         p.USART3,
         (
-            gpiob.pb10.into_af7(&mut gpiob.moder, &mut gpiob.afrh), //tx pb10
-            gpiob.pb11.into_af7(&mut gpiob.moder, &mut gpiob.afrh),
-        ), //rx pb11
+            gpiob.pb10.into_af7_push_pull(&mut gpiob.moder, &mut gpiob.otyper, &mut gpiob.afrh), //tx pb10
+            gpiob.pb11.into_af7_push_pull(&mut gpiob.moder, &mut gpiob.otyper, &mut gpiob.afrh), //rx pb11
+        ),
         115_200.Bd(), // 9600.bps(),
         clocks,
         &mut rcc.apb1,

@@ -100,9 +100,9 @@ fn setup() -> (Tx<USART1>, Rx<USART1>) {
     Serial::usart1(
         p.USART1,
         (
-            gpioa.pa9.into_af7(&mut gpioa.moder, &mut gpioa.afrh), //tx pa9
-            gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh),
-        ), //rx pa10
+            gpioa .pa9.into_af7_push_pull(&mut gpioa.moder, &mut gpioa.otyper, &mut gpioa.afrh), //tx pa9
+            gpioa.pa10.into_af7_push_pull(&mut gpioa.moder, &mut gpioa.otyper, &mut gpioa.afrh), //rx pa10
+        ),
         9600.Bd(),
         clocks,
         &mut rcc.apb2,
