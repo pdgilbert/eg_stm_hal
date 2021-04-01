@@ -780,10 +780,10 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<Adc>) {
 
 #[cfg(feature = "stm32l4xx")]
 use stm32l4xx_hal::{
-    delay::Delay, 
-    adc::{ADC},
+    adc::ADC,
+    delay::Delay,
     gpio::{gpiob::PB1, Analog},
-    pac::{CorePeripherals, Peripherals,},
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
 };
 
@@ -807,7 +807,13 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<ADC>) {
     // unclear why Delay is needed in this hal. (Thus needs cp.)
     let mut delay = Delay::new(cp.SYST, clocks);
     let adcs: Adcs<ADC> = Adcs {
-        ad_1st: ADC::new(p.ADC1, p.ADC_COMMON, &mut rcc.ahb2, &mut rcc.ccipr, &mut delay,),
+        ad_1st: ADC::new(
+            p.ADC1,
+            p.ADC_COMMON,
+            &mut rcc.ahb2,
+            &mut rcc.ccipr,
+            &mut delay,
+        ),
     };
 
     //The MCU temperature sensor is internally connected to the ADC12_IN16 input channel
