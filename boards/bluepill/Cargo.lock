@@ -285,7 +285,6 @@ dependencies = [
  "driver-pal",
  "embedded-graphics",
  "embedded-hal 0.2.4",
- "embedded-hal-compat",
  "embedded-spi",
  "f3",
  "heapless 0.6.1",
@@ -301,7 +300,6 @@ dependencies = [
  "stm32f1xx-hal",
  "stm32f3xx-hal",
  "stm32f4xx-hal",
- "stm32f7xx-hal",
  "stm32h7xx-hal",
  "stm32l0xx-hal",
  "stm32l1xx-hal",
@@ -353,16 +351,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f2260cabeacf4bda1df1a8d54f67047a9aadf02fe14cfab07649f2cec6a4693b"
 dependencies = [
  "nb 1.0.0",
-]
-
-[[package]]
-name = "embedded-hal-compat"
-version = "0.1.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a2afb504e8ae78ede52799ea060abb3836fe2f7a24e8ac1cacb9086c5cfcabf7"
-dependencies = [
- "embedded-hal 0.2.4",
- "embedded-hal 1.0.0-alpha.4",
 ]
 
 [[package]]
@@ -499,12 +487,6 @@ source = "git+https://github.com/eldruin/mcp4x-rs#da0b047ed2d54fdadc46f41dfed8f4
 dependencies = [
  "embedded-hal 0.2.4",
 ]
-
-[[package]]
-name = "micromath"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "be00a244d4394124986da477e8b2814dcb7995ab238817d9037bc336c4b0b843"
 
 [[package]]
 name = "nb"
@@ -864,38 +846,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "stm32f7"
-version = "0.11.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e8e6dbd8bf0965421c0c76c09e05683e71243216bf4d87984c7f95ed53caa28c"
-dependencies = [
- "bare-metal 0.2.5",
- "cortex-m 0.6.7",
- "cortex-m-rt",
- "vcell",
-]
-
-[[package]]
-name = "stm32f7xx-hal"
-version = "0.2.0"
-source = "git+https://github.com/stm32-rs/stm32f7xx-hal#f1e36d9a6bdc9d7d01d35327bbb276eca9291dc4"
-dependencies = [
- "as-slice",
- "bare-metal 0.2.5",
- "bxcan",
- "cast",
- "cortex-m 0.6.7",
- "cortex-m-rt",
- "embedded-hal 0.2.4",
- "micromath",
- "nb 0.1.3",
- "rand_core 0.5.1",
- "rtcc",
- "stm32f7",
- "void",
-]
-
-[[package]]
 name = "stm32h7"
 version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -903,7 +853,6 @@ checksum = "8b672c837e0ee8158ecc7fce0f9a948dd0693a9c588338e728d14b73307a0b7d"
 dependencies = [
  "bare-metal 0.2.5",
  "cortex-m 0.7.2",
- "cortex-m-rt",
  "vcell",
 ]
 
