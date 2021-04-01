@@ -545,7 +545,6 @@ fn setup() -> (
 
 #[cfg(feature = "stm32l0xx")]
 use stm32l0xx_hal::{
-    delay::Delay,
     pac::{CorePeripherals, Peripherals, USART2},
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
@@ -557,7 +556,7 @@ use stm32l0xx_hal::{
 fn setup() -> (
     Tx<USART2>,
     Rx<USART2>,
-    impl DelayMs<u32> + Transmit<Error = sx127xError<Error, void::Void, Infallible>>,
+    impl DelayMs<u32> + Transmit<Error = sx127xError<Error, void::Void>>,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();

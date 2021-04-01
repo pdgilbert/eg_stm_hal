@@ -446,8 +446,7 @@ use stm32l0xx_hal::{
 use void;
 
 #[cfg(feature = "stm32l0xx")]
-fn setup(
-) -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, void::Void, Infallible>>
+fn setup() -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, void::Void>>
 {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
