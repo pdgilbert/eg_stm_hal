@@ -46,8 +46,12 @@ pub trait ReadTempC {
    #![allow(non_snake_case)]
     #[cfg(feature = "stm32f0xx")]
     fn read_tempC(&mut self, adcs: &mut Adcs<Adc>) -> i32;
-    #[cfg(feature = "stm32f1xx")]
+
+    #[cfg(feature = "stm32f103")]
     fn read_tempC(&mut self, adcs: &mut Adcs<Adc<ADC1>, Adc<ADC2>>) -> i32;
+    #[cfg(any(feature = "stm32f100", feature = "stm32f101" ))]
+    fn read_tempC(&mut self, adcs: &mut Adcs<Adc<ADC1>>) -> i32;
+
     #[cfg(feature = "stm32f3xx")]
     fn read_tempC(&mut self, adcs: &mut Adcs<Adc<ADC1>, Adc<ADC3>>) -> i32;
     #[cfg(feature = "stm32f4xx")]
@@ -68,8 +72,12 @@ pub trait ReadMV {
     // for reading channel millivolts on channel (self.ch)
     #[cfg(feature = "stm32f0xx")]
     fn read_mv(&mut self, adcs: &mut Adcs<Adc>) -> u32;
-    #[cfg(feature = "stm32f1xx")]
+
+    #[cfg(feature = "stm32f103")]
     fn read_mv(&mut self, adcs: &mut Adcs<Adc<ADC1>, Adc<ADC2>>) -> u32;
+    #[cfg(any(feature = "stm32f100", feature = "stm32f101" ))]
+    fn read_mv(&mut self, adcs: &mut Adcs<Adc<ADC1>>) -> u32;
+
     #[cfg(feature = "stm32f3xx")]
     fn read_mv(&mut self, adcs: &mut Adcs<Adc<ADC1>, Adc<ADC3>>) -> u32;
     #[cfg(feature = "stm32f4xx")]
@@ -92,8 +100,10 @@ pub struct Sensor<U> {
     //ch  : Option<U>,
 }
 
+// Possibly this should all be by MCU rather than some by HAL?
+
 #[cfg(any(
-    feature = "stm32f1xx",
+    feature = "stm32f103",
     feature = "stm32f3xx",
     feature = "stm32f7xx",
     feature = "stm32h7xx"
@@ -105,6 +115,8 @@ pub struct Adcs<T, U> {
 
 #[cfg(any(
     feature = "stm32f0xx",
+    feature = "stm32f100",
+    feature = "stm32f101",
     feature = "stm32f4xx",
     feature = "stm32l0xx",
     feature = "stm32l1xx",
@@ -185,7 +197,8 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<Adc>) {
     (mcutemp, tmp36, adcs)
 }
 
-#[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
+
+#[cfg(feature = "stm32f103")] //  eg blue pill stm32f103
 use stm32f1xx_hal::{
     adc::Adc,
     gpio::{gpiob::PB1, Analog},
@@ -193,7 +206,16 @@ use stm32f1xx_hal::{
     prelude::*,
 };
 
-#[cfg(feature = "stm32f1xx")]
+//  stm32f100 and stm32f101 only have one adc  CODE BELOW NEEDS TO B FIXED FOR THIS
+#[cfg(any(feature = "stm32f101",  feature = "stm32f100"))] 
+use stm32f1xx_hal::{
+    adc::Adc,
+    gpio::{gpiob::PB1, Analog},
+    pac::{Peripherals, ADC1},
+    prelude::*,
+};
+
+#[cfg(feature = "stm32f103")]
 fn setup() -> (
     impl ReadTempC,
     impl ReadTempC + ReadMV,
@@ -251,6 +273,63 @@ fn setup() -> (
         fn read_mv(&mut self, a: &mut Adcs<Adc<ADC1>, Adc<ADC2>>) -> u32 {
             match &mut self.ch {
                 Some(ch) => a.ad_2nd.read(ch).unwrap(),
+                None => panic!(),
+            }
+        }
+    }
+
+    (mcutemp, tmp36, adcs)
+}
+
+#[cfg(any(feature = "stm32f101",  feature = "stm32f100"))] 
+fn setup() -> (
+    impl ReadTempC,
+    impl ReadTempC + ReadMV,
+    Adcs<Adc<ADC1>>,
+) {
+
+    let p = Peripherals::take().unwrap();
+    let mut flash = p.FLASH.constrain();
+    let mut rcc = p.RCC.constrain();
+
+    let clocks = rcc.cfgr.adcclk(2.mhz()).freeze(&mut flash.acr);
+
+    let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
+
+    let adcs: Adcs<Adc<ADC1>> = Adcs {
+        ad_1st: Adc::adc1(p.ADC1, &mut rcc.apb2, clocks),
+    };
+
+    //The MCU temperature sensor is internally connected to the ADC12_IN16 input channel
+    // so no channel needs to be specified here.
+
+    let mcutemp: Sensor<Option<PB1<Analog>>> = Sensor { ch: None }; // no channel
+
+    let tmp36: Sensor<Option<PB1<Analog>>> = Sensor {
+        ch: Some(gpiob.pb1.into_analog(&mut gpiob.crl)),
+    }; //channel pb1
+
+    impl ReadTempC for Sensor<Option<PB1<Analog>>> {
+        fn read_tempC(&mut self, a: &mut Adcs<Adc<ADC1>>) -> i32 {
+            match &mut self.ch {
+                Some(ch) => {
+                    let v: f32 = a.ad_1st.read(ch).unwrap();
+                    (v / 12.412122) as i32 - 50 as i32
+                }
+
+                None => {
+                    let z = &mut a.ad_1st;
+                    z.read_temp() as i32
+                }
+            }
+        }
+    }
+
+    impl ReadMV for Sensor<Option<PB1<Analog>>> {
+        // TMP36 on PB1 using ad_1st
+        fn read_mv(&mut self, a: &mut Adcs<Adc<ADC1>>) -> u32 {
+            match &mut self.ch {
+                Some(ch) => a.ad_1st.read(ch).unwrap(),
                 None => panic!(),
             }
         }
@@ -360,9 +439,8 @@ fn setup() -> (
 use stm32f4xx_hal::{
     adc::{config::AdcConfig, Adc, Temperature}, //SampleTime
     gpio::{gpiob::PB1, Analog},
-    pac::Peripherals,
+    pac::{Peripherals,ADC1,},  //ADC2},          // 405 has ADC2 but 401 and 411 have only one adc
     prelude::*,
-    stm32::ADC1, //ADC2},          // 405 has ADC2 but 401 and 411 have only one adc
 };
 
 #[cfg(feature = "stm32f4xx")]
