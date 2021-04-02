@@ -133,7 +133,8 @@ stm32f0xx-hal = { git = "https://github.com/stm32-rs/stm32f0xx-hal", optional = 
 stm32f1xx-hal = { git = "https://github.com/stm32-rs/stm32f1xx-hal", optional = true }
 stm32f3xx-hal = { git = "https://github.com/stm32-rs/stm32f3xx-hal", optional = true }
 stm32f4xx-hal = { git = "https://github.com/stm32-rs/stm32f4xx-hal", optional = true }
-# bxcan defmt version stm32f7xx-hal = { git = "https://github.com/stm32-rs/stm32f7xx-hal", optional = true }
+# stm32f7xx-hal = { git = "https://github.com/stm32-rs/stm32f7xx-hal", optional = true }
+stm32f7xx-hal = { git = "https://github.com/pdgilbert/stm32f7xx-hal", branch="test-bxcan-version-relax", optional = true }
 stm32h7xx-hal = { git = "https://github.com/stm32-rs/stm32h7xx-hal", optional = true }
 stm32l0xx-hal = { git = "https://github.com/stm32-rs/stm32l0xx-hal", optional = true }
 stm32l1xx-hal = { git = "https://github.com/stm32-rs/stm32l1xx-hal", optional = true, default-features = false}
@@ -163,8 +164,8 @@ stm32f303xc = ["stm32f3xx-hal/stm32f303xc", "stm32f3xx-hal/rt"]
 stm32f401 = ["stm32f4xx-hal/stm32f401", "stm32f4xx-hal/rt"] 
 stm32f405 = ["stm32f4xx-hal/stm32f405", "stm32f4xx-hal/rt"] 
 stm32f411 = ["stm32f4xx-hal/stm32f411", "stm32f4xx-hal/rt"] 
-# bxcan defmt version stm32f722 = ["stm32f7xx-hal/stm32f722", "stm32f7xx-hal/rt"] 
-# bxcan defmt version stm32h742 = ["stm32h7xx-hal/stm32h742", "stm32h7xx-hal/rt"]
+stm32f722 = ["stm32f7xx-hal/stm32f722", "stm32f7xx-hal/rt"] 
+stm32h742 = ["stm32h7xx-hal/stm32h742", "stm32h7xx-hal/rt"]
 # see https://www.st.com/resource/en/datasheet/stm32l072v8.pdf  p12 for some MCU variants
 stm32l0x2 = ["stm32l0xx-hal/stm32l0x2", "stm32l0xx-hal/rt", "stm32l0xx-hal/mcu-STM32L072KZTx"]
 #stm32l0x1 = ["stm32l0xx-hal/stm32l0x1", "stm32l0xx-hal/rt", "stm32l0xx-hal/mcu-STM32L071KBTx"]
