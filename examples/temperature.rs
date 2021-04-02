@@ -49,7 +49,7 @@ pub trait ReadTempC {
 
     #[cfg(feature = "stm32f103")]
     fn read_tempC(&mut self, adcs: &mut Adcs<Adc<ADC1>, Adc<ADC2>>) -> i32;
-    #[cfg(any(feature = "stm32f100", feature = "stm32f101" ))]
+    #[cfg(any(feature = "stm32f100", feature = "stm32f101"))]
     fn read_tempC(&mut self, adcs: &mut Adcs<Adc<ADC1>>) -> i32;
 
     #[cfg(feature = "stm32f3xx")]
@@ -75,7 +75,7 @@ pub trait ReadMV {
 
     #[cfg(feature = "stm32f103")]
     fn read_mv(&mut self, adcs: &mut Adcs<Adc<ADC1>, Adc<ADC2>>) -> u32;
-    #[cfg(any(feature = "stm32f100", feature = "stm32f101" ))]
+    #[cfg(any(feature = "stm32f100", feature = "stm32f101"))]
     fn read_mv(&mut self, adcs: &mut Adcs<Adc<ADC1>>) -> u32;
 
     #[cfg(feature = "stm32f3xx")]
@@ -197,7 +197,6 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<Adc>) {
     (mcutemp, tmp36, adcs)
 }
 
-
 #[cfg(feature = "stm32f103")] //  eg blue pill stm32f103
 use stm32f1xx_hal::{
     adc::Adc,
@@ -207,7 +206,7 @@ use stm32f1xx_hal::{
 };
 
 //  stm32f100 and stm32f101 only have one adc  CODE BELOW NEEDS TO B FIXED FOR THIS
-#[cfg(any(feature = "stm32f101",  feature = "stm32f100"))] 
+#[cfg(any(feature = "stm32f101", feature = "stm32f100"))]
 use stm32f1xx_hal::{
     adc::Adc,
     gpio::{gpiob::PB1, Analog},
@@ -281,13 +280,8 @@ fn setup() -> (
     (mcutemp, tmp36, adcs)
 }
 
-#[cfg(any(feature = "stm32f101",  feature = "stm32f100"))] 
-fn setup() -> (
-    impl ReadTempC,
-    impl ReadTempC + ReadMV,
-    Adcs<Adc<ADC1>>,
-) {
-
+#[cfg(any(feature = "stm32f101", feature = "stm32f100"))]
+fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<Adc<ADC1>>) {
     let p = Peripherals::take().unwrap();
     let mut flash = p.FLASH.constrain();
     let mut rcc = p.RCC.constrain();
@@ -439,7 +433,7 @@ fn setup() -> (
 use stm32f4xx_hal::{
     adc::{config::AdcConfig, Adc, Temperature}, //SampleTime
     gpio::{gpiob::PB1, Analog},
-    pac::{Peripherals,ADC1,},  //ADC2},          // 405 has ADC2 but 401 and 411 have only one adc
+    pac::{Peripherals, ADC1}, //ADC2},          // 405 has ADC2 but 401 and 411 have only one adc
     prelude::*,
 };
 
