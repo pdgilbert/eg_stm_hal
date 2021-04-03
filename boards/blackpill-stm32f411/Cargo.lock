@@ -285,7 +285,6 @@ dependencies = [
  "driver-pal",
  "embedded-graphics",
  "embedded-hal 0.2.4",
- "embedded-hal-compat",
  "embedded-spi",
  "f3",
  "heapless 0.6.1",
@@ -353,16 +352,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f2260cabeacf4bda1df1a8d54f67047a9aadf02fe14cfab07649f2cec6a4693b"
 dependencies = [
  "nb 1.0.0",
-]
-
-[[package]]
-name = "embedded-hal-compat"
-version = "0.1.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a2afb504e8ae78ede52799ea060abb3836fe2f7a24e8ac1cacb9086c5cfcabf7"
-dependencies = [
- "embedded-hal 0.2.4",
- "embedded-hal 1.0.0-alpha.4",
 ]
 
 [[package]]
@@ -890,11 +879,11 @@ dependencies = [
 [[package]]
 name = "stm32f4xx-hal"
 version = "0.8.3"
-source = "git+https://github.com/stm32-rs/stm32f4xx-hal#e9ef4ed01000c76a2af81d4eafa3afaccd1eed26"
+source = "git+https://github.com/pdgilbert/stm32f4xx-hal?branch=test-bxcan-version-relax#5a30ece08daa966b4a65f86b91c8767d8b72a070"
 dependencies = [
  "bare-metal 0.2.5",
  "cast",
- "cortex-m 0.6.7",
+ "cortex-m 0.5.11",
  "cortex-m-rt",
  "embedded-dma",
  "embedded-hal 0.2.4",
@@ -920,7 +909,7 @@ dependencies = [
 [[package]]
 name = "stm32f7xx-hal"
 version = "0.2.0"
-source = "git+https://github.com/stm32-rs/stm32f7xx-hal#f1e36d9a6bdc9d7d01d35327bbb276eca9291dc4"
+source = "git+https://github.com/pdgilbert/stm32f7xx-hal?branch=test-bxcan-version-relax#bba3e5ef63107097d884de02967287ff5943d098"
 dependencies = [
  "as-slice",
  "bare-metal 0.2.5",

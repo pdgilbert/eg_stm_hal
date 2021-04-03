@@ -108,6 +108,7 @@ See [Running Examples](#running-examples) for more details.
 | xxx                  | notes |   Description                                                  |
 | -------------------- |:-----:|:-------------------------------------------------------------- |
 | blink                |   1   | Blink on-board LED                                             |
+| blink_impl           |   1   | Blink on-board LED. setup() uses impl traits.                  |
 | blink3               |   1   | Blink off-board LEDs attached to  pb 13,14,15                  |
 | echo_by_char         |   2   | Echo console input, char by char,  + semihost output           |
 | echo_string          |       | Read 15 chars input from console, output to semihost, repeat   |
