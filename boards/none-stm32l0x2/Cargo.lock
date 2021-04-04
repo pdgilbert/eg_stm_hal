@@ -879,11 +879,11 @@ dependencies = [
 [[package]]
 name = "stm32f4xx-hal"
 version = "0.8.3"
-source = "git+https://github.com/stm32-rs/stm32f4xx-hal#6a56889966b3310e88dba44525ce80f85d20b210"
+source = "git+https://github.com/pdgilbert/stm32f4xx-hal?branch=test-bxcan-version-relax#40a634710fce6f28fd2b0f65cbac077628810cd7"
 dependencies = [
  "bare-metal 0.2.5",
  "cast",
- "cortex-m 0.6.7",
+ "cortex-m 0.5.11",
  "cortex-m-rt",
  "embedded-dma",
  "embedded-hal 0.2.4",
@@ -909,7 +909,7 @@ dependencies = [
 [[package]]
 name = "stm32f7xx-hal"
 version = "0.2.0"
-source = "git+https://github.com/stm32-rs/stm32f7xx-hal#f1e36d9a6bdc9d7d01d35327bbb276eca9291dc4"
+source = "git+https://github.com/pdgilbert/stm32f7xx-hal?branch=test-bxcan-version-relax#bba3e5ef63107097d884de02967287ff5943d098"
 dependencies = [
  "as-slice",
  "bare-metal 0.2.5",

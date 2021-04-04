@@ -114,15 +114,19 @@ use stm32f3xx_hal::{
     },
     //i2c::{BlockingI2c, DutyCycle, Mode},
     hal::blocking::i2c::{Read, Write, WriteRead},
-    i2c::I2c,
+    i2c,
+    //i2c::{Read, Write, WriteRead},
+    //i2c::{I2c,BlockingI2c, Mode, PinScl, PinSda},
     pac::Peripherals,
     pac::I2C1,
     prelude::*,
 };
 
 #[cfg(feature = "stm32f3xx")]
-fn setup() -> impl WriteRead {
+fn setup() -> i2c::I2c<I2C1, (PB8<Alternate<AF4>>, PB9<Alternate<AF4>>)> {
+    //fn setup() -> I2c<I2C1, impl PinScl<I2C1> + PinSda<I2C1>> {
     //fn setup() -> BlockingI2c<I2C1, impl PinScl<I2C1>, impl PinSda<I2C1>> {
+    //fn setup() -> impl WriteRead {
     //fn setup() -> () {
     //I2c<I2C1, (PB8<Alternate<OpenDrain>>, PB9<Alternate<OpenDrain>>)> {
     //BlockingI2c<I2C2, (PB8<Alternate<OpenDrain>>, PB9<Alternate<OpenDrain>>)> {
@@ -147,7 +151,7 @@ fn setup() -> impl WriteRead {
 
     // return i2c
     //BlockingI2c::i2c1(
-    I2c::new(
+    i2c::I2c::new(
         p.I2C1,
         (scl, sda),
         //&mut afio.mapr,  need this for i2c1 but not i2c2

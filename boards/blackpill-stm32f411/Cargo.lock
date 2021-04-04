@@ -265,9 +265,9 @@ dependencies = [
 
 [[package]]
 name = "driver-pal"
-version = "0.8.0-alpha.2"
+version = "0.8.0-alpha.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1c37eb49917b491b205271207996ac5b0d491312a4e8acd5014906280d16df31"
+checksum = "4a7483af22e06f2b2fff6ebcaf2724aa29d47c29fa5dcadfc1f71ef862de5b40"
 dependencies = [
  "embedded-hal 1.0.0-alpha.4",
  "log",
@@ -466,9 +466,9 @@ dependencies = [
 
 [[package]]
 name = "libc"
-version = "0.2.91"
+version = "0.2.92"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8916b1f6ca17130ec6568feccee27c156ad12037880833a3b842a823236502e7"
+checksum = "56d855069fafbb9b344c0f962150cd2c1187975cb1c22c1522c240d8c4986714"
 
 [[package]]
 name = "log"
@@ -500,9 +500,9 @@ dependencies = [
 
 [[package]]
 name = "micromath"
-version = "1.1.0"
+version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "be00a244d4394124986da477e8b2814dcb7995ab238817d9037bc336c4b0b843"
+checksum = "bc4010833aea396656c2f91ee704d51a6f1329ec2ab56ffd00bfd56f7481ea94"
 
 [[package]]
 name = "nb"
@@ -624,9 +624,9 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.24"
+version = "1.0.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e0704ee1a7e00d7bb417d0770ea303c1bccbabf0ef1667dae92b5967f5f8a71"
+checksum = "a152013215dca273577e18d2bf00fa862b89b24169fb78c4c95aeb07992c9cec"
 dependencies = [
  "unicode-xid",
 ]
@@ -848,9 +848,8 @@ dependencies = [
 [[package]]
 name = "stm32f3xx-hal"
 version = "0.6.1"
-source = "git+https://github.com/stm32-rs/stm32f3xx-hal#f8eb2926a38c9a40c41ba53de60839ac25d78f6e"
+source = "git+https://github.com/stm32-rs/stm32f3xx-hal#231c9592508d85d72e4f54b5f408d42546184ea4"
 dependencies = [
- "bare-metal 1.0.0",
  "cfg-if",
  "cortex-m 0.7.2",
  "cortex-m-rt",
@@ -861,6 +860,7 @@ dependencies = [
  "paste",
  "rtcc",
  "stm32f3",
+ "typenum",
  "void",
 ]
 
@@ -879,11 +879,11 @@ dependencies = [
 [[package]]
 name = "stm32f4xx-hal"
 version = "0.8.3"
-source = "git+https://github.com/pdgilbert/stm32f4xx-hal?branch=test-bxcan-version-relax#5a30ece08daa966b4a65f86b91c8767d8b72a070"
+source = "git+https://github.com/pdgilbert/stm32f4xx-hal?branch=test-bxcan-version-relax#40a634710fce6f28fd2b0f65cbac077628810cd7"
 dependencies = [
  "bare-metal 0.2.5",
  "cast",
- "cortex-m 0.5.11",
+ "cortex-m 0.6.7",
  "cortex-m-rt",
  "embedded-dma",
  "embedded-hal 0.2.4",
@@ -941,7 +941,7 @@ dependencies = [
 [[package]]
 name = "stm32h7xx-hal"
 version = "0.9.0"
-source = "git+https://github.com/stm32-rs/stm32h7xx-hal#443eacdc040b24191a4878d94d578f7016d50256"
+source = "git+https://github.com/stm32-rs/stm32h7xx-hal#417fc047428cef29a080dd632ab5c2e76f3c48d4"
 dependencies = [
  "bare-metal 1.0.0",
  "cast",
@@ -1040,9 +1040,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "1.0.64"
+version = "1.0.68"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3fd9d1e9976102a03c542daa2eff1b43f9d72306342f3f8b3ed5fb8908195d6f"
+checksum = "3ce15dd3ed8aa2f8eeac4716d6ef5ab58b6b9256db41d7e1a0224c2788e8fd87"
 dependencies = [
  "proc-macro2",
  "quote",

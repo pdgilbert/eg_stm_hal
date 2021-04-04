@@ -1,6 +1,6 @@
 //! Blink  onboard LED if one is available, or PC13 otherwise.
 //! See blink.rs  example for more details.
-//! Relative to blink.rs this file uses  trait LED and fn setup() -> (impl LED, Delay) 
+//! Relative to blink.rs this file uses  trait LED and fn setup() -> (impl LED, Delay)
 
 #![deny(unsafe_code)]
 #![no_std]
@@ -214,7 +214,6 @@ fn setup() -> (impl LED, Delay) {
 use stm32h7xx_hal::{
     delay::Delay,
     gpio::{gpioc::PC13, Output, PushPull},
-    hal::digital::v2::OutputPin,
     pac::{CorePeripherals, Peripherals},
     prelude::*,
 };
