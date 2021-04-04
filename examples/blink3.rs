@@ -52,7 +52,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     impl LED for PB14<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -61,7 +61,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     impl LED for PB15<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -70,7 +70,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     // Next is following examples in https://github.com/stm32-rs/stm32f0xx-hal/
     // I do not understand the logic and advantage / disadvantage of this  relative
@@ -129,7 +129,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     impl LED for PB14<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -138,7 +138,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     impl LED for PB15<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -147,7 +147,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     // return (led1, led2, led3, delay)
     (
@@ -190,7 +190,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     impl LED for PB14<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -199,7 +199,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     impl LED for PB15<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -208,7 +208,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     // return (led1, led2, led3, delay)
     (
@@ -264,7 +264,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     impl LED for PB14<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -273,7 +273,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     impl LED for PB15<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -282,7 +282,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     // return (led1, led2, led3, delay)
     (
@@ -326,7 +326,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     impl LED for PB14<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -335,7 +335,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     impl LED for PB15<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -344,7 +344,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     // return (led1, led2, led3, delay)
     (
@@ -391,7 +391,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     impl LED for PB14<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -400,7 +400,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     impl LED for PB15<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -409,7 +409,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     // return (led1, led2, led3, delay)
     (
@@ -452,7 +452,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     impl LED for PB14<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -461,7 +461,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     impl LED for PB15<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -470,7 +470,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     // return (led1, led2, led3, delay)
     (
@@ -517,7 +517,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     impl LED for PB14<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -526,7 +526,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     impl LED for PB15<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -535,7 +535,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     // return (led1, led2, led3, delay)
     (
@@ -586,7 +586,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     impl LED for PB14<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -595,7 +595,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     impl LED for PB15<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -604,7 +604,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     // return (led1, led2, led3, delay)
     (

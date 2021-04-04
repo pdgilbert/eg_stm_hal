@@ -511,10 +511,11 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<Adc<ADC1>>) {
 
 #[cfg(feature = "stm32f7xx")]
 use stm32f7xx_hal::{
-    device::adc1::{config::AdcConfig, Adc, Temperature},
-    device::{ADC1, ADC2},
+    adc::Adc,
+    //device::adc1::{config::AdcConfig, Adc, Temperature},
+    //device::{ADC1, ADC2},
     gpio::{gpiob::PB1, Analog},
-    pac::Peripherals,
+    pac::{Peripherals, ADC1, ADC2},
     prelude::*,
 };
 
@@ -526,11 +527,10 @@ fn setup() -> (
 ) {
     // On stm32f722 a temperature sensor is internally connected to ???.
     // Two adc's are used but no channel is specified for the mcutemp on adc3 because it uses an internal channel.
+    // stm32f722 has 3 12bit ADCs
     // NOT YET BUILDING
 
     // WAITING ON ADC SUPPORT IN stm32f7xx_hal
-
-    // stm32f722 has 3 ADCs
 
     let p = Peripherals::take().unwrap();
     let rcc = p.RCC.constrain();
