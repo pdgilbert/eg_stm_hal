@@ -324,6 +324,7 @@ use stm32l4xx_hal::{
 
 #[cfg(feature = "stm32l4xx")]
 fn setup() -> (PA8<Output<OpenDrain>>, Delay) {
+    // OPEN DRAIN OUTPUT NOT RECOGNIZED AS INPUT See https://github.com/stm32-rs/stm32l4xx-hal/issues/144
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut flash = p.FLASH.constrain();
