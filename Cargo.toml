@@ -80,6 +80,10 @@ path = "examples/lora_spi_receive.rs"
 name = "lora_spi_gps"
 path = "examples/lora_spi_gps.rs"
 
+[[example]]
+name = "ads1015_oled"
+path = "examples/ads1015_oled.rs"
+
 
 #[[example]]
 #name = "digi_pot"
@@ -99,8 +103,9 @@ panic-halt           = { version = ">=0.2.0" }
 #dht11 = "0.3.1"
 #dht-sensor = "0.1.1"
 
-ads1x1x =  { version = "0.2", optional = true }
-# this causes problem with stm32l0xx_hal:  shared-bus = { version = "0.1.4", features = ["cortexm"] }
+ads1x1x =  { version = "0.2.1"}
+# this causes problem with stm32l0xx_hal:  
+shared-bus = { version = "0.1.4", features = ["cortexm"] }
 
 # for example digi_pot
 # mcp4x = "0.1"
@@ -118,7 +123,7 @@ radio-sx127x  = { git ="https://github.com/rust-iot/rust-radio-sx127x", default-
 radio         = { version = "0.7.0" }
 driver-pal    = { version = "0.8.0-alpha.0", default-features = false }
 
-# for  text_i2c which uses ssd1306, ads1015-display example.    need rust 1.40.0 for #[non_exhaustive]
+# for  text_i2c which uses ssd1306, ads1015-oled example.    need rust 1.40.0 for #[non_exhaustive]
 ssd1306   = { git = "https://github.com/jamwaffles/ssd1306"  }  #version = "0.3.1" # "0.2.6" "0.3.1" 
 embedded-graphics   = { version = ">=0.6.0" }                   #version = ">=0.6.0" #  "0.4.4" # "0.4.9"  "0.6.2" 
 

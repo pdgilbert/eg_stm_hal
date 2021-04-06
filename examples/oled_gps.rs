@@ -267,7 +267,7 @@ fn setup() -> (
     (
         tx2,
         rx2,
-        I2c::i2c2(p.I2C2, (scl, sda), 400.khz(), clocks), // i2c
+        I2c::new(p.I2C2, (scl, sda), 400.khz(), clocks), // i2c
         Delay::new(cp.SYST, clocks),
     )
 }

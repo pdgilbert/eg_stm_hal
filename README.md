@@ -141,6 +141,7 @@ These are examples which use an additional device crate.
 | lora_spi_send    | rust-radio-sx127x |       | transmit a character string over LoRa,  + semihost output  |
 | lora_spi_receive | rust-radio-sx127x |       | receive  a character string over LoRa,  + semihost output  |
 | lora_spi_gps     | rust-radio-sx127x |       | read gps and transmit over LoRa,  + semihost output        |
+| ads1015_oled     | ads1015, ssd1306  |       | read ADC on i2c and write on ssd1306 OLED                  |
 
 The current status of these examples is [here.](https://pdgilbert.github.io/eg_stm_hal/#additional-examples)
 

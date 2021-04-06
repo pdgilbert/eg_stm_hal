@@ -188,7 +188,7 @@ fn setup() -> I2c<I2C2, (PB10<AlternateOD<AF4>>, PB3<AlternateOD<AF9>>)> {
     let sda = gpiob.pb3.into_alternate_af9().set_open_drain(); // sda on PB3
 
     // return i2c
-    I2c::i2c2(p.I2C2, (scl, sda), 400.khz(), clocks)
+    I2c::new(p.I2C2, (scl, sda), 400.khz(), clocks)
 }
 
 #[cfg(feature = "stm32f7xx")]
