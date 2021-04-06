@@ -511,11 +511,11 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<Adc<ADC1>>) {
 
 #[cfg(feature = "stm32f7xx")]
 use stm32f7xx_hal::{
-    adc::Adc,
+    //adc::Adc,
     //device::adc1::{config::AdcConfig, Adc, Temperature},
     //device::{ADC1, ADC2},
     gpio::{gpiob::PB1, Analog},
-    pac::{Peripherals, ADC1, ADC2},
+    pac::{Peripherals, Adc, ADC1, ADC2},
     prelude::*,
 };
 
