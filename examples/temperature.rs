@@ -739,9 +739,7 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<Adc<Ready>>) {
 
     // only one  adc
 
-    let adcs: Adcs<Adc<Ready>> = Adcs {
-        ad_1st: adc,
-    };
+    let adcs: Adcs<Adc<Ready>> = Adcs { ad_1st: adc };
 
     //The MCU temperature sensor is internally connected to the ADC12_IN16 input channel
     // so no channel needs to be specified here.

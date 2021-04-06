@@ -28,7 +28,7 @@ use ads1x1x::{channel as AdcChannel, Ads1x1x, FullScaleRange, SlaveAddr};
 
 use core::fmt::Write;
 use embedded_graphics::{
-    fonts::{Font8x16, Text},  //Font6x8,
+    fonts::{Font8x16, Text}, //Font6x8,
     pixelcolor::BinaryColor,
     prelude::*,
     style::TextStyleBuilder,
@@ -54,9 +54,9 @@ use stm32f0xx_hal::{
     prelude::*,
 };
 
-
 #[cfg(feature = "stm32f0xx")]
-fn setup() -> (I2c<I2C1, PB8<Alternate<AF1>>, PB7<Alternate<AF1>>>,
+fn setup() -> (
+    I2c<I2C1, PB8<Alternate<AF1>>, PB7<Alternate<AF1>>>,
     PC13<Output<PushPull>>,
     Delay,
 ) {
@@ -145,8 +145,8 @@ use stm32f3xx_hal::{
     delay::Delay,
     gpio::{
         gpiob::{PB8, PB9},
-        gpioe::{PE15,},
-        Alternate, Output, PushPull, OpenDrain, Pin, AF4,
+        gpioe::PE15,
+        Alternate, OpenDrain, Output, Pin, PushPull, AF4,
     },
     hal::blocking::i2c::{Read, WriteRead},
     i2c,
@@ -155,11 +155,7 @@ use stm32f3xx_hal::{
 };
 
 #[cfg(feature = "stm32f3xx")]
-fn setup() -> (
-    impl WriteRead,
-    PE15<Output<PushPull>>,
-    Delay,
-) {
+fn setup() -> (impl WriteRead, PE15<Output<PushPull>>, Delay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
@@ -196,7 +192,7 @@ fn setup() -> (
     let led = gpioe
         .pe15
         .into_push_pull_output(&mut gpioe.moder, &mut gpioe.otyper); // led on pe15
- 
+
     (i2c, led, Delay::new(cp.SYST, clocks)) // return tuple (i2c, led, delay)
 }
 
@@ -222,7 +218,7 @@ fn setup() -> (
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
-    let  rcc = p.RCC.constrain();
+    let rcc = p.RCC.constrain();
     let clocks = rcc.cfgr.freeze();
 
     let gpiob = p.GPIOB.split(); // for i2c
@@ -237,25 +233,26 @@ fn setup() -> (
 
     // led
     let gpioc = p.GPIOC.split();
-    let led = gpioc.pc13.into_push_pull_output(); 
+    let led = gpioc.pc13.into_push_pull_output();
 
     (i2c, led, Delay::new(cp.SYST, clocks)) // return tuple (i2c, led, delay)
 }
 
-
-
-
 #[cfg(feature = "stm32f7xx")]
 use stm32f7xx_hal::{
     delay::Delay,
-    i2c::{BlockingI2c, Mode, PinScl, PinSda},
     gpio::{gpioc::PC13, Output, PushPull},
-    pac::{CorePeripherals, Peripherals, I2C1,},
+    i2c::{BlockingI2c, Mode, PinScl, PinSda},
+    pac::{CorePeripherals, Peripherals, I2C1},
     prelude::*,
 };
 
 #[cfg(feature = "stm32f7xx")]
-fn setup() -> (BlockingI2c<I2C1, impl PinScl<I2C1>, impl PinSda<I2C1>>, PC13<Output<PushPull>>, Delay) {
+fn setup() -> (
+    BlockingI2c<I2C1, impl PinScl<I2C1>, impl PinSda<I2C1>>,
+    PC13<Output<PushPull>>,
+    Delay,
+) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.constrain();
@@ -284,12 +281,11 @@ fn setup() -> (BlockingI2c<I2C1, impl PinScl<I2C1>, impl PinSda<I2C1>>, PC13<Out
     (i2c, led, Delay::new(cp.SYST, clocks)) // return tuple (i2c, led, delay)
 }
 
-
 #[cfg(feature = "stm32h7xx")]
 use stm32h7xx_hal::{
     delay::Delay,
-    i2c::I2c,
     gpio::{gpioc::PC13, Output, PushPull},
+    i2c::I2c,
     //gpio::{gpiob::{PB8, PB9}, Alternate, AF4, }, really! builds without this
     pac::{CorePeripherals, Peripherals, I2C1},
     prelude::*,
@@ -311,13 +307,13 @@ fn setup() -> (I2c<I2C1>, PC13<Output<PushPull>>, Delay) {
     let scl = gpiob.pb8.into_alternate_af4().set_open_drain(); // scl on PB8
     let sda = gpiob.pb9.into_alternate_af4().set_open_drain(); // sda on PB9
 
-    let i2c = p.I2C1
+    let i2c = p
+        .I2C1
         .i2c((scl, sda), 400.khz(), ccdr.peripheral.I2C1, &clocks);
 
     let led = gpioc.pc13.into_push_pull_output(); // led on pc13
 
     (i2c, led, Delay::new(cp.SYST, clocks)) // return tuple (i2c, led, delay)
-
 }
 
 #[cfg(feature = "stm32l0xx")]
@@ -326,7 +322,7 @@ use stm32l0xx_hal::{
     gpio::{
         gpiob::{PB8, PB9},
         gpioc::PC13,
-        PushPull, OpenDrain, Output,
+        OpenDrain, Output, PushPull,
     },
     i2c::I2c,
     pac::{CorePeripherals, Peripherals, I2C1},
@@ -335,7 +331,11 @@ use stm32l0xx_hal::{
 };
 
 #[cfg(feature = "stm32l0xx")]
-fn setup() -> (I2c<I2C1, PB9<Output<OpenDrain>>, PB8<Output<OpenDrain>>>, PC13<Output<PushPull>>, Delay) {
+fn setup() -> (
+    I2c<I2C1, PB9<Output<OpenDrain>>, PB8<Output<OpenDrain>>>,
+    PC13<Output<PushPull>>,
+    Delay,
+) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
@@ -349,21 +349,20 @@ fn setup() -> (I2c<I2C1, PB9<Output<OpenDrain>>, PB8<Output<OpenDrain>>>, PC13<O
     let sda = gpiob.pb9.into_open_drain_output(); // sda on PB9
 
     let i2c = p.I2C1.i2c(sda, scl, 400.khz(), &mut rcc);
-    
+
     let led = gpioc.pc13.into_push_pull_output(); // led on pc13 with on/off
 
     (i2c, led, Delay::new(cp.SYST, rcc.clocks)) // return tuple (i2c, led, delay)
 }
 
-
 #[cfg(feature = "stm32l1xx")] // eg  Discovery STM32L100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{
     delay::Delay,
-    i2c::{I2c, Pins},
     gpio::{gpiob::PB6, Output, PushPull},
+    i2c::{I2c, Pins},
     prelude::*,
     rcc, // for ::Config but avoid name conflict with serial
-    stm32::{CorePeripherals, Peripherals, I2C1,},
+    stm32::{CorePeripherals, Peripherals, I2C1},
     //gpio::{gpiob::{PB8, PB9}, Output, OpenDrain, },
 };
 
@@ -380,8 +379,8 @@ fn setup() -> (I2c<I2C1, impl Pins<I2C1>>, PB6<Output<PushPull>>, Delay) {
     let sda = gpiob.pb9.into_open_drain_output(); // sda on PB9
 
     let i2c = p.I2C1.i2c((scl, sda), 400.khz(), &mut rcc);
-    
-    let led = gpiob.pb6.into_push_pull_output(); // led on pb6 
+
+    let led = gpiob.pb6.into_push_pull_output(); // led on pb6
 
     (i2c, led, Delay::new(cp.SYST, rcc.clocks)) // return tuple (i2c, led, delay)
 }
@@ -400,13 +399,17 @@ use stm32l4xx_hal::{
 };
 
 #[cfg(feature = "stm32l4xx")]
-fn setup() -> (I2c<
-    I2C2,
-    (
-        PB10<Alternate<AF4, Output<OpenDrain>>>,
-        PB11<Alternate<AF4, Output<OpenDrain>>>,
-    ),
->, PC13<Output<PushPull>>, Delay) {
+fn setup() -> (
+    I2c<
+        I2C2,
+        (
+            PB10<Alternate<AF4, Output<OpenDrain>>>,
+            PB11<Alternate<AF4, Output<OpenDrain>>>,
+        ),
+    >,
+    PC13<Output<PushPull>>,
+    Delay,
+) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut flash = p.FLASH.constrain();
@@ -435,16 +438,14 @@ fn setup() -> (I2c<
     let sda = sda.into_af4(&mut gpiob.moder, &mut gpiob.afrh);
 
     let i2c = I2c::i2c2(p.I2C2, (scl, sda), 400.khz(), clocks, &mut rcc.apb1r1);
-    
+
     let mut gpioc = p.GPIOC.split(&mut rcc.ahb2);
     let led = gpioc
-            .pc13
-            .into_push_pull_output(&mut gpioc.moder, &mut gpioc.otyper); // led on pc13
+        .pc13
+        .into_push_pull_output(&mut gpioc.moder, &mut gpioc.otyper); // led on pc13
 
     (i2c, led, Delay::new(cp.SYST, clocks)) // return tuple (i2c, led, delay)
-
 }
-
 
 // End of hal/MCU specific setup. Following should be generic code.
 
@@ -462,10 +463,10 @@ fn main() -> ! {
         .connect(interface)
         .into();
     disp.init().unwrap();
-    
-//    let text_style = TextStyleBuilder::new(Font6x8)
-//        .text_color(BinaryColor::On)
-//        .build();
+
+    //    let text_style = TextStyleBuilder::new(Font6x8)
+    //        .text_color(BinaryColor::On)
+    //        .build();
     let text_style = TextStyleBuilder::new(Font8x16)
         .text_color(BinaryColor::On)
         .build();
@@ -478,7 +479,8 @@ fn main() -> ! {
 
     let mut adc = Ads1x1x::new_ads1015(manager.acquire(), SlaveAddr::default());
     // need to be able to measure [0-5V]
-    adc.set_full_scale_range(FullScaleRange::Within6_144V).unwrap();
+    adc.set_full_scale_range(FullScaleRange::Within6_144V)
+        .unwrap();
 
     loop {
         // Blink LED 0 to check that everything is actually running.
