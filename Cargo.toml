@@ -100,12 +100,11 @@ panic-reset          = { version = ">=0.1.0" }
 panic-halt           = { version = ">=0.2.0" }
 
 # for example  ads1015-display
-#dht11 = "0.3.1"
-#dht-sensor = "0.1.1"
-
 ads1x1x =  { version = "0.2.1"}
 # this causes problem with stm32l0xx_hal:  
 shared-bus = { version = "0.1.4", features = ["cortexm"] }
+#dht11 = "0.3.1"
+#dht-sensor = "0.1.1"
 
 # for example digi_pot
 # mcp4x = "0.1"
@@ -138,8 +137,7 @@ stm32f0xx-hal = { git = "https://github.com/stm32-rs/stm32f0xx-hal", optional = 
 stm32f1xx-hal = { git = "https://github.com/stm32-rs/stm32f1xx-hal", optional = true }
 stm32f3xx-hal = { git = "https://github.com/stm32-rs/stm32f3xx-hal", optional = true }
 stm32f4xx-hal = { git = "https://github.com/stm32-rs/stm32f4xx-hal", optional = true }
-# stm32f7xx-hal = { git = "https://github.com/stm32-rs/stm32f7xx-hal", optional = true }
-stm32f7xx-hal = { git = "https://github.com/pdgilbert/stm32f7xx-hal", branch="test-bxcan-version-relax", optional = true }
+stm32f7xx-hal = { git = "https://github.com/stm32-rs/stm32f7xx-hal", optional = true }
 stm32h7xx-hal = { git = "https://github.com/stm32-rs/stm32h7xx-hal", optional = true }
 stm32l0xx-hal = { git = "https://github.com/stm32-rs/stm32l0xx-hal", optional = true }
 stm32l1xx-hal = { git = "https://github.com/stm32-rs/stm32l1xx-hal", optional = true, default-features = false}

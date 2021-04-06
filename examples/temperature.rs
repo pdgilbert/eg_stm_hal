@@ -715,10 +715,9 @@ fn setup() -> (
 
 #[cfg(feature = "stm32l0xx")]
 use stm32l0xx_hal::{
-    adc::{Adc, Ready},
+    adc::{Adc, Ready, VTemp},
     gpio::{gpiob::PB1, Analog},
     pac::Peripherals,
-    pac::ADC,
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
 };
@@ -733,9 +732,9 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<Adc<Ready>>) {
 
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
-    let mut adc = p.ADC.constrain(&mut rcc);
+    let adc = p.ADC.constrain(&mut rcc);
 
-    let mut gpiob = p.GPIOB.split(&mut rcc);
+    let gpiob = p.GPIOB.split(&mut rcc);
 
     // only one  adc
 
@@ -759,8 +758,8 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<Adc<Ready>>) {
                 }
 
                 None => {
-                    let z = &mut a.ad_1st;
-                    z.read_temp() as i32
+                    let v: f32 = a.ad_1st.read(&mut VTemp).unwrap();
+                    (v / 12.412122) as i32 - 50 as i32     //CHECK THIS
                 }
             }
         }
