@@ -11,13 +11,14 @@ use panic_semihosting as _;
 #[cfg(not(debug_assertions))]
 use panic_halt as _;
 
-// use panic_halt as _;  // put a breakpoint on `rust_begin_unwind` to catch panics
-// use panic_abort; // may still require nightly?
-// use panic_itm;   // logs messages over ITM; requires ITM support
-// use panic_semihosting as _; // logs messages to the host stderr; requires a debugger
-
-// use nb::block;
 use cortex_m_rt::entry;
+
+use embedded_hal::digital::v2::OutputPin;
+
+pub trait LED {
+    fn on(&mut self) -> ();
+    fn off(&mut self) -> ();
+}
 
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
 
@@ -34,10 +35,7 @@ use stm32f0xx_hal::{
 
 #[cfg(feature = "stm32f0xx")]
 fn setup() -> (
-    PB13<Output<PushPull>>,
-    PB14<Output<PushPull>>,
-    PB15<Output<PushPull>>,
-    Delay,
+    impl LED, impl LED, impl LED, Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let mut p = Peripherals::take().unwrap();
@@ -99,15 +97,9 @@ use stm32f1xx_hal::{
     prelude::*,
 };
 
-#[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
-use embedded_hal::digital::v2::OutputPin;
-
 #[cfg(feature = "stm32f1xx")]
 fn setup() -> (
-    PB13<Output<PushPull>>,
-    PB14<Output<PushPull>>,
-    PB15<Output<PushPull>>,
-    Delay,
+    impl LED, impl LED, impl LED, Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -171,10 +163,7 @@ use stm32f3xx_hal::{
 
 #[cfg(feature = "stm32f3xx")]
 fn setup() -> (
-    PB13<Output<PushPull>>,
-    PB14<Output<PushPull>>,
-    PB15<Output<PushPull>>,
-    Delay,
+    impl LED, impl LED, impl LED, Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -238,10 +227,7 @@ use stm32f4xx_hal::{
 
 #[cfg(feature = "stm32f4xx")]
 fn setup() -> (
-    PB13<Output<PushPull>>,
-    PB14<Output<PushPull>>,
-    PB15<Output<PushPull>>,
-    Delay,
+    impl LED, impl LED, impl LED, Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -289,7 +275,6 @@ fn setup() -> (
         gpiob.pb13.into_push_pull_output(), // led on pb13
         gpiob.pb14.into_push_pull_output(), // led on pb14
         gpiob.pb15.into_push_pull_output(), // led on pb15
-        //AsmDelay::new(bitrate::U32BitrateExt::mhz(32)),
         Delay::new(cp.SYST, clocks),
     )
 }
@@ -307,10 +292,7 @@ use stm32f7xx_hal::{
 
 #[cfg(feature = "stm32f7xx")]
 fn setup() -> (
-    PB13<Output<PushPull>>,
-    PB14<Output<PushPull>>,
-    PB15<Output<PushPull>>,
-    Delay,
+    impl LED, impl LED, impl LED, Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -362,17 +344,14 @@ use stm32h7xx_hal::{
         gpiob::{PB13, PB14, PB15},
         Output, PushPull,
     },
-    hal::digital::v2::OutputPin,
+    //hal::digital::v2::impl LED, impl LED, impl LED, Delay,,
     pac::{CorePeripherals, Peripherals},
     prelude::*,
 };
 
 #[cfg(feature = "stm32h7xx")]
 fn setup() -> (
-    PB13<Output<PushPull>>,
-    PB14<Output<PushPull>>,
-    PB15<Output<PushPull>>,
-    Delay,
+    impl LED, impl LED, impl LED, Delay,
 ) {
     // see https://github.com/stm32-rs/stm32h7xx-hal/blob/master/examples/blinky.rs
     let cp = CorePeripherals::take().unwrap();
@@ -434,10 +413,7 @@ use stm32l0xx_hal::{
 
 #[cfg(feature = "stm32l0xx")]
 fn setup() -> (
-    PB13<Output<PushPull>>,
-    PB14<Output<PushPull>>,
-    PB15<Output<PushPull>>,
-    Delay,
+    impl LED, impl LED, impl LED, Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -481,6 +457,7 @@ fn setup() -> (
     )
 }
 
+
 #[cfg(feature = "stm32l1xx")] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{
     delay::Delay,
@@ -493,15 +470,9 @@ use stm32l1xx_hal::{
     stm32::{CorePeripherals, Peripherals},
 };
 
-#[cfg(feature = "stm32l1xx")] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
-use embedded_hal::digital::v2::OutputPin;
-
 #[cfg(feature = "stm32l1xx")]
 fn setup() -> (
-    PB13<Output<PushPull>>,
-    PB14<Output<PushPull>>,
-    PB15<Output<PushPull>>,
-    Delay,
+    impl LED, impl LED, impl LED, Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -559,10 +530,7 @@ use stm32l4xx_hal::{
 
 #[cfg(feature = "stm32l4xx")]
 fn setup() -> (
-    PB13<Output<PushPull>>,
-    PB14<Output<PushPull>>,
-    PB15<Output<PushPull>>,
-    Delay,
+    impl LED, impl LED, impl LED, Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -622,11 +590,6 @@ fn setup() -> (
 }
 
 // End of hal/MCU specific setup. Following should be generic code.
-
-pub trait LED {
-    fn on(&mut self) -> ();
-    fn off(&mut self) -> ();
-}
 
 #[entry]
 fn main() -> ! {

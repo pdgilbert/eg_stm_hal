@@ -17,11 +17,6 @@ use panic_semihosting as _;
 #[cfg(not(debug_assertions))]
 use panic_halt as _;
 
-use embedded_hal::blocking::delay::DelayMs;
-
-//use cortex_m::asm;  //for breakpoint
-//asm::bkpt();
-
 use cortex_m_rt::entry;
 use cortex_m_semihosting::hprintln;
 
@@ -32,7 +27,9 @@ use dht_sensor::dht11::Reading;
 use dht_sensor::dht22::Reading;
 use dht_sensor::*;
 
-use embedded_hal::digital::v2::OutputPin; // for  set_high().ok()
+use embedded_hal::{digital::v2::OutputPin, // for  set_high().ok()
+                   blocking::delay::DelayMs};
+
 
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
 
@@ -113,9 +110,6 @@ use stm32f3xx_hal::{
     pac::{CorePeripherals, Peripherals},
     prelude::*,
 };
-
-//#[cfg(feature = "stm32f3xx")]
-//use asm_delay::{bitrate, Delay};
 
 #[cfg(feature = "stm32f3xx")]
 fn setup() -> (PA8<Output<OpenDrain>>, Delay) {
@@ -319,8 +313,6 @@ use stm32l4xx_hal::{
     pac::{CorePeripherals, Peripherals},
     prelude::*,
 };
-//#[cfg(feature = "stm32l4xx")]
-//use embedded_hal::digital::v2::{InputPin, OutputPin};
 
 #[cfg(feature = "stm32l4xx")]
 fn setup() -> (PA8<Output<OpenDrain>>, Delay) {

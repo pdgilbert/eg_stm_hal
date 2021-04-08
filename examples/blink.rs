@@ -32,9 +32,9 @@ use panic_halt as _;
 // use panic_itm;   // logs messages over ITM; requires ITM support
 // use panic_semihosting as _; // logs messages to the host stderr; requires a debugger
 
-// use nb::block;
-//use asm_delay::{bitrate, AsmDelay};
 use cortex_m_rt::entry;
+
+use embedded_hal::digital::v2::OutputPin;
 
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
 // 1. Get device specific peripherals
@@ -82,9 +82,6 @@ use stm32f1xx_hal::{
     prelude::*,
 };
 
-#[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
-use embedded_hal::digital::v2::OutputPin;
-
 #[cfg(feature = "stm32f1xx")]
 fn setup() -> (PC13<Output<PushPull>>, Delay) {
     let cp = CorePeripherals::take().unwrap();
@@ -105,7 +102,6 @@ fn setup() -> (PC13<Output<PushPull>>, Delay) {
     // return tuple  (led, delay)
     (
         gpioc.pc13.into_push_pull_output(&mut gpioc.crh), // led on pc13 with on/off
-        //AsmDelay::new(bitrate::U32BitrateExt::mhz(16)),
         Delay::new(cp.SYST, clocks),
     )
 }
@@ -159,8 +155,6 @@ use stm32f4xx_hal::{
 
 #[cfg(feature = "stm32f4xx")]
 fn setup() -> (PC13<Output<PushPull>>, Delay) {
-    //(PA5<Output<PushPull>>, Delay) {
-
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let rcc = p.RCC.constrain();
@@ -228,7 +222,7 @@ fn setup() -> (PC13<Output<PushPull>>, Delay) {
 use stm32h7xx_hal::{
     delay::Delay,
     gpio::{gpioc::PC13, Output, PushPull},
-    hal::digital::v2::OutputPin,
+    //hal::digital::v2::OutputPin,
     pac::{CorePeripherals, Peripherals},
     prelude::*,
 };
@@ -300,9 +294,6 @@ use stm32l1xx_hal::{
     rcc, // for ::Config but note name conflict with serial
     stm32::{CorePeripherals, Peripherals},
 };
-
-#[cfg(feature = "stm32l1xx")]
-use embedded_hal::digital::v2::OutputPin;
 
 #[cfg(feature = "stm32l1xx")]
 fn setup() -> (PB6<Output<PushPull>>, Delay) {
