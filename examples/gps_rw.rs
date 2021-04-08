@@ -136,14 +136,20 @@ fn setup() -> (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>) {
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.constrain();
     let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
+
     //Why does next need arg, there is only one possibility?
     let mut gpioa = p.GPIOA.split(&mut rcc.ahb);
+
     let (tx1, rx1) = Serial::usart1(
         p.USART1,
         (
-            gpioa.pa9.into_af7(&mut gpioa.moder, &mut gpioa.afrh), //tx pa9   for console
-            gpioa.pa10.into_af7(&mut gpioa.moder, &mut gpioa.afrh),
-        ), //tx pb10  for console
+            gpioa
+                .pa9
+                .into_af7_push_pull(&mut gpioa.moder, &mut gpioa.otyper, &mut gpioa.afrh), //tx pa9
+            gpioa
+                .pa10
+                .into_af7_push_pull(&mut gpioa.moder, &mut gpioa.otyper, &mut gpioa.afrh), //rx pa10
+        ),
         9600.Bd(),
         clocks,
         &mut rcc.apb2,
@@ -153,14 +159,19 @@ fn setup() -> (Tx<USART1>, Rx<USART1>, Tx<USART2>, Rx<USART2>) {
     let (tx2, rx2) = Serial::usart2(
         p.USART2,
         (
-            gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl), //tx pa2  for GPS
-            gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl),
-        ), //rx pa3  for GPS
-        9600.Bd(), // 115_200.bps(),
+            gpioa
+                .pa2
+                .into_af7_push_pull(&mut gpioa.moder, &mut gpioa.otyper, &mut gpioa.afrl), //tx pa2
+            gpioa
+                .pa3
+                .into_af7_push_pull(&mut gpioa.moder, &mut gpioa.otyper, &mut gpioa.afrl), //rx pa3
+        ),
+        115_200.Bd(), // 9600.bps(),
         clocks,
         &mut rcc.apb1,
     )
     .split();
+
     (tx1, rx1, tx2, rx2)
 }
 

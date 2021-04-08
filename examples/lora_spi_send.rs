@@ -108,7 +108,7 @@ use stm32f0xx_hal::{
 };
 
 #[cfg(feature = "stm32f0xx")]
-fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
+fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible>> {
     //  Infallible, Infallible   reflect the error type on the spi and gpio traits.
 
     let cp = CorePeripherals::take().unwrap();
@@ -146,46 +146,15 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible
 #[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
 use stm32f1xx_hal::{
     delay::Delay,
-    gpio::{
-        gpioa::{PA0, PA1, PA5, PA6, PA7},
-        gpiob::{PB8, PB9},
-        Alternate, Floating, Input, Output, PushPull,
-    },
-    pac::{CorePeripherals, Peripherals, SPI1},
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     spi::{Error, Spi, Spi1NoRemap},
 };
 
-use embedded_spi::wrapper::Wrapper;
-
-type LoraType = Sx127x<
-    Wrapper<
-        Spi<
-            SPI1,
-            Spi1NoRemap,
-            (
-                PA5<Alternate<PushPull>>,
-                PA6<Input<Floating>>,
-                PA7<Alternate<PushPull>>,
-            ),
-            u8,
-        >,
-        Error,
-        PA1<Output<PushPull>>,
-        PB8<Input<Floating>>,
-        PB9<Input<Floating>>,
-        PA0<Output<PushPull>>,
-        Infallible,
-        Delay,
-    >,
-    Error,
-    Infallible,
-    Infallible,
->;
+//use embedded_spi::wrapper::Wrapper;
 
 #[cfg(feature = "stm32f1xx")]
-fn setup() -> LoraType {
-//fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
+fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible>> {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
@@ -235,13 +204,13 @@ fn setup() -> LoraType {
 #[cfg(feature = "stm32f3xx")] //  eg Discovery-stm32f303
 use stm32f3xx_hal::{
     delay::Delay,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     spi::{Error, Spi},
-    stm32::Peripherals,
 };
 
 #[cfg(feature = "stm32f3xx")]
-fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
+fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible>> {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
@@ -258,9 +227,15 @@ fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible
     let spi = Spi::spi1(
         p.SPI1,
         (
-            gpioa.pa5.into_af5(&mut gpioa.moder, &mut gpioa.afrl), // sck   on PA5
-            gpioa.pa6.into_af5(&mut gpioa.moder, &mut gpioa.afrl), // miso  on PA6
-            gpioa.pa7.into_af5(&mut gpioa.moder, &mut gpioa.afrl), // mosi  on PA7
+            gpioa
+                .pa5
+                .into_af5_push_pull(&mut gpioa.moder, &mut gpioa.otyper, &mut gpioa.afrl), // sck   on PA5
+            gpioa
+                .pa6
+                .into_af5_push_pull(&mut gpioa.moder, &mut gpioa.otyper, &mut gpioa.afrl), // miso  on PA6
+            gpioa
+                .pa7
+                .into_af5_push_pull(&mut gpioa.moder, &mut gpioa.otyper, &mut gpioa.afrl), // mosi  on PA7
         ),
         MODE,
         8_000_000.Hz(),
@@ -317,7 +292,7 @@ use stm32f4xx_hal::{
 //    fn setup() ->  LoraType {
 
 #[cfg(feature = "stm32f4xx")]
-fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
+fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible>> {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
@@ -376,7 +351,7 @@ use stm32f7xx_hal::{
 };
 
 #[cfg(feature = "stm32f7xx")]
-fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
+fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible>> {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
@@ -424,7 +399,7 @@ use stm32h7xx_hal::{
 };
 
 #[cfg(feature = "stm32h7xx")]
-fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Never, Infallible>> {
+fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Never>> {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let pwr = p.PWR.constrain();
@@ -476,7 +451,7 @@ use stm32l0xx_hal::{
 };
 
 #[cfg(feature = "stm32l0xx")]
-fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, void::Void, Infallible>> {
+fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, void::Void>> {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
@@ -522,7 +497,7 @@ use stm32l1xx_hal::{
 };
 
 #[cfg(feature = "stm32l1xx")]
-fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
+fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible>> {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi());
@@ -569,7 +544,7 @@ use stm32l4xx_hal::{
 };
 
 #[cfg(feature = "stm32l4xx")]
-fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
+fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible>> {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut flash = p.FLASH.constrain();

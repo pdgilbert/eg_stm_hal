@@ -111,8 +111,7 @@ use stm32f0xx_hal::{
 };
 
 #[cfg(feature = "stm32f0xx")]
-fn setup(
-) -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>
+fn setup() -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible>>
 {
     let cp = CorePeripherals::take().unwrap();
     let mut p = Peripherals::take().unwrap();
@@ -155,8 +154,7 @@ use stm32f1xx_hal::{
 };
 
 #[cfg(feature = "stm32f1xx")]
-fn setup(
-) -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>
+fn setup() -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible>>
 {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -207,14 +205,13 @@ fn setup(
 #[cfg(feature = "stm32f3xx")] //  eg Discovery-stm32f303
 use stm32f3xx_hal::{
     delay::Delay,
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     spi::{Error, Spi},
-    stm32::Peripherals,
 };
 
 #[cfg(feature = "stm32f3xx")]
-fn setup(
-) -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>
+fn setup() -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible>>
 {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -232,9 +229,15 @@ fn setup(
     let spi = Spi::spi1(
         p.SPI1,
         (
-            gpioa.pa5.into_af5(&mut gpioa.moder, &mut gpioa.afrl), // sck   on PA5
-            gpioa.pa6.into_af5(&mut gpioa.moder, &mut gpioa.afrl), // miso  on PA6
-            gpioa.pa7.into_af5(&mut gpioa.moder, &mut gpioa.afrl), // mosi  on PA7
+            gpioa
+                .pa5
+                .into_af5_push_pull(&mut gpioa.moder, &mut gpioa.otyper, &mut gpioa.afrl), // sck   on PA5
+            gpioa
+                .pa6
+                .into_af5_push_pull(&mut gpioa.moder, &mut gpioa.otyper, &mut gpioa.afrl), // miso  on PA6
+            gpioa
+                .pa7
+                .into_af5_push_pull(&mut gpioa.moder, &mut gpioa.otyper, &mut gpioa.afrl), // mosi  on PA7
         ),
         MODE,
         8_000_000.Hz(),
@@ -279,8 +282,7 @@ use stm32f4xx_hal::{
 };
 
 #[cfg(feature = "stm32f4xx")]
-fn setup(
-) -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>
+fn setup() -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible>>
 {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -337,8 +339,7 @@ use stm32f7xx_hal::{
 };
 
 #[cfg(feature = "stm32f7xx")]
-fn setup(
-) -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>
+fn setup() -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible>>
 {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -386,8 +387,9 @@ use stm32h7xx_hal::{
 };
 
 #[cfg(feature = "stm32h7xx")]
-fn setup() -> impl DelayMs<u32>
-       + Receive<Info = PacketInfo, Error = sx127xError<Error, stm32h7xx_hal::Never, Infallible>> {
+fn setup(
+) -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, stm32h7xx_hal::Never>>
+{
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let pwr = p.PWR.constrain();
@@ -442,8 +444,7 @@ use stm32l0xx_hal::{
 use void;
 
 #[cfg(feature = "stm32l0xx")]
-fn setup(
-) -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, void::Void, Infallible>>
+fn setup() -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, void::Void>>
 {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -490,8 +491,7 @@ use stm32l1xx_hal::{
 };
 
 #[cfg(feature = "stm32l1xx")]
-fn setup(
-) -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>
+fn setup() -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible>>
 {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -538,8 +538,7 @@ use stm32l4xx_hal::{
 };
 
 #[cfg(feature = "stm32l4xx")]
-fn setup(
-) -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>
+fn setup() -> impl DelayMs<u32> + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible>>
 {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -633,12 +632,6 @@ fn main() -> ! {
             Err(err) => hprintln!("poll error {:?} ", err).unwrap(),
         };
 
-        match lora.try_delay_ms(100u32) {
-            Ok(b) => b, // b is ()
-            Err(_err) => {
-                hprintln!("Error returned from lora.try_delay_ms().").unwrap();
-                panic!("should reset in release mode.");
-            }
-        };
+        lora.delay_ms(100u32);
     }
 }

@@ -80,6 +80,10 @@ path = "examples/lora_spi_receive.rs"
 name = "lora_spi_gps"
 path = "examples/lora_spi_gps.rs"
 
+[[example]]
+name = "ads1015_oled"
+path = "examples/ads1015_oled.rs"
+
 
 #[[example]]
 #name = "digi_pot"
@@ -96,11 +100,11 @@ panic-reset          = { version = ">=0.1.0" }
 panic-halt           = { version = ">=0.2.0" }
 
 # for example  ads1015-display
+ads1x1x =  { version = "0.2.1"}
+# this causes problem with stm32l0xx_hal:  
+shared-bus = { version = "0.1.4", features = ["cortexm"] }
 #dht11 = "0.3.1"
 #dht-sensor = "0.1.1"
-
-ads1x1x =  { version = "0.2", optional = true }
-# this causes problem with stm32l0xx_hal:  shared-bus = { version = "0.1.4", features = ["cortexm"] }
 
 # for example digi_pot
 # mcp4x = "0.1"
@@ -142,10 +146,6 @@ stm32l4xx-hal = { git = "https://github.com/stm32-rs/stm32l4xx-hal", optional = 
 
 # for bugs and unusual return values in some hals
 void          = { version = ">=1.0.2", default-features = false }
-
-[patch.crates-io]
-# Patch for radio-hal to update embedded-hal version
-radio = { git = "https://github.com/ryankurte/rust-radio.git", branch = "master" }
 
 [features]
 stm32f0xx = []

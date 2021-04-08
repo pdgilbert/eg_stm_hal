@@ -157,8 +157,9 @@ use stm32f3xx_hal::{
     delay::Delay,
     gpio::{
         gpiob::{PB8, PB9},
-        AF4,
+        Alternate, AF4,
     },
+    hal::blocking::i2c::{Read, Write, WriteRead},
     i2c::I2c,
     pac::{CorePeripherals, Peripherals, I2C1, USART2},
     prelude::*,
@@ -166,12 +167,7 @@ use stm32f3xx_hal::{
 };
 
 #[cfg(feature = "stm32f3xx")]
-fn setup() -> (
-    Tx<USART2>,
-    Rx<USART2>,
-    I2c<I2C1, (PB8<AF4>, PB9<AF4>)>,
-    Delay,
-) {
+fn setup() -> (Tx<USART2>, Rx<USART2>, impl WriteRead, Delay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.constrain();
@@ -181,10 +177,14 @@ fn setup() -> (
     let (tx2, rx2) = Serial::usart2(
         p.USART2,
         (
-            gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl), //tx pa2  for GPS rx
-            gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl),
-        ), //rx pa3  for GPS tx
-        9600.Bd(), // 115_200.bps(),
+            gpioa
+                .pa2
+                .into_af7_push_pull(&mut gpioa.moder, &mut gpioa.otyper, &mut gpioa.afrl), //tx pa2 for GPS rx
+            gpioa
+                .pa3
+                .into_af7_push_pull(&mut gpioa.moder, &mut gpioa.otyper, &mut gpioa.afrl), //rx pa3 for GPS tx
+        ),
+        9600.Bd(), // 115_200.Bd(),
         clocks,
         &mut rcc.apb1,
     )
@@ -192,8 +192,12 @@ fn setup() -> (
 
     let mut gpiob = p.GPIOB.split(&mut rcc.ahb);
 
-    let scl = gpiob.pb8.into_af4(&mut gpiob.moder, &mut gpiob.afrh); // scl on PB8
-    let sda = gpiob.pb9.into_af4(&mut gpiob.moder, &mut gpiob.afrh); // sda on PB9
+    let scl = gpiob
+        .pb8
+        .into_af4_open_drain(&mut gpiob.moder, &mut gpiob.otyper, &mut gpiob.afrh); // scl on PB8
+    let sda = gpiob
+        .pb9
+        .into_af4_open_drain(&mut gpiob.moder, &mut gpiob.otyper, &mut gpiob.afrh); // sda on PB9
 
     (
         tx2,
@@ -252,7 +256,7 @@ fn setup() -> (
     (
         tx2,
         rx2,
-        I2c::i2c2(p.I2C2, (scl, sda), 400.khz(), clocks), // i2c
+        I2c::new(p.I2C2, (scl, sda), 400.khz(), clocks), // i2c
         Delay::new(cp.SYST, clocks),
     )
 }

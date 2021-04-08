@@ -160,15 +160,6 @@ fn setup() -> (impl LED, Delay) {
         }
     }
 
-    //impl LED for PA5<Output<PushPull>> {
-    //    fn on(&mut self) -> () {
-    //        self.try_set_high().unwrap()
-    //    }
-    //    fn off(&mut self) -> () {
-    //        self.try_set_low().unwrap()
-    //    }
-    //}
-
     // return tuple  (led, delay)
     (
         gpioc.pc13.into_push_pull_output(), // led on pc13 with on/off

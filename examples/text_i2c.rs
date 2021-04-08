@@ -115,26 +115,56 @@ fn setup() -> BlockingI2c<I2C2, (PB10<Alternate<OpenDrain>>, PB11<Alternate<Open
 use stm32f3xx_hal::{
     gpio::{
         gpiob::{PB8, PB9},
-        AF4,
+        Alternate, OpenDrain, Pin, AF4,
     },
-    i2c::I2c,
+    //i2c::{BlockingI2c, DutyCycle, Mode},
+    hal::blocking::i2c::{Read, Write, WriteRead},
+    i2c,
+    //i2c::{Read, Write, WriteRead},
+    //i2c::{I2c,BlockingI2c, Mode, PinScl, PinSda},
     pac::Peripherals,
     pac::I2C1,
     prelude::*,
 };
 
 #[cfg(feature = "stm32f3xx")]
-fn setup() -> I2c<I2C1, (PB8<AF4>, PB9<AF4>)> {
+fn setup() -> i2c::I2c<I2C1, (PB8<Alternate<AF4>>, PB9<Alternate<AF4>>)> {
+    //fn setup() -> I2c<I2C1, impl PinScl<I2C1> + PinSda<I2C1>> {
+    //fn setup() -> BlockingI2c<I2C1, impl PinScl<I2C1>, impl PinSda<I2C1>> {
+    //fn setup() -> impl WriteRead {
+    //fn setup() -> () {
+    //I2c<I2C1, (PB8<Alternate<OpenDrain>>, PB9<Alternate<OpenDrain>>)> {
+    //BlockingI2c<I2C2, (PB8<Alternate<OpenDrain>>, PB9<Alternate<OpenDrain>>)> {
+    //I2c<I2C1, (PB8<Alternate<AF4>>, PB9<Alternate<AF4>>)> {
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.constrain();
     let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
     let mut gpiob = p.GPIOB.split(&mut rcc.ahb);
 
-    let scl = gpiob.pb8.into_af4(&mut gpiob.moder, &mut gpiob.afrh); // scl on PB8
-    let sda = gpiob.pb9.into_af4(&mut gpiob.moder, &mut gpiob.afrh); // sda on PB9
+    let mut scl =
+        gpiob
+            .pb8
+            .into_af4_open_drain(&mut gpiob.moder, &mut gpiob.otyper, &mut gpiob.afrh); // scl on PB8
+    let mut sda =
+        gpiob
+            .pb9
+            .into_af4_open_drain(&mut gpiob.moder, &mut gpiob.otyper, &mut gpiob.afrh); // sda on PB9
+
+    // not sure if pull up is needed
+    scl.internal_pull_up(&mut gpiob.pupdr, true);
+    sda.internal_pull_up(&mut gpiob.pupdr, true);
 
     // return i2c
-    I2c::new(p.I2C1, (scl, sda), 400_000.Hz(), clocks, &mut rcc.apb1)
+    //BlockingI2c::i2c1(
+    i2c::I2c::new(
+        p.I2C1,
+        (scl, sda),
+        //&mut afio.mapr,  need this for i2c1 but not i2c2
+        400_000.Hz(),
+        //100u32.kHz().try_into().unwrap(),
+        clocks,
+        &mut rcc.apb1,
+    )
 }
 
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64, blackpills stm32f401 and stm32f411
@@ -163,7 +193,7 @@ fn setup() -> I2c<I2C2, (PB10<AlternateOD<AF4>>, PB3<AlternateOD<AF9>>)> {
     let sda = gpiob.pb3.into_alternate_af9().set_open_drain(); // sda on PB3
 
     // return i2c
-    I2c::i2c2(p.I2C2, (scl, sda), 400.khz(), clocks)
+    I2c::new(p.I2C2, (scl, sda), 400.khz(), clocks)
 }
 
 #[cfg(feature = "stm32f7xx")]

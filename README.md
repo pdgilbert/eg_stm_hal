@@ -108,6 +108,7 @@ See [Running Examples](#running-examples) for more details.
 | xxx                  | notes |   Description                                                  |
 | -------------------- |:-----:|:-------------------------------------------------------------- |
 | blink                |   1   | Blink on-board LED                                             |
+| blink_impl           |   1   | Blink on-board LED. setup() uses impl traits.                  |
 | blink3               |   1   | Blink off-board LEDs attached to  pb 13,14,15                  |
 | echo_by_char         |   2   | Echo console input, char by char,  + semihost output           |
 | echo_string          |       | Read 15 chars input from console, output to semihost, repeat   |
@@ -135,15 +136,12 @@ These are examples which use an additional device crate.
 | xxx              |    crate          | notes |   Description                                              |
 | ---------------- |:-----------------:|:-----:|:---------------------------------------------------------- |
 | dht              | dht               |       | read a dht11 sensor and write to semihost                  |
-| dht11            | dht11             |       | read a dht11 sensor and write to semihost                  |
 | text_i2c         | ssd1306           |       | write 2 text lines on ssd1306 OLED                         |
 | oled_gps         | ssd1306           |       | read gps and write coordinates on ssd1306 OLED             |
 | lora_spi_send    | rust-radio-sx127x |       | transmit a character string over LoRa,  + semihost output  |
 | lora_spi_receive | rust-radio-sx127x |       | receive  a character string over LoRa,  + semihost output  |
 | lora_spi_gps     | rust-radio-sx127x |       | read gps and transmit over LoRa,  + semihost output        |
-| lora_send        | sx127x_lora       |       | transmit a character string over LoRa,  + semihost output  |
-| lora_receive     | sx127x_lora       |       | receive  a character string over LoRa,  + semihost output  |
-| lora_gps         | sx127x_lora       |       | read gps and transmit over LoRa,  + semihost output        |
+| ads1015_oled     | ads1015, ssd1306  |       | read ADC on i2c and write on ssd1306 OLED                  |
 
 The current status of these examples is [here.](https://pdgilbert.github.io/eg_stm_hal/#additional-examples)
 
