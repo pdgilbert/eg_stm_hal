@@ -467,9 +467,9 @@ dependencies = [
 
 [[package]]
 name = "libc"
-version = "0.2.92"
+version = "0.2.93"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "56d855069fafbb9b344c0f962150cd2c1187975cb1c22c1522c240d8c4986714"
+checksum = "9385f66bf6105b241aa65a61cb923ef20efc665cb9f9bb50ac2f0c4b7f378d41"
 
 [[package]]
 name = "log"
@@ -806,7 +806,7 @@ dependencies = [
 [[package]]
 name = "stm32f1xx-hal"
 version = "0.7.0"
-source = "git+https://github.com/stm32-rs/stm32f1xx-hal#01482efb3eae6db8048a50ad79f59cf86083e4f8"
+source = "git+https://github.com/stm32-rs/stm32f1xx-hal#19af4811444a6f9bc227202d2e9019cf71620fa8"
 dependencies = [
  "bxcan",
  "cast",
@@ -920,7 +920,7 @@ dependencies = [
 [[package]]
 name = "stm32f7xx-hal"
 version = "0.2.0"
-source = "git+https://github.com/pdgilbert/stm32f7xx-hal?branch=test-bxcan-version-relax#bba3e5ef63107097d884de02967287ff5943d098"
+source = "git+https://github.com/stm32-rs/stm32f7xx-hal#76d0fcdd9416fca97944999791a8bb538329fa32"
 dependencies = [
  "as-slice",
  "bare-metal 0.2.5",
@@ -952,7 +952,7 @@ dependencies = [
 [[package]]
 name = "stm32h7xx-hal"
 version = "0.9.0"
-source = "git+https://github.com/stm32-rs/stm32h7xx-hal#a625d2b56a675dd2990056751301bb136338a86c"
+source = "git+https://github.com/stm32-rs/stm32h7xx-hal#dbef30b7c1e8bd6338805cf0831581aeed6cd889"
 dependencies = [
  "bare-metal 1.0.0",
  "cast",

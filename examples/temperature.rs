@@ -515,7 +515,7 @@ use stm32f7xx_hal::{
     //device::adc1::{config::AdcConfig, Adc, Temperature},
     //device::{ADC1, ADC2},
     gpio::{gpiob::PB1, Analog},
-    pac::{Peripherals, Adc, ADC1, ADC2},
+    pac::{Adc, Peripherals, ADC1, ADC2},
     prelude::*,
 };
 
@@ -759,7 +759,7 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<Adc<Ready>>) {
 
                 None => {
                     let v: f32 = a.ad_1st.read(&mut VTemp).unwrap();
-                    (v / 12.412122) as i32 - 50 as i32     //CHECK THIS
+                    (v / 12.412122) as i32 - 50 as i32 //CHECK THIS
                 }
             }
         }
