@@ -4,6 +4,19 @@
 //! Note that the DisplaySize setting needs to be adjusted for 128x64 or 128x32 display
 //! Compare this example with gps_rw, lora_gps and text_i2c.
 
+// Example use of impl trait: If scl and sda are on PB10 and PB11 (eg in stm32f1xx below) then
+//    fn setup() ->  (Tx<USART3>, Rx<USART3>,
+//                    BlockingI2c<I2C2,  (PB10<Alternate<OpenDrain>>, PB11<Alternate<OpenDrain>>) >,
+//                    Delay )  {
+// is changed to
+//    fn setup() ->  (Tx<USART2>, Rx<USART2>,
+//                    BlockingI2c<I2C2, impl Pins<I2C2>>,
+//                    Delay )  {
+// Also 
+//   use stm32f1xx_hal::{ gpio::{gpiob::{PB10, PB11}, Alternate, OpenDrain, },
+// will be needed.
+
+
 #![deny(unsafe_code)]
 #![no_main]
 #![no_std]
@@ -14,20 +27,15 @@ use panic_semihosting as _;
 #[cfg(not(debug_assertions))]
 use panic_halt as _;
 
-//use cortex_m::asm;
+use cortex_m_rt::entry;
+
+//use core::fmt::Write;  // for writeln
+use cortex_m_semihosting::hprintln;
+use nb::block;
 
 use heapless::{consts, Vec};
 
-use cortex_m_rt::entry;
-//use core::fmt::Write;  // for writeln
-use cortex_m_semihosting::hprintln;
-//use core::str;
-//use core::ascii;
-use nb::block;
-
 use embedded_hal::blocking::delay::DelayMs;
-
-//use cortex_m::asm;  //for breakpoint
 
 use eg_stm_hal::to_str;
 
@@ -93,12 +101,7 @@ use stm32f1xx_hal::{
     delay::Delay,
     device::I2C2,
     device::USART2,
-    gpio::{
-        gpiob::{PB10, PB11},
-        Alternate, //gpioa::{PA2, PA3},
-        OpenDrain,
-    },
-    i2c::{BlockingI2c, DutyCycle, Mode},
+    i2c::{BlockingI2c, DutyCycle, Mode, Pins},
     pac::{CorePeripherals, Peripherals},
     prelude::*,
     serial::{Config, Rx, Serial, Tx}, //, StopBits
@@ -108,13 +111,9 @@ use stm32f1xx_hal::{
 fn setup() -> (
     Tx<USART2>,
     Rx<USART2>,
-    BlockingI2c<I2C2, (PB10<Alternate<OpenDrain>>, PB11<Alternate<OpenDrain>>)>,
+    BlockingI2c<I2C2, impl Pins<I2C2>>,
     Delay,
 ) {
-    //fn setup() ->  (Tx<USART3>, Rx<USART3>,
-    //                BlockingI2c<I2C2,  (PB10<Alternate<OpenDrain>>, PB11<Alternate<OpenDrain>>) >,
-    //                    Delay )  {
-
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.constrain();

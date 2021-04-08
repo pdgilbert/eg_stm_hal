@@ -12,6 +12,14 @@
 //!
 //! Compare this example with oled_gps.
 
+// Example use of impl trait: If scl and sda are on PB10 and PB11 (eg in stm32f1xx below) then
+//      fn setup() -> BlockingI2c<I2C2, (PB10<Alternate<OpenDrain>>, PB11<Alternate<OpenDrain>>)> {
+// is changed to
+//      fn setup() -> BlockingI2c<I2C2, impl Pins<I2C2>> {
+// Also 
+//   use stm32f1xx_hal::{ gpio::{gpiob::{PB10, PB11}, Alternate, OpenDrain, },
+// will be needed.
+ 
 #![no_std]
 #![no_main]
 
@@ -63,17 +71,13 @@ fn setup() -> I2c<I2C1, PB8<Alternate<AF1>>, PB7<Alternate<AF1>>> {
 #[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
 use stm32f1xx_hal::{
     device::I2C2,
-    gpio::{
-        gpiob::{PB10, PB11},
-        Alternate, OpenDrain,
-    },
-    i2c::{BlockingI2c, DutyCycle, Mode},
+    i2c::{BlockingI2c, DutyCycle, Mode, Pins},
     pac::Peripherals,
     prelude::*,
 };
 
 #[cfg(feature = "stm32f1xx")]
-fn setup() -> BlockingI2c<I2C2, (PB10<Alternate<OpenDrain>>, PB11<Alternate<OpenDrain>>)> {
+fn setup() -> BlockingI2c<I2C2, impl Pins<I2C2>> {
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.constrain();
 
