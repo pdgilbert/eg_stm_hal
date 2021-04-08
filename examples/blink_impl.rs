@@ -2,6 +2,11 @@
 //! See blink.rs  example for more details.
 //! Relative to blink.rs this file uses  trait LED and fn setup() -> (impl LED, Delay)
 
+// Example use of impl trait: If the LED  output pin is PC13 then
+//      fn setup() -> (PC13<Output<PushPull>>, Delay) {
+// is changed to
+//      fn setup() -> (impl LED, Delay) {
+
 #![deny(unsafe_code)]
 #![no_std]
 #![no_main]
@@ -15,11 +20,6 @@ use panic_halt as _;
 use cortex_m_rt::entry;
 
 use embedded_hal::digital::OutputPin;
-
-//Output pin in is PC13 for many devices, in which case
-//  fn setup() -> (impl LED, Delay) {
-//replaces
-//  fn setup() -> (PC13<Output<PushPull>>, Delay) {
 
 pub trait LED {
     fn on(&mut self) -> ();

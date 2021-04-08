@@ -17,13 +17,11 @@ use panic_semihosting as _;
 #[cfg(not(debug_assertions))]
 use panic_halt as _;
 
-use embedded_hal::blocking::delay::DelayMs;
-
-//use cortex_m::asm;  //for breakpoint
-//asm::bkpt();
-
 use cortex_m_rt::entry;
 use cortex_m_semihosting::hprintln;
+
+use embedded_hal::{digital::{InputPin, OutputPin},
+                   blocking::delay::DelayMs};
 
 //https://github.com/michaelbeaumont/dht-sensor
 #[cfg(not(feature = "dht22"))]
@@ -31,8 +29,6 @@ use dht_sensor::dht11::Reading;
 #[cfg(feature = "dht22")]
 use dht_sensor::dht22::Reading;
 use dht_sensor::*;
-
-use embedded_hal::digital::OutputPin;
 
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
 
@@ -72,8 +68,6 @@ fn setup() -> (PA8<Output<OpenDrain>>, Delay) {
     (pa8, delay) //DHT data will be on A8
 }
 
-use embedded_hal::digital::InputPin;
-use embedded_hal::digital::OutputPin;
 #[cfg(feature = "stm32f1xx")]
 use stm32f1xx_hal::{
     delay::Delay,
@@ -214,7 +208,6 @@ fn setup() -> (PA8<Output<OpenDrain>>, Delay) {
 use stm32h7xx_hal::{
     delay::Delay,
     gpio::{gpioa::PA8, OpenDrain, Output},
-    hal::digital::v2::OutputPin,
     pac::{CorePeripherals, Peripherals},
     prelude::*,
 };
@@ -320,8 +313,6 @@ use stm32l4xx_hal::{
     pac::{CorePeripherals, Peripherals},
     prelude::*,
 };
-//#[cfg(feature = "stm32l4xx")]
-//use embedded_hal::digital::v2::{InputPin, OutputPin};
 
 #[cfg(feature = "stm32l4xx")]
 fn setup() -> (PA8<Output<OpenDrain>>, Delay) {

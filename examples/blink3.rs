@@ -11,13 +11,15 @@ use panic_semihosting as _;
 #[cfg(not(debug_assertions))]
 use panic_halt as _;
 
-// use panic_halt as _;  // put a breakpoint on `rust_begin_unwind` to catch panics
-// use panic_abort; // may still require nightly?
-// use panic_itm;   // logs messages over ITM; requires ITM support
-// use panic_semihosting as _; // logs messages to the host stderr; requires a debugger
-
-// use nb::block;
 use cortex_m_rt::entry;
+
+use embedded_hal::digital::OutputPin;
+
+pub trait LED {
+    fn on(&mut self) -> ();
+    fn off(&mut self) -> ();
+}
+
 
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
 
@@ -34,10 +36,7 @@ use stm32f0xx_hal::{
 
 #[cfg(feature = "stm32f0xx")]
 fn setup() -> (
-    PB13<Output<PushPull>>,
-    PB14<Output<PushPull>>,
-    PB15<Output<PushPull>>,
-    Delay,
+    impl LED, impl LED, impl LED, Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let mut p = Peripherals::take().unwrap();
@@ -47,28 +46,28 @@ fn setup() -> (
 
     impl LED for PB13<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_set_low().unwrap()
         }
     }
 
     impl LED for PB14<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_low().unwrap()
         }
     }
 
     impl LED for PB15<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_low().unwrap()
         }
     }
 
@@ -88,6 +87,7 @@ fn setup() -> (
     (led1, led2, led3, Delay::new(cp.SYST, &rcc))
 }
 
+
 #[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
 use stm32f1xx_hal::{
     delay::Delay,
@@ -99,15 +99,9 @@ use stm32f1xx_hal::{
     prelude::*,
 };
 
-#[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
-use embedded_hal::digital::v2::OutputPin;
-
 #[cfg(feature = "stm32f1xx")]
 fn setup() -> (
-    PB13<Output<PushPull>>,
-    PB14<Output<PushPull>>,
-    PB15<Output<PushPull>>,
-    Delay,
+    impl LED, impl LED, impl LED, Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -124,28 +118,28 @@ fn setup() -> (
     // all leds wire with pin as source, cathode connect to ground though a resistor.
     impl LED for PB13<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_low().unwrap()
         }
     }
 
     impl LED for PB14<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_low().unwrap()
         }
     }
 
     impl LED for PB15<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_low().unwrap()
         }
     }
 
@@ -171,10 +165,7 @@ use stm32f3xx_hal::{
 
 #[cfg(feature = "stm32f3xx")]
 fn setup() -> (
-    PB13<Output<PushPull>>,
-    PB14<Output<PushPull>>,
-    PB15<Output<PushPull>>,
-    Delay,
+    impl LED, impl LED, impl LED, Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -185,28 +176,28 @@ fn setup() -> (
     // all leds wire with pin as source, cathode connect to ground though a resistor.
     impl LED for PB13<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_low().unwrap()
         }
     }
 
     impl LED for PB14<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_low().unwrap()
         }
     }
 
     impl LED for PB15<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_low().unwrap()
         }
     }
 
@@ -238,10 +229,7 @@ use stm32f4xx_hal::{
 
 #[cfg(feature = "stm32f4xx")]
 fn setup() -> (
-    PB13<Output<PushPull>>,
-    PB14<Output<PushPull>>,
-    PB15<Output<PushPull>>,
-    Delay,
+    impl LED, impl LED, impl LED, Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -259,28 +247,28 @@ fn setup() -> (
     // all leds wire with pin as source, cathode connect to ground though a resistor.
     impl LED for PB13<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_low().unwrap()
         }
     }
 
     impl LED for PB14<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_low().unwrap()
         }
     }
 
     impl LED for PB15<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_low().unwrap()
         }
     }
 
@@ -306,10 +294,7 @@ use stm32f7xx_hal::{
 
 #[cfg(feature = "stm32f7xx")]
 fn setup() -> (
-    PB13<Output<PushPull>>,
-    PB14<Output<PushPull>>,
-    PB15<Output<PushPull>>,
-    Delay,
+    impl LED, impl LED, impl LED, Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -320,28 +305,28 @@ fn setup() -> (
     // all leds wire with pin as source, cathode connect to ground though a resistor.
     impl LED for PB13<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_low().unwrap()
         }
     }
 
     impl LED for PB14<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_low().unwrap()
         }
     }
 
     impl LED for PB15<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_low().unwrap()
         }
     }
 
@@ -361,17 +346,13 @@ use stm32h7xx_hal::{
         gpiob::{PB13, PB14, PB15},
         Output, PushPull,
     },
-    hal::digital::v2::OutputPin,
     pac::{CorePeripherals, Peripherals},
     prelude::*,
 };
 
 #[cfg(feature = "stm32h7xx")]
 fn setup() -> (
-    PB13<Output<PushPull>>,
-    PB14<Output<PushPull>>,
-    PB15<Output<PushPull>>,
-    Delay,
+    impl LED, impl LED, impl LED, Delay,
 ) {
     // see https://github.com/stm32-rs/stm32h7xx-hal/blob/master/examples/blinky.rs
     let cp = CorePeripherals::take().unwrap();
@@ -385,28 +366,28 @@ fn setup() -> (
     // all leds wire with pin as source, cathode connect to ground though a resistor.
     impl LED for PB13<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_low().unwrap()
         }
     }
 
     impl LED for PB14<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_low().unwrap()
         }
     }
 
     impl LED for PB15<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_low().unwrap()
         }
     }
 
@@ -433,10 +414,7 @@ use stm32l0xx_hal::{
 
 #[cfg(feature = "stm32l0xx")]
 fn setup() -> (
-    PB13<Output<PushPull>>,
-    PB14<Output<PushPull>>,
-    PB15<Output<PushPull>>,
-    Delay,
+    impl LED, impl LED, impl LED, Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -446,28 +424,28 @@ fn setup() -> (
     // all leds wire with pin as source, cathode connect to ground though a resistor.
     impl LED for PB13<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_low().unwrap()
         }
     }
 
     impl LED for PB14<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_low().unwrap()
         }
     }
 
     impl LED for PB15<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_low().unwrap()
         }
     }
 
@@ -479,6 +457,7 @@ fn setup() -> (
         cp.SYST.delay(rcc.clocks),
     )
 }
+
 
 #[cfg(feature = "stm32l1xx")] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{
@@ -492,15 +471,9 @@ use stm32l1xx_hal::{
     stm32::{CorePeripherals, Peripherals},
 };
 
-#[cfg(feature = "stm32l1xx")] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
-use embedded_hal::digital::v2::OutputPin;
-
 #[cfg(feature = "stm32l1xx")]
 fn setup() -> (
-    PB13<Output<PushPull>>,
-    PB14<Output<PushPull>>,
-    PB15<Output<PushPull>>,
-    Delay,
+    impl LED, impl LED, impl LED, Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -511,28 +484,28 @@ fn setup() -> (
     // all leds wire with pin as source, cathode connect to ground though a resistor.
     impl LED for PB13<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_low().unwrap()
         }
     }
 
     impl LED for PB14<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_low().unwrap()
         }
     }
 
     impl LED for PB15<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_low().unwrap()
         }
     }
 
@@ -558,10 +531,7 @@ use stm32l4xx_hal::{
 
 #[cfg(feature = "stm32l4xx")]
 fn setup() -> (
-    PB13<Output<PushPull>>,
-    PB14<Output<PushPull>>,
-    PB15<Output<PushPull>>,
-    Delay,
+    impl LED, impl LED, impl LED, Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -580,28 +550,28 @@ fn setup() -> (
     // all leds wire with pin as source, cathode connect to ground though a resistor.
     impl LED for PB13<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_low().unwrap()
         }
     }
 
     impl LED for PB14<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_low().unwrap()
         }
     }
 
     impl LED for PB15<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_high().unwrap()
+            self.try_set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_low().unwrap()
+            self.try_set_low().unwrap()
         }
     }
 
@@ -622,11 +592,6 @@ fn setup() -> (
 
 // End of hal/MCU specific setup. Following should be generic code.
 
-pub trait LED {
-    fn on(&mut self) -> ();
-    fn off(&mut self) -> ();
-}
-
 #[entry]
 fn main() -> ! {
     let (mut led1, mut led2, mut led3, mut delay) = setup();
@@ -639,11 +604,11 @@ fn main() -> ! {
         let _r = led1.on();
         let _r = led2.on();
         let _r = led3.on();
-        delay.delay_ms(on);
+        delay.try_delay_ms(on).unwrap();
 
         let _r = led1.off();
         let _r = led2.off();
         let _r = led3.off();
-        delay.try_delay_ms(off);
+        delay.try_delay_ms(off).unwrap();
     }
 }
