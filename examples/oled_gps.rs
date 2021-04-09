@@ -59,9 +59,9 @@ use stm32f0xx_hal::{
         gpiob::{PB7, PB8},
         Alternate, AF1,
     },
-    i2c::{I2c, Pins},
-    pac::USART3,
-    pac::{CorePeripherals, Peripherals},
+    Pin::{Pins, slaPin, sdcPin},
+    i2c::I2c,
+    pac::{CorePeripherals, Peripherals, USART3},
     prelude::*,
     serial::{Rx, Serial, Tx},
 };
@@ -269,10 +269,8 @@ fn setup() -> (
 #[cfg(feature = "stm32f7xx")]
 use stm32f7xx_hal::{
     delay::Delay,
-    i2c::{BlockingI2c, Mode, PinScl, PinSda, Pins},
-    pac::I2C1,
-    pac::USART2,
-    pac::{CorePeripherals, Peripherals},
+    i2c::{BlockingI2c, Mode, PinScl, PinSda},
+    pac::{CorePeripherals, Peripherals, I2C1, USART2},
     prelude::*,
     serial::{Config, Oversampling, Rx, Serial, Tx},
 };
@@ -281,8 +279,7 @@ use stm32f7xx_hal::{
 fn setup() -> (
     Tx<USART2>,
     Rx<USART2>,
-    BlockingI2c<I2C1, impl Pins<I2C1>>,
-    //BlockingI2c<I2C1, impl PinScl<I2C1>, impl PinSda<I2C1>>,
+    BlockingI2c<I2C1, impl PinScl<I2C1>, impl PinSda<I2C1>>,
     Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
@@ -330,19 +327,15 @@ fn setup() -> (
 #[cfg(feature = "stm32h7xx")]
 use stm32h7xx_hal::{
     delay::Delay,
-    i2c::{I2c, Pins},
-    //gpio::{gpiob::{PB8, PB9}, Alternate, AF4, },
-    pac::I2C1,
-    pac::USART2,
-    pac::{CorePeripherals, Peripherals},
+    i2c::I2c,
+    pac::{CorePeripherals, Peripherals, I2C1, USART2},
     prelude::*,
     serial::{Rx, Tx},
 };
 
 #[cfg(feature = "stm32h7xx")]
 fn setup() -> (Tx<USART2>, Rx<USART2>, 
-               I2c<I2C1, impl Pins<I2C2>>,
-               //I2c<I2C1>, 
+               I2c<I2C1>, 
                Delay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();

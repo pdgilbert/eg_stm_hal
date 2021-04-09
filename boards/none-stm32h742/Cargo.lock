@@ -920,7 +920,7 @@ dependencies = [
 [[package]]
 name = "stm32f7xx-hal"
 version = "0.2.0"
-source = "git+https://github.com/pdgilbert/stm32f7xx-hal?branch=test-bxcan-version-relax#bba3e5ef63107097d884de02967287ff5943d098"
+source = "git+https://github.com/stm32-rs/stm32f7xx-hal#76d0fcdd9416fca97944999791a8bb538329fa32"
 dependencies = [
  "as-slice",
  "bare-metal 0.2.5",

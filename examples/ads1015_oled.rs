@@ -59,7 +59,8 @@ use stm32f0xx_hal::{
         gpioc::PC13,
         Alternate, Output, PushPull, AF1,
     },
-    i2c::{I2c, Pins},
+    Pin::Pins,
+    i2c::I2c,
     pac::{CorePeripherals, Peripherals, I2C1},
     prelude::*,
 };
@@ -247,15 +248,14 @@ fn setup() -> (
 use stm32f7xx_hal::{
     delay::Delay,
     gpio::{gpioc::PC13, Output, PushPull},
-    i2c::{BlockingI2c, Mode, PinScl, PinSda, Pins},
+    i2c::{BlockingI2c, Mode, PinScl, PinSda},
     pac::{CorePeripherals, Peripherals, I2C1},
     prelude::*,
 };
 
 #[cfg(feature = "stm32f7xx")]
 fn setup() -> (
-    BlockingI2c<I2C1, impl Pins<I2C1>>,
-    //BlockingI2c<I2C1, impl PinScl<I2C1>, impl PinSda<I2C1>>,
+    BlockingI2c<I2C1, impl PinScl<I2C1>, impl PinSda<I2C1>>,
     PC13<Output<PushPull>>,
     Delay,
 ) {
@@ -291,14 +291,13 @@ fn setup() -> (
 use stm32h7xx_hal::{
     delay::Delay,
     gpio::{gpioc::PC13, Output, PushPull},
-    i2c::{I2c, Pins},
-    //gpio::{gpiob::{PB8, PB9}, Alternate, AF4, }, really! builds without this
+    i2c::I2c,
     pac::{CorePeripherals, Peripherals, I2C1},
     prelude::*,
 };
 
 #[cfg(feature = "stm32h7xx")]
-fn setup() -> (I2c<I2C1, impl Pins<I2C1>>, PC13<Output<PushPull>>, Delay) {
+fn setup() -> (I2c<I2C1>, PC13<Output<PushPull>>, Delay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let pwr = p.PWR.constrain();
