@@ -2,7 +2,7 @@ name: Examples
 
 on:
   push:
-    branches: [ master, to-impl]
+    branches: [ master, to-impl ]
   pull_request:
     branches: [ master ]
 
