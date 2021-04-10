@@ -17,7 +17,7 @@
 //    PC13<Output<PushPull>>, Delay ) {
 // is changed to
 //    fn setup() ->  BlockingI2c<I2C1, impl Pins<I2C1>>, PC13<Output<PushPull>>, Delay ) {
-// Also 
+// Also
 //   use stm32f1xx_hal::{ gpio::{gpiob::{PB8, PB9}, Alternate, OpenDrain, },
 // will be needed.
 
@@ -54,7 +54,7 @@ use nb::block;
 #[cfg(feature = "stm32f0xx")] //  eg stm32f030xc
 use stm32f0xx_hal::{
     delay::Delay,
-    gpio::{gpioc::PC13,Output, PushPull},
+    gpio::{gpioc::PC13, Output, PushPull},
     i2c::{I2c, SclPin, SdaPin},
     pac::{CorePeripherals, Peripherals, I2C1},
     prelude::*,
@@ -93,8 +93,7 @@ fn setup() -> (
 use stm32f1xx_hal::{
     delay::Delay,
     device::I2C1,
-    gpio::{gpioc::PC13, Output, PushPull,
-    },
+    gpio::{gpioc::PC13, Output, PushPull},
     i2c::{BlockingI2c, DutyCycle, Mode, Pins},
     pac::{CorePeripherals, Peripherals},
     prelude::*,
@@ -106,7 +105,7 @@ fn setup() -> (
     PC13<Output<PushPull>>,
     Delay,
 ) {
-//fn setup() -> (impl WriteRead, PC13<Output<PushPull>>, Delay) {
+    //fn setup() -> (impl WriteRead, PC13<Output<PushPull>>, Delay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
@@ -153,8 +152,8 @@ use stm32f3xx_hal::{
         Alternate, OpenDrain, Output, Pin, PushPull, AF4,
     },
     hal::blocking::i2c::{Read, WriteRead},
-    i2c::{I2c, Pins},
     i2c,
+    i2c::{I2c, Pins},
     pac::{CorePeripherals, Peripherals, I2C1},
     prelude::*,
 };
@@ -211,11 +210,7 @@ use stm32f4xx_hal::{
 };
 
 #[cfg(feature = "stm32f4xx")]
-fn setup() -> (
-    I2c<I2C2, impl Pins<I2C2>>,
-    PC13<Output<PushPull>>,
-    Delay,
-) {
+fn setup() -> (I2c<I2C2, impl Pins<I2C2>>, PC13<Output<PushPull>>, Delay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
@@ -324,7 +319,7 @@ use stm32l0xx_hal::{
         gpioc::PC13,
         OpenDrain, Output, PushPull,
     },
-    i2c::{I2c},
+    i2c::I2c,
     pac::{CorePeripherals, Peripherals, I2C1},
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
@@ -401,7 +396,7 @@ use stm32l4xx_hal::{
 
 #[cfg(feature = "stm32l4xx")]
 fn setup() -> (
-     I2c<
+    I2c<
         I2C2,
         (
             PB10<Alternate<AF4, Output<OpenDrain>>>,

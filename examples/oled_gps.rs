@@ -12,10 +12,9 @@
 //    fn setup() ->  (Tx<USART2>, Rx<USART2>,
 //                    BlockingI2c<I2C2, impl Pins<I2C2>>,
 //                    Delay )  {
-// Also 
+// Also
 //   use stm32f1xx_hal::{ gpio::{gpiob::{PB10, PB11}, Alternate, OpenDrain, },
 // will be needed.
-
 
 #![deny(unsafe_code)]
 #![no_main]
@@ -167,9 +166,12 @@ use stm32f3xx_hal::{
 };
 
 #[cfg(feature = "stm32f3xx")]
-fn setup() -> (Tx<USART2>, Rx<USART2>, 
-       impl I2c<I2C2, impl Pins<I2C2>>,
-       Delay) {
+fn setup() -> (
+    Tx<USART2>,
+    Rx<USART2>,
+    impl I2c<I2C2, impl Pins<I2C2>>,
+    Delay,
+) {
     //I2c<I2C1, (PB8<Alternate<AF4>>, PB9<Alternate<AF4>>)>,
     //    I2c<I2C1, impl PinScl<I2C1> + PinSda<I2C1>>,
     let cp = CorePeripherals::take().unwrap();
@@ -221,12 +223,7 @@ use stm32f4xx_hal::{
 };
 
 #[cfg(feature = "stm32f4xx")]
-fn setup() -> (
-    Tx<USART2>,
-    Rx<USART2>,
-    I2c<I2C2, impl Pins<I2C2>>,
-    Delay,
-) {
+fn setup() -> (Tx<USART2>, Rx<USART2>, I2c<I2C2, impl Pins<I2C2>>, Delay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let clocks = p.RCC.constrain().cfgr.freeze();
@@ -329,9 +326,7 @@ use stm32h7xx_hal::{
 };
 
 #[cfg(feature = "stm32h7xx")]
-fn setup() -> (Tx<USART2>, Rx<USART2>, 
-               I2c<I2C1>, 
-               Delay) {
+fn setup() -> (Tx<USART2>, Rx<USART2>, I2c<I2C1>, Delay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let pwr = p.PWR.constrain();
@@ -385,9 +380,14 @@ use stm32l0xx_hal::{
 };
 
 #[cfg(feature = "stm32l0xx")]
-fn setup() -> (Tx<USART2>, Rx<USART2>, I2c<I2C1, PB9<Output<OpenDrain>>, PB8<Output<OpenDrain>>>, Delay) {
-//fn setup() -> (Tx<USART2>, Rx<USART2>, I2c<I2C1, impl SCLPin<I2C1>, impl SDAPin<I2C1>>, Delay) {
-//fn setup() -> (Tx<USART2>, Rx<USART2>, I2c<I2C1, impl SCLPin<I2C>, impl SDAPin<I2C>>, Delay) {
+fn setup() -> (
+    Tx<USART2>,
+    Rx<USART2>,
+    I2c<I2C1, PB9<Output<OpenDrain>>, PB8<Output<OpenDrain>>>,
+    Delay,
+) {
+    //fn setup() -> (Tx<USART2>, Rx<USART2>, I2c<I2C1, impl SCLPin<I2C1>, impl SDAPin<I2C1>>, Delay) {
+    //fn setup() -> (Tx<USART2>, Rx<USART2>, I2c<I2C1, impl SCLPin<I2C>, impl SDAPin<I2C>>, Delay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
@@ -496,7 +496,7 @@ fn setup() -> (
     >,
     Delay,
 ) {
-//fn setup() -> ( Tx<USART2>, Rx<USART2>, I2c<I2C1, impl Pins<I2C1>>, Delay, ) {
+    //fn setup() -> ( Tx<USART2>, Rx<USART2>, I2c<I2C1, impl Pins<I2C1>>, Delay, ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut flash = p.FLASH.constrain();
