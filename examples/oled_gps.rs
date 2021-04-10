@@ -385,7 +385,8 @@ use stm32l0xx_hal::{
 };
 
 #[cfg(feature = "stm32l0xx")]
-fn setup() -> (Tx<USART2>, Rx<USART2>, I2c<I2C1, impl SCLPin<I2C1>, impl SDAPin<I2C1>>, Delay) {
+fn setup() -> (Tx<USART2>, Rx<USART2>, I2c<I2C1, PB9<Output<OpenDrain>>, PB8<Output<OpenDrain>>>, Delay) {
+//fn setup() -> (Tx<USART2>, Rx<USART2>, I2c<I2C1, impl SCLPin<I2C1>, impl SDAPin<I2C1>>, Delay) {
 //fn setup() -> (Tx<USART2>, Rx<USART2>, I2c<I2C1, impl SCLPin<I2C>, impl SDAPin<I2C>>, Delay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -476,7 +477,7 @@ use stm32l4xx_hal::{
         gpioa::{PA10, PA9},
         Alternate, OpenDrain, Output, AF4,
     },
-    i2c::{I2c, Pins},
+    i2c::{I2c, SclPin, SdaPin},
     pac::{CorePeripherals, Peripherals, I2C1, USART2},
     prelude::*,
     serial::{Config, Rx, Serial, Tx},
@@ -486,11 +487,16 @@ use stm32l4xx_hal::{
 fn setup() -> (
     Tx<USART2>,
     Rx<USART2>,
-    I2c<I2C1, impl Pins<I2C1>>,
+    I2c<
+        I2C1,
+        (
+            PA9<Alternate<AF4, Output<OpenDrain>>>,
+            PA10<Alternate<AF4, Output<OpenDrain>>>,
+        ),
+    >,
     Delay,
 ) {
-    //           I2c<I2C1, (PB8<Alternate<AF4, Output<OpenDrain>>>, PB9<Alternate<AF4, Output<OpenDrain>>>)>,
-
+//fn setup() -> ( Tx<USART2>, Rx<USART2>, I2c<I2C1, impl Pins<I2C1>>, Delay, ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut flash = p.FLASH.constrain();

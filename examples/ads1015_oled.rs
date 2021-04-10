@@ -324,7 +324,7 @@ use stm32l0xx_hal::{
         gpioc::PC13,
         OpenDrain, Output, PushPull,
     },
-    i2c::{I2c, Pins},
+    i2c::{I2c},
     pac::{CorePeripherals, Peripherals, I2C1},
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
@@ -332,7 +332,8 @@ use stm32l0xx_hal::{
 
 #[cfg(feature = "stm32l0xx")]
 fn setup() -> (
-    I2c<I2C1, impl Pins<I2C1>>,
+    I2c<I2C1, PB9<Output<OpenDrain>>, PB8<Output<OpenDrain>>>,
+    //I2c<I2C1, impl Pins<I2C1>>,
     PC13<Output<PushPull>>,
     Delay,
 ) {
@@ -393,14 +394,21 @@ use stm32l4xx_hal::{
         gpioc::PC13,
         Alternate, OpenDrain, Output, PushPull, AF4,
     },
-    i2c::{I2c, Pins},
+    i2c::{I2c, SclPin, SdaPin},
     pac::{CorePeripherals, Peripherals, I2C2},
     prelude::*,
 };
 
 #[cfg(feature = "stm32l4xx")]
 fn setup() -> (
-    I2c<I2C2, impl Pins<I2C2>>,
+     I2c<
+        I2C2,
+        (
+            PB10<Alternate<AF4, Output<OpenDrain>>>,
+            PB11<Alternate<AF4, Output<OpenDrain>>>,
+        ),
+    >,
+    //I2c<I2C2, impl Pins<I2C2>>,
     PC13<Output<PushPull>>,
     Delay,
 ) {

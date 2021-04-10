@@ -253,14 +253,15 @@ use stm32l0xx_hal::{
         gpiob::{PB8, PB9},
         OpenDrain, Output,
     },
-    i2c::{I2c, Pins},
+    i2c::{I2c},
     pac::{Peripherals, I2C1},
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
 };
 
 #[cfg(feature = "stm32l0xx")]
-fn setup() -> I2c<I2C1, impl Pins<I2C1>> {
+fn setup() ->  I2c<I2C1, PB9<Output<OpenDrain>>, PB8<Output<OpenDrain>>> {
+//fn setup() -> I2c<I2C1, impl Pins<I2C1>> {         //SOMETHING LIKE THIS SHOULD WORK
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
     let gpiob = p.GPIOB.split(&mut rcc);
@@ -310,14 +311,20 @@ use stm32l4xx_hal::{
         gpiob::{PB10, PB11},
         Alternate, OpenDrain, Output, AF4,
     },
-    //i2c::{I2c, Pins},
-    i2c::{I2c, PinScl, PinSda},
+    i2c::{I2c, SclPin, SdaPin},
     pac::{Peripherals, I2C2},
     prelude::*,
 };
 
 #[cfg(feature = "stm32l4xx")]
-fn setup() -> I2c<I2C2, impl PinScl<I2C2> + PinSda<I2C2>> {
+fn setup() ->     I2c<
+        I2C2,
+        (
+            PB10<Alternate<AF4, Output<OpenDrain>>>,
+            PB11<Alternate<AF4, Output<OpenDrain>>>,
+        ),
+    > {
+//fn setup() -> I2c<I2C2, impl SclPin<I2C2> + SdaPin<I2C2>> {      //SOMETHING LIKE THIS SHOULD WORK
 //fn setup() -> I2c<I2C2, impl Pins<I2C2>> {
     let p = Peripherals::take().unwrap();
     let mut flash = p.FLASH.constrain();
