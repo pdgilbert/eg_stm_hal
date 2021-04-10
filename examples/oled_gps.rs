@@ -55,13 +55,8 @@ use ssd1306::{prelude::*, Builder, I2CDIBuilder};
 #[cfg(feature = "stm32f0xx")] //  eg  stm32f030xc
 use stm32f0xx_hal::{
     delay::Delay,
-    gpio::{
-        gpiob::{PB7, PB8},
-        Alternate, AF1,
-    },
-    Pin::{Pins, slaPin, sdcPin},
-    i2c::I2c,
-    pac::{CorePeripherals, Peripherals, USART3},
+    i2c::{I2c, SclPin, SdaPin},
+    pac::{CorePeripherals, Peripherals, I2C1, USART3},
     prelude::*,
     serial::{Rx, Serial, Tx},
 };
@@ -70,7 +65,7 @@ use stm32f0xx_hal::{
 fn setup() -> (
     Tx<USART3>,
     Rx<USART3>,
-    I2c<I2C1, impl Pins<I2C1>>,
+    I2c<I2C1, impl SclPin<I2C1>, impl SdaPin<I2C1>>,
     Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
@@ -382,17 +377,16 @@ use stm32l0xx_hal::{
         gpiob::{PB8, PB9},
         OpenDrain, Output,
     },
-    i2c::I2c,
-    pac::I2C1,
-    pac::USART2,
-    pac::{CorePeripherals, Peripherals},
+    i2c::{I2c, SCLPin, SDAPin},
+    pac::{CorePeripherals, Peripherals, I2C1, USART2},
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
     serial::{Config, Rx, Serial2Ext, Tx},
 };
 
 #[cfg(feature = "stm32l0xx")]
-fn setup() -> (Tx<USART1>, Rx<USART1>, I2c<I2C1, impl Pins<I2C1>>, Delay) {
+fn setup() -> (Tx<USART2>, Rx<USART2>, I2c<I2C1, impl SCLPin<I2C1>, impl SDAPin<I2C1>>, Delay) {
+//fn setup() -> (Tx<USART2>, Rx<USART2>, I2c<I2C1, impl SCLPin<I2C>, impl SDAPin<I2C>>, Delay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi16());

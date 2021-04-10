@@ -54,20 +54,15 @@ use nb::block;
 #[cfg(feature = "stm32f0xx")] //  eg stm32f030xc
 use stm32f0xx_hal::{
     delay::Delay,
-    gpio::{
-        gpiob::{PB7, PB8},
-        gpioc::PC13,
-        Alternate, Output, PushPull, AF1,
-    },
-    Pin::Pins,
-    i2c::I2c,
+    gpio::{gpioc::PC13,Output, PushPull},
+    i2c::{I2c, SclPin, SdaPin},
     pac::{CorePeripherals, Peripherals, I2C1},
     prelude::*,
 };
 
 #[cfg(feature = "stm32f0xx")]
 fn setup() -> (
-    I2c<I2C1, impl Pins<I2C1>>,
+    I2c<I2C1, impl SclPin<I2C1>, impl SdaPin<I2C1>>,
     PC13<Output<PushPull>>,
     Delay,
 ) {

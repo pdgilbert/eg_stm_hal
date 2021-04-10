@@ -40,17 +40,13 @@ use ssd1306::{prelude::*, Builder, I2CDIBuilder};
 
 #[cfg(feature = "stm32f0xx")] //  eg stm32f030xc
 use stm32f0xx_hal::{
-    gpio::{
-        gpiob::{PB7, PB8},
-        Alternate, AF1,
-    },
-    i2c::{I2c, Pin::{Pins, slaPin, sdcPin}},
+    i2c::{I2c, SclPin, SdaPin},
     pac::{Peripherals, I2C1},
     prelude::*,
 };
 
 #[cfg(feature = "stm32f0xx")]
-fn setup() -> I2c<I2C1, impl Pins<I2C1>> {
+fn setup() -> I2c<I2C1, impl SclPin<I2C1>, impl SdaPin<I2C1>> {
     let mut p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.configure().freeze(&mut p.FLASH);
 
@@ -115,14 +111,15 @@ use stm32f3xx_hal::{
         gpiob::{PB8, PB9},
         Alternate, OpenDrain, Pin, AF4,
     },
-    hal::blocking::i2c::{Read, Write, WriteRead, PinScl, PinSda,  Pins},
-    i2c::{I2c,BlockingI2c, Mode, PinScl, PinSda,  Pins, Read, Write, WriteRead, DutyCycle, Mode},
+    //hal::blocking::i2c::{Read, Write, WriteRead},
+    //hal::I2c,
+    i2c::{I2c, SclPin, SdaPin},
     pac::{Peripherals, I2C1},
     prelude::*,
 };
 
 #[cfg(feature = "stm32f3xx")]
-fn setup() -> I2c<I2C1, impl PinScl<I2C1> + PinSda<I2C1>> {
+fn setup() -> I2c<I2C1, impl SclPin<I2C1> + SdaPin<I2C1>> {
 //fn setup() -> BlockingI2c<I2C1, impl Pins<I2C1>> {
 //fn setup() -> i2c::I2c<I2C1, (PB8<Alternate<AF4>>, PB9<Alternate<AF4>>)> {
     //fn setup() -> I2c<I2C1, impl PinScl<I2C1> + PinSda<I2C1>> {
@@ -151,8 +148,8 @@ fn setup() -> I2c<I2C1, impl PinScl<I2C1> + PinSda<I2C1>> {
     sda.internal_pull_up(&mut gpiob.pupdr, true);
 
     // return i2c
-    //i2c::I2c::new(
-    BlockingI2c::i2c1(
+    //BlockingI2c::i2c1(
+    I2c::new(
         p.I2C1,
         (scl, sda),
         //&mut afio.mapr,  need this for i2c1 but not i2c2
