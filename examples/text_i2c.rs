@@ -12,6 +12,14 @@
 //!
 //! Compare this example with oled_gps.
 
+// Example use of impl trait: If scl and sda are on PB10 and PB11 (eg in stm32f1xx below) then
+//      fn setup() -> BlockingI2c<I2C2, (PB10<Alternate<OpenDrain>>, PB11<Alternate<OpenDrain>>)> {
+// is changed to
+//      fn setup() -> BlockingI2c<I2C2, impl Pins<I2C2>> {
+// Also
+//   use stm32f1xx_hal::{ gpio::{gpiob::{PB10, PB11}, Alternate, OpenDrain, },
+// will be needed.
+
 #![no_std]
 #![no_main]
 
@@ -37,18 +45,13 @@ use ssd1306::{prelude::*, Builder, I2CDIBuilder};
 
 #[cfg(feature = "stm32f0xx")] //  eg stm32f030xc
 use stm32f0xx_hal::{
-    gpio::{
-        gpiob::{PB7, PB8},
-        Alternate, AF1,
-    },
-    i2c::I2c,
-    pac::Peripherals,
-    pac::I2C1,
+    i2c::{I2c, SclPin, SdaPin},
+    pac::{Peripherals, I2C1},
     prelude::*,
 };
 
 #[cfg(feature = "stm32f0xx")]
-fn setup() -> I2c<I2C1, PB8<Alternate<AF1>>, PB7<Alternate<AF1>>> {
+fn setup() -> I2c<I2C1, impl SclPin<I2C1>, impl SdaPin<I2C1>> {
     let mut p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.configure().freeze(&mut p.FLASH);
 
@@ -68,17 +71,13 @@ fn setup() -> I2c<I2C1, PB8<Alternate<AF1>>, PB7<Alternate<AF1>>> {
 #[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
 use stm32f1xx_hal::{
     device::I2C2,
-    gpio::{
-        gpiob::{PB10, PB11},
-        Alternate, OpenDrain,
-    },
-    i2c::{BlockingI2c, DutyCycle, Mode},
+    i2c::{BlockingI2c, DutyCycle, Mode, Pins},
     pac::Peripherals,
     prelude::*,
 };
 
 #[cfg(feature = "stm32f1xx")]
-fn setup() -> BlockingI2c<I2C2, (PB10<Alternate<OpenDrain>>, PB11<Alternate<OpenDrain>>)> {
+fn setup() -> BlockingI2c<I2C2, impl Pins<I2C2>> {
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.constrain();
 
@@ -117,18 +116,17 @@ use stm32f3xx_hal::{
         gpiob::{PB8, PB9},
         Alternate, OpenDrain, Pin, AF4,
     },
-    //i2c::{BlockingI2c, DutyCycle, Mode},
-    hal::blocking::i2c::{Read, Write, WriteRead},
-    i2c,
-    //i2c::{Read, Write, WriteRead},
-    //i2c::{I2c,BlockingI2c, Mode, PinScl, PinSda},
-    pac::Peripherals,
-    pac::I2C1,
+    //hal::blocking::i2c::{Read, Write, WriteRead},
+    //hal::I2c,
+    i2c::{I2c, SclPin, SdaPin},
+    pac::{Peripherals, I2C1},
     prelude::*,
 };
 
 #[cfg(feature = "stm32f3xx")]
-fn setup() -> i2c::I2c<I2C1, (PB8<Alternate<AF4>>, PB9<Alternate<AF4>>)> {
+fn setup() -> I2c<I2C1, impl SclPin<I2C1> + SdaPin<I2C1>> {
+    //fn setup() -> BlockingI2c<I2C1, impl Pins<I2C1>> {
+    //fn setup() -> i2c::I2c<I2C1, (PB8<Alternate<AF4>>, PB9<Alternate<AF4>>)> {
     //fn setup() -> I2c<I2C1, impl PinScl<I2C1> + PinSda<I2C1>> {
     //fn setup() -> BlockingI2c<I2C1, impl PinScl<I2C1>, impl PinSda<I2C1>> {
     //fn setup() -> impl WriteRead {
@@ -156,7 +154,7 @@ fn setup() -> i2c::I2c<I2C1, (PB8<Alternate<AF4>>, PB9<Alternate<AF4>>)> {
 
     // return i2c
     //BlockingI2c::i2c1(
-    i2c::I2c::new(
+    I2c::new(
         p.I2C1,
         (scl, sda),
         //&mut afio.mapr,  need this for i2c1 but not i2c2
@@ -169,18 +167,13 @@ fn setup() -> i2c::I2c<I2C1, (PB8<Alternate<AF4>>, PB9<Alternate<AF4>>)> {
 
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64, blackpills stm32f401 and stm32f411
 use stm32f4xx_hal::{
-    gpio::{
-        gpiob::{PB10, PB3},
-        AlternateOD, AF4, AF9,
-    },
-    i2c::I2c,
-    pac::Peripherals,
-    pac::I2C2,
+    i2c::{I2c, Pins},
+    pac::{Peripherals, I2C2},
     prelude::*,
 };
 
 #[cfg(feature = "stm32f4xx")]
-fn setup() -> I2c<I2C2, (PB10<AlternateOD<AF4>>, PB3<AlternateOD<AF9>>)> {
+fn setup() -> I2c<I2C2, impl Pins<I2C2>> {
     let p = Peripherals::take().unwrap();
     let rcc = p.RCC.constrain();
     let clocks = rcc.cfgr.freeze();
@@ -198,18 +191,16 @@ fn setup() -> I2c<I2C2, (PB10<AlternateOD<AF4>>, PB3<AlternateOD<AF9>>)> {
 
 #[cfg(feature = "stm32f7xx")]
 use stm32f7xx_hal::{
+    //i2c::{BlockingI2c, Mode, Pins},
     i2c::{BlockingI2c, Mode, PinScl, PinSda},
-    pac::Peripherals,
-    pac::I2C1,
+    pac::{Peripherals, I2C1},
     prelude::*,
 };
 
-//fn setup() ->  BlockingI2c<I2C1, PB8<Alternate<AF4>>, PB9<Alternate<AF4>>> {
-//fn setup() ->  BlockingI2c<I2C1, impl PinScl<AF4>, impl PinSda<AF4>> {
-//fn setup() ->  BlockingI2c<I2C1, impl PinScl<I2C1>, impl PinSda<I2C1>> {
-//fn setup() ->  BlockingI2c<I2C1, impl PinScl<I2C1>, impl PinSda<I2C1>> {
 #[cfg(feature = "stm32f7xx")]
 fn setup() -> BlockingI2c<I2C1, impl PinScl<I2C1>, impl PinSda<I2C1>> {
+    //fn setup() -> BlockingI2c<I2C1, impl Pins<I2C1>> {
+    //fn setup() ->  BlockingI2c<I2C1, PB8<Alternate<AF4>>, PB9<Alternate<AF4>>> {
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.constrain();
     let clocks = rcc.cfgr.freeze();
@@ -234,13 +225,7 @@ fn setup() -> BlockingI2c<I2C1, impl PinScl<I2C1>, impl PinSda<I2C1>> {
 }
 
 #[cfg(feature = "stm32h7xx")]
-use stm32h7xx_hal::{
-    i2c::I2c,
-    pac::Peripherals,
-    //gpio::{gpiob::{PB8, PB9}, Alternate, AF4, }, really! builds without this
-    pac::I2C1,
-    prelude::*,
-};
+use stm32h7xx_hal::{i2c::I2c, pac::Peripherals, pac::I2C1, prelude::*};
 
 #[cfg(feature = "stm32h7xx")]
 fn setup() -> I2c<I2C1> {
@@ -269,14 +254,14 @@ use stm32l0xx_hal::{
         OpenDrain, Output,
     },
     i2c::I2c,
-    pac::Peripherals,
-    pac::I2C1,
+    pac::{Peripherals, I2C1},
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
 };
 
 #[cfg(feature = "stm32l0xx")]
 fn setup() -> I2c<I2C1, PB9<Output<OpenDrain>>, PB8<Output<OpenDrain>>> {
+    //fn setup() -> I2c<I2C1, impl Pins<I2C1>> {         //SOMETHING LIKE THIS SHOULD WORK
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
     let gpiob = p.GPIOB.split(&mut rcc);
@@ -326,9 +311,8 @@ use stm32l4xx_hal::{
         gpiob::{PB10, PB11},
         Alternate, OpenDrain, Output, AF4,
     },
-    i2c::I2c,
-    pac::Peripherals,
-    pac::I2C2,
+    i2c::{I2c, SclPin, SdaPin},
+    pac::{Peripherals, I2C2},
     prelude::*,
 };
 
@@ -340,6 +324,8 @@ fn setup() -> I2c<
         PB11<Alternate<AF4, Output<OpenDrain>>>,
     ),
 > {
+    //fn setup() -> I2c<I2C2, impl SclPin<I2C2> + SdaPin<I2C2>> {      //SOMETHING LIKE THIS SHOULD WORK
+    //fn setup() -> I2c<I2C2, impl Pins<I2C2>> {
     let p = Peripherals::take().unwrap();
     let mut flash = p.FLASH.constrain();
     let mut rcc = p.RCC.constrain();

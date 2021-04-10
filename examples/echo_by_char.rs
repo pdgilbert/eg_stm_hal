@@ -62,6 +62,8 @@ use stm32f1xx_hal::{
 
 #[cfg(feature = "stm32f1xx")]
 fn setup() -> (Tx<USART1>, Rx<USART1>) {
+    //fn setup() -> (impl WriteRead<USART1>) {
+    //fn setup() -> (impl Write<USART1>, impl Read<USART1>) {
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.constrain();
     let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);

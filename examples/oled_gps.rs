@@ -4,6 +4,18 @@
 //! Note that the DisplaySize setting needs to be adjusted for 128x64 or 128x32 display
 //! Compare this example with gps_rw, lora_gps and text_i2c.
 
+// Example use of impl trait: If scl and sda are on PB10 and PB11 (eg in stm32f1xx below) then
+//    fn setup() ->  (Tx<USART3>, Rx<USART3>,
+//                    BlockingI2c<I2C2,  (PB10<Alternate<OpenDrain>>, PB11<Alternate<OpenDrain>>) >,
+//                    Delay )  {
+// is changed to
+//    fn setup() ->  (Tx<USART2>, Rx<USART2>,
+//                    BlockingI2c<I2C2, impl Pins<I2C2>>,
+//                    Delay )  {
+// Also
+//   use stm32f1xx_hal::{ gpio::{gpiob::{PB10, PB11}, Alternate, OpenDrain, },
+// will be needed.
+
 #![deny(unsafe_code)]
 #![no_main]
 #![no_std]
@@ -14,20 +26,15 @@ use panic_semihosting as _;
 #[cfg(not(debug_assertions))]
 use panic_halt as _;
 
-//use cortex_m::asm;
+use cortex_m_rt::entry;
+
+//use core::fmt::Write;  // for writeln
+use cortex_m_semihosting::hprintln;
+use nb::block;
 
 use heapless::{consts, Vec};
 
-use cortex_m_rt::entry;
-//use core::fmt::Write;  // for writeln
-use cortex_m_semihosting::hprintln;
-//use core::str;
-//use core::ascii;
-use nb::block;
-
 use embedded_hal::blocking::delay::DelayMs;
-
-//use cortex_m::asm;  //for breakpoint
 
 use eg_stm_hal::to_str;
 
@@ -47,11 +54,7 @@ use ssd1306::{prelude::*, Builder, I2CDIBuilder};
 #[cfg(feature = "stm32f0xx")] //  eg  stm32f030xc
 use stm32f0xx_hal::{
     delay::Delay,
-    gpio::{
-        gpiob::{PB7, PB8},
-        Alternate, AF1,
-    },
-    i2c::I2c,
+    i2c::{I2c, SclPin, SdaPin},
     pac::{CorePeripherals, Peripherals, I2C1, USART3},
     prelude::*,
     serial::{Rx, Serial, Tx},
@@ -61,7 +64,7 @@ use stm32f0xx_hal::{
 fn setup() -> (
     Tx<USART3>,
     Rx<USART3>,
-    I2c<I2C1, PB8<Alternate<AF1>>, PB7<Alternate<AF1>>>,
+    I2c<I2C1, impl SclPin<I2C1>, impl SdaPin<I2C1>>,
     Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
@@ -89,13 +92,10 @@ fn setup() -> (
 #[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
 use stm32f1xx_hal::{
     delay::Delay,
-    gpio::{
-        gpiob::{PB10, PB11},
-        Alternate, //gpioa::{PA2, PA3},
-        OpenDrain,
-    },
-    i2c::{BlockingI2c, DutyCycle, Mode},
-    pac::{CorePeripherals, Peripherals, I2C2, USART2},
+    device::I2C2,
+    device::USART2,
+    i2c::{BlockingI2c, DutyCycle, Mode, Pins},
+    pac::{CorePeripherals, Peripherals},
     prelude::*,
     serial::{Config, Rx, Serial, Tx}, //, StopBits
 };
@@ -104,8 +104,7 @@ use stm32f1xx_hal::{
 fn setup() -> (
     Tx<USART2>,
     Rx<USART2>,
-    impl WriteOnlyDataCommand,
-    //BlockingI2c<I2C2, (PB10<Alternate<OpenDrain>>, PB11<Alternate<OpenDrain>>)>,
+    BlockingI2c<I2C2, impl Pins<I2C2>>,
     Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
@@ -160,14 +159,21 @@ use stm32f3xx_hal::{
         Alternate, AF4,
     },
     hal::blocking::i2c::{Read, Write, WriteRead},
-    i2c::I2c,
+    i2c::{I2c, Pins},
     pac::{CorePeripherals, Peripherals, I2C1, USART2},
     prelude::*,
     serial::{Rx, Serial, Tx},
 };
 
 #[cfg(feature = "stm32f3xx")]
-fn setup() -> (Tx<USART2>, Rx<USART2>, impl WriteRead, Delay) {
+fn setup() -> (
+    Tx<USART2>,
+    Rx<USART2>,
+    impl I2c<I2C2, impl Pins<I2C2>>,
+    Delay,
+) {
+    //I2c<I2C1, (PB8<Alternate<AF4>>, PB9<Alternate<AF4>>)>,
+    //    I2c<I2C1, impl PinScl<I2C1> + PinSda<I2C1>>,
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.constrain();
@@ -210,23 +216,14 @@ fn setup() -> (Tx<USART2>, Rx<USART2>, impl WriteRead, Delay) {
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64, blackpills stm32f401 and stm32f411
 use stm32f4xx_hal::{
     delay::Delay,
-    gpio::{
-        gpiob::{PB10, PB3},
-        AlternateOD, AF4, AF9,
-    },
-    i2c::I2c,
+    i2c::{I2c, Pins},
     pac::{CorePeripherals, Peripherals, I2C2, USART2},
     prelude::*,
     serial::{config::Config, Rx, Serial, Tx},
 };
 
 #[cfg(feature = "stm32f4xx")]
-fn setup() -> (
-    Tx<USART2>,
-    Rx<USART2>,
-    I2c<I2C2, (PB10<AlternateOD<AF4>>, PB3<AlternateOD<AF9>>)>,
-    Delay,
-) {
+fn setup() -> (Tx<USART2>, Rx<USART2>, I2c<I2C2, impl Pins<I2C2>>, Delay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let clocks = p.RCC.constrain().cfgr.freeze();
@@ -323,7 +320,6 @@ fn setup() -> (
 use stm32h7xx_hal::{
     delay::Delay,
     i2c::I2c,
-    //gpio::{gpiob::{PB8, PB9}, Alternate, AF4, },
     pac::{CorePeripherals, Peripherals, I2C1, USART2},
     prelude::*,
     serial::{Rx, Tx},
@@ -376,7 +372,7 @@ use stm32l0xx_hal::{
         gpiob::{PB8, PB9},
         OpenDrain, Output,
     },
-    i2c::I2c,
+    i2c::{I2c, SCLPin, SDAPin},
     pac::{CorePeripherals, Peripherals, I2C1, USART2},
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
@@ -390,6 +386,8 @@ fn setup() -> (
     I2c<I2C1, PB9<Output<OpenDrain>>, PB8<Output<OpenDrain>>>,
     Delay,
 ) {
+    //fn setup() -> (Tx<USART2>, Rx<USART2>, I2c<I2C1, impl SCLPin<I2C1>, impl SDAPin<I2C1>>, Delay) {
+    //fn setup() -> (Tx<USART2>, Rx<USART2>, I2c<I2C1, impl SCLPin<I2C>, impl SDAPin<I2C>>, Delay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
@@ -479,7 +477,7 @@ use stm32l4xx_hal::{
         gpioa::{PA10, PA9},
         Alternate, OpenDrain, Output, AF4,
     },
-    i2c::I2c,
+    i2c::{I2c, SclPin, SdaPin},
     pac::{CorePeripherals, Peripherals, I2C1, USART2},
     prelude::*,
     serial::{Config, Rx, Serial, Tx},
@@ -498,8 +496,7 @@ fn setup() -> (
     >,
     Delay,
 ) {
-    //           I2c<I2C1, (PB8<Alternate<AF4, Output<OpenDrain>>>, PB9<Alternate<AF4, Output<OpenDrain>>>)>,
-
+    //fn setup() -> ( Tx<USART2>, Rx<USART2>, I2c<I2C1, impl Pins<I2C1>>, Delay, ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut flash = p.FLASH.constrain();

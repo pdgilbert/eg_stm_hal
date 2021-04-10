@@ -3,7 +3,7 @@ name: Examples
 
 on:
   push:
-    branches: [ e-h-1.0.0-alpha.4 ]
+    branches: [ master, e-h-1.0.0-alpha.4 ]
   pull_request:
     branches: [ e-h-1.0.0-alpha.4 ]
 

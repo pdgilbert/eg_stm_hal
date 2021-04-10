@@ -177,6 +177,7 @@ stm32l100 = ["stm32l1xx-hal/stm32l100", "stm32l1xx-hal/rt"]
 stm32l151 = ["stm32l1xx-hal/stm32l151", "stm32l1xx-hal/rt"]
 stm32l4x1 = ["stm32l4xx-hal/stm32l4x1", "stm32l4xx-hal/rt"]
 stm32l4x2 = ["stm32l4xx-hal/stm32l4x2", "stm32l4xx-hal/rt"]
+stm32l4x6 = ["stm32l4xx-hal/stm32l4x6", "stm32l4xx-hal/rt"]
 
 
 # features passed through to dht example

@@ -223,7 +223,7 @@ fn setup() -> (PC13<Output<PushPull>>, Delay) {
 use stm32h7xx_hal::{
     delay::Delay,
     gpio::{gpioc::PC13, Output, PushPull},
-    hal::digital::v2::OutputPin,
+    //hal::digital::v2::OutputPin,
     pac::{CorePeripherals, Peripherals},
     prelude::*,
 };
@@ -297,9 +297,6 @@ use stm32l1xx_hal::{
     rcc, // for ::Config but note name conflict with serial
     stm32::{CorePeripherals, Peripherals},
 };
-
-#[cfg(feature = "stm32l1xx")]
-use embedded_hal::digital::v2::OutputPin;
 
 #[cfg(feature = "stm32l1xx")]
 fn setup() -> (PB6<Output<PushPull>>, Delay) {
