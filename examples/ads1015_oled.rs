@@ -146,20 +146,18 @@ fn setup() -> (
 #[cfg(feature = "stm32f3xx")] //  eg Discovery-stm32f303
 use stm32f3xx_hal::{
     delay::Delay,
-    gpio::{
-        gpiob::{PB8, PB9},
-        gpioe::PE15,
-        Alternate, OpenDrain, Output, Pin, PushPull, AF4,
-    },
-    hal::blocking::i2c::{Read, WriteRead},
-    i2c,
-    i2c::{I2c, Pins},
+    gpio::{gpioe::PE15, Output, PushPull},
+    i2c::{I2c, SclPin, SdaPin},
     pac::{CorePeripherals, Peripherals, I2C1},
     prelude::*,
 };
 
 #[cfg(feature = "stm32f3xx")]
-fn setup() -> (impl WriteRead, PE15<Output<PushPull>>, Delay) {
+fn setup() -> (
+    I2c<I2C1, (impl SclPin<I2C1>, impl SdaPin<I2C1>)>,
+    PE15<Output<PushPull>>,
+    Delay,
+) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
@@ -181,7 +179,7 @@ fn setup() -> (impl WriteRead, PE15<Output<PushPull>>, Delay) {
     scl.internal_pull_up(&mut gpiob.pupdr, true);
     sda.internal_pull_up(&mut gpiob.pupdr, true);
 
-    let i2c = i2c::I2c::new(
+    let i2c = I2c::new(
         p.I2C1,
         (scl, sda),
         //&mut afio.mapr,  need this for i2c1 but not i2c2

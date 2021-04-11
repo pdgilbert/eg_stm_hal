@@ -107,28 +107,13 @@ fn setup() -> BlockingI2c<I2C2, impl Pins<I2C2>> {
 
 #[cfg(feature = "stm32f3xx")] //  eg Discovery-stm32f303
 use stm32f3xx_hal::{
-    gpio::{
-        gpiob::{PB8, PB9},
-        Alternate, OpenDrain, Pin, AF4,
-    },
-    //hal::blocking::i2c::{Read, Write, WriteRead},
-    //hal::I2c,
     i2c::{I2c, SclPin, SdaPin},
     pac::{Peripherals, I2C1},
     prelude::*,
 };
 
 #[cfg(feature = "stm32f3xx")]
-fn setup() -> I2c<I2C1, impl SclPin<I2C1> + SdaPin<I2C1>> {
-    //fn setup() -> BlockingI2c<I2C1, impl Pins<I2C1>> {
-    //fn setup() -> i2c::I2c<I2C1, (PB8<Alternate<AF4>>, PB9<Alternate<AF4>>)> {
-    //fn setup() -> I2c<I2C1, impl PinScl<I2C1> + PinSda<I2C1>> {
-    //fn setup() -> BlockingI2c<I2C1, impl PinScl<I2C1>, impl PinSda<I2C1>> {
-    //fn setup() -> impl WriteRead {
-    //fn setup() -> () {
-    //I2c<I2C1, (PB8<Alternate<OpenDrain>>, PB9<Alternate<OpenDrain>>)> {
-    //BlockingI2c<I2C2, (PB8<Alternate<OpenDrain>>, PB9<Alternate<OpenDrain>>)> {
-    //I2c<I2C1, (PB8<Alternate<AF4>>, PB9<Alternate<AF4>>)> {
+fn setup() -> I2c<I2C1, (impl SclPin<I2C1>, impl SdaPin<I2C1>)> {
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.constrain();
     let clocks = rcc.cfgr.freeze(&mut p.FLASH.constrain().acr);
@@ -148,16 +133,8 @@ fn setup() -> I2c<I2C1, impl SclPin<I2C1> + SdaPin<I2C1>> {
     sda.internal_pull_up(&mut gpiob.pupdr, true);
 
     // return i2c
-    //BlockingI2c::i2c1(
-    I2c::new(
-        p.I2C1,
-        (scl, sda),
-        //&mut afio.mapr,  need this for i2c1 but not i2c2
-        400_000.Hz(),
-        //100u32.kHz().try_into().unwrap(),
-        clocks,
-        &mut rcc.apb1,
-    )
+    //BlockingI2c::new(
+    I2c::new(p.I2C1, (scl, sda), 400_000.Hz(), clocks, &mut rcc.apb1)
 }
 
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64, blackpills stm32f401 and stm32f411

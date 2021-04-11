@@ -154,12 +154,7 @@ fn setup() -> (
 #[cfg(feature = "stm32f3xx")] //  eg Discovery-stm32f303
 use stm32f3xx_hal::{
     delay::Delay,
-    gpio::{
-        gpiob::{PB8, PB9},
-        Alternate, AF4,
-    },
-    hal::blocking::i2c::{Read, Write, WriteRead},
-    i2c::{I2c, Pins},
+    i2c::{I2c, SclPin, SdaPin},
     pac::{CorePeripherals, Peripherals, I2C1, USART2},
     prelude::*,
     serial::{Rx, Serial, Tx},
@@ -169,11 +164,9 @@ use stm32f3xx_hal::{
 fn setup() -> (
     Tx<USART2>,
     Rx<USART2>,
-    impl I2c<I2C2, impl Pins<I2C2>>,
+    I2c<I2C1, (impl SclPin<I2C1>, impl SdaPin<I2C1>)>,
     Delay,
 ) {
-    //I2c<I2C1, (PB8<Alternate<AF4>>, PB9<Alternate<AF4>>)>,
-    //    I2c<I2C1, impl PinScl<I2C1> + PinSda<I2C1>>,
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.constrain();
