@@ -234,7 +234,8 @@ use stm32l0xx_hal::{
 #[cfg(feature = "stm32l0xx")]
 fn setup() -> I2c<I2C1, PB9<Output<OpenDrain>>, PB8<Output<OpenDrain>>> {
     //fn setup() -> I2c<I2C1, impl SCLPin<I2C1>, impl SDAPin<I2C1>> {
-    //fn setup() -> I2c<I2C1, impl Pins<I2C1>> {    //SOMETHING LIKE THIS SHOULD WORK. MAY NEED DIFFERENT MCU?
+    //fn setup() -> I2c<I2C1, impl SCLPin<I2C1>, impl SDAPin<I2C1>> { // SOMETHING LIKE THIS OR
+    //fn setup() -> I2c<I2C1, impl Pins<I2C1>> {    // THIS SHOULD WORK. MAY NEED DIFFERENT MCU?
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
     let gpiob = p.GPIOB.split(&mut rcc);

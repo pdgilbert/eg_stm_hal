@@ -49,6 +49,11 @@ use ssd1306::{prelude::*, Builder, I2CDIBuilder};
 
 use nb::block;
 
+pub trait LED {
+    fn on(&mut self) -> ();
+    fn off(&mut self) -> ();
+}
+
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
 
 #[cfg(feature = "stm32f0xx")] //  eg stm32f030xc
@@ -102,7 +107,7 @@ use stm32f1xx_hal::{
 #[cfg(feature = "stm32f1xx")]
 fn setup() -> (
     BlockingI2c<I2C1, impl Pins<I2C1>>,
-    PC13<Output<PushPull>>,
+    impl LED, //PC13<Output<PushPull>>,
     Delay,
 ) {
     //fn setup() -> (impl WriteRead, PC13<Output<PushPull>>, Delay) {
@@ -139,6 +144,15 @@ fn setup() -> (
     // led
     let mut gpioc = p.GPIOC.split(&mut rcc.apb2);
     let led = gpioc.pc13.into_push_pull_output(&mut gpioc.crh); // led on pc13
+
+    impl LED for PC13<Output<PushPull>> {
+        fn on(&mut self) -> () {
+            self.set_low().unwrap()
+        }
+        fn off(&mut self) -> () {
+            self.set_high().unwrap()
+        }
+    }
 
     (i2c, led, Delay::new(cp.SYST, clocks)) // return tuple (i2c, led, delay)
 }
@@ -469,10 +483,9 @@ fn main() -> ! {
     loop {
         // Blink LED 0 to check that everything is actually running.
         // If the LED 0 is off, something went wrong.
-        led.set_high().unwrap();
-        delay.delay_ms(50_u16);
-        led.set_low().unwrap();
-        delay.delay_ms(50_u16);
+        led.on();
+        delay.delay_ms(10_u16);
+        led.off();
 
         // Read voltage in all channels
         let values = [
@@ -493,17 +506,12 @@ fn main() -> ! {
         // write some extra spaces after the number to clear up when the numbers get smaller
         for i in 0..values.len() {
             write!(lines[i], "Channel {}: {}    ", i, values[i]).unwrap();
-            //disp.draw(
-            //    Font6x8::render_str(&lines[i])
-            //        .with_stroke(Some(1u8.into()))
-            //        .translate(Coord::new(0, i as i32 * 16))
-            //        .into_iter(),
-            //);
             Text::new(&lines[i], Point::new(0, i as i32 * 16))
                 .into_styled(text_style)
                 .draw(&mut disp)
                 .unwrap();
         }
         disp.flush().unwrap();
+        delay.delay_ms(2000_u16);  // pause for 2s
     }
 }
