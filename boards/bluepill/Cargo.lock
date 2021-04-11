@@ -806,7 +806,7 @@ dependencies = [
 [[package]]
 name = "stm32f1xx-hal"
 version = "0.7.0"
-source = "git+https://github.com/stm32-rs/stm32f1xx-hal#19af4811444a6f9bc227202d2e9019cf71620fa8"
+source = "git+https://github.com/stm32-rs/stm32f1xx-hal#0442ccb176133c4c4c9114dfe41b8854e2c9fc85"
 dependencies = [
  "bxcan",
  "cast",
@@ -890,7 +890,7 @@ dependencies = [
 [[package]]
 name = "stm32f4xx-hal"
 version = "0.9.0"
-source = "git+https://github.com/stm32-rs/stm32f4xx-hal#4b0f1615977474c987db9f91d55394861a2eb01f"
+source = "git+https://github.com/stm32-rs/stm32f4xx-hal#b2a8d656d53bf500155af76953e48dc8e6b927a7"
 dependencies = [
  "bare-metal 1.0.0",
  "cast",
@@ -981,7 +981,7 @@ dependencies = [
 [[package]]
 name = "stm32l0xx-hal"
 version = "0.7.0"
-source = "git+https://github.com/stm32-rs/stm32l0xx-hal#8bb5d3c989dc55a82cc7ef746cf0c27a4cf1bbe8"
+source = "git+https://github.com/stm32-rs/stm32l0xx-hal#54dc6152cb614c82877e931c4c91e3b94e04b686"
 dependencies = [
  "as-slice",
  "cast",
@@ -1051,9 +1051,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "1.0.68"
+version = "1.0.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3ce15dd3ed8aa2f8eeac4716d6ef5ab58b6b9256db41d7e1a0224c2788e8fd87"
+checksum = "48fe99c6bd8b1cc636890bcc071842de909d902c81ac7dab53ba33c421ab8ffb"
 dependencies = [
  "proc-macro2",
  "quote",
