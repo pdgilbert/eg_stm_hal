@@ -465,11 +465,6 @@ fn setup() -> (Tx<USART1>, Rx<USART1>, I2c<I2C1, impl Pins<I2C1>>, Delay) {
 #[cfg(feature = "stm32l4xx")]
 use stm32l4xx_hal::{
     delay::Delay,
-    //gpio::{gpiob::{PB8, PB9}, Alternate, AF4, Output, OpenDrain},
-    gpio::{
-        gpioa::{PA10, PA9},
-        Alternate, OpenDrain, Output, AF4,
-    },
     i2c::{I2c, SclPin, SdaPin},
     pac::{CorePeripherals, Peripherals, I2C1, USART2},
     prelude::*,
@@ -480,16 +475,9 @@ use stm32l4xx_hal::{
 fn setup() -> (
     Tx<USART2>,
     Rx<USART2>,
-    I2c<
-        I2C1,
-        (
-            PA9<Alternate<AF4, Output<OpenDrain>>>,
-            PA10<Alternate<AF4, Output<OpenDrain>>>,
-        ),
-    >,
+    I2c<I2C1, (impl SclPin<I2C1>, impl SdaPin<I2C1>)>,
     Delay,
 ) {
-    //fn setup() -> ( Tx<USART2>, Rx<USART2>, I2c<I2C1, impl Pins<I2C1>>, Delay, ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut flash = p.FLASH.constrain();
@@ -509,8 +497,8 @@ fn setup() -> (
         p.USART2,
         (
             gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl), //tx pa2  for GPS rx
-            gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl),
-        ), //rx pa3  for GPS tx
+            gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl), //rx pa3  for GPS tx
+        ),
         Config::default().baudrate(9600.bps()),
         clocks,
         &mut rcc.apb1r1,
@@ -518,14 +506,6 @@ fn setup() -> (
     .split();
 
     // following github.com/stm32-rs/stm32l4xx-hal/blob/master/examples/i2c_write.rs
-    //
-    //         let mut scl = gpiob.pb8.into_open_drain_output(&mut gpiob.moder, &mut gpiob.otyper);  // scl on PB8
-    //         scl.internal_pull_up(&mut gpiob.pupdr, true);
-    //         let scl = scl.into_af4(&mut gpiob.moder, &mut gpiob.afrh);
-    //
-    //         let mut sda = gpiob.pb9.into_open_drain_output(&mut gpiob.moder, &mut gpiob.otyper);  // sda on PB9
-    //         sda.internal_pull_up(&mut gpiob.pupdr, true);
-    //         let sda = sda.into_af4(&mut gpiob.moder, &mut gpiob.afrh);
 
     let mut scl = gpioa
         .pa9

@@ -382,11 +382,7 @@ fn setup() -> (I2c<I2C1, impl Pins<I2C1>>, PB6<Output<PushPull>>, Delay) {
 #[cfg(feature = "stm32l4xx")]
 use stm32l4xx_hal::{
     delay::Delay,
-    gpio::{
-        gpiob::{PB10, PB11},
-        gpioc::PC13,
-        Alternate, OpenDrain, Output, PushPull, AF4,
-    },
+    gpio::{gpioc::PC13, Output, PushPull },
     i2c::{I2c, SclPin, SdaPin},
     pac::{CorePeripherals, Peripherals, I2C2},
     prelude::*,
@@ -394,14 +390,7 @@ use stm32l4xx_hal::{
 
 #[cfg(feature = "stm32l4xx")]
 fn setup() -> (
-    I2c<
-        I2C2,
-        (
-            PB10<Alternate<AF4, Output<OpenDrain>>>,
-            PB11<Alternate<AF4, Output<OpenDrain>>>,
-        ),
-    >,
-    //I2c<I2C2, impl Pins<I2C2>>,
+    I2c<I2C2, (impl SclPin<I2C2>, impl SdaPin<I2C2>)>,
     PC13<Output<PushPull>>,
     Delay,
 ) {
