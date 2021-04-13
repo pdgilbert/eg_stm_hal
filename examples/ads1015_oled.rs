@@ -52,6 +52,7 @@ use nb::block;
 pub trait LED {
     fn on(&mut self) -> ();
     fn off(&mut self) -> ();
+    fn blink(&mut self, on: u16) -> ();
 }
 
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
@@ -68,7 +69,7 @@ use stm32f0xx_hal::{
 #[cfg(feature = "stm32f0xx")]
 fn setup() -> (
     I2c<I2C1, impl SclPin<I2C1>, impl SdaPin<I2C1>>,
-    PC13<Output<PushPull>>,
+    impl LED,
     Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
@@ -87,17 +88,39 @@ fn setup() -> (
 
     let i2c = I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), &mut rcc);
 
+    let mut delay = Delay::new(cp.SYST, &rcc);
+    let mut pause = |t: u16| delay.delay_ms(t);
+
     // led
     let gpioc = p.GPIOC.split(&mut rcc);
     let led = cortex_m::interrupt::free(move |cs| gpioc.pc13.into_push_pull_output(cs));
 
-    (i2c, led, Delay::new(cp.SYST, &rcc)) // return tuple (i2c, led, delay)
+    impl LED for PC13<Output<PushPull>> {
+        fn on(&mut self) -> () {
+            self.set_low().unwrap()
+        }
+        fn off(&mut self) -> () {
+            self.set_high().unwrap()
+        }
+        fn blink(&mut self, time: u16) -> () {
+            self.on();
+            //let _z = |time| {pause(time)};
+            self.off()
+        }
+    }
+
+    //led.blink(10000);
+    led.on();
+    let _z = pause(10000);
+    led.off();
+
+    (i2c, led, delay) // return tuple (i2c, led, delay)
 }
 
 #[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
 use stm32f1xx_hal::{
     delay::Delay,
-    device::I2C1,
+    device::I2C2,
     gpio::{gpioc::PC13, Output, PushPull},
     i2c::{BlockingI2c, DutyCycle, Mode, Pins},
     pac::{CorePeripherals, Peripherals},
@@ -105,12 +128,7 @@ use stm32f1xx_hal::{
 };
 
 #[cfg(feature = "stm32f1xx")]
-fn setup() -> (
-    BlockingI2c<I2C1, impl Pins<I2C1>>,
-    impl LED, //PC13<Output<PushPull>>,
-    Delay,
-) {
-    //fn setup() -> (impl WriteRead, PC13<Output<PushPull>>, Delay) {
+fn setup() -> (BlockingI2c<I2C2, impl Pins<I2C2>>, impl LED, Delay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
@@ -122,13 +140,13 @@ fn setup() -> (
     // can have (scl, sda) using I2C1  on (PB8, PB9 ) or on  (PB6, PB7)
     //     or   (scl, sda) using I2C2  on (PB10, PB11)
 
-    let i2c = BlockingI2c::i2c1(
-        p.I2C1,
+    let i2c = BlockingI2c::i2c2(
+        p.I2C2,
         (
-            gpiob.pb8.into_alternate_open_drain(&mut gpiob.crh), // i2c scl on pb8
-            gpiob.pb9.into_alternate_open_drain(&mut gpiob.crh), // i2c sda on pb9
+            gpiob.pb10.into_alternate_open_drain(&mut gpiob.crh), // scl on PB10
+            gpiob.pb11.into_alternate_open_drain(&mut gpiob.crh), // sda on PB11
         ),
-        &mut p.AFIO.constrain(&mut rcc.apb2).mapr,
+        //&mut afio.mapr,  need this for i2c1 but not i2c2
         Mode::Fast {
             frequency: 100_000.hz(),
             duty_cycle: DutyCycle::Ratio2to1,
@@ -141,9 +159,12 @@ fn setup() -> (
         1000,
     );
 
+    let mut delay = Delay::new(cp.SYST, clocks);
+    let mut pause = |t: u16| delay.delay_ms(t);
+
     // led
     let mut gpioc = p.GPIOC.split(&mut rcc.apb2);
-    let led = gpioc.pc13.into_push_pull_output(&mut gpioc.crh); // led on pc13
+    let mut led = gpioc.pc13.into_push_pull_output(&mut gpioc.crh); // led on pc13
 
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -152,9 +173,19 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_high().unwrap()
         }
+        fn blink(&mut self, time: u16) -> () {
+            self.on();
+            //let _z = |time| {pause(time)};
+            self.off()
+        }
     }
 
-    (i2c, led, Delay::new(cp.SYST, clocks)) // return tuple (i2c, led, delay)
+    //led.blink(10000);
+    led.on();
+    let _z = pause(10000);
+    led.off();
+
+    (i2c, led, delay) // return tuple (i2c, led, delay)
 }
 
 #[cfg(feature = "stm32f3xx")] //  eg Discovery-stm32f303
@@ -169,7 +200,7 @@ use stm32f3xx_hal::{
 #[cfg(feature = "stm32f3xx")]
 fn setup() -> (
     I2c<I2C1, (impl SclPin<I2C1>, impl SdaPin<I2C1>)>,
-    PE15<Output<PushPull>>,
+    impl LED,
     Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
@@ -203,13 +234,35 @@ fn setup() -> (
         &mut rcc.apb1,
     );
 
+    let mut delay = Delay::new(cp.SYST, clocks);
+    let mut pause = |t: u16| delay.delay_ms(t);
+
     // led
     let mut gpioe = p.GPIOE.split(&mut rcc.ahb);
     let led = gpioe
         .pe15
         .into_push_pull_output(&mut gpioe.moder, &mut gpioe.otyper); // led on pe15
 
-    (i2c, led, Delay::new(cp.SYST, clocks)) // return tuple (i2c, led, delay)
+    impl LED for PE15<Output<PushPull>> {
+        fn on(&mut self) -> () {
+            self.set_low().unwrap()
+        }
+        fn off(&mut self) -> () {
+            self.set_high().unwrap()
+        }
+        fn blink(&mut self, time: u16) -> () {
+            self.on();
+            //let _z = |time| {pause(time)};
+            self.off()
+        }
+    }
+
+    //led.blink(10000);
+    led.on();
+    let _z = pause(10000);
+    led.off();
+
+    (i2c, led, delay) // return tuple (i2c, led, delay)
 }
 
 #[cfg(feature = "stm32f4xx")] // eg Nucleo-64  stm32f411
@@ -222,7 +275,7 @@ use stm32f4xx_hal::{
 };
 
 #[cfg(feature = "stm32f4xx")]
-fn setup() -> (I2c<I2C2, impl Pins<I2C2>>, PC13<Output<PushPull>>, Delay) {
+fn setup() -> (I2c<I2C2, impl Pins<I2C2>>, impl LED, Delay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
@@ -239,11 +292,33 @@ fn setup() -> (I2c<I2C2, impl Pins<I2C2>>, PC13<Output<PushPull>>, Delay) {
 
     let i2c = I2c::new(p.I2C2, (scl, sda), 400.khz(), clocks);
 
+    let mut delay = Delay::new(cp.SYST, clocks);
+    let mut pause = |t: u16| delay.delay_ms(t);
+
     // led
     let gpioc = p.GPIOC.split();
     let led = gpioc.pc13.into_push_pull_output();
 
-    (i2c, led, Delay::new(cp.SYST, clocks)) // return tuple (i2c, led, delay)
+    impl LED for PC13<Output<PushPull>> {
+        fn on(&mut self) -> () {
+            self.set_low().unwrap()
+        }
+        fn off(&mut self) -> () {
+            self.set_high().unwrap()
+        }
+        fn blink(&mut self, time: u16) -> () {
+            self.on();
+            //let _z = |time| {pause(time)};
+            self.off()
+        }
+    }
+
+    //led.blink(10000);
+    led.on();
+    let _z = pause(10000);
+    led.off();
+
+    (i2c, led, delay) // return tuple (i2c, led, delay)
 }
 
 #[cfg(feature = "stm32f7xx")]
@@ -258,7 +333,7 @@ use stm32f7xx_hal::{
 #[cfg(feature = "stm32f7xx")]
 fn setup() -> (
     BlockingI2c<I2C1, impl PinScl<I2C1>, impl PinSda<I2C1>>,
-    PC13<Output<PushPull>>,
+    impl LED,
     Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
@@ -284,9 +359,32 @@ fn setup() -> (
         1000,
     );
 
+    let mut delay = Delay::new(cp.SYST, clocks);
+    let mut pause = |t: u16| delay.delay_ms(t);
+
+    // led
     let led = gpioc.pc13.into_push_pull_output(); // led on pc13
 
-    (i2c, led, Delay::new(cp.SYST, clocks)) // return tuple (i2c, led, delay)
+    impl LED for PC13<Output<PushPull>> {
+        fn on(&mut self) -> () {
+            self.set_low().unwrap()
+        }
+        fn off(&mut self) -> () {
+            self.set_high().unwrap()
+        }
+        fn blink(&mut self, time: u16) -> () {
+            self.on();
+            //let _z = |time| {pause(time)};
+            self.off()
+        }
+    }
+
+    //led.blink(10000);
+    led.on();
+    let _z = pause(10000);
+    led.off();
+
+    (i2c, led, delay) // return tuple (i2c, led, delay)
 }
 
 #[cfg(feature = "stm32h7xx")]
@@ -299,7 +397,7 @@ use stm32h7xx_hal::{
 };
 
 #[cfg(feature = "stm32h7xx")]
-fn setup() -> (I2c<I2C1>, PC13<Output<PushPull>>, Delay) {
+fn setup() -> (I2c<I2C1>, impl LED, Delay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let pwr = p.PWR.constrain();
@@ -318,9 +416,32 @@ fn setup() -> (I2c<I2C1>, PC13<Output<PushPull>>, Delay) {
         .I2C1
         .i2c((scl, sda), 400.khz(), ccdr.peripheral.I2C1, &clocks);
 
+    let mut delay = Delay::new(cp.SYST, clocks);
+    let mut pause = |t: u16| delay.delay_ms(t);
+
+    // led
     let led = gpioc.pc13.into_push_pull_output(); // led on pc13
 
-    (i2c, led, Delay::new(cp.SYST, clocks)) // return tuple (i2c, led, delay)
+    impl LED for PC13<Output<PushPull>> {
+        fn on(&mut self) -> () {
+            self.set_low().unwrap()
+        }
+        fn off(&mut self) -> () {
+            self.set_high().unwrap()
+        }
+        fn blink(&mut self, time: u16) -> () {
+            self.on();
+            //let _z = |time| {pause(time)};
+            self.off()
+        }
+    }
+
+    //led.blink(10000);
+    led.on();
+    let _z = pause(10000);
+    led.off();
+
+    (i2c, led, delay) // return tuple (i2c, led, delay)
 }
 
 #[cfg(feature = "stm32l0xx")]
@@ -341,12 +462,13 @@ use stm32l0xx_hal::{
 fn setup() -> (
     I2c<I2C1, PB9<Output<OpenDrain>>, PB8<Output<OpenDrain>>>,
     //I2c<I2C1, impl Pins<I2C1>>,
-    PC13<Output<PushPull>>,
+    impl LED,
     Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
+    let clocks = rcc.clocks;
 
     let gpiob = p.GPIOB.split(&mut rcc);
     let gpioc = p.GPIOC.split(&mut rcc);
@@ -358,9 +480,32 @@ fn setup() -> (
 
     let i2c = p.I2C1.i2c(sda, scl, 400.khz(), &mut rcc);
 
+    let mut delay = Delay::new(cp.SYST, clocks);
+    let mut pause = |t: u16| delay.delay_ms(t);
+
+    // led
     let led = gpioc.pc13.into_push_pull_output(); // led on pc13 with on/off
 
-    (i2c, led, Delay::new(cp.SYST, rcc.clocks)) // return tuple (i2c, led, delay)
+    impl LED for PC13<Output<PushPull>> {
+        fn on(&mut self) -> () {
+            self.set_low().unwrap()
+        }
+        fn off(&mut self) -> () {
+            self.set_high().unwrap()
+        }
+        fn blink(&mut self, time: u16) -> () {
+            self.on();
+            //let _z = |time| {pause(time)};
+            self.off()
+        }
+    }
+
+    //led.blink(10000);
+    led.on();
+    let _z = pause(10000);
+    led.off();
+
+    (i2c, led, delay) // return tuple (i2c, led, delay)
 }
 
 #[cfg(feature = "stm32l1xx")] // eg  Discovery STM32L100 and Heltec lora_node STM32L151CCU6
@@ -375,10 +520,11 @@ use stm32l1xx_hal::{
 };
 
 #[cfg(feature = "stm32l1xx")]
-fn setup() -> (I2c<I2C1, impl Pins<I2C1>>, PB6<Output<PushPull>>, Delay) {
+fn setup() -> (I2c<I2C1, impl Pins<I2C1>>, impl LED, Delay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi());
+    let clocks = rcc.clocks;
 
     let gpiob = p.GPIOB.split();
 
@@ -388,15 +534,38 @@ fn setup() -> (I2c<I2C1, impl Pins<I2C1>>, PB6<Output<PushPull>>, Delay) {
 
     let i2c = p.I2C1.i2c((scl, sda), 400.khz(), &mut rcc);
 
+    let mut delay = Delay::new(cp.SYST, clocks);
+    let mut pause = |t: u16| delay.delay_ms(t);
+
+    // led
     let led = gpiob.pb6.into_push_pull_output(); // led on pb6
 
-    (i2c, led, Delay::new(cp.SYST, rcc.clocks)) // return tuple (i2c, led, delay)
+    impl LED for PB6<Output<PushPull>> {
+        fn on(&mut self) -> () {
+            self.set_low().unwrap()
+        }
+        fn off(&mut self) -> () {
+            self.set_high().unwrap()
+        }
+        fn blink(&mut self, time: u16) -> () {
+            self.on();
+            //let _z = |time| {pause(time)};
+            self.off()
+        }
+    }
+
+    //led.blink(10000);
+    led.on();
+    let _z = pause(10000);
+    led.off();
+
+    (i2c, led, delay) // return tuple (i2c, led, delay)
 }
 
 #[cfg(feature = "stm32l4xx")]
 use stm32l4xx_hal::{
     delay::Delay,
-    gpio::{gpioc::PC13, Output, PushPull },
+    gpio::{gpioc::PC13, Output, PushPull},
     i2c::{I2c, SclPin, SdaPin},
     pac::{CorePeripherals, Peripherals, I2C2},
     prelude::*,
@@ -405,7 +574,7 @@ use stm32l4xx_hal::{
 #[cfg(feature = "stm32l4xx")]
 fn setup() -> (
     I2c<I2C2, (impl SclPin<I2C2>, impl SdaPin<I2C2>)>,
-    PC13<Output<PushPull>>,
+    impl LED,
     Delay,
 ) {
     let cp = CorePeripherals::take().unwrap();
@@ -438,11 +607,35 @@ fn setup() -> (
     let i2c = I2c::i2c2(p.I2C2, (scl, sda), 400.khz(), clocks, &mut rcc.apb1r1);
 
     let mut gpioc = p.GPIOC.split(&mut rcc.ahb2);
+
+    let mut delay = Delay::new(cp.SYST, clocks);
+    let mut pause = |t: u16| delay.delay_ms(t);
+
+    // led
     let led = gpioc
         .pc13
         .into_push_pull_output(&mut gpioc.moder, &mut gpioc.otyper); // led on pc13
 
-    (i2c, led, Delay::new(cp.SYST, clocks)) // return tuple (i2c, led, delay)
+    impl LED for PC13<Output<PushPull>> {
+        fn on(&mut self) -> () {
+            self.set_low().unwrap()
+        }
+        fn off(&mut self) -> () {
+            self.set_high().unwrap()
+        }
+        fn blink(&mut self, time: u16) -> () {
+            self.on();
+            //let _z = |time| {pause(time)};
+            self.off()
+        }
+    }
+
+    //led.blink(10000);
+    led.on();
+    let _z = pause(10000);
+    led.off();
+
+    (i2c, led, delay) // return tuple (i2c, led, delay)
 }
 
 // End of hal/MCU specific setup. Following should be generic code.
@@ -512,6 +705,6 @@ fn main() -> ! {
                 .unwrap();
         }
         disp.flush().unwrap();
-        delay.delay_ms(2000_u16);  // pause for 2s
+        delay.delay_ms(2000_u16); // pause for 2s
     }
 }

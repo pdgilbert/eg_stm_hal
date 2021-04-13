@@ -89,8 +89,8 @@ fn setup() -> BlockingI2c<I2C2, impl Pins<I2C2>> {
         p.I2C2,
         (
             gpiob.pb10.into_alternate_open_drain(&mut gpiob.crh), // scl on PB10
-            gpiob.pb11.into_alternate_open_drain(&mut gpiob.crh),
-        ), // sda on PB11
+            gpiob.pb11.into_alternate_open_drain(&mut gpiob.crh), // sda on PB11
+        ),
         //&mut afio.mapr,  need this for i2c1 but not i2c2
         Mode::Fast {
             frequency: 400_000.hz(),

@@ -120,8 +120,8 @@ fn setup() -> (
         p.USART2,
         (
             gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl), //tx pa2  for GPS
-            gpioa.pa3,
-        ), //rx pa3  for GPS
+            gpioa.pa3,                                          //rx pa3  for GPS
+        ),
         &mut afio.mapr,
         Config::default().baudrate(9_600.bps()),
         clocks,
@@ -132,9 +132,9 @@ fn setup() -> (
     let i2c = BlockingI2c::i2c2(
         p.I2C2,
         (
-            gpiob.pb10.into_alternate_open_drain(&mut gpiob.crh), // scl on PB8 10
-            gpiob.pb11.into_alternate_open_drain(&mut gpiob.crh),
-        ), // sda on PB9 11
+            gpiob.pb10.into_alternate_open_drain(&mut gpiob.crh), // scl on PB10
+            gpiob.pb11.into_alternate_open_drain(&mut gpiob.crh), // sda on PB11
+        ),
         //&mut afio.mapr,  need this for i2c1 but not i2c2
         Mode::Fast {
             frequency: 400_000.hz(),

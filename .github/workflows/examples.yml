@@ -2,7 +2,7 @@ name: Examples
 
 on:
   push:
-    branches: [ master, to-impl ]
+    branches: [ master, ads-blink ]
   pull_request:
     branches: [ master ]
 
