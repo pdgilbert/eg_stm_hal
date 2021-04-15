@@ -52,7 +52,7 @@ use nb::block;
 pub trait LED {
     fn on(&mut self) -> ();
     fn off(&mut self) -> ();
-    fn blink(&mut self, on: u16) -> ();
+    //fn blink(&mut self, on: u16) -> ();
 }
 
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
@@ -173,12 +173,12 @@ fn setup() -> (BlockingI2c<I2C2, impl Pins<I2C2>>, impl LED, Delay) {
         fn off(&mut self) -> () {
             self.set_high().unwrap()
         }
-        fn blink(&mut self, time: u16) -> () {
-            self.on();
-            //let _z = pause(time);
-            let _z = |time| pause(time);
-            self.off()
-        }
+        //fn blink(&mut self, time: u16) -> () {
+        //    self.on();
+        //    //let _z = pause(time);
+        //    let _z = |time| pause(time);
+        //    self.off()
+        //}
     }
 
     //led.blink(10000);
@@ -246,10 +246,10 @@ fn setup() -> (
 
     impl LED for PE15<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_low().unwrap()
+            self.set_high().unwrap()
         }
         fn off(&mut self) -> () {
-            self.set_high().unwrap()
+            self.set_low().unwrap()
         }
         fn blink(&mut self, time: u16) -> () {
             self.on();
@@ -293,12 +293,11 @@ fn setup() -> (I2c<I2C2, impl Pins<I2C2>>, impl LED, Delay) {
 
     let i2c = I2c::new(p.I2C2, (scl, sda), 400.khz(), clocks);
 
-    let mut delay = Delay::new(cp.SYST, clocks);
-    let mut pause = |t: u16| delay.delay_ms(t);
+    let delay = Delay::new(cp.SYST, clocks);
 
     // led
     let gpioc = p.GPIOC.split();
-    let mut led = gpioc.pc13.into_push_pull_output();
+    let led = gpioc.pc13.into_push_pull_output();
 
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -307,18 +306,8 @@ fn setup() -> (I2c<I2C2, impl Pins<I2C2>>, impl LED, Delay) {
         fn off(&mut self) -> () {
             self.set_high().unwrap()
         }
-        fn blink(&mut self, time: u16) -> () {
-            self.on();
-            //let _z = pause(time);
-            //let _z = |time| {pause(time)};
-            self.off()
-        }
+        //fn blink(&mut self, time: u16) -> () {...} //here
     }
-
-    //led.blink(10000);
-    led.on();
-    let _z = pause(10000);
-    led.off();
 
     (i2c, led, delay) // return tuple (i2c, led, delay)
 }
@@ -544,10 +533,10 @@ fn setup() -> (I2c<I2C1, impl Pins<I2C1>>, impl LED, Delay) {
 
     impl LED for PB6<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_low().unwrap()
-        }
+           self.set_high().unwrap()
+         }
         fn off(&mut self) -> () {
-            self.set_high().unwrap()
+            self.set_low().unwrap()
         }
         fn blink(&mut self, time: u16) -> () {
             self.on();
@@ -649,6 +638,23 @@ fn setup() -> (
 fn main() -> ! {
     let (i2c, mut led, mut delay) = setup();
 
+    let mut pause = |t: u16| delay.delay_ms(t);
+
+    fn blink(led : &mut impl LED, time: u16) -> () {
+        led.on();
+        //let _z = pause(time);
+        //let _z = |time| {pause(time)};
+        led.off()
+    }
+
+    //led.blink(3000);
+    blink(&mut led, 3000);
+
+    led.on();
+    let _z = pause(3000); // 3s
+    led.off();
+
+
     let manager = shared_bus::BusManager::<cortex_m::interrupt::Mutex<_>, _>::new(i2c);
     let interface = I2CDIBuilder::new().init(manager.acquire());
     let mut disp: GraphicsMode<_, _> = Builder::new()
@@ -670,24 +676,37 @@ fn main() -> ! {
         .unwrap();
     disp.flush().unwrap();
 
-    let mut adc = Ads1x1x::new_ads1015(manager.acquire(), SlaveAddr::default());
+    //let mut adc = Ads1x1x::new_ads1015(manager.acquire(), SlaveAddr::default()); // = addr = GND
+    let mut adc_a = Ads1x1x::new_ads1015(manager.acquire(), SlaveAddr::Alternative(false, false)); //addr = GND
+    let mut adc_b = Ads1x1x::new_ads1015(manager.acquire(), SlaveAddr::Alternative(false, true )); //addr =  V
+    //let mut adc = Ads1x1x::new_ads1015(manager.acquire(), SlaveAddr::Alternative(true,  false)); //addr = SDA
+    // next (scl) does not work on my (cheapo ad1015)
+    //let mut adc = Ads1x1x::new_ads1015(manager.acquire(), SlaveAddr::Alternative(true,  true )); //addr = SCL
+
     // need to be able to measure [0-5V]
-    adc.set_full_scale_range(FullScaleRange::Within6_144V)
-        .unwrap();
+    adc_a.set_full_scale_range(FullScaleRange::Within6_144V).unwrap();
+    adc_b.set_full_scale_range(FullScaleRange::Within6_144V).unwrap();
 
     loop {
-        // Blink LED 0 to check that everything is actually running.
-        // If the LED 0 is off, something went wrong.
+        // Blink LED to check that everything is actually running.
+        // If the LED is off, something went wrong.
         led.on();
         delay.delay_ms(10_u16);
         led.off();
 
         // Read voltage in all channels
-        let values = [
-            block!(adc.read(&mut AdcChannel::SingleA0)).unwrap_or(8091),
-            block!(adc.read(&mut AdcChannel::SingleA1)).unwrap_or(8091),
-            block!(adc.read(&mut AdcChannel::SingleA2)).unwrap_or(8091),
-            block!(adc.read(&mut AdcChannel::SingleA3)).unwrap_or(8091),
+        let values_a = [
+            block!(adc_a.read(&mut AdcChannel::SingleA0)).unwrap_or(8091),
+            block!(adc_a.read(&mut AdcChannel::SingleA1)).unwrap_or(8091),
+            block!(adc_a.read(&mut AdcChannel::SingleA2)).unwrap_or(8091),
+            block!(adc_a.read(&mut AdcChannel::SingleA3)).unwrap_or(8091),
+        ];
+
+        let values_b = [
+            block!(adc_b.read(&mut AdcChannel::SingleA0)).unwrap_or(8091),
+            block!(adc_b.read(&mut AdcChannel::SingleA1)).unwrap_or(8091),
+            block!(adc_b.read(&mut AdcChannel::SingleA2)).unwrap_or(8091),
+            block!(adc_b.read(&mut AdcChannel::SingleA3)).unwrap_or(8091),
         ];
 
         let mut lines: [heapless::String<heapless::consts::U32>; 4] = [
@@ -698,9 +717,9 @@ fn main() -> ! {
         ];
 
         disp.clear();
-        // write some extra spaces after the number to clear up when the numbers get smaller
-        for i in 0..values.len() {
-            write!(lines[i], "Channel {}: {}    ", i, values[i]).unwrap();
+        for i in 0..values_a.len() {
+            write!(lines[i], "A{}:{:4}  B{}:{:4} ", i, values_a[i], i, values_b[i]).unwrap();
+            
             Text::new(&lines[i], Point::new(0, i as i32 * 16))
                 .into_styled(text_style)
                 .draw(&mut disp)
