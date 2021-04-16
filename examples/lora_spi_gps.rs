@@ -25,6 +25,7 @@ use panic_semihosting as _;
 use panic_halt as _;
 //use panic_reset;
 
+#[cfg(not(any(feature = "stm32h7xx", feature = "stm32l0xx")))]
 use core::convert::Infallible;
 
 use cortex_m_rt::entry;
@@ -607,7 +608,6 @@ fn setup() -> (
 
 #[cfg(feature = "stm32l1xx")] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{
-    delay::Delay,
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
     serial::{Config, Rx, SerialExt, Tx},

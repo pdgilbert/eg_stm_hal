@@ -26,6 +26,7 @@ use panic_semihosting as _;
 #[cfg(not(debug_assertions))]
 use panic_halt as _;
 
+#[cfg(not(any(feature = "stm32h7xx", feature = "stm32l0xx")))]
 use core::convert::Infallible;
 
 // use nb::block;
