@@ -182,20 +182,20 @@ The variable `HAL` is used in the example code whereas some of the underlying HA
 actually need the specific `MCU`.
 Board directories use one of 
 ```
-  export HAL=stm32f0xx MCU=stm32f030xc TARGET=thumbv6m-none-eabi     # none-stm32f030      Cortex-M0
-  export HAL=stm32f1xx MCU=stm32f103   TARGET=thumbv7m-none-eabi     # bluepill            Cortex-M3
-  export HAL=stm32f1xx MCU=stm32f100   TARGET=thumbv7m-none-eabi     # none-stm32f100      Cortex-M3
-  export HAL=stm32f1xx MCU=stm32f101   TARGET=thumbv7m-none-eabi     # none-stm32f101      Cortex-M3
-  export HAL=stm32f3xx MCU=stm32f303xc TARGET=thumbv7em-none-eabihf  # discovery-stm32f303 Cortex-M3
-  export HAL=stm32f4xx MCU=stm32f401   TARGET=thumbv7em-none-eabihf  # blackpill-stm32f401 Cortex-M4
-  export HAL=stm32f4xx MCU=stm32f411   TARGET=thumbv7em-none-eabihf  # blackpill-stm32f411 Cortex-M4
-  export HAL=stm32f4xx MCU=stm32f411   TARGET=thumbv7em-none-eabihf  # nucleo-64           Cortex-M4
-  export HAL=stm32f7xx MCU=stm32f722   TARGET=thumbv7em-none-eabihf  # none-stm32f722      Cortex-M7
-  export HAL=stm32h7xx MCU=stm32h742   TARGET=thumbv7em-none-eabihf  # none-stm32h742      Cortex-M7
-  export HAL=stm32l0xx MCU=stm32l0x2   TARGET=thumbv6m-none-eabi     # none-stm32l0x2      Cortex-M0
-  export HAL=stm32l1xx MCU=stm32l100   TARGET=thumbv7m-none-eabi     # discovery-stm32l100 Cortex-M3
-  export HAL=stm32l1xx MCU=stm32l151   TARGET=thumbv7m-none-eabi     # heltec-lora-node151 Cortex-M3
-  export HAL=stm32l4xx MCU=stm32l4x2   TARGET=thumbv7em-none-eabi    # none-stm32l4x1      Cortex-M4
+  export HAL=stm32f0xx MCU=stm32f030xc   TARGET=thumbv6m-none-eabi     # none-stm32f030      Cortex-M0
+  export HAL=stm32f1xx MCU=stm32f103     TARGET=thumbv7m-none-eabi     # bluepill            Cortex-M3
+  export HAL=stm32f1xx MCU=stm32f100     TARGET=thumbv7m-none-eabi     # none-stm32f100      Cortex-M3
+  export HAL=stm32f1xx MCU=stm32f101     TARGET=thumbv7m-none-eabi     # none-stm32f101      Cortex-M3
+  export HAL=stm32f3xx MCU=stm32f303xc   TARGET=thumbv7em-none-eabihf  # discovery-stm32f303 Cortex-M3
+  export HAL=stm32f4xx MCU=stm32f401     TARGET=thumbv7em-none-eabihf  # blackpill-stm32f401 Cortex-M4
+  export HAL=stm32f4xx MCU=stm32f411     TARGET=thumbv7em-none-eabihf  # blackpill-stm32f411 Cortex-M4
+  export HAL=stm32f4xx MCU=stm32f411     TARGET=thumbv7em-none-eabihf  # nucleo-64           Cortex-M4
+  export HAL=stm32f7xx MCU=stm32f722     TARGET=thumbv7em-none-eabihf  # none-stm32f722      Cortex-M7
+  export HAL=stm32h7xx MCU=stm32h742     TARGET=thumbv7em-none-eabihf  # none-stm32h742      Cortex-M7
+  export HAL=stm32l0xx MCU=stm32l072kztx TARGET=thumbv6m-none-eabi     # none-stm32l0x2      Cortex-M0
+  export HAL=stm32l1xx MCU=stm32l100     TARGET=thumbv7m-none-eabi     # discovery-stm32l100 Cortex-M3
+  export HAL=stm32l1xx MCU=stm32l151     TARGET=thumbv7m-none-eabi     # heltec-lora-node151 Cortex-M3
+  export HAL=stm32l4xx MCU=stm32l4x2     TARGET=thumbv7em-none-eabi    # none-stm32l4x1      Cortex-M4
 ```
 
 ## Running Examples
