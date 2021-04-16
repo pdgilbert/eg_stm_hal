@@ -154,19 +154,21 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<Adc>) {
     let mcutemp: Sensor<Option<PB1<Analog>>> = Sensor { ch: None }; // no channel
 
     let tmp36: Sensor<Option<PB1<Analog>>> = Sensor {
-        ch: Some(cortex_m::interrupt::free(move |cs| gpiob.pb1.into_analog(cs))), //channel pb1
+        ch: Some(cortex_m::interrupt::free(move |cs| {
+            gpiob.pb1.into_analog(cs)
+        })), //channel pb1
     };
-    
+
     impl ReadTempC for Sensor<Option<PB1<Analog>>> {
         fn read_tempC(&mut self, a: &mut Adcs<Adc>) -> i32 {
             match &mut self.ch {
                 Some(ch) => {
                     let v: f32 = a.ad_1st.read(ch).unwrap();
-                    (v / 12.412122) as i32 - 50 as i32   //CHECK THIS
+                    (v / 12.412122) as i32 - 50 as i32 //CHECK THIS
                 }
                 None => {
                     let t: f32 = a.ad_1st.read(&mut VTemp).unwrap();
-                    (t / 100.0) as i32  //CHECK THIS
+                    (t / 100.0) as i32 //CHECK THIS
                 }
             }
         }
@@ -396,7 +398,7 @@ fn setup() -> (
                 None => {
                     let z = &mut a.ad_1st;
                     //z.read_temp() as i32;  //NEEDS TO CONNECT USING INTERNAL CHANNEL 16
-                    // see https://github.com/stm32-rs/stm32f3xx-hal/issues/163 
+                    // see https://github.com/stm32-rs/stm32f3xx-hal/issues/163
                     //let t = read_mcu_temp(&mut p.ADC1_2, &mut p.ADC1);
                     //t as i32
                     32 as i32
@@ -839,7 +841,7 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<Adc>) {
 
 #[cfg(feature = "stm32l4xx")]
 use stm32l4xx_hal::{
-    adc::{ADC, Temperature},
+    adc::{Temperature, ADC},
     delay::Delay,
     gpio::{gpiob::PB1, Analog},
     pac::{CorePeripherals, Peripherals},
@@ -893,8 +895,10 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<ADC>) {
 
                 None => {
                     let z = &mut a.ad_1st;
-                    let v = z.read(&mut Temperature).expect("MCU temperature read failed.");
-                    (v as f32 / 12.412122) as i32 - 50 as i32  // CHECK SCALE
+                    let v = z
+                        .read(&mut Temperature)
+                        .expect("MCU temperature read failed.");
+                    (v as f32 / 12.412122) as i32 - 50 as i32 // CHECK SCALE
                 }
             }
         }
