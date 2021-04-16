@@ -591,7 +591,7 @@ fn setup() -> (
                 None => panic!(),
             }
         }
-    };
+    }
 
     (mcutemp, tmp36, adcs)
 }

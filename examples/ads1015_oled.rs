@@ -116,11 +116,10 @@ fn setup() -> (
     let i2c = I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), &mut rcc);
 
     let mut delay = Delay::new(cp.SYST, &rcc);
-    let mut pause = |t: u16| delay.delay_ms(t);
 
     // led
     let gpioc = p.GPIOC.split(&mut rcc);
-    let mut led = cortex_m::interrupt::free(move |cs| gpioc.pc13.into_push_pull_output(cs));
+    let led = cortex_m::interrupt::free(move |cs| gpioc.pc13.into_push_pull_output(cs));
 
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -177,11 +176,10 @@ fn setup() -> (BlockingI2c<I2C2, impl Pins<I2C2>>, impl LED, Delay) {
     );
 
     let mut delay = Delay::new(cp.SYST, clocks);
-    let mut pause = |t: u16| delay.delay_ms(t);
 
     // led
     let mut gpioc = p.GPIOC.split(&mut rcc.apb2);
-    let mut led = gpioc.pc13.into_push_pull_output(&mut gpioc.crh); // led on pc13
+    let led = gpioc.pc13.into_push_pull_output(&mut gpioc.crh); // led on pc13
 
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -242,11 +240,10 @@ fn setup() -> (
     );
 
     let mut delay = Delay::new(cp.SYST, clocks);
-    let mut pause = |t: u16| delay.delay_ms(t);
 
     // led
     let mut gpioe = p.GPIOE.split(&mut rcc.ahb);
-    let mut led = gpioe
+    let led = gpioe
         .pe15
         .into_push_pull_output(&mut gpioe.moder, &mut gpioe.otyper); // led on pe15
 
@@ -346,10 +343,9 @@ fn setup() -> (
     );
 
     let mut delay = Delay::new(cp.SYST, clocks);
-    let mut pause = |t: u16| delay.delay_ms(t);
 
     // led
-    let mut led = gpioc.pc13.into_push_pull_output(); // led on pc13
+    let led = gpioc.pc13.into_push_pull_output(); // led on pc13
 
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -393,10 +389,9 @@ fn setup() -> (I2c<I2C1>, impl LED, Delay) {
         .i2c((scl, sda), 400.khz(), ccdr.peripheral.I2C1, &clocks);
 
     let mut delay = Delay::new(cp.SYST, clocks);
-    let mut pause = |t: u16| delay.delay_ms(t);
 
     // led
-    let mut led = gpioc.pc13.into_push_pull_output(); // led on pc13
+    let led = gpioc.pc13.into_push_pull_output(); // led on pc13
 
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -447,10 +442,9 @@ fn setup() -> (
     let i2c = p.I2C1.i2c(sda, scl, 400.khz(), &mut rcc);
 
     let mut delay = Delay::new(cp.SYST, clocks);
-    let mut pause = |t: u16| delay.delay_ms(t);
 
     // led
-    let mut led = gpioc.pc13.into_push_pull_output(); // led on pc13 with on/off
+    let led = gpioc.pc13.into_push_pull_output(); // led on pc13 with on/off
 
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -491,10 +485,9 @@ fn setup() -> (I2c<I2C1, impl Pins<I2C1>>, impl LED, Delay) {
     let i2c = p.I2C1.i2c((scl, sda), 400.khz(), &mut rcc);
 
     let mut delay = Delay::new(cp.SYST, clocks);
-    let mut pause = |t: u16| delay.delay_ms(t);
 
     // led
-    let mut led = gpiob.pb6.into_push_pull_output(); // led on pb6
+    let led = gpiob.pb6.into_push_pull_output(); // led on pb6
 
     impl LED for PB6<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -555,10 +548,9 @@ fn setup() -> (
     let mut gpioc = p.GPIOC.split(&mut rcc.ahb2);
 
     let mut delay = Delay::new(cp.SYST, clocks);
-    let mut pause = |t: u16| delay.delay_ms(t);
 
     // led
-    let mut led = gpioc
+    let led = gpioc
         .pc13
         .into_push_pull_output(&mut gpioc.moder, &mut gpioc.otyper); // led on pc13
 
@@ -662,6 +654,6 @@ fn main() -> ! {
                 .unwrap();
         }
         disp.flush().unwrap();
-        delay.delay_ms(2000_u16); // pause for 2s
+        delay.delay_ms(2000_u16); // sleep for 2s
     }
 }
