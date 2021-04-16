@@ -337,8 +337,8 @@ fn setup() -> (
 ) {
     // On stm32f303xc a temperature sensor is internally connected to ADC3_IN18.
     // Two adc's are used but no channel is specified for the mcutemp on adc3 because it uses an internal channel.
-    // THIS BUILDS WITH CRITICAL SECTIONS ARE COMMENTED OUT,  BUT DOES NOT YET BUILDING PROPERLY
 
+    // THIS BUILDS WITH CRITICAL SECTIONS COMMENTED OUT,  BUT DOES NOT YET BUILDING PROPERLY
     // see https://github.com/stm32-rs/stm32f3xx-hal/issues/163 for some suggestions
 
     let mut p = Peripherals::take().unwrap();
@@ -396,6 +396,7 @@ fn setup() -> (
                 None => {
                     let z = &mut a.ad_1st;
                     //z.read_temp() as i32;  //NEEDS TO CONNECT USING INTERNAL CHANNEL 16
+                    // see https://github.com/stm32-rs/stm32f3xx-hal/issues/163 
                     //let t = read_mcu_temp(&mut p.ADC1_2, &mut p.ADC1);
                     //t as i32
                     32 as i32
@@ -499,7 +500,7 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<Adc<ADC1>>) {
 
 #[cfg(feature = "stm32f7xx")]
 use stm32f7xx_hal::{
-    //adc::Adc,
+    adc::Adc,
     //device::adc1::{config::AdcConfig, Adc, Temperature},
     //device::{ADC1, ADC2},
     gpio::{gpiob::PB1, Analog},
@@ -517,8 +518,7 @@ fn setup() -> (
     // Two adc's are used but no channel is specified for the mcutemp on adc3 because it uses an internal channel.
     // stm32f722 has 3 12bit ADCs
     // NOT YET BUILDING
-
-    // WAITING ON ADC SUPPORT IN stm32f7xx_hal
+    // see   https://github.com/stm32-rs/stm32f7xx-hal/issues/116
 
     let p = Peripherals::take().unwrap();
     let rcc = p.RCC.constrain();
@@ -839,7 +839,7 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<Adc>) {
 
 #[cfg(feature = "stm32l4xx")]
 use stm32l4xx_hal::{
-    adc::ADC,
+    adc::{ADC, Temperature},
     delay::Delay,
     gpio::{gpiob::PB1, Analog},
     pac::{CorePeripherals, Peripherals},
@@ -850,7 +850,6 @@ use stm32l4xx_hal::{
 fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<ADC>) {
     // On stm32L4X2 a temperature sensor is internally connected to the single adc.
     // No channel is specified for the mcutemp because it uses an internal channel ADC1_IN17.
-    // BUILDING BUT PROBABLY NOT DOING WHAT IT SHOULD
 
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -881,8 +880,8 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<ADC>) {
     let mcutemp: Sensor<Option<PB1<Analog>>> = Sensor { ch: None }; // no channel
 
     let tmp36: Sensor<Option<PB1<Analog>>> = Sensor {
-        ch: Some(gpiob.pb1.into_analog(&mut gpiob.moder, &mut gpiob.pupdr)),
-    }; //channel pb1
+        ch: Some(gpiob.pb1.into_analog(&mut gpiob.moder, &mut gpiob.pupdr)), //channel pb1
+    };
 
     impl ReadTempC for Sensor<Option<PB1<Analog>>> {
         fn read_tempC(&mut self, a: &mut Adcs<ADC>) -> i32 {
@@ -893,10 +892,9 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<ADC>) {
                 }
 
                 None => {
-                    let _z = &mut a.ad_1st;
-                    // maybe let mut a1 = gpioc.pc0.into_analog(&mut gpioc.moder, &mut gpioc.pupdr);
-                    //z.read(a1) as i32;
-                    42i32
+                    let z = &mut a.ad_1st;
+                    let v = z.read(&mut Temperature).expect("MCU temperature read failed.");
+                    (v as f32 / 12.412122) as i32 - 50 as i32  // CHECK SCALE
                 }
             }
         }
