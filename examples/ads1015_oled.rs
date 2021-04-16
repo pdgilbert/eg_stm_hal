@@ -115,7 +115,7 @@ fn setup() -> (
 
     let i2c = I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), &mut rcc);
 
-    let mut delay = Delay::new(cp.SYST, &rcc);
+    let delay = Delay::new(cp.SYST, &rcc);
 
     // led
     let gpioc = p.GPIOC.split(&mut rcc);
@@ -175,7 +175,7 @@ fn setup() -> (BlockingI2c<I2C2, impl Pins<I2C2>>, impl LED, Delay) {
         1000,
     );
 
-    let mut delay = Delay::new(cp.SYST, clocks);
+    let delay = Delay::new(cp.SYST, clocks);
 
     // led
     let mut gpioc = p.GPIOC.split(&mut rcc.apb2);
@@ -239,7 +239,7 @@ fn setup() -> (
         &mut rcc.apb1,
     );
 
-    let mut delay = Delay::new(cp.SYST, clocks);
+    let delay = Delay::new(cp.SYST, clocks);
 
     // led
     let mut gpioe = p.GPIOE.split(&mut rcc.ahb);
@@ -342,7 +342,7 @@ fn setup() -> (
         1000,
     );
 
-    let mut delay = Delay::new(cp.SYST, clocks);
+    let delay = Delay::new(cp.SYST, clocks);
 
     // led
     let led = gpioc.pc13.into_push_pull_output(); // led on pc13
@@ -388,7 +388,7 @@ fn setup() -> (I2c<I2C1>, impl LED, Delay) {
         .I2C1
         .i2c((scl, sda), 400.khz(), ccdr.peripheral.I2C1, &clocks);
 
-    let mut delay = Delay::new(cp.SYST, clocks);
+    let delay = Delay::new(cp.SYST, clocks);
 
     // led
     let led = gpioc.pc13.into_push_pull_output(); // led on pc13
@@ -441,7 +441,7 @@ fn setup() -> (
 
     let i2c = p.I2C1.i2c(sda, scl, 400.khz(), &mut rcc);
 
-    let mut delay = Delay::new(cp.SYST, clocks);
+    let delay = Delay::new(cp.SYST, clocks);
 
     // led
     let led = gpioc.pc13.into_push_pull_output(); // led on pc13 with on/off
@@ -484,7 +484,7 @@ fn setup() -> (I2c<I2C1, impl Pins<I2C1>>, impl LED, Delay) {
 
     let i2c = p.I2C1.i2c((scl, sda), 400.khz(), &mut rcc);
 
-    let mut delay = Delay::new(cp.SYST, clocks);
+    let delay = Delay::new(cp.SYST, clocks);
 
     // led
     let led = gpiob.pb6.into_push_pull_output(); // led on pb6
@@ -547,7 +547,7 @@ fn setup() -> (
 
     let mut gpioc = p.GPIOC.split(&mut rcc.ahb2);
 
-    let mut delay = Delay::new(cp.SYST, clocks);
+    let delay = Delay::new(cp.SYST, clocks);
 
     // led
     let led = gpioc
