@@ -130,31 +130,22 @@ pub struct Adcs<T> {
 
 #[cfg(feature = "stm32f0xx")] //  eg stm32f030xc
 use stm32f0xx_hal::{
-    adc::Adc,
+    adc::{Adc, VTemp},
     gpio::{gpiob::PB1, Analog},
     pac::Peripherals,
-    pac::ADC,
     prelude::*,
 };
-
-//#[cfg(feature = "stm32f0xx")]
-//use embedded_hal::digital::v2::OutputPin;
 
 #[cfg(feature = "stm32f0xx")]
 fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<Adc>) {
     // On stm32f030xc a temperature sensor is internally connected to the single adc.
     // No channel is specified for the mcutemp because it uses an internal channel.
-    // NOT YET BUILDING
-    // Hal adc use looks very different for other hals. MAKE SURE HAL IS UP-TO-DATE RE ADC.
     // see  https://github.com/stm32-rs/stm32f0xx-hal/blob/master/examples/adc_values.rs
 
     let mut p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.configure().sysclk(48.mhz()).freeze(&mut p.FLASH);
 
     let gpiob = p.GPIOB.split(&mut rcc);
-
-    // Initialise ADC
-    // let adc = hal::adc::Adc::new(p.ADC, &mut rcc);
 
     let adcs: Adcs<Adc> = Adcs {
         ad_1st: Adc::new(p.ADC, &mut rcc),
@@ -163,22 +154,19 @@ fn setup() -> (impl ReadTempC, impl ReadTempC + ReadMV, Adcs<Adc>) {
     let mcutemp: Sensor<Option<PB1<Analog>>> = Sensor { ch: None }; // no channel
 
     let tmp36: Sensor<Option<PB1<Analog>>> = Sensor {
-        ch: Some(gpiob.pb1.into_analog(&mut gpiob)),
-    }; //channel pb1
-
+        ch: Some(cortex_m::interrupt::free(move |cs| gpiob.pb1.into_analog(cs))), //channel pb1
+    };
+    
     impl ReadTempC for Sensor<Option<PB1<Analog>>> {
         fn read_tempC(&mut self, a: &mut Adcs<Adc>) -> i32 {
             match &mut self.ch {
                 Some(ch) => {
                     let v: f32 = a.ad_1st.read(ch).unwrap();
-                    (v / 12.412122) as i32 - 50 as i32
+                    (v / 12.412122) as i32 - 50 as i32   //CHECK THIS
                 }
-
                 None => {
-                    let z = &mut a.ad_1st;
-                    //adc::VTemp::read(&mut shared.adc, None)  see stm32f0xx-hal/examples/adc_values.rs
-                    //z.read_temp() as i32
-                    32 as i32
+                    let t: f32 = a.ad_1st.read(&mut VTemp).unwrap();
+                    (t / 100.0) as i32  //CHECK THIS
                 }
             }
         }
