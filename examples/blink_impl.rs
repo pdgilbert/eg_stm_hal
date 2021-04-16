@@ -1,6 +1,8 @@
 //! Blink  onboard LED if one is available, or PC13 otherwise.
 //! See blink.rs  example for more details.
-//! Relative to blink.rs this file uses  trait LED and fn setup() -> (impl LED, Delay)
+//! Relative to blink.rs this file uses trait LED with trait bounds and
+//!    fn setup() -> (impl LED, Delay)
+//! so setups all have similar and simpler signature.
 
 // Example use of impl trait: If the LED  output pin is PC13 then
 //      fn setup() -> (PC13<Output<PushPull>>, Delay) {
@@ -24,6 +26,36 @@ use embedded_hal::digital::v2::OutputPin;
 pub trait LED {
     fn on(&mut self) -> ();
     fn off(&mut self) -> ();
+
+    // default methods
+    fn blink(&mut self, time: u16, delay: &mut Delay) -> () {
+        self.on();
+        delay.delay_ms(time);
+        self.off()
+    }
+    fn blink_ok(&mut self, delay: &mut Delay) -> () {
+        let dot: u16 = 5;
+        let dash: u16 = 100;
+        let spc: u16 = 300;
+        let space: u16 = 800;
+        let end: u16 = 1500;
+
+        // dash-dash-dash
+        self.blink(dash, delay);
+        delay.delay_ms(spc);
+        self.blink(dash, delay);
+        delay.delay_ms(spc);
+        self.blink(dash, delay);
+        delay.delay_ms(space);
+
+        // dash-dot-dash
+        self.blink(dash, delay);
+        delay.delay_ms(spc);
+        self.blink(dot, delay);
+        delay.delay_ms(spc);
+        self.blink(dash, delay);
+        delay.delay_ms(end);
+    }
 }
 
 #[cfg(feature = "stm32f0xx")] //  eg  stm32f303x4
@@ -348,14 +380,14 @@ fn setup() -> (impl LED, Delay) {
 fn main() -> ! {
     let (mut led, mut delay) = setup();
 
-    let on: u32 = 1000;
-    let off: u32 = 3000;
+    led.blink_ok(&mut delay); // blink OK to indicate setup complete and main started.
 
-    // Wait for the timer to trigger an update and change the state of the LED
+    let on: u16 = 10; // on for 10 ms
+    let off: u16 = 3000; //off for  3 s
+
+    // blink LED and sleep
     loop {
-        let _r = led.on();
-        delay.delay_ms(on);
-        let _r = led.off();
+        led.blink(on, &mut delay);
         delay.delay_ms(off);
     }
 }

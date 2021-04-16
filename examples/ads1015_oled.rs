@@ -3,10 +3,8 @@
 //!
 //! Uses the `embedded_graphics` crate to draw.
 //! Wiring pin connections for scl and sda to display as in the setup sections below.
-//! (not yet Tested on generic (cheap) ssd1306 OLED 0.91" 128x32 and 0.96" 128x64 displays. )
-//! Note that the DisplaySize setting needs to be adjusted for 128x64 or 128x32 display
-//!
-//! This example based on
+//! The full DisplaySize 128x64 is used. Writing will need to be adjusted if display size is smaller.
+//! This example took guidance from
 //!    https://github.com/jamwaffles/ssd1306/blob/master/examples/text_i2c.rs  and
 //!    https://github.com/eldruin/driver-examples/stm32f1-bluepill/examples/ads1015-adc-display-bp.rs
 //!  See https://blog.eldruin.com/ads1x1x-analog-to-digital-converter-driver-in-rust/
@@ -52,7 +50,36 @@ use nb::block;
 pub trait LED {
     fn on(&mut self) -> ();
     fn off(&mut self) -> ();
-    //fn blink(&mut self, on: u16) -> ();
+
+    // default methods
+    fn blink(&mut self, time: u16, delay: &mut Delay) -> () {
+        self.on();
+        delay.delay_ms(time);
+        self.off()
+    }
+    fn blink_ok(&mut self, delay: &mut Delay) -> () {
+        let dot: u16 = 5;
+        let dash: u16 = 100;
+        let spc: u16 = 300;
+        let space: u16 = 800;
+        let end: u16 = 1500;
+
+        // dash-dash-dash
+        self.blink(dash, delay);
+        delay.delay_ms(spc);
+        self.blink(dash, delay);
+        delay.delay_ms(spc);
+        self.blink(dash, delay);
+        delay.delay_ms(space);
+
+        // dash-dot-dash
+        self.blink(dash, delay);
+        delay.delay_ms(spc);
+        self.blink(dot, delay);
+        delay.delay_ms(spc);
+        self.blink(dash, delay);
+        delay.delay_ms(end);
+    }
 }
 
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
@@ -102,17 +129,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_high().unwrap()
         }
-        fn blink(&mut self, time: u16) -> () {
-            self.on();
-            //let _z = |time| {pause(time)};
-            self.off()
-        }
     }
-
-    //led.blink(10000);
-    led.on();
-    let _z = pause(10000);
-    led.off();
 
     (i2c, led, delay) // return tuple (i2c, led, delay)
 }
@@ -173,18 +190,7 @@ fn setup() -> (BlockingI2c<I2C2, impl Pins<I2C2>>, impl LED, Delay) {
         fn off(&mut self) -> () {
             self.set_high().unwrap()
         }
-        //fn blink(&mut self, time: u16) -> () {
-        //    self.on();
-        //    //let _z = pause(time);
-        //    let _z = |time| pause(time);
-        //    self.off()
-        //}
     }
-
-    //led.blink(10000);
-    led.on();
-    let _z = pause(10000);
-    led.off();
 
     (i2c, led, delay) // return tuple (i2c, led, delay)
 }
@@ -251,17 +257,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-        fn blink(&mut self, time: u16) -> () {
-            self.on();
-            //let _z = |time| {pause(time)};
-            self.off()
-        }
     }
-
-    //led.blink(10000);
-    led.on();
-    let _z = pause(10000);
-    led.off();
 
     (i2c, led, delay) // return tuple (i2c, led, delay)
 }
@@ -306,7 +302,6 @@ fn setup() -> (I2c<I2C2, impl Pins<I2C2>>, impl LED, Delay) {
         fn off(&mut self) -> () {
             self.set_high().unwrap()
         }
-        //fn blink(&mut self, time: u16) -> () {...} //here
     }
 
     (i2c, led, delay) // return tuple (i2c, led, delay)
@@ -363,17 +358,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_high().unwrap()
         }
-        fn blink(&mut self, time: u16) -> () {
-            self.on();
-            //let _z = |time| {pause(time)};
-            self.off()
-        }
     }
-
-    //led.blink(10000);
-    led.on();
-    let _z = pause(10000);
-    led.off();
 
     (i2c, led, delay) // return tuple (i2c, led, delay)
 }
@@ -420,17 +405,7 @@ fn setup() -> (I2c<I2C1>, impl LED, Delay) {
         fn off(&mut self) -> () {
             self.set_high().unwrap()
         }
-        fn blink(&mut self, time: u16) -> () {
-            self.on();
-            //let _z = |time| {pause(time)};
-            self.off()
-        }
     }
-
-    //led.blink(10000);
-    led.on();
-    let _z = pause(10000);
-    led.off();
 
     (i2c, led, delay) // return tuple (i2c, led, delay)
 }
@@ -484,17 +459,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_high().unwrap()
         }
-        fn blink(&mut self, time: u16) -> () {
-            self.on();
-            //let _z = |time| {pause(time)};
-            self.off()
-        }
     }
-
-    //led.blink(10000);
-    led.on();
-    let _z = pause(10000);
-    led.off();
 
     (i2c, led, delay) // return tuple (i2c, led, delay)
 }
@@ -533,22 +498,12 @@ fn setup() -> (I2c<I2C1, impl Pins<I2C1>>, impl LED, Delay) {
 
     impl LED for PB6<Output<PushPull>> {
         fn on(&mut self) -> () {
-           self.set_high().unwrap()
-         }
+            self.set_high().unwrap()
+        }
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-        fn blink(&mut self, time: u16) -> () {
-            self.on();
-            //let _z = |time| {pause(time)};
-            self.off()
-        }
     }
-
-    //led.blink(10000);
-    led.on();
-    let _z = pause(10000);
-    led.off();
 
     (i2c, led, delay) // return tuple (i2c, led, delay)
 }
@@ -614,17 +569,7 @@ fn setup() -> (
         fn off(&mut self) -> () {
             self.set_high().unwrap()
         }
-        fn blink(&mut self, time: u16) -> () {
-            self.on();
-            //let _z = |time| {pause(time)};
-            self.off()
-        }
     }
-
-    //led.blink(10000);
-    led.on();
-    let _z = pause(10000);
-    led.off();
 
     (i2c, led, delay) // return tuple (i2c, led, delay)
 }
@@ -638,22 +583,7 @@ fn setup() -> (
 fn main() -> ! {
     let (i2c, mut led, mut delay) = setup();
 
-    let mut pause = |t: u16| delay.delay_ms(t);
-
-    fn blink(led : &mut impl LED, time: u16) -> () {
-        led.on();
-        //let _z = pause(time);
-        //let _z = |time| {pause(time)};
-        led.off()
-    }
-
-    //led.blink(3000);
-    blink(&mut led, 3000);
-
-    led.on();
-    let _z = pause(3000); // 3s
-    led.off();
-
+    led.blink_ok(&mut delay); // blink OK to indicate setup complete and main started.
 
     let manager = shared_bus::BusManager::<cortex_m::interrupt::Mutex<_>, _>::new(i2c);
     let interface = I2CDIBuilder::new().init(manager.acquire());
@@ -678,21 +608,22 @@ fn main() -> ! {
 
     //let mut adc = Ads1x1x::new_ads1015(manager.acquire(), SlaveAddr::default()); // = addr = GND
     let mut adc_a = Ads1x1x::new_ads1015(manager.acquire(), SlaveAddr::Alternative(false, false)); //addr = GND
-    let mut adc_b = Ads1x1x::new_ads1015(manager.acquire(), SlaveAddr::Alternative(false, true )); //addr =  V
-    //let mut adc = Ads1x1x::new_ads1015(manager.acquire(), SlaveAddr::Alternative(true,  false)); //addr = SDA
-    // next (scl) does not work on my (cheapo ad1015)
-    //let mut adc = Ads1x1x::new_ads1015(manager.acquire(), SlaveAddr::Alternative(true,  true )); //addr = SCL
+    let mut adc_b = Ads1x1x::new_ads1015(manager.acquire(), SlaveAddr::Alternative(false, true)); //addr =  V
+
+    //(true,  false)) above for addr attached to SDA.   (true,  true ) for addr attached to  SCL
+    // but scl does not work on my (cheapo) ads1015.
 
     // need to be able to measure [0-5V]
-    adc_a.set_full_scale_range(FullScaleRange::Within6_144V).unwrap();
-    adc_b.set_full_scale_range(FullScaleRange::Within6_144V).unwrap();
+    adc_a
+        .set_full_scale_range(FullScaleRange::Within6_144V)
+        .unwrap();
+    adc_b
+        .set_full_scale_range(FullScaleRange::Within6_144V)
+        .unwrap();
 
     loop {
         // Blink LED to check that everything is actually running.
-        // If the LED is off, something went wrong.
-        led.on();
-        delay.delay_ms(10_u16);
-        led.off();
+        led.blink(10_u16, &mut delay);
 
         // Read voltage in all channels
         let values_a = [
@@ -718,8 +649,13 @@ fn main() -> ! {
 
         disp.clear();
         for i in 0..values_a.len() {
-            write!(lines[i], "A{}:{:4}  B{}:{:4} ", i, values_a[i], i, values_b[i]).unwrap();
-            
+            write!(
+                lines[i],
+                "A{}:{:4}  B{}:{:4} ",
+                i, values_a[i], i, values_b[i]
+            )
+            .unwrap();
+
             Text::new(&lines[i], Point::new(0, i as i32 * 16))
                 .into_styled(text_style)
                 .draw(&mut disp)
