@@ -90,12 +90,12 @@ Those names link to a file recording the commit that was used for the last CI ex
 
 {% capture blink          %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/blink.rs"          title="link to example source code">blink</a>                   {% endcapture %}
 {% capture blink3         %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/blink3.rs"         title="link to example source code">blink3</a>                  {% endcapture %}
-{% capture echo_by_char   %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/echo_by_char.rs"   title="link to example source code">echo_\\nby_char</a>            {% endcapture %}
-{% capture echo_string    %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/echo_string.rs"    title="link to example source code">echo_\\nstring</a>             {% endcapture %}
-{% capture serial_char    %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/serial_char.rs"    title="link to example source code">serial_\\nchar</a>             {% endcapture %}
-{% capture serial_string  %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/serial_string.rs"  title="link to example source code">serial_\\nstring</a>           {% endcapture %}
+{% capture echo_by_char   %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/echo_by_char.rs"   title="link to example source code">echo_by_char</a>            {% endcapture %}
+{% capture echo_string    %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/echo_string.rs"    title="link to example source code">echo_string</a>             {% endcapture %}
+{% capture serial_char    %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/serial_char.rs"    title="link to example source code">serial_char</a>             {% endcapture %}
+{% capture serial_string  %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/serial_string.rs"  title="link to example source code">serial_string</a>           {% endcapture %}
 {% capture gps_rw         %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/gps_rw.rs"         title="link to example source code">gps_rw</a>                  {% endcapture %}
-{% capture temperature    %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/temperature.rs"    title="link to example source code">temp-\\nerature</a>             {% endcapture %}
+{% capture temperature    %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/temperature.rs"    title="link to example source code">temperature</a>             {% endcapture %}
 
 {% capture dht            %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/dht.rs"            title="link to example source code">dht</a>                     {% endcapture %}
 {% capture dht11          %}<a href="https://github.com/pdgilbert/eg_stm_hal/blob/master/examples/dht11.rs"          title="link to example source code">dht11</a>                   {% endcapture %}
