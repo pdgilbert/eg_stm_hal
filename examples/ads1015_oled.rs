@@ -622,9 +622,9 @@ fn main() -> ! {
             //block!(adc_a.read(&mut AdcChannel::SingleA0)).unwrap_or(8091), // A0 to GND
             //block!(adc_a.read(&mut AdcChannel::SingleA1)).unwrap_or(8091), // A1 to GND
             block!(adc_a.read(&mut AdcChannel::DifferentialA0A1)).unwrap_or(8091), // A1 to A0, + => A1 < A0
-            block!(adc_a.read(&mut AdcChannel::SingleA1)).unwrap_or(8091), // A1 to GND
-            block!(adc_a.read(&mut AdcChannel::SingleA2)).unwrap_or(8091), // A2 to GND
-            block!(adc_a.read(&mut AdcChannel::SingleA3)).unwrap_or(8091), // A3 to GND
+            block!(adc_a.read(&mut AdcChannel::SingleA1)).unwrap_or(8091),         // A1 to GND
+            block!(adc_a.read(&mut AdcChannel::SingleA2)).unwrap_or(8091),         // A2 to GND
+            block!(adc_a.read(&mut AdcChannel::SingleA3)).unwrap_or(8091),         // A3 to GND
         ];
 
         let values_b = [
