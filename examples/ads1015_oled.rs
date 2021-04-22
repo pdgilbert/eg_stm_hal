@@ -607,10 +607,10 @@ fn main() -> ! {
 
     // need to be able to measure [0-5V]
     adc_a
-        .set_full_scale_range(FullScaleRange::Within6_144V)
+        .set_full_scale_range(FullScaleRange::Within4_096V) // +- 6.144v , 4.096v, 2.048v, 1.024v, 0.512v, 0.256v
         .unwrap();
     adc_b
-        .set_full_scale_range(FullScaleRange::Within6_144V)
+        .set_full_scale_range(FullScaleRange::Within4_096V)
         .unwrap();
 
     loop {
@@ -619,10 +619,12 @@ fn main() -> ! {
 
         // Read voltage in all channels
         let values_a = [
-            block!(adc_a.read(&mut AdcChannel::SingleA0)).unwrap_or(8091),
-            block!(adc_a.read(&mut AdcChannel::SingleA1)).unwrap_or(8091),
-            block!(adc_a.read(&mut AdcChannel::SingleA2)).unwrap_or(8091),
-            block!(adc_a.read(&mut AdcChannel::SingleA3)).unwrap_or(8091),
+            //block!(adc_a.read(&mut AdcChannel::SingleA0)).unwrap_or(8091), // A0 to GND
+            //block!(adc_a.read(&mut AdcChannel::SingleA1)).unwrap_or(8091), // A1 to GND
+            block!(adc_a.read(&mut AdcChannel::DifferentialA0A1)).unwrap_or(8091), // A1 to A0, + => A1 < A0
+            block!(adc_a.read(&mut AdcChannel::SingleA1)).unwrap_or(8091), // A1 to GND
+            block!(adc_a.read(&mut AdcChannel::SingleA2)).unwrap_or(8091), // A2 to GND
+            block!(adc_a.read(&mut AdcChannel::SingleA3)).unwrap_or(8091), // A3 to GND
         ];
 
         let values_b = [
@@ -643,7 +645,7 @@ fn main() -> ! {
         for i in 0..values_a.len() {
             write!(
                 lines[i],
-                "A{}:{:4}  B{}:{:4} ",
+                "A{}:{:5} B{}:{:4} ",
                 i, values_a[i], i, values_b[i]
             )
             .unwrap();
