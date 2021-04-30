@@ -599,8 +599,9 @@ fn main() -> ! {
     //let mut adc = Ads1x1x::new_ads1015(manager.acquire(), SlaveAddr::default()); // = addr = GND
     let mut adc_a = Ads1x1x::new_ads1015(manager.acquire(), SlaveAddr::Alternative(false, false)); //addr = GND
     let mut adc_b = Ads1x1x::new_ads1015(manager.acquire(), SlaveAddr::Alternative(false, true)); //addr =  V
-                                                                                                  //let mut adc_c = Ads1x1x::new_ads1015(manager.acquire(), SlaveAddr::Alternative( true, false)); //addr = SDA
-                                                                                                  //let mut adc_c = Ads1x1x::new_ads1015(manager.acquire(), SlaveAddr::Alternative( true,  true)); //addr = SCL
+
+    //let mut adc_c = Ads1x1x::new_ads1015(manager.acquire(), SlaveAddr::Alternative( true, false)); //addr = SDA
+    //let mut adc_c = Ads1x1x::new_ads1015(manager.acquire(), SlaveAddr::Alternative( true,  true)); //addr = SCL
 
     // set FullScaleRange to measure expected max voltage.
     // This is very small for diff across low value shunt resistors
