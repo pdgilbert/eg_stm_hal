@@ -173,10 +173,11 @@ so I do not expect to ever set it up as a crate for importing.
 To build the examples cd into one of the board directories, eg `cd boards/bluepill` 
 and use
 ```
-cargo build  --target $TARGET  --features $HAL,$MCU --example xxx
+cargo build  --target $TARGET  --features $HAL,$MCU --example xxx  [ --release ]
 ```
 where `xxx` is one of the examples from the table above, and `TARGET`, `HAL`  and `MCU` are
-environment variables for your processor (and corresponding to the board directory). 
+environment variables for your processor (and corresponding to the board directory).
+The `--release` flag will be necessary if the binary does not fit in flash.
 Variables `HAL`  and `MCU` overlap. It should be possible to determine  `HAL`  based on `MCU`.
 The variable `HAL` is used in the example code whereas some of the underlying HAL packages
 actually need the specific `MCU`.

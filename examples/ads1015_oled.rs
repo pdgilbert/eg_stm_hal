@@ -59,9 +59,9 @@ pub trait LED {
     }
     fn blink_ok(&mut self, delay: &mut Delay) -> () {
         let dot: u16 = 5;
-        let dash: u16 = 100;
-        let spc: u16 = 300;
-        let space: u16 = 800;
+        let dash: u16 = 200;
+        let spc: u16 = 500;
+        let space: u16 = 1000;
         let end: u16 = 1500;
 
         // dash-dash-dash
@@ -585,12 +585,8 @@ fn main() -> ! {
         .into();
     disp.init().unwrap();
 
-    //    let text_style = TextStyleBuilder::new(Font6x8)
-    //        .text_color(BinaryColor::On)
-    //        .build();
-    let text_style = TextStyleBuilder::new(Font8x16)
-        .text_color(BinaryColor::On)
-        .build();
+    //let text_style = TextStyleBuilder::new(Font6x8).text_color(BinaryColor::On).build();
+    let text_style = TextStyleBuilder::new(Font8x16).text_color(BinaryColor::On).build();
 
     Text::new("Display initialized ...", Point::zero())
         .into_styled(text_style)
@@ -600,33 +596,35 @@ fn main() -> ! {
 
     //let mut adc = Ads1x1x::new_ads1015(manager.acquire(), SlaveAddr::default()); // = addr = GND
     let mut adc_a = Ads1x1x::new_ads1015(manager.acquire(), SlaveAddr::Alternative(false, false)); //addr = GND
-    let mut adc_b = Ads1x1x::new_ads1015(manager.acquire(), SlaveAddr::Alternative(false, true)); //addr =  V
+    let mut adc_b = Ads1x1x::new_ads1015(manager.acquire(), SlaveAddr::Alternative(false,  true)); //addr =  V
+    //let mut adc_c = Ads1x1x::new_ads1015(manager.acquire(), SlaveAddr::Alternative( true, false)); //addr = SDA
+    //let mut adc_c = Ads1x1x::new_ads1015(manager.acquire(), SlaveAddr::Alternative( true,  true)); //addr = SCL
 
-    //(true,  false)) above for addr attached to SDA.   (true,  true ) for addr attached to  SCL
-    // but scl does not work on my (cheapo) ads1015.
-
-    // need to be able to measure [0-5V]
-    adc_a
-        .set_full_scale_range(FullScaleRange::Within4_096V) // +- 6.144v , 4.096v, 2.048v, 1.024v, 0.512v, 0.256v
-        .unwrap();
-    adc_b
-        .set_full_scale_range(FullScaleRange::Within4_096V)
-        .unwrap();
+    // set FullScaleRange to measure expected max voltage.
+    // This is very small for diff across low value shunt resistors
+    //   but up to 5v for single pin with usb power.
+    // +- 6.144v , 4.096v, 2.048v, 1.024v, 0.512v, 0.256v
+    adc_a.set_full_scale_range(FullScaleRange::Within0_256V) .unwrap();
+    adc_b.set_full_scale_range(FullScaleRange::Within4_096V).unwrap();
+    //adc_c.set_full_scale_range(FullScaleRange::Within4_096V).unwrap();
 
     loop {
         // Blink LED to check that everything is actually running.
+        // Note that blink takes about a mA current and makes measurement below noisy.
+        // Comment out blinking to calibrate scale.
         led.blink(10_u16, &mut delay);
 
-        // Read voltage in all channels
+        // Read voltage
+        //first adc     Note that readings may be zero using USB power (programming) rather than battery.
         let values_a = [
-            //block!(adc_a.read(&mut AdcChannel::SingleA0)).unwrap_or(8091), // A0 to GND
+            //block!(adc_a.read(&mut AdcChannel::SingleA0)).unwrap_or(8091), // A0 to GND  
             //block!(adc_a.read(&mut AdcChannel::SingleA1)).unwrap_or(8091), // A1 to GND
-            block!(adc_a.read(&mut AdcChannel::DifferentialA0A1)).unwrap_or(8091), // A1 to A0, + => A1 < A0
-            block!(adc_a.read(&mut AdcChannel::SingleA1)).unwrap_or(8091),         // A1 to GND
-            block!(adc_a.read(&mut AdcChannel::SingleA2)).unwrap_or(8091),         // A2 to GND
-            block!(adc_a.read(&mut AdcChannel::SingleA3)).unwrap_or(8091),         // A3 to GND
+            //block!(adc_a.read(&mut AdcChannel::DifferentialA0A3)).unwrap_or(8091), // A0 to A3  + => A1 < A3 
+            block!(adc_a.read(&mut AdcChannel::DifferentialA1A3)).unwrap_or(8091), // A1 to A3  battery
+            block!(adc_a.read(&mut AdcChannel::DifferentialA2A3)).unwrap_or(8091), // A2 to A3  load
         ];
 
+        // second adc
         let values_b = [
             block!(adc_b.read(&mut AdcChannel::SingleA0)).unwrap_or(8091),
             block!(adc_b.read(&mut AdcChannel::SingleA1)).unwrap_or(8091),
@@ -634,22 +632,36 @@ fn main() -> ! {
             block!(adc_b.read(&mut AdcChannel::SingleA3)).unwrap_or(8091),
         ];
 
+        // third adc
+        //let values_c = [
+        //    block!(adc_c.read(&mut AdcChannel::SingleA0)).unwrap_or(8091),
+        //    block!(adc_c.read(&mut AdcChannel::SingleA1)).unwrap_or(8091),
+        //    block!(adc_c.read(&mut AdcChannel::SingleA2)).unwrap_or(8091),
+        //    block!(adc_c.read(&mut AdcChannel::SingleA3)).unwrap_or(8091),
+        //];
+
         let mut lines: [heapless::String<heapless::consts::U32>; 4] = [
             heapless::String::new(),
             heapless::String::new(),
             heapless::String::new(),
             heapless::String::new(),
         ];
+        
+        let scale1 = 90; // to be calibrated. mA/mV depends on FullScaleRange above and values of shunt resistors
+        let scale2 = 90; // to be calibrated. 
+
+        //for i in 0..lines.len() {
+        //    write!(lines[i], "A{}:{:5} B{}:{:4} ",  i, values_a[i], i, values_b[i]).unwrap();
+        //}
+        write!(lines[0], "battery {:5} mA",  values_a[0] * scale1 / 1000).unwrap();
+        write!(lines[1], "load:   {:5} mA",  values_a[1] * scale2 / 1000).unwrap();
+        write!(lines[2], "B:{:5} {:5}",      values_b[0], values_b[1], ).unwrap();
+        write!(lines[3], "  {:5} {:5}",      values_b[2], values_b[3]).unwrap();
+        //write!(lines[2], "B:{:2} {:3} {:3} {:3} ",    values_b[0], values_b[1], values_b[2], values_b[3]).unwrap();
+        //write!(lines[3], "C:{:2} {:3} {:3} {:3} ",    values_c[0], values_c[1], values_c[2], values_c[3]).unwrap();
 
         disp.clear();
-        for i in 0..values_a.len() {
-            write!(
-                lines[i],
-                "A{}:{:5} B{}:{:4} ",
-                i, values_a[i], i, values_b[i]
-            )
-            .unwrap();
-
+        for i in 0..lines.len() {
             Text::new(&lines[i], Point::new(0, i as i32 * 16))
                 .into_styled(text_style)
                 .draw(&mut disp)

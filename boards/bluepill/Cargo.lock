@@ -467,9 +467,9 @@ dependencies = [
 
 [[package]]
 name = "libc"
-version = "0.2.93"
+version = "0.2.94"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9385f66bf6105b241aa65a61cb923ef20efc665cb9f9bb50ac2f0c4b7f378d41"
+checksum = "18794a8ad5b29321f790b55d93dfba91e125cb1a9edbd4f8e3150acc771c1a5e"
 
 [[package]]
 name = "log"
@@ -779,7 +779,7 @@ dependencies = [
 [[package]]
 name = "stm32f0xx-hal"
 version = "0.17.1"
-source = "git+https://github.com/stm32-rs/stm32f0xx-hal#06f783725ed271067a0a6f4f506f1a9da9210057"
+source = "git+https://github.com/stm32-rs/stm32f0xx-hal#8970b06de2463cd4d4ec14179dff2b12541751a7"
 dependencies = [
  "bare-metal 1.0.0",
  "bxcan",
@@ -859,7 +859,7 @@ dependencies = [
 [[package]]
 name = "stm32f3xx-hal"
 version = "0.6.1"
-source = "git+https://github.com/stm32-rs/stm32f3xx-hal#231c9592508d85d72e4f54b5f408d42546184ea4"
+source = "git+https://github.com/stm32-rs/stm32f3xx-hal#09b15bd7a9ae87770b7c4c70b06aedf10fa2b58c"
 dependencies = [
  "cfg-if",
  "cortex-m 0.7.2",
@@ -890,7 +890,7 @@ dependencies = [
 [[package]]
 name = "stm32f4xx-hal"
 version = "0.9.0"
-source = "git+https://github.com/stm32-rs/stm32f4xx-hal#cf950ec9fefd1192a4cc3a435ee6f2c13904181c"
+source = "git+https://github.com/stm32-rs/stm32f4xx-hal#bb160bbe8604bccf28557975131d0afdb2fa1014"
 dependencies = [
  "bare-metal 1.0.0",
  "cast",
@@ -919,8 +919,8 @@ dependencies = [
 
 [[package]]
 name = "stm32f7xx-hal"
-version = "0.2.0"
-source = "git+https://github.com/stm32-rs/stm32f7xx-hal#76d0fcdd9416fca97944999791a8bb538329fa32"
+version = "0.3.0"
+source = "git+https://github.com/stm32-rs/stm32f7xx-hal#850131aab92ced30b9d9db8069efd77613340524"
 dependencies = [
  "as-slice",
  "bare-metal 0.2.5",
@@ -952,7 +952,7 @@ dependencies = [
 [[package]]
 name = "stm32h7xx-hal"
 version = "0.9.0"
-source = "git+https://github.com/stm32-rs/stm32h7xx-hal#59f601d02dfdc13603a0f8b200b7a49aa6dec4f7"
+source = "git+https://github.com/stm32-rs/stm32h7xx-hal#762f50482f364f5cefe9bd7f98b026472dc45519"
 dependencies = [
  "bare-metal 1.0.0",
  "cast",
@@ -1035,7 +1035,7 @@ dependencies = [
 [[package]]
 name = "stm32l4xx-hal"
 version = "0.6.0"
-source = "git+https://github.com/stm32-rs/stm32l4xx-hal#62e15e8b0d8a018f0eb2730362b8465a3c64a943"
+source = "git+https://github.com/stm32-rs/stm32l4xx-hal#284c5e49cb25809c4e0e25cabf628ce0679257e3"
 dependencies = [
  "cast",
  "cortex-m 0.6.7",
