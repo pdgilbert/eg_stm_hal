@@ -610,10 +610,22 @@ fn main() -> ! {
     adc_a
         .set_full_scale_range(FullScaleRange::Within0_256V)
         .unwrap();
+    //adc_a.set_full_scale_range(FullScaleRange::Within4_096V).unwrap();
     adc_b
         .set_full_scale_range(FullScaleRange::Within4_096V)
         .unwrap();
     //adc_c.set_full_scale_range(FullScaleRange::Within4_096V).unwrap();
+
+    // Note scale_cur divides, scale_a and scale_b multiply
+    let scale_cur = 10; // calibrated to get mA/mV depends on FullScaleRange above and values of shunt resistors
+    let scale_a = 2; // calibrated to get mV    depends on FullScaleRange
+    let scale_b = 2; // calibrated to get mV    depends on FullScaleRange
+
+    //TMP35 scale is 100 deg C per 1.0v (slope 10mV/deg C) and goes through
+    //     <50C, 1.0v>,  so 0.0v is  -50C.
+
+    let scale_temp = 5; //divides
+    let offset_temp = 50;
 
     loop {
         // Blink LED to check that everything is actually running.
@@ -622,7 +634,7 @@ fn main() -> ! {
         led.blink(10_u16, &mut delay);
 
         // Read voltage
-        //first adc     Note that readings may be zero using USB power (programming) rather than battery.
+        //first adc  Note that readings are zero on USB power (programming) rather than battery.
         let values_a = [
             //block!(adc_a.read(&mut AdcChannel::SingleA0)).unwrap_or(8091), // A0 to GND
             //block!(adc_a.read(&mut AdcChannel::SingleA1)).unwrap_or(8091), // A1 to GND
@@ -630,6 +642,18 @@ fn main() -> ! {
             block!(adc_a.read(&mut AdcChannel::DifferentialA1A3)).unwrap_or(8091), // A1 to A3  battery
             block!(adc_a.read(&mut AdcChannel::DifferentialA2A3)).unwrap_or(8091), // A2 to A3  load
         ];
+
+        // toggle FullScaleRange to measure battery voltage, not just diff across shunt resistor
+        // also first adc
+        adc_a
+            .set_full_scale_range(FullScaleRange::Within4_096V)
+            .unwrap();
+        let values_v = [
+            block!(adc_a.read(&mut AdcChannel::SingleA0)).unwrap_or(8091), // A0 to GND
+        ];
+        adc_a
+            .set_full_scale_range(FullScaleRange::Within0_256V)
+            .unwrap();
 
         // second adc
         let values_b = [
@@ -654,17 +678,28 @@ fn main() -> ! {
             heapless::String::new(),
         ];
 
-        let scale1 = 90; // to be calibrated. mA/mV depends on FullScaleRange above and values of shunt resistors
-        let scale2 = 90; // to be calibrated.
-
-        //for i in 0..lines.len() {
-        //    write!(lines[i], "A{}:{:5} B{}:{:4} ",  i, values_a[i], i, values_b[i]).unwrap();
-        //}
-        write!(lines[0], "battery {:5} mA", values_a[0] * scale1 / 1000).unwrap();
-        write!(lines[1], "load:   {:5} mA", values_a[1] * scale2 / 1000).unwrap();
-        write!(lines[2], "B:{:5} {:5}", values_b[0], values_b[1],).unwrap();
-        write!(lines[3], "  {:5} {:5}", values_b[2], values_b[3]).unwrap();
-        //write!(lines[2], "B:{:2} {:3} {:3} {:3} ",    values_b[0], values_b[1], values_b[2], values_b[3]).unwrap();
+        write!(
+            lines[0],
+            "bat:{:4}mV{:4}mA",
+            values_v[0] * scale_a,
+            values_a[0] / scale_cur
+        )
+        .unwrap();
+        write!(lines[1], "load:    {:5}mA", values_a[1] / scale_cur).unwrap();
+        write!(
+            lines[2],
+            "B:{:4} {:4} {:4}",
+            values_b[0] * scale_b,
+            values_b[1] * scale_b,
+            values_b[2] * scale_b
+        )
+        .unwrap();
+        write!(
+            lines[3],
+            "temperature{:3} C",
+            values_b[3] / scale_temp - offset_temp
+        )
+        .unwrap();
         //write!(lines[3], "C:{:2} {:3} {:3} {:3} ",    values_c[0], values_c[1], values_c[2], values_c[3]).unwrap();
 
         disp.clear();

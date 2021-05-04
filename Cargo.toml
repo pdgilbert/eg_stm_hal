@@ -123,6 +123,7 @@ radio         = { version = "0.7.0" }
 driver-pal    = { version = "0.8.0-alpha.0", default-features = false }
 
 # for  text_i2c which uses ssd1306, ads1015-oled example.    need rust 1.40.0 for #[non_exhaustive]
+#ssd1306   = { version = ">=0.5.2"}
 ssd1306   = { git = "https://github.com/jamwaffles/ssd1306"  }  #version = "0.3.1" # "0.2.6" "0.3.1" 
 embedded-graphics   = { version = ">=0.6.0" }                   #version = ">=0.6.0" #  "0.4.4" # "0.4.9"  "0.6.2" 
 
