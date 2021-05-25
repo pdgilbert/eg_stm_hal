@@ -25,10 +25,6 @@ use panic_halt as _;
 
 //use cortex_m::asm;
 
-//use cortex_m::singleton;
-//or ?
-use heapless::{consts, Vec};
-
 //use eg_stm_hal::to_str;
 
 use cortex_m_rt::entry;
@@ -476,8 +472,8 @@ fn main() -> ! {
     // read gps on usart2
     hprintln!("about to read GPS").unwrap();
 
-    // byte buffer length 80
-    let mut buffer: Vec<u8, consts::U80> = Vec::new();
+    // byte buffer up to 80  u8 elements on stack
+    let mut buffer: heapless::Vec<u8, 80> = heapless::Vec::new();
     hprintln!("buffer at {} of {}", buffer.len(), buffer.capacity()).unwrap(); //0 of 80
     buffer.clear();
 

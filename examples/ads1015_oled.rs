@@ -574,7 +574,7 @@ fn display(
            //disp : impl DrawTarget<BinaryColor> + WriteOnlyDataCommand, 
            //disp : impl DrawTarget<BinaryColor> + cortex_m::prelude::_embedded_hal_serial_Write, 
            text_style : TextStyle<BinaryColor, Font8x16>) -> () {
-    let mut lines: [heapless::String<heapless::consts::U32>; 4] = [
+    let mut lines: [heapless::String<32>; 4] = [
         heapless::String::new(),
         heapless::String::new(),
         heapless::String::new(),
