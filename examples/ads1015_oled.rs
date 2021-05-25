@@ -408,12 +408,8 @@ fn setup() -> (I2c<I2C1>, impl LED, Delay) {
 #[cfg(feature = "stm32l0xx")]
 use stm32l0xx_hal::{
     delay::Delay,
-    gpio::{
-        gpiob::{PB8, PB9},
-        gpioc::PC13,
-        OpenDrain, Output, PushPull,
-    },
-    i2c::I2c,
+    gpio::{gpioc::PC13, Output, PushPull,},
+    i2c::{I2c, SCLPin, SDAPin},
     pac::{CorePeripherals, Peripherals, I2C1},
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
@@ -421,8 +417,7 @@ use stm32l0xx_hal::{
 
 #[cfg(feature = "stm32l0xx")]
 fn setup() -> (
-    I2c<I2C1, PB9<Output<OpenDrain>>, PB8<Output<OpenDrain>>>,
-    //I2c<I2C1, impl Pins<I2C1>>,
+   I2c<I2C1, impl SDAPin<I2C1>, impl SCLPin<I2C1>>,
     impl LED,
     Delay,
 ) {

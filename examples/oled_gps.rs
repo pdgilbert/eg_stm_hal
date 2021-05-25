@@ -361,10 +361,6 @@ fn setup() -> (Tx<USART2>, Rx<USART2>, I2c<I2C1>, Delay) {
 #[cfg(feature = "stm32l0xx")]
 use stm32l0xx_hal::{
     delay::Delay,
-    gpio::{
-        gpiob::{PB8, PB9},
-        OpenDrain, Output,
-    },
     i2c::{I2c, SCLPin, SDAPin},
     pac::{CorePeripherals, Peripherals, I2C1, USART2},
     prelude::*,
@@ -376,11 +372,9 @@ use stm32l0xx_hal::{
 fn setup() -> (
     Tx<USART2>,
     Rx<USART2>,
-    I2c<I2C1, PB9<Output<OpenDrain>>, PB8<Output<OpenDrain>>>,
+    I2c<I2C1, impl SDAPin<I2C1>, impl SCLPin<I2C1>>,
     Delay,
 ) {
-    //fn setup() -> (Tx<USART2>, Rx<USART2>, I2c<I2C1, impl SCLPin<I2C1>, impl SDAPin<I2C1>>, Delay) {
-    //fn setup() -> (Tx<USART2>, Rx<USART2>, I2c<I2C1, impl SCLPin<I2C>, impl SDAPin<I2C>>, Delay) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
