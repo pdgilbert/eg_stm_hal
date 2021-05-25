@@ -32,8 +32,6 @@ use cortex_m_rt::entry;
 use cortex_m_semihosting::hprintln;
 use nb::block;
 
-use heapless::{consts, Vec};
-
 use embedded_hal::blocking::delay::DelayMs;
 
 use eg_stm_hal::to_str;
@@ -570,7 +568,7 @@ fn main() -> ! {
     delay.delay_ms(1000_u16);
 
     // byte buffer length 80
-    let mut buffer: Vec<u8, consts::U80> = Vec::new();
+    let mut buffer: heapless::Vec<u8, 80> = heapless::Vec::new();
     //hprintln!("buffer at {} of {}", buffer.len(), buffer.capacity()).unwrap();  //0 of 80
     buffer.clear();
 

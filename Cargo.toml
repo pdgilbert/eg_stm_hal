@@ -188,7 +188,8 @@ dht22 = []
 [dev-dependencies]
 cortex-m-semihosting = { version = ">=0.3.3" }
 panic-semihosting    = { version = ">=0.5.2" }
-heapless = ">=0.4.3"
+#heapless = ">=0.4.3"
+heapless = ">=0.7"
 
 ## Devices with 64 or 128 Kb ROM
 #medium = []
