@@ -99,6 +99,9 @@ cortex-m-rt          = { version = ">=0.6.8" }
 panic-reset          = { version = ">=0.1.0" }
 panic-halt           = { version = ">=0.2.0" }
 
+
+rtt-target = { version =  "0.2.2", features = ["cortex-m"] }
+
 # for example  ads1015-display
 ads1x1x =  { version = "0.2.1"}
 # this causes problem with stm32l0xx_hal:  
@@ -171,7 +174,7 @@ stm32f411 = ["stm32f4xx-hal/stm32f411", "stm32f4xx-hal/rt"]
 stm32f722 = ["stm32f7xx-hal/stm32f722", "stm32f7xx-hal/rt"] 
 stm32h742 = ["stm32h7xx-hal/stm32h742", "stm32h7xx-hal/rt"]
 # see https://www.st.com/resource/en/datasheet/stm32l072v8.pdf  p12 for some MCU variants
-#stm32l0x2 =    ["stm32l0xx-hal/stm32l0x2", "stm32l0xx-hal/rt", "stm32l0xx-hal/mcu-STM32L072KZTx"]
+stm32l0x2 =     ["stm32l0xx-hal/stm32l0x2", "stm32l0xx-hal/rt", "stm32l0xx-hal/mcu-STM32L072KZTx"]
 stm32l072kztx = ["stm32l0xx-hal/stm32l0x2", "stm32l0xx-hal/rt", "stm32l0xx-hal/mcu-STM32L072KZTx"]
 stm32l0x1 = ["stm32l0xx-hal/stm32l0x1", "stm32l0xx-hal/rt", "stm32l0xx-hal/mcu-STM32L071KBTx"]
 stm32l100 = ["stm32l1xx-hal/stm32l100", "stm32l1xx-hal/rt"]
@@ -188,7 +191,7 @@ dht22 = []
 [dev-dependencies]
 cortex-m-semihosting = { version = ">=0.3.3" }
 panic-semihosting    = { version = ">=0.5.2" }
-heapless = ">=0.4.3"
+heapless = ">=0.4.3, <0.7.0" # problems with 0.7.0
 
 ## Devices with 64 or 128 Kb ROM
 #medium = []

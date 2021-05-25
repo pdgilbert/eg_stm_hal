@@ -6,7 +6,7 @@ version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0c9ccf501f61a710a83cfc5a6fb2df0013454c3215aeeeb20ebe4b21e2917501"
 dependencies = [
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "nb 0.1.3",
 ]
 
@@ -107,6 +107,38 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "14c189c53d098945499cdfa7ecc63567cf3886b3332b312a5b4585d8d3a6a610"
 
 [[package]]
+name = "camino"
+version = "1.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d4648c6d00a709aa069a236adcaae4f605a6241c72bf5bee79331a4b625921a9"
+dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "cargo-platform"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0226944a63d1bf35a3b5f948dd7c59e263db83695c9e8bffc4037de02e30f1d7"
+dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "cargo_metadata"
+version = "0.13.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "081e3f0755c1f380c2d010481b6fa2e02973586d5f2b24eebb7a2a1d98b143d8"
+dependencies = [
+ "camino",
+ "cargo-platform",
+ "semver 0.11.0",
+ "semver-parser 0.10.2",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "cast"
 version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -164,7 +196,7 @@ checksum = "643a210c1bdc23d0db511e2a576082f4ff4dcae9d0c37f50b431b8f8439d6d6b"
 dependencies = [
  "bare-metal 0.2.5",
  "bitfield",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "volatile-register",
 ]
 
@@ -205,7 +237,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4160ab978165ef486b79dca2156cf91f28156e696600c158bac179e957c0f618"
 dependencies = [
  "defmt-macros",
- "heapless 0.5.6",
+ "heapless",
  "semver 0.11.0",
 ]
 
@@ -233,14 +265,14 @@ version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "74d643854f324f02daea7153ebbfec5cfcc2f395faf1c7011be65e543570de28"
 dependencies = [
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
 ]
 
 [[package]]
 name = "display-interface"
-version = "0.4.0"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "da12a892db5cce95ae247e8803dc653b1a73da3b0450f7983eb518dd54f583cf"
+checksum = "7517c040926d7b02b111884aa089177db80878533127f7c1b480d852c5fb4112"
 
 [[package]]
 name = "display-interface-i2c"
@@ -249,18 +281,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4895cd4e54e5536ef370d7f1eec787aad8275dd8ad15815aebfa71dd847b4ebf"
 dependencies = [
  "display-interface",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
 ]
 
 [[package]]
 name = "display-interface-spi"
-version = "0.4.0"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "94d08c3a1682b166cbcbb4fe009a31a1834ba46c16599bf7a9b3cc7bc31b38b0"
+checksum = "489378ad054862146fbd1f09f51d585ccbe4bd1e2feadcda2a13ac33f840e1a5"
 dependencies = [
  "byte-slice-cast",
  "display-interface",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
 ]
 
 [[package]]
@@ -284,10 +316,10 @@ dependencies = [
  "dht-sensor",
  "driver-pal",
  "embedded-graphics",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "embedded-spi",
  "f3",
- "heapless 0.6.1",
+ "heapless",
  "mcp4x",
  "nb 1.0.0",
  "panic-halt",
@@ -295,6 +327,7 @@ dependencies = [
  "panic-semihosting",
  "radio",
  "radio-sx127x",
+ "rtt-target",
  "shared-bus",
  "ssd1306",
  "stm32f0xx-hal",
@@ -338,9 +371,9 @@ dependencies = [
 
 [[package]]
 name = "embedded-hal"
-version = "0.2.4"
+version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fa998ce59ec9765d15216393af37a58961ddcefb14c753b4816ba2191d865fcb"
+checksum = "db184d3fa27bc7a2344250394c0264144dfe0bc81a4401801dcb964b8dd172ad"
 dependencies = [
  "nb 0.1.3",
  "void",
@@ -361,7 +394,7 @@ version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b5571fd6dcf36d58537276ea736c97e7358cfad9da9d48fc0a001b302e78933f"
 dependencies = [
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "log",
 ]
 
@@ -444,16 +477,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "heapless"
-version = "0.6.1"
+name = "itoa"
+version = "0.4.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "634bd4d29cbf24424d0a4bfcbf80c6960129dc24424752a7d1d1390607023422"
-dependencies = [
- "as-slice",
- "generic-array 0.14.4",
- "hash32",
- "stable_deref_trait",
-]
+checksum = "dd25036021b0de88a0aff6b850051563c6516d0bf53f8638938edbb9de732736"
 
 [[package]]
 name = "l3gd20"
@@ -461,7 +488,7 @@ version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f3da4a9711f4c14fc5cdf6631189de01c58536a00e5a370c071dcbd10b5b96ec"
 dependencies = [
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "generic-array 0.11.2",
 ]
 
@@ -487,7 +514,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9e5d1a5c290951321d1b0d4a40edd828537de9889134a0e67c5146542ae57706"
 dependencies = [
  "cast",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "generic-array 0.11.2",
 ]
 
@@ -496,7 +523,7 @@ name = "mcp4x"
 version = "0.1.0"
 source = "git+https://github.com/eldruin/mcp4x-rs#da0b047ed2d54fdadc46f41dfed8f4feb550ab24"
 dependencies = [
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
 ]
 
 [[package]]
@@ -654,7 +681,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2cfe519d23c26c678d169b34bf51e9c5cb0267ae18901f1037fa7caabc70dc5"
 dependencies = [
  "async-trait",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "log",
  "nb 0.1.3",
 ]
@@ -665,18 +692,12 @@ version = "0.10.1"
 source = "git+https://github.com/rust-iot/rust-radio-sx127x?rev=2285c1ca9f527ab464a27f6a43af3b0a93130d2f#2285c1ca9f527ab464a27f6a43af3b0a93130d2f"
 dependencies = [
  "bitflags",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "embedded-spi",
  "libc",
  "log",
  "radio",
 ]
-
-[[package]]
-name = "rand_core"
-version = "0.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "90bde5296fc891b0cef12a6d03ddccc162ce7b2aff54160af9338f8d40df6d19"
 
 [[package]]
 name = "rand_core"
@@ -694,6 +715,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "rtt-target"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0869b4c5b6a6d8c5583fc473f9eb3423a170f77626b8c8a7fb18eddcda5770e2"
+dependencies = [
+ "cortex-m 0.6.7",
+ "ufmt-write",
+]
+
+[[package]]
 name = "rustc_version"
 version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -701,6 +732,12 @@ checksum = "138e3e0acb6c9fb258b19b67cb8abd63c00679d2851805ea151465464fe9030a"
 dependencies = [
  "semver 0.9.0",
 ]
+
+[[package]]
+name = "ryu"
+version = "1.0.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "71d301d4193d031abdd79ff7e3dd721168a9572ef3fe51a1517aba235bd8f86e"
 
 [[package]]
 name = "semver"
@@ -718,6 +755,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f301af10236f6df4160f7c3f04eec6dbc70ace82d23326abad5edee88801c6b6"
 dependencies = [
  "semver-parser 0.10.2",
+ "serde",
 ]
 
 [[package]]
@@ -736,14 +774,51 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde"
+version = "1.0.125"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "558dc50e1a5a5fa7112ca2ce4effcb321b0300c0d4ccf0776a9f60cd89031171"
+dependencies = [
+ "serde_derive",
+]
+
+[[package]]
+name = "serde_derive"
+version = "1.0.125"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b093b7a2bb58203b5da3056c05b4ec1fed827dcfdb37347a8841695263b3d06d"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "serde_json"
+version = "1.0.64"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "799e97dc9fdae36a5c8b8f2cae9ce2ee9fdce2058c57a93e6099d919fd982f79"
+dependencies = [
+ "itoa",
+ "ryu",
+ "serde",
+]
+
+[[package]]
 name = "shared-bus"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ed792a53f339088822c0cc9d6ebfb950752016a288dc96ed3e302e9592f18ab0"
 dependencies = [
  "cortex-m 0.5.11",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
 ]
+
+[[package]]
+name = "slice-group-by"
+version = "0.2.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1f7474f0b646d228360ab62ed974744617bc869d959eac8403bfa3665931a7fb"
 
 [[package]]
 name = "ssd1306"
@@ -754,7 +829,7 @@ dependencies = [
  "display-interface-i2c",
  "display-interface-spi",
  "embedded-graphics",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "generic-array 0.14.4",
 ]
 
@@ -785,7 +860,7 @@ dependencies = [
  "bxcan",
  "cast",
  "cortex-m 0.7.2",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "nb 1.0.0",
  "stm32f0",
  "void",
@@ -806,14 +881,14 @@ dependencies = [
 [[package]]
 name = "stm32f1xx-hal"
 version = "0.7.0"
-source = "git+https://github.com/stm32-rs/stm32f1xx-hal#0442ccb176133c4c4c9114dfe41b8854e2c9fc85"
+source = "git+https://github.com/stm32-rs/stm32f1xx-hal#5d55f83528a1a4eebcc672201751a320d9be5854"
 dependencies = [
  "bxcan",
  "cast",
  "cortex-m 0.6.7",
  "cortex-m-rt",
  "embedded-dma",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "nb 0.1.3",
  "stm32f1",
  "void",
@@ -850,7 +925,7 @@ checksum = "6b413661b50595f7b34f66612b1f793a1ff687dad7daf5a5544663ed2fd7482c"
 dependencies = [
  "cast",
  "cortex-m 0.5.11",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "nb 0.1.3",
  "stm32f30x",
  "void",
@@ -859,17 +934,19 @@ dependencies = [
 [[package]]
 name = "stm32f3xx-hal"
 version = "0.6.1"
-source = "git+https://github.com/stm32-rs/stm32f3xx-hal#09b15bd7a9ae87770b7c4c70b06aedf10fa2b58c"
+source = "git+https://github.com/stm32-rs/stm32f3xx-hal#7a12c20c89e7c88871710674d257fbbd1d17a4c7"
 dependencies = [
+ "cargo_metadata",
  "cfg-if",
  "cortex-m 0.7.2",
  "cortex-m-rt",
  "embedded-dma",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "embedded-time",
  "nb 1.0.0",
  "paste",
  "rtcc",
+ "slice-group-by",
  "stm32f3",
  "typenum",
  "void",
@@ -890,16 +967,16 @@ dependencies = [
 [[package]]
 name = "stm32f4xx-hal"
 version = "0.9.0"
-source = "git+https://github.com/stm32-rs/stm32f4xx-hal#bb160bbe8604bccf28557975131d0afdb2fa1014"
+source = "git+https://github.com/stm32-rs/stm32f4xx-hal#38e039984cc9440a7059465953875b16e5f8878b"
 dependencies = [
  "bare-metal 1.0.0",
  "cast",
  "cortex-m 0.7.2",
  "cortex-m-rt",
  "embedded-dma",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "nb 1.0.0",
- "rand_core 0.6.2",
+ "rand_core",
  "rtcc",
  "stm32f4",
  "void",
@@ -920,7 +997,7 @@ dependencies = [
 [[package]]
 name = "stm32f7xx-hal"
 version = "0.3.0"
-source = "git+https://github.com/stm32-rs/stm32f7xx-hal#850131aab92ced30b9d9db8069efd77613340524"
+source = "git+https://github.com/stm32-rs/stm32f7xx-hal#af93075e9cc0c8c1f104fe4cbbfd3816f42053a3"
 dependencies = [
  "as-slice",
  "bare-metal 0.2.5",
@@ -928,10 +1005,10 @@ dependencies = [
  "cast",
  "cortex-m 0.6.7",
  "cortex-m-rt",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "micromath",
  "nb 0.1.3",
- "rand_core 0.5.1",
+ "rand_core",
  "rtcc",
  "stm32f7",
  "void",
@@ -952,14 +1029,14 @@ dependencies = [
 [[package]]
 name = "stm32h7xx-hal"
 version = "0.9.0"
-source = "git+https://github.com/stm32-rs/stm32h7xx-hal#762f50482f364f5cefe9bd7f98b026472dc45519"
+source = "git+https://github.com/stm32-rs/stm32h7xx-hal#a0e891660287e61578490f2f3cde95c54c2046f6"
 dependencies = [
  "bare-metal 1.0.0",
  "cast",
  "cortex-m 0.7.2",
  "cortex-m-rt",
  "embedded-dma",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "nb 1.0.0",
  "paste",
  "stm32h7",
@@ -968,12 +1045,12 @@ dependencies = [
 
 [[package]]
 name = "stm32l0"
-version = "0.10.0"
+version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8386ff55bd099b3c6c7ea16bb68296cbe6025981f96ed69b222b6e6633ca6148"
+checksum = "ed7ffdb929148070435dbc4dc69fd62b3a031c0543b4a9d2ec9fc8b31a0f3344"
 dependencies = [
  "bare-metal 0.2.5",
- "cortex-m 0.6.7",
+ "cortex-m 0.7.2",
  "cortex-m-rt",
  "vcell",
 ]
@@ -981,14 +1058,14 @@ dependencies = [
 [[package]]
 name = "stm32l0xx-hal"
 version = "0.7.0"
-source = "git+https://github.com/stm32-rs/stm32l0xx-hal#54dc6152cb614c82877e931c4c91e3b94e04b686"
+source = "git+https://github.com/stm32-rs/stm32l0xx-hal#1324d0991d700a4363eaa84f9b7f65258a31cb51"
 dependencies = [
  "as-slice",
  "cast",
- "cortex-m 0.6.7",
+ "cortex-m 0.7.2",
  "cortex-m-rt",
  "cortex-m-semihosting",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "nb 0.1.3",
  "stm32l0",
  "void",
@@ -1014,7 +1091,7 @@ dependencies = [
  "bare-metal 0.2.5",
  "cast",
  "cortex-m 0.5.11",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "nb 0.1.3",
  "stm32l1",
  "void",
@@ -1035,13 +1112,13 @@ dependencies = [
 [[package]]
 name = "stm32l4xx-hal"
 version = "0.6.0"
-source = "git+https://github.com/stm32-rs/stm32l4xx-hal#284c5e49cb25809c4e0e25cabf628ce0679257e3"
+source = "git+https://github.com/stm32-rs/stm32l4xx-hal#5fce562ddaff46ddd1c17cfc2cdd3bea4f8eae4c"
 dependencies = [
  "cast",
  "cortex-m 0.6.7",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "nb 0.1.3",
- "rand_core 0.6.2",
+ "rand_core",
  "stable_deref_trait",
  "stm32l4",
  "void",
@@ -1049,9 +1126,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "1.0.70"
+version = "1.0.72"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b9505f307c872bab8eb46f77ae357c8eba1fdacead58ee5a850116b1d7f82883"
+checksum = "a1e8cdbefb79a9a5a65e0db8b47b723ee907b7c7f8496c76a1770b5c310bab82"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1071,10 +1148,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "56dee185309b50d1f11bfedef0fe6d036842e3fb77413abef29f8f8d1c5d4c1c"
 
 [[package]]
-name = "unicode-xid"
-version = "0.2.1"
+name = "ufmt-write"
+version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f7fe0bb3479651439c9112f72b6c505038574c9fbb575ed1bf3b797fa39dd564"
+checksum = "e87a2ed6b42ec5e28cc3b94c09982969e9227600b2e3dcbc1db927a84c06bd69"
+
+[[package]]
+name = "unicode-xid"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8ccb82d61f80a663efe1f787a51b16b5a51e3314d6ac365b08639f52387b33f3"
 
 [[package]]
 name = "vcell"

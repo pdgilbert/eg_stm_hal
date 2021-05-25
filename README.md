@@ -152,7 +152,7 @@ I am trying to have a common code base for examples that run on different boards
 The setup is to have common files `src/`, `examples/`, ..., at the top level.
 Then in the `boards/` directories use soft links to the common files. 
 That leaves only `memory.x` and build files `target/` and `Cargo.lock` in
-the `boards/` directories.
+the `boards/` directories. (And possibly Embed.toml, more when I figure this out.)
 
 You can get this package from Github with 
 ```
@@ -182,29 +182,32 @@ Variables `HAL`  and `MCU` overlap. It should be possible to determine  `HAL`  b
 The variable `HAL` is used in the example code whereas some of the underlying HAL packages
 actually need the specific `MCU`.
 Board directories use one of 
+
 ```
-  export HAL=stm32f0xx MCU=stm32f030xc   TARGET=thumbv6m-none-eabi     # none-stm32f030      Cortex-M0
-  export HAL=stm32f1xx MCU=stm32f103     TARGET=thumbv7m-none-eabi     # bluepill            Cortex-M3
-  export HAL=stm32f1xx MCU=stm32f100     TARGET=thumbv7m-none-eabi     # none-stm32f100      Cortex-M3
-  export HAL=stm32f1xx MCU=stm32f101     TARGET=thumbv7m-none-eabi     # none-stm32f101      Cortex-M3
-  export HAL=stm32f3xx MCU=stm32f303xc   TARGET=thumbv7em-none-eabihf  # discovery-stm32f303 Cortex-M3
-  export HAL=stm32f4xx MCU=stm32f401     TARGET=thumbv7em-none-eabihf  # blackpill-stm32f401 Cortex-M4
-  export HAL=stm32f4xx MCU=stm32f411     TARGET=thumbv7em-none-eabihf  # blackpill-stm32f411 Cortex-M4
-  export HAL=stm32f4xx MCU=stm32f411     TARGET=thumbv7em-none-eabihf  # nucleo-64           Cortex-M4
-  export HAL=stm32f7xx MCU=stm32f722     TARGET=thumbv7em-none-eabihf  # none-stm32f722      Cortex-M7
-  export HAL=stm32h7xx MCU=stm32h742     TARGET=thumbv7em-none-eabihf  # none-stm32h742      Cortex-M7
-  export HAL=stm32l0xx MCU=stm32l072kztx TARGET=thumbv6m-none-eabi     # none-stm32l0x2      Cortex-M0
-  export HAL=stm32l1xx MCU=stm32l100     TARGET=thumbv7m-none-eabi     # discovery-stm32l100 Cortex-M3
-  export HAL=stm32l1xx MCU=stm32l151     TARGET=thumbv7m-none-eabi     # heltec-lora-node151 Cortex-M3
-  export HAL=stm32l4xx MCU=stm32l4x2     TARGET=thumbv7em-none-eabi    # none-stm32l4x1      Cortex-M4
+              cargo run  environment variables                        openocd         embed        test board and processor
+  _____________________________________________________________     _____________  _____________   ___________________________
+  export HAL=stm32f0xx MCU=stm32f030xc TARGET=thumbv6m-none-eabi    PROC=stm32f0x  CHIP=STM32F0x  # none-stm32f030      Cortex-M0
+  export HAL=stm32f1xx MCU=stm32f103   TARGET=thumbv7m-none-eabi    PROC=stm32f1x  CHIP=STM32F103C8  # bluepill            Cortex-M3
+  export HAL=stm32f1xx MCU=stm32f100   TARGET=thumbv7m-none-eabi    PROC=stm32f1x  CHIP=STM32F1x  # none-stm32f100      Cortex-M3
+  export HAL=stm32f1xx MCU=stm32f101   TARGET=thumbv7m-none-eabi    PROC=stm32f1x  CHIP=STM32F1x  # none-stm32f101      Cortex-M3
+  export HAL=stm32f3xx MCU=stm32f303xc TARGET=thumbv7em-none-eabihf PROC=stm32f3x  CHIP=STM32F3x  # discovery-stm32f303 Cortex-M3
+  export HAL=stm32f4xx MCU=stm32f401   TARGET=thumbv7em-none-eabihf PROC=stm32f4x  CHIP=STM32F4x  # blackpill-stm32f401 Cortex-M4
+  export HAL=stm32f4xx MCU=stm32f411   TARGET=thumbv7em-none-eabihf PROC=stm32f4x  CHIP=STM32F4x  # blackpill-stm32f411 Cortex-M4
+  export HAL=stm32f4xx MCU=stm32f411   TARGET=thumbv7em-none-eabihf PROC=stm32f4x  CHIP=STM32F4x  # nucleo-64           Cortex-M4
+  export HAL=stm32f7xx MCU=stm32f722   TARGET=thumbv7em-none-eabihf PROC=stm32f7x  CHIP=STM32F7x  # none-stm32f722      Cortex-M7
+  export HAL=stm32h7xx MCU=stm32h742   TARGET=thumbv7em-none-eabihf PROC=          CHIP=          # none-stm32h742      Cortex-M7
+  export HAL=stm32l0xx MCU=stm32l0x2   TARGET=thumbv6m-none-eabi    PROC=stm32l0   CHIP=STM32L0   # none-stm32l0x2      Cortex-M0
+  export HAL=stm32l1xx MCU=stm32l100   TARGET=thumbv7m-none-eabi    PROC=stm32l1   CHIP=STM32L1   # discovery-stm32l100 Cortex-M3
+  export HAL=stm32l1xx MCU=stm32l151   TARGET=thumbv7m-none-eabi    PROC=stm32l1   CHIP=STM32L1   # heltec-lora-node151 Cortex-M3
+  export HAL=stm32l4xx MCU=stm32l4x2   TARGET=thumbv7em-none-eabi   PROC=stm32l4x  CHIP=STM32L4x  # none-stm32l4x1      Cortex-M4
 ```
 
 ## Running Examples
 
-Running the examples will require three shell windows on your desktop. 
+Running some examples will require three shell windows on your desktop. 
 One to run cargo and compile the examples and run gdb to load and debug them.
-Another to run openocd to interface through the STlink to the development board.
-And the third to run a console connected to a usb-ttl dongle for IO in some of the examples.
+Another to run `openocd` to interface through the STlink to the development board.
+And the third, in some examples, to run a console connected to a usb-ttl dongle for IO.
 (I use minicom for this last, but there are many other possibilities.) 
 
 (If the next connections to USB fail with `Permission denied` then the simplest 
@@ -224,19 +227,21 @@ the USB device number for the console by
 ```
 dmesg | grep -i tty  
 ```
-Then in a separate windows do
+Then in one window do
 ```
 minicom -D /dev/ttyUSBx -b9600
 ```
 where `x` is replaced by the number of the USB console device.
 9600 is the bit rate in the code but can be change.
-Next determine the settings for `INTERFACE` and `PROC` as described below in
+In the next, `PROC` is as listed in the table above and `INTERFACE` corresponds to your
+ST-Link version, probably `export INTERFACE=stlink-v2` or `export INTERFACE=stlink-v2-1`, 
+see more below in
 [Misc Notes on ST-Link and OpenOCD](#misc-notes-on-st-link-and-openocd)
-and then
+In another window execute
 ```
 openocd -f interface/$INTERFACE.cfg -f target/$PROC.cfg 
 ```
-`openocd` seems to figure out the USB device to use. In the other window do
+`openocd` seems to figure out the USB device to use. Then in the other window do
 ```
 cargo  run --target $TARGET --features $HAL,$MCU --example xxx
 ```
@@ -270,15 +275,6 @@ FILL IN LAYOUT
 
 ## Misc Notes on ST-Link and OpenOCD
 
-The openocd  command above uses `INTERFACE` and `PROC` environment variables that indicate the
-ST-Link version and the development board MCU family respectively. 
-(The PROC will be similar to the HAL and MCU setting, unfortunately they are not exactly the same.)
-Typical specifications for a bluepill development board and ST-Link dongle would be
-
-```
-  export INTERFACE=stlink-v2    PROC=stm32f1x  #cheap  dongle and blue pill
-  export INTERFACE=stlink-v2-1  PROC=stm32f1x  #better dongle and blue pill
-```
 Many development boards have an ST-Link built onto the board, in which case you need to determine
 the version, and that is not always clear. My discovery-stm32f303 (Discovery kit STM32F303)
 says STlink V2-B but that 
@@ -325,20 +321,61 @@ Either power the blue pill with its own supply (eg. battery) or with separate 3.
 lines from the development board (typically pins 1 and 2) and do not exceed about 100mw for 
 the blue pill and other things attached.
 
-Here are settings I used for manual testing as reported at 
-[status of examples](https://pdgilbert.github.io/eg_stm_hal/)
+Here are settings for some boards I have tried:
 ```
-  export INTERFACE=stlink-v2    PROC=stm32f1x  #cheap dongle and blue pill
-  export INTERFACE=stlink-v2-1  PROC=stm32f3x  #discovery-stm32f303
-  export INTERFACE=stlink-v2    PROC=stm32f4x  # blackpills  with STM32F401 and STM32F411
-  export INTERFACE=stlink-v2-1  PROC=stm32f4x  #nucleo-64
-  export INTERFACE=stlink-v2    PROC=stm32l1   #discovery-stm32l100 
-  export INTERFACE=stlink-v2    PROC=stm32l1   #heltec-lora-node151 with cheap dongle  
+  export INTERFACE=stlink-v2    #cheap dongle with blue pill and blackpills with STM32F401 and STM32F411
+  export INTERFACE=stlink-v2-1  #discovery-stm32f303
+  export INTERFACE=stlink-v2-1  #nucleo-64
+  export INTERFACE=stlink-v2    #discovery-stm32l100 
+  export INTERFACE=stlink-v2    #heltec-lora-node151 with cheap dongle  
 ```
 
 The complete list of possible  openocd cfg file options are in
 `/usr/share/openocd/scripts/interface/`, `/usr/share/openocd/scripts/target`
 and `/usr/share/openocd/scripts/board`
+
+## Embed and probe-rs
+
+(still very rough notes)
+
+```
+cargo embed  --target $TARGET  --features $HAL,$MCU --example xxx  --chip $CHIP
+```
+
+The chip setting can be specified in the `Embed.toml` file but then that needs to be altered
+for diffferent boards.
+
+See https://github.com/eldruin/driver-examples/tree/master/stm32f1-bluepill#additional-example-programs-for-several-rust-drivers-running-on-stm32f103-bluepill-board
+
+Need firmware update on ST-Link.
+
+Messages like
+```
+WARN probe_rs::architecture::arm::memory::romtable > Component at 0xe0001000: CIDR0 has invalid preamble (expected 0xd, got 0x0)
+...
+Error failed attaching to target
+             
+             Caused by:
+                 0: Unable to load specification for chip
+                 1: The connected chip could not automatically be determined.
+``
+mean you need file `Embed.toml` with something like
+```
+default.probe]
+protocol = "Swd"
+
+[default.general]
+chip = "STM32F303VCTx"
+#chip = "STM32F103C8"
+
+[default.rtt]
+enabled = true
+
+[default.gdb]
+enabled = false
+
+```
+See `https://github.com/probe-rs/cargo-embed/src/config/default.toml` for other settings.
 
 ## Misc Install Notes
 
