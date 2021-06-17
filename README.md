@@ -8,7 +8,7 @@
 - [Github workflow CI](https://github.com/pdgilbert/eg_stm_hal/action)
 - [Table of Core Examples Status](#table-of-core-examples-status)
 - [Additional Examples](#additional-examples)
-- [Additional Examples CI](https://github.com/pdgilbert/rust-integration-testing/action)
+- [Additional Examples CI](https://github.com/pdgilbert/rust-integration-testing/actions)
 
 
 Following is the status of examples. 
@@ -144,14 +144,13 @@ so, only USART1 is available. This means that examples using more than one USART
 
 Additional examples use crates other than the HAL and the main embedded crates. 
 There are now a fairly large number of these examples.
-They are maintained separately at https://github.com/pdgilbert/rust-integration-testing and 
-the [CI testing is at ](https://github.com/pdgilbert/rust-integration-testing/action). The testing strategy
+They are [maintained at ](https://github.com/pdgilbert/rust-integration-testing) and 
+the [CI testing is at ](https://github.com/pdgilbert/rust-integration-testing/actions). The testing strategy
 is more extensive than above. Examples are tested using both released and git versions of the crates.
 A simple table as above is difficult to maintain, but the github workflow action report at 
 the above CI link is a good summary.
 
-Code for these are in 
-[subdirectories of examples/](https://github.com/pdgilbert/rust-integration-testing/examples/)
+Code for these are in subdirectories of the repository `examples/` directory.
 The main groupings are as follows. 
 
 ### examples/misc
@@ -161,10 +160,11 @@ specified. The code must be compiled with `--release`  to run or it is not fast 
 sensor and an `Error Timeout` occurs. The sensor values are approximately 
 correct at room temperature, but the sensors have not been calibrated or tested at other temperatures.
 
-- `text_i2c` uses crate [ssd1306](https://github.com/jamwaffles/ssd1306).
+- `text_i2c` uses crate [ssd1306](https://github.com/jamwaffles/ssd1306). Run tests have been succesful.
 
-- `oled_gps` uses crate `embedded-graphics`. (Run testing on `discovery-stm32f303` is not very reliably, 
-but better on 5v than 3v. Run testing on stm32l1xx fails reading gps,does not return.)
+- `oled_gps` uses crate `embedded-graphics`. Run testing on `discovery-stm32f303` is not very reliably, 
+but better on 5v than 3v. Run testing on stm32l1xx fails reading gps, it does not return.  
+Run tests on other hardware have been mostly succesful.
 
 - the directory also has the core examples in the table above so they are included in the 
 expanded CI testing strategies.
@@ -174,15 +174,15 @@ expanded CI testing strategies.
 - many examples by Diego Barrios Romero [see](https://github.com/eldruin/driver-examples) where there are
 also links to blog posts describing the examples. Versions in `examples/driver-examples` have been 
 adjusted to run with various HAL crates. 
-I do not have hardware to test most of these examples so they  have not been run tested.
+I do not have hardware to test many of these examples so they have not all been run tested.
 
 ### examples/radio-sx127x has
 - `lora_spi_send`, `lora_spi_receive` and `lora_spi_gps` use 
 crate [rust-radio-sx127x](https://github.com/rust-iot/rust-radio-sx127x).
 The crate uses `embedded-hal 1.0.0 alpha`. 
 It works with hal crates built with older embedded-hal by using a `compat()` shim to satisfy traits.
-These examples have been (occassionaly) run tested on hardware.
+These examples have been (occassionaly) run tested on `bluepill` and `blackpill stm32f411` hardware.
 
 ### examples/rtic
 - many examples from [RTIC](https://rtic.rs). Not yet working in CI as they still require some manual editing
-to work with different HALs.
+to work with different HALs. Some have been run tested on `bluepill` and `blackpill stm32f411` hardware.
