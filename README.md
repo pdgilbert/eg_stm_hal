@@ -7,7 +7,8 @@
 - [Travis CI](https://travis-ci.org/pdgilbert/eg_stm_hal)
 - [Github workflow CI](https://github.com/pdgilbert/eg_stm_hal/action)
 - [Table of Core Examples Status](#table-of-core-examples-status)
-- [Table of Additional Examples Status](#table-of-additional-examples-status)
+- [Additional Examples](#additional-examples)
+- [Additional Examples CI](https://github.com/pdgilbert/rust-integration-testing/action)
 
 
 Following is the status of examples. 
@@ -139,46 +140,49 @@ so, only USART1 is available. This means that examples using more than one USART
 11. Hal does not yet support adc.
 12. no echo.
 
-## Table of Additional Examples Status
+## Additional Examples
 
-Additional examples are as follows.
+Additional examples use crates other than the HAL and the main embedded crates. 
+There are now a fairly large number of these examples.
+They are maintained separately at https://github.com/pdgilbert/rust-integration-testing and 
+the [CI testing is at ](https://github.com/pdgilbert/rust-integration-testing/action). The testing strategy
+is more extensive than above. Examples are tested using both released and git versions of the crates.
+A simple table as above is difficult to maintain, but the github workflow action report at 
+the above CI link is a good summary.
+
+Code for these are in 
+[subdirectories of examples/](https://github.com/pdgilbert/rust-integration-testing/examples/)
+The main groupings are as follows. 
+
+### examples/misc
 - `dht` uses crate [dht-sensor](https://github.com/michaelbeaumont/dht-sensor). Run tests were done with 
 both DHT11 and DHT22 sensors. DHT22 is specified by adding feature `dht22`. DHT11 is used if nothing is 
 specified. The code must be compiled with `--release`  to run or it is not fast enough to read the 
-sensor and an `Error Timeout` occurs. Run tests indicated the sensor values are approximately 
+sensor and an `Error Timeout` occurs. The sensor values are approximately 
 correct at room temperature, but the sensors have not been calibrated or tested at other temperatures.
 
 - `text_i2c` uses crate [ssd1306](https://github.com/jamwaffles/ssd1306).
 
-- `oled_gps` uses crate `embedded-graphics`.
+- `oled_gps` uses crate `embedded-graphics`. (Run testing on `discovery-stm32f303` is not very reliably, 
+but better on 5v than 3v. Run testing on stm32l1xx fails reading gps,does not return.)
 
-- `lora_spi_send`, `lora_spi_receive` and `lora_spi_gps` use crate [rust-radio-sx127x](https://github.com/ryankurte/rust-radio-sx127x).
-The crate uses `embedded-hal 1.0.0 alpha`. It works with hal crates built with older embedded-hal by using a `compat()` shim
-to satisfy traits. It builds but may not be showing correctly in this table because the tests for the table are using  `embedded-hal 0.2.4`.
-
-- Previously there was an example using [dht11](https://github.com/plorefice/dht11-rs) but I couls not get it to run.
-
-- Previously there were examples using [sx127x_lora](https://github.com/mr-glt/sx127x_lora) or forks
-which compiled but I could not get them to run.
+- the directory also has the core examples in the table above so they are included in the 
+expanded CI testing strategies.
 
 
-|    hal      | board   |                {{dht}}                      |                {{text_i2c}}                      |                {{oled_gps}}                      |                   {{lora_spi_send}}                          |                {{lora_spi_receive}}               |                {{lora_spi_gps}}                      |
-|:-----------:|:--------------------:|:-----:|:-----:|:--------:|:-----
-| {{stm32f0}} | {{b00}} |<img src="{{db00}}dht.png" {{p}} />          |<img src="{{db00}}text_i2c.png" {{p}} />          |<img src="{{db00}}oled_gps.png" {{p}} />          |<img src="{{db00}}lora_spi_send.png" {{p}} />          |<img src="{{db00}}lora_spi_receive.png" {{p}} />          |<img src="{{db00}}lora_spi_gps.png" {{p}} />          |
-| {{stm32f1}} | {{b01}} |<img src="{{db01}}dht.png" {{p}} /> {{runH}} |<img src="{{db01}}text_i2c.png" {{p}} /> {{runA}} |<img src="{{db01}}oled_gps.png" {{p}} />   no-3   |<img src="{{db01}}lora_spi_send.png" {{p}} /> {{runG}} |<img src="{{db01}}lora_spi_receive.png" {{p}} /> {{runG}} |<img src="{{db01}}lora_spi_gps.png" {{p}} /> {{runG}} |
-| {{stm32f3}} | {{b02}} |<img src="{{db02}}dht.png" {{p}} /> {{runH}} |<img src="{{db02}}text_i2c.png" {{p}} /> {{runB}} |<img src="{{db02}}oled_gps.png" {{p}} />{{runB}}-4|<img src="{{db02}}lora_spi_send.png" {{p}} />          |<img src="{{db02}}lora_spi_receive.png" {{p}} />          |<img src="{{db02}}lora_spi_gps.png" {{p}} />          |
-| {{stm32f4}} | {{b03}} |<img src="{{db03}}dht.png" {{p}} />          |<img src="{{db03}}text_i2c.png" {{p}} /> {{runB}} |<img src="{{db03}}oled_gps.png" {{p}} />          |<img src="{{db03}}lora_spi_send.png" {{p}} />          |<img src="{{db03}}lora_spi_receive.png" {{p}} />          |<img src="{{db03}}lora_spi_gps.png" {{p}} />          |
-| {{stm32f4}} | {{b04}} |<img src="{{db04}}dht.png" {{p}} /> {{runH}} |<img src="{{db04}}text_i2c.png" {{p}} /> {{runB}} |<img src="{{db04}}oled_gps.png" {{p}} /> {{runB}} |<img src="{{db04}}lora_spi_send.png" {{p}} /> {{runG}} |<img src="{{db04}}lora_spi_receive.png" {{p}} /> {{runG}} |<img src="{{db04}}lora_spi_gps.png" {{p}} /> {{runG}} |
-| {{stm32f4}} | {{b05}} |<img src="{{db05}}dht.png" {{p}} /> {{runH}} |<img src="{{db05}}text_i2c.png" {{p}} /> {{runB}} |<img src="{{db05}}oled_gps.png" {{p}} /> {{runB}} |<img src="{{db05}}lora_spi_send.png" {{p}} />          |<img src="{{db05}}lora_spi_receive.png" {{p}} />          |<img src="{{db05}}lora_spi_gps.png" {{p}} />          |
-| {{stm32f7}} | {{b06}} |<img src="{{db06}}dht.png" {{p}} />          |<img src="{{db06}}text_i2c.png" {{p}} />          |<img src="{{db06}}oled_gps.png" {{p}} />          |<img src="{{db06}}lora_spi_send.png" {{p}} />          |<img src="{{db06}}lora_spi_receive.png" {{p}} />          |<img src="{{db06}}lora_spi_gps.png" {{p}} />          |
-| {{stm32h7}} | {{b07}} |<img src="{{db07}}dht.png" {{p}} />          |<img src="{{db07}}text_i2c.png" {{p}} />          |<img src="{{db07}}oled_gps.png" {{p}} />          |<img src="{{db07}}lora_spi_send.png" {{p}} />          |<img src="{{db07}}lora_spi_receive.png" {{p}} />          |<img src="{{db07}}lora_spi_gps.png" {{p}} />          |
-| {{stm32l0}} | {{b08}} |<img src="{{db08}}dht.png" {{p}} />          |<img src="{{db08}}text_i2c.png" {{p}} />          |<img src="{{db08}}oled_gps.png" {{p}} />          |<img src="{{db08}}lora_spi_send.png" {{p}} />          |<img src="{{db08}}lora_spi_receive.png" {{p}} />          |<img src="{{db08}}lora_spi_gps.png" {{p}} />          |
-| {{stm32l1}} | {{b09}} |<img src="{{db09}}dht.png" {{p}} />          |<img src="{{db09}}text_i2c.png" {{p}} /> {{runC}} |<img src="{{db09}}oled_gps.png" {{p}} />   no-5   |<img src="{{db09}}lora_spi_send.png" {{p}} />          |<img src="{{db09}}lora_spi_receive.png" {{p}} />          |<img src="{{db09}}lora_spi_gps.png" {{p}} />          |
-| {{stm32l1}} | {{b10}} |<img src="{{db10}}dht.png" {{p}} /> {{runH}} |<img src="{{db10}}text_i2c.png" {{p}} /> {{runC}} |<img src="{{db10}}oled_gps.png" {{p}} />   no-5   |<img src="{{db10}}lora_spi_send.png" {{p}} />          |<img src="{{db10}}lora_spi_receive.png" {{p}} />          |<img src="{{db10}}lora_spi_gps.png" {{p}} />          |
-| {{stm32l4}} | {{b11}} |<img src="{{db11}}dht.png" {{p}} />          |<img src="{{db11}}text_i2c.png" {{p}} />          |<img src="{{db11}}oled_gps.png" {{p}} />          |<img src="{{db11}}lora_spi_send.png" {{p}} />          |<img src="{{db11}}lora_spi_receive.png" {{p}} />          |<img src="{{db11}}lora_spi_gps.png" {{p}} />          |
+### examples/driver-examples
+- many examples by Diego Barrios Romero [see](https://github.com/eldruin/driver-examples) where there are
+also links to blog posts describing the examples. Versions in `examples/driver-examples` have been 
+adjusted to run with various HAL crates. 
+I do not have hardware to test most of these examples so they  have not been run tested.
 
-1. panic. Timer not set right yet.
-2. stall/timeout reading sensor.
-3. compiling --release to fit flash.
-4. not very reliably. Better on 5v than 3v.
-5.  Fails reading gps (does not return). 
+### examples/radio-sx127x has
+- `lora_spi_send`, `lora_spi_receive` and `lora_spi_gps` use 
+crate [rust-radio-sx127x](https://github.com/rust-iot/rust-radio-sx127x).
+The crate uses `embedded-hal 1.0.0 alpha`. 
+It works with hal crates built with older embedded-hal by using a `compat()` shim to satisfy traits.
+These examples have been (occassionaly) run tested on hardware.
+
+### examples/rtic
+- many examples from [RTIC](https://rtic.rs). Not yet working in CI as they still require some manual editing
+to work with different HALs.
