@@ -1,4 +1,4 @@
-//! Echo console input back to console + semihost output, char by char
+//! Echo console input back to console +  rprintln output (previously used semihost hprintln), char by char
 //!
 //! Connect the Tx pin pa9  to the Rx pin of usb-ttl converter
 //! Connect the Rx pin pa10 to the Tx pin of usb-ttl converter
@@ -15,10 +15,12 @@ use panic_semihosting as _;
 #[cfg(not(debug_assertions))]
 use panic_halt as _;
 
+use rtt_target::{rprintln, rtt_init_print};
+
 use cortex_m_rt::entry;
 //use core::fmt::Write;  // for writeln, but not supported by stm32f3xx_hal
 use core::str::from_utf8;
-use cortex_m_semihosting::hprintln;
+//use cortex_m_semihosting::hprintln;
 use nb::block;
 
 //use embedded_hal::serial;
@@ -313,15 +315,20 @@ fn setup() -> (Tx<USART1>, Rx<USART1>) {
 
 #[entry]
 fn main() -> ! {
+    rtt_init_print!();
+    rprintln!("blink example");
+
     let (mut tx1, mut rx1) = setup();
 
-    hprintln!("test write to console ...").unwrap();
+    //hprintln!("test write to console ...").unwrap();
+    rprintln!("test write to console ...");
 
     for byte in b"\r\nconsole connect check.\r\n" {
         block!(tx1.write(*byte)).ok();
     }
 
-    hprintln!("test read and write by char. Please type into the console ...").unwrap();
+    //hprintln!("test read and write by char. Please type into the console ...").unwrap();
+    rprintln!("test read and write by char. Please type into the console ...");
     //writeln!(tx1, "\r\nPlease type (slowly) into the console below:\r\n").unwrap();
     for byte in b"\r\nType (slowly) below:\r\n" {
         block!(tx1.write(*byte)).ok();
@@ -331,6 +338,7 @@ fn main() -> ! {
         // Read a byte and write
         let received = block!(rx1.read()).unwrap();
         block!(tx1.write(received)).ok();
-        hprintln!("{}", from_utf8(&[received]).unwrap()).unwrap();
+        //hprintln!("{}", from_utf8(&[received]).unwrap()).unwrap();
+        rprintln!("{}", from_utf8(&[received]).unwrap());
     }
 }

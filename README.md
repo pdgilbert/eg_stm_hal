@@ -48,6 +48,7 @@ the main crates associated with `embedded-hal`. The second group of additional e
 - [Running Examples](#running-examples)
 - [Hardware Notes](#hardware-notes)
 - [Misc Notes on ST-Link and OpenOCD](#misc-notes-on-st-link-and-openocd)
+- [Embed and probe-rs notes](#embed-and-probe-rs)
 - [Misc Install Notes](#misc-install-notes)
 - [Links](#Links)
 - [License](#License)

@@ -34,8 +34,6 @@ use panic_halt as _;
 
 use cortex_m_rt::entry;
 
-use rtt_target::{rprintln, rtt_init_print};
-
 use embedded_hal::digital::v2::OutputPin;
 
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
@@ -372,9 +370,6 @@ pub trait LED {
 
 #[entry]
 fn main() -> ! {
-    rtt_init_print!();
-    rprintln!("blink example");
-
     let (mut led, mut delay) = setup();
 
     let on: u32 = 1000;
@@ -384,7 +379,6 @@ fn main() -> ! {
     loop {
         let _r = led.on();
         delay.delay_ms(on);
-        rprintln!("blink ");
         let _r = led.off();
         delay.delay_ms(off);
     }
