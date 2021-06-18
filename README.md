@@ -56,11 +56,12 @@ of the HAL is not always so obvious in a simple example. It will become more app
 ##  Overall Status
 As of June 2021 this repository is focusing on the core examples describe more below and at the
 [summary and status of examples](https://pdgilbert.github.io/eg_stm_hal/). 
-This link also has links to several additional examples being maintained elsewhere.
+There you will also find links to several additional examples being maintained elsewhere.
 
-While some examples are working with many HALs, the examples using dma are still work in progress.
+While some examples are working with many HALs, the examples using dma, echo_string and serial_string,
+are still work in progress.
 
-The descriptions below are primarily for newbies trying to setup and run simple examples.
+The description below is primarily for newbies trying to setup and run simple examples.
 
 Testing if the code runs and does something resembling what it is supposed to do 
 requires hardware and is not as automatic as CI. 

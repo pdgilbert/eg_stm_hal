@@ -1,6 +1,6 @@
 [package]
 name = "eg_stm_hal"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Paul Gilbert <pdgilbert@users.noreply.github.com>"]
 edition = "2018"
 repository = "https://github.com/pdgilbert/eg_stm_hal"
@@ -22,10 +22,6 @@ test = true
 [[example]]
 name = "blink"
 path = "examples/blink.rs"
-
-[[example]]
-name = "blink3"
-path = "examples/blink3.rs"
 
 [[example]]
 name = "echo_by_char"
@@ -55,7 +51,6 @@ path = "examples/temperature.rs"
 [dependencies]
 #cortex-m            = { version = ">=0.7.1", optional = true }
 cortex-m             = { version = ">=0.6.4" } # optional breaks blink for stm32f0xx
-#cortex-m            = { version = "=0.6.4"  } #as of March 2021 needed for stm32h742,  stm32l0x2, stm32l4x2 but others need >=0.7.0
 nb                   = { version = ">=0.1.2" }
 cortex-m-rt          = { version = ">=0.6.8" }
 panic-reset          = { version = ">=0.1.0" }
