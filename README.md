@@ -142,13 +142,13 @@ so, only USART1 is available. This means that examples using more than one USART
 
 ## Additional Examples
 
-Additional examples use crates other than the HAL and the main embedded crates. 
+Additional examples use crates in addition to the HAL and the main embedded crates. 
 There are now a fairly large number of these examples.
 They are [maintained at ](https://github.com/pdgilbert/rust-integration-testing) and 
 the [CI testing is at ](https://github.com/pdgilbert/rust-integration-testing/actions). The testing strategy
 is more extensive than above. Examples are tested using both released and git versions of the crates.
-A simple table as above is difficult to maintain, but the github workflow action report at 
-the above CI link is a good summary.
+A simple table as above is difficult to maintain, but the most recent (non-dependabot) github workflow report at 
+the above CI link is usually a good summary.
 
 Code for these are in subdirectories of the repository `examples/` directory.
 The main groupings are as follows. 
@@ -171,10 +171,10 @@ expanded CI testing strategies.
 
 
 ### examples/driver-examples
-- many examples by Diego Barrios Romero [see](https://github.com/eldruin/driver-examples) where there are
+- many examples on (Diego Barrios Romero repository](https://github.com/eldruin/driver-examples) where there are
 also links to blog posts describing the examples. Versions in `examples/driver-examples` have been 
 adjusted to run with various HAL crates. 
-I do not have hardware to test many of these examples so they have not all been run tested.
+I do not have hardware to test many of these examples so they have not been run tested.
 
 ### examples/radio-sx127x has
 - `lora_spi_send`, `lora_spi_receive` and `lora_spi_gps` use 
