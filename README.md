@@ -4,8 +4,7 @@
 ##  Links
 - [code repository](https://github.com/pdgilbert/eg_stm_hal) 
 - [main documentation](https://github.com/pdgilbert/eg_stm_hal#examples-using-embedded-rust)
-- [Travis CI](https://travis-ci.org/pdgilbert/eg_stm_hal)
-- [Github workflow CI](https://github.com/pdgilbert/eg_stm_hal/action)
+- [Github workflow CI](https://github.com/pdgilbert/eg_stm_hal/actions)
 - [Table of Core Examples Status](#table-of-core-examples-status)
 - [Additional Examples](#additional-examples)
 - [Additional Examples CI](https://github.com/pdgilbert/rust-integration-testing/actions)
@@ -23,13 +22,14 @@ hal, so cannot do the manual testing myself.
 In the table cells: 
 green check marks and red X marks indicate that the CI of the example builds or fails.
 `runs` is an indication that a manual test on actual hardware has been done and it works correctly or as noted, and 
-`no` means the manual test fails badly as noted. The CI testing is automatic and corresponds to the most recent
-example code, and using recent git versions of crates. Note however, if the build fails before checking
-examples, the old status marks will be left in place and they may not indicate the proper status. This can happen,
-for example, because a repository has disappeared or because of a lock conflict between parallel parts of the build.
-To check for that it is necessary to consult the [Travis CI](https://travis-ci.org/pdgilbert/eg_stm_hal).
-The manual tests are not automatic, and less current.
-When I remember to record it, 
+`no` means the manual test fails badly as noted. 
+
+As of June 2021 the Travis.org CI has stopped. The Github Workflow testing is working but the generation 
+of the table below has not been migrated from Travis. It is relatively accurate (as of June 2021) but for
+recent results see the [Github workflow CI.](https://github.com/pdgilbert/eg_stm_hal/actions)
+
+The CI testing is automatic and corresponds to the most recent example code, and using recent git versions of crates. 
+The manual tests are not automatic, and less current. When I remember to record it, 
 clicking on `runs` will go to the code repository history for the commit when a manual test was done.
 In addition to the example code at the time, the `Cargo.lock` file in the board directories gives an
 indication of the versions of dependencies.
