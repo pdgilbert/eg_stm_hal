@@ -171,7 +171,7 @@ expanded CI testing strategies.
 
 
 ### examples/driver-examples
-- many examples on (Diego Barrios Romero repository](https://github.com/eldruin/driver-examples) where there are
+- many examples on [Diego Barrios Romero repository](https://github.com/eldruin/driver-examples) where there are
 also links to blog posts describing the examples. Versions in `examples/driver-examples` have been 
 adjusted to run with various HAL crates. 
 I do not have hardware to test many of these examples so they have not been run tested.
