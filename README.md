@@ -4,14 +4,14 @@ See the [status of examples](https://pdgilbert.github.io/eg_stm_hal/) for a summ
 
 ## Preamble
 These are newbie notes. 
-This is my attempt to organize notes made while trying to figure out Rust/embedded.
+It is my attempt to organize notes made while trying to figure out Rust/embedded.
 CI is used to help keep track of what is working or not.
 The examples and notes are here in case they may be useful to others. 
 There is a lot of confusing out-of-date information
 on the web, so my hope is that the CI links will warn readers when this project 
 becomes old and broken.
 
-Rust seems to have many attractive features compared to more mature languages.
+Rust has many attractive features compared to more mature languages.
 It has a modern packaging system which encourages documentation and testing.
 The language elements are designed so the compiler can catch many errors.
 This is frustrating while learning the language but will be a substantial time saving
@@ -32,12 +32,10 @@ environments. Just the setup may change.)
 
 The code in the examples is organized so that the setup for different HALs and hardware is in the 
 first section and the generic application code follows. The hope is that this will make clear how
-to best take advantage of the generic aspect of `embedded-hal`. (The setup in many examples, 
-including these, tends to dominate the application code, so the advantage of the HAL is not
-always so obvious.) 
-These examples are divided into two groups. The first group of core examples uses only the MCU specific HAL crate and
-the main crates associated with `embedded-hal`. The second group of additional examples uses additional device driver crates.
-
+to best take advantage of the generic aspect of `embedded-hal`. (Since examples tend to be very simple
+applications, the setup in many examples tends to dominate the application code. This happens even
+more in examples here because of the setup for several different HALs. Because of this, the advantage 
+of the HAL is not always so obvious in a simple example. It will become more apparent in a large project.) 
 
 ##  Contents
 - [Overall Status](#overall-status)
@@ -56,20 +54,13 @@ the main crates associated with `embedded-hal`. The second group of additional e
 
 
 ##  Overall Status
- (Sept 2020) work in progress ...
+As of June 2021 this repository is focusing on the core examples describe more below and at the
+[summary and status of examples](https://pdgilbert.github.io/eg_stm_hal/). 
+This link also has links to several additional examples being maintained elsewhere.
 
-This project's overall Travis CI build status is 
-[![Build Status](https://api.travis-ci.org/pdgilbert/eg_stm_hal.svg?branch=master)](https://travis-ci.org/pdgilbert/eg_stm_hal).
-This will indicate `failing` if any examples fail on any boards, 
-so will usually indicate `failing` even if most examples work on most boards.
-The CI is set up to use recent git versions of dependencies, so this project CI failing can be a result of updates
-in dependencies. The upside of this is that if the examples are not failing then they are working with
-recent versions of dependencies, 
-unlike many examples from the web that I have worked through in my own learning process.
+While some examples are working with many HALs, the examples using dma are still work in progress.
 
-For the individual boards described below 
-[details of the build and failures](https://travis-ci.org/pdgilbert/eg_stm_hal) can be
-seen at Travis CI.
+The descriptions below are primarily for newbies trying to setup and run simple examples.
 
 Testing if the code runs and does something resembling what it is supposed to do 
 requires hardware and is not as automatic as CI. 
@@ -77,27 +68,13 @@ If you check the examples using MCUs other than those listed below then please p
 using [issues](https://github.com/pdgilbert/eg_stm_hal/issues) for this git project.
 
 This project's examples depend on [embedded_hal](https://docs.rs/embedded-hal/) and several stm32 HALs. 
-See [stm32 HALs on Github](https://github.com/stm32-rs) and on [Travis CI.](https://travis-ci.com/stm32-rs)
-
-|   HAL git                         |       HAL Travis CI  Status           | 
-|:---------------------------------:|:-------------------------------------:|
-| [stm32f0xx-hal](https://github.com/stm32-rs/stm32f0xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32f0xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32f0xx-hal) |
-| [stm32f1xx-hal](https://github.com/stm32-rs/stm32f1xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32f1xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32f1xx-hal) |
-| [stm32f3xx-hal](https://github.com/stm32-rs/stm32f3xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32f3xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32f3xx-hal) |
-| [stm32f4xx-hal](https://github.com/stm32-rs/stm32f4xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32f4xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32f4xx-hal) |
-| [stm32f7xx-hal](https://github.com/stm32-rs/stm32f7xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32f7xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32f7xx-hal) |
-| [stm32g0xx-hal](https://github.com/stm32-rs/stm32g0xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32g0xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32g0xx-hal) |
-| [stm32g4xx-hal](https://github.com/stm32-rs/stm32g4xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32g4xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32g4xx-hal) |
-| [stm32h7xx-hal](https://github.com/stm32-rs/stm32h7xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32h7xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32h7xx-hal) |
-| [stm32l0xx-hal](https://github.com/stm32-rs/stm32l0xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32l0xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32l0xx-hal) |
-| [stm32l1xx-hal](https://github.com/stm32-rs/stm32l1xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32l1xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32l1xx-hal) |
-| [stm32l4xx-hal](https://github.com/stm32-rs/stm32l4xx-hal) | [![Build Status](https://travis-ci.com/stm32-rs/stm32l4xx-hal.svg?branch=master)](https://travis-ci.com/stm32-rs/stm32l4xx-hal) |
-
+See [stm32 HALs on Github](https://github.com/stm32-rs).
 
 ## Summary of Examples
 
-These examples are derived after working through many other examples, in particular the examples
+These examples are derived after working through many other examples, starting with examples
 in [stm32f1xx-hal.](https://github.com/stm32-rs/stm32f1xx-hal)
+The current status of examples is [summarized automatically by the CI.](https://pdgilbert.github.io/eg_stm_hal/#status-of-examples)
 
 There is more detail in comments in the example source files, see the 
 [example directory](https://github.com/pdgilbert/eg_stm_hal/tree/master/examples).
@@ -109,8 +86,6 @@ See [Running Examples](#running-examples) for more details.
 | xxx                  | notes |   Description                                                  |
 | -------------------- |:-----:|:-------------------------------------------------------------- |
 | blink                |   1   | Blink on-board LED                                             |
-| blink_impl           |   1   | Blink on-board LED. setup() uses impl traits.                  |
-| blink3               |   1   | Blink off-board LEDs attached to  pb 13,14,15                  |
 | echo_by_char         |   2   | Echo console input, char by char,  + semihost output           |
 | echo_string          |       | Read 15 chars input from console, output to semihost, repeat   |
 | serial_char          |       | Single char between usarts 2 and 3, console and semihost output|
@@ -119,7 +94,7 @@ See [Running Examples](#running-examples) for more details.
 | temperature          |       | Read temperature of MCU and external TMP35 * semihost output   |
 
 
-0.  Using the git versions of HALs (in July 2020 much is changing and release in crates.io is old). 
+0.  Using the git versions of HALs (much is changing and release in crates.io is old). 
 1.  Does not blink when stepping in gdb, use continue.
 2.  With local echo on in console the characters are doubled, `<cr>` adds a single `<lf>`.
      Without local echo there is no `<lf>`. There is trouble if you type too fast.
@@ -128,24 +103,12 @@ See [Running Examples](#running-examples) for more details.
       completely eliminating the development board. 
       (If the dongle power is used. 5v if preferred on mine.)
 
-The current status of examples is [summarized automatically by the CI.](https://pdgilbert.github.io/eg_stm_hal/#status-of-examples)
 
 ## Additional Examples
 
-These are examples use an additional device crates. 
-They are now [maintained with many others at ](https://github.com/pdgilbert/rust-integration-testing/)
-
-| xxx              |    crate          | notes |   Description                                              |
-| ---------------- |:-----------------:|:-----:|:---------------------------------------------------------- |
-| dht              | dht               |       | read a dht11 sensor and write to semihost                  |
-| text_i2c         | ssd1306           |       | write 2 text lines on ssd1306 OLED                         |
-| oled_gps         | ssd1306           |       | read gps and write coordinates on ssd1306 OLED             |
-| lora_spi_send    | rust-radio-sx127x |       | transmit a character string over LoRa,  + semihost output  |
-| lora_spi_receive | rust-radio-sx127x |       | receive  a character string over LoRa,  + semihost output  |
-| lora_spi_gps     | rust-radio-sx127x |       | read gps and transmit over LoRa,  + semihost output        |
-| ads1015_oled     | ads1015, ssd1306  |       | read ADC on i2c and write on ssd1306 OLED                  |
-
-The current status of these examples is [here.](https://github.com/pdgilbert/rust-integration-testing/actions)
+Additional examples are now maintained with many others 
+in [repository rust-integration-testing.](https://github.com/pdgilbert/rust-integration-testing/)
+See that repository for more details. It uses a setup somewhat similar to the one here.
 
 
 ##  This Package Setup
