@@ -20,11 +20,6 @@ path = "../../src/lib.rs"
 test = true
 
 [[example]]
-name = "test"
-path = "examples/test.rs"
-#required-features = ["rt"]
-
-[[example]]
 name = "blink"
 path = "examples/blink.rs"
 
@@ -56,39 +51,6 @@ path = "examples/gps_rw.rs"
 name = "temperature"
 path = "examples/temperature.rs"
 
-[[example]]
-name = "dht"
-path = "examples/dht.rs"
-
-[[example]]
-name = "text_i2c"
-path = "examples/text_i2c.rs"
-
-#[[example]]
-#name = "ads1015-display"
-#path = "examples/ads1015-display.rs"
-
-[[example]]
-name = "lora_spi_send"
-path = "examples/lora_spi_send.rs"
-
-[[example]]
-name = "lora_spi_receive"
-path = "examples/lora_spi_receive.rs"
-
-[[example]]
-name = "lora_spi_gps"
-path = "examples/lora_spi_gps.rs"
-
-[[example]]
-name = "ads1015_oled"
-path = "examples/ads1015_oled.rs"
-
-
-#[[example]]
-#name = "digi_pot"
-#path = "examples/digi_pot.rs"
-
 
 [dependencies]
 #cortex-m            = { version = ">=0.7.1", optional = true }
@@ -99,43 +61,9 @@ cortex-m-rt          = { version = ">=0.6.8" }
 panic-reset          = { version = ">=0.1.0" }
 panic-halt           = { version = ">=0.2.0" }
 
-
 rtt-target = { version =  "0.2.2", features = ["cortex-m"] }
 
-# for example  ads1015-display
-ads1x1x =  { version = "0.2.1"}
-# this causes problem with stm32l0xx_hal:  
-shared-bus = { version = "0.1.4", features = ["cortexm"] }
-#dht11 = "0.3.1"
-#dht-sensor = "0.1.1"
-
-# for example digi_pot
-# mcp4x = "0.1"
-f3 = { version = ">=0.6.1", optional = true }
-
-embedded-spi = { version = "0.6", default-features = false }
-
 embedded-hal = { version = "0.2.4" }
-
-# for  lora_spi_*
-#this is commit prior to merging "update-everything" into master, which changed from e-h 0.2.4 to 1.0.0alpha
-radio-sx127x  = { git ="https://github.com/rust-iot/rust-radio-sx127x", default-features = false, rev = "2285c1ca9f527ab464a27f6a43af3b0a93130d2f" }
-# see branches e-h-1.0.0-alpha.4 or e-h-1.0.0alpha-compat to use newer versions
-
-radio         = { version = "0.7.0" }
-driver-pal    = { version = "0.8.0-alpha.0", default-features = false }
-
-# for  text_i2c which uses ssd1306, ads1015-oled example.    need rust 1.40.0 for #[non_exhaustive]
-#ssd1306   = { version = ">=0.5.2"}
-ssd1306   = { git = "https://github.com/jamwaffles/ssd1306"  }  #version = "0.3.1" # "0.2.6" "0.3.1" 
-embedded-graphics   = { version = ">=0.6.0" }                   #version = ">=0.6.0" #  "0.4.4" # "0.4.9"  "0.6.2" 
-
-dht-sensor   = { version =  "^0.2.1" }
-#git = "https://github.com/michaelbeaumont/dht-sensor", branch = "main", rev = "bcbcf8146f98b15b62dba4f5e2ce9f74a243e6d9"
-
-# for example digi_pot
-mcp4x   = { git = "https://github.com/eldruin/mcp4x-rs" }
-# version = "0.1",  optional = true
 
 stm32f0xx-hal = { git = "https://github.com/stm32-rs/stm32f0xx-hal", optional = true }
 stm32f1xx-hal = { git = "https://github.com/stm32-rs/stm32f1xx-hal", optional = true }
@@ -183,10 +111,6 @@ stm32l4x1 = ["stm32l4xx-hal/stm32l4x1", "stm32l4xx-hal/rt"]
 stm32l4x2 = ["stm32l4xx-hal/stm32l4x2", "stm32l4xx-hal/rt"]
 stm32l4x6 = ["stm32l4xx-hal/stm32l4x6", "stm32l4xx-hal/rt"]
 
-
-# features passed through to dht example
-dht11 = []
-dht22 = []
 
 [dev-dependencies]
 cortex-m-semihosting = { version = ">=0.3.3" }
